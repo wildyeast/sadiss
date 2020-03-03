@@ -1,7 +1,7 @@
 # wasm-fm-synth
 
 wasm-fm-synth will be a browser synthesizer/sequencer. The sound engine is
-taken from [here]: https://rustwasm.github.io/docs/wasm-bindgen/examples/web-audio.html
+taken from https://rustwasm.github.io/docs/wasm-bindgen/examples/web-audio.html
 
 
 ```
