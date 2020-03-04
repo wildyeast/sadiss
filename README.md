@@ -3,7 +3,7 @@
 wasm-fm-synth will be a browser synthesizer/sequencer. The sound engine is
 taken from https://rustwasm.github.io/docs/wasm-bindgen/examples/web-audio.html
 
-To compile this, [Rust](https://www.rust-lang.org/tools/install) and [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/)
+To build this, [Rust](https://www.rust-lang.org/tools/install) and [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/) have to be installed.
 
 ```
 $ npm install
