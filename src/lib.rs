@@ -103,7 +103,7 @@ impl FmOsc {
     }
 
     #[wasm_bindgen]
-    pub fn set_primary_frequency(&self, freq: f32) {
+    pub fn set_freq(&self, freq: f32) {
         self.primary.frequency().set_value(freq);
 
         // The frequency of the FM oscillator depends on the frequency of the
@@ -115,12 +115,12 @@ impl FmOsc {
     #[wasm_bindgen]
     pub fn set_note(&self, note: u8) {
         let freq = midi_to_freq(note);
-        self.set_primary_frequency(freq);
+        self.set_freq(freq);
     }
 
     /// This should be between 0 and 1, though higher values are accepted.
     #[wasm_bindgen]
-    pub fn set_fm_amount(&mut self, amt: f32) {
+    pub fn set_amount(&mut self, amt: f32) {
         self.fm_gain_ratio = amt;
 
         self.fm_gain
@@ -130,7 +130,7 @@ impl FmOsc {
 
     /// This should be between 0 and 1, though higher values are accepted.
     #[wasm_bindgen]
-    pub fn set_fm_frequency(&mut self, amt: f32) {
+    pub fn set_mod(&mut self, amt: f32) {
         self.fm_freq_ratio = amt;
         self.fm_osc
             .frequency()

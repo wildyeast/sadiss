@@ -4,21 +4,20 @@
     Modulation frequency: <input type="range" :min="faderValues.mod.min" :max="faderValues.mod.max" :step="faderValues.mod.step" style="width: 400px" v-model="mod" /><br>
     Modulation amount: <input type="range" :min="faderValues.amount.min" :max="faderValues.amount.max" :step="faderValues.amount.step" style="width: 400px" v-model="amount" /><br>
     Gain: <input type="range" step="0.05" :min="faderValues.gain.min" :max="faderValues.gain.max" :step="faderValues.gain.step" style="width: 400px" v-model="gain" /><br>
-    LFO waveform: <select><option>square</option></select><br>
-    LFO target: <select v-model="lfo.target"><option v-for="key of Object.keys(operationsDict)" :value="key">{{ key }}</option></select><br>
-    LFO rate: <input type="range" min="0" max="1000" style="width: 400px" v-model="lfo.rate" /> {{ lfo.rate }}<br>
-    LFO depth: <input type="range" min="0" max="1" step="0.05"  style="width: 400px" v-model="lfo.depth" /> {{ lfo.depth }}<br>
-    <button @click="startLfo">Start Lfo</button><br>
+    <Lfo :key="lfo.id" v-for="lfo of lfos" :lfo="lfo" />
+    <button @click="addLfo">add lfo</button></br>
   </div>
 </template>
 <script>
 /* global getOscillator */
-
-
+import Lfo from './components/Lfo.vue'
+import { operations } from './constants'
 export default {
   name: 'App',
+  components: { Lfo },
   data: () => ({
     osc: null,
+    operations,
     freq: 0,
     freqOffset: 0,
     mod: 0,
@@ -27,17 +26,7 @@ export default {
     amountOffset: 0,
     gain: 0,
     gainOffset: 0,
-    lfo: {
-      depth: 0,
-      rate: 0,
-      target: 'freq'
-    },
-    operationsDict: {
-      freq: 'set_primary_frequency',
-      mod: 'set_fm_frequency',
-      amount: 'set_fm_amount',
-      gain: 'set_gain'
-    },
+    lfos: [],
     faderValues: {
       freq: {
         init: 50,
@@ -67,16 +56,16 @@ export default {
   }),
   watch: {
     freq: function (to) {
-      this.callOsc('set_primary_frequency', Number(to), this.freqOffset)
+      this.setOscValue('freq', Number(to))
     },
     mod: function (to) {
-      this.callOsc('set_fm_frequency', Number(to), this.modOffset)
+      this.setOscValue('mod', Number(to))
     },
     amount: function (to) {
-      this.callOsc('set_fm_amount', Number(to), this.amountOffset)
+      this.setOscValue('amount', Number(to))
     },
     gain: function (to) {
-      this.callOsc('set_gain', Number(to), this.gainOffset)
+      this.setOscValue('gain', Number(to))
     }
   },
   async mounted () {
@@ -88,23 +77,33 @@ export default {
   },
   methods: {
     // Call wasm oscillator function
-    callOsc (f, newValue, offset) {
-      this.osc[f](Number(newValue) + Number(offset))
+    setOscValue (key, value) {
+      this.osc[`set_${key}`](Number(value) + Number(this[`${key}Offset`]))
+    },
+    addToOffset (key, value) {
+      this[`${key}Offset`] += value 
+      this.setOscValue(key, this[key])
     },
     async sleep (ms) {
       // TODO Move timing mechanism to Wasm for more accuracy
       await new Promise(resolve => setTimeout(resolve, ms))
     },
-    async startLfo () {
+    addLfo () {
+      this.lfos.push({
+        id: this.lfos.length,
+        depth: 0,
+        rate: 0,
+        target: 'freq',
+        run: this.runLfo
+      })
+    },
+    async runLfo (lfo) {
       let direction = -1
       while(true) {
-        let depth = (this.faderValues[this.lfo.target].max - this.faderValues[this.lfo.target].min) * this.lfo.depth
-        this.callOsc(
-          this.operationsDict[this.lfo.target], // property
-          this[this.lfo.target],// newValue
-          this[`${this.lfo.target}Offset`] + (depth * direction)) // offset
-        direction *= -1
-        await this.sleep(this.lfo.rate)
+        let depth = (this.faderValues[lfo.target].max - this.faderValues[lfo.target].min) * lfo.depth
+        this.addToOffset(lfo.target, (depth * direction)) // offset
+        direction = direction * -1
+        await this.sleep(lfo.rate)
       }
     },
     // Start oscillator
