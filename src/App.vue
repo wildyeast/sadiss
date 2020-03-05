@@ -1,19 +1,51 @@
 <template>
   <div>
-    Primary frequency: <input type="range" :min="faderValues.freq.min" :max="faderValues.freq.max" :step="faderValues.freq.step" style="width: 400px" v-model="freq" /><br>
-    Modulation frequency: <input type="range" :min="faderValues.mod.min" :max="faderValues.mod.max" :step="faderValues.mod.step" style="width: 400px" v-model="mod" /><br>
-    Modulation amount: <input type="range" :min="faderValues.amount.min" :max="faderValues.amount.max" :step="faderValues.amount.step" style="width: 400px" v-model="amount" /><br>
-    Gain: <input type="range" step="0.05" :min="faderValues.gain.min" :max="faderValues.gain.max" :step="faderValues.gain.step" style="width: 400px" v-model="gain" /><br>
-    <Lfo :key="lfo.id" v-for="lfo of lfos" :lfo="lfo" />
-    <button @click="addLfo">add lfo</button></br>
+    Primary frequency: <input
+      v-model="freq"
+      type="range"
+      :min="faderValues.freq.min"
+      :max="faderValues.freq.max"
+      :step="faderValues.freq.step"
+      style="width: 400px"
+    ><br>
+    Modulation frequency: <input
+      v-model="mod"
+      type="range"
+      :min="faderValues.mod.min"
+      :max="faderValues.mod.max"
+      :step="faderValues.mod.step"
+      style="width: 400px"
+    ><br>
+    Modulation amount: <input
+      v-model="amount"
+      type="range"
+      :min="faderValues.amount.min"
+      :max="faderValues.amount.max"
+      :step="faderValues.amount.step"
+      style="width: 400px"
+    ><br>
+    Gain: <input
+      v-model="gain"
+      type="range"
+      :min="faderValues.gain.min"
+      :max="faderValues.gain.max"
+      :step="faderValues.gain.step"
+      style="width: 400px"
+    ><br>
+    <Lfo
+      v-for="lfo of lfos"
+      :key="lfo.id"
+      :lfo="lfo"
+    />
+    <button @click="addLfo">
+      add lfo
+    </button><br>
   </div>
 </template>
 <script>
 /* global getOscillator */
 import Lfo from './components/Lfo.vue'
 import { operations } from './constants'
-
-
 
 export default {
   name: 'App',
@@ -84,7 +116,7 @@ export default {
       this.osc[`set_${key}`](Number(value) + Number(this[`${key}Offset`]))
     },
     addToOffset (key, value) {
-      this[`${key}Offset`] += value 
+      this[`${key}Offset`] += value
       this.setOscValue(key, this[key])
     },
     async sleep (ms) {
@@ -102,8 +134,8 @@ export default {
     },
     async runLfo (lfo) {
       let direction = -1
-      while(true) {
-        let depth = (this.faderValues[lfo.target].max - this.faderValues[lfo.target].min) * lfo.depth
+      while (true) {
+        const depth = (this.faderValues[lfo.target].max - this.faderValues[lfo.target].min) * lfo.depth
         this.addToOffset(lfo.target, (depth * direction)) // offset
         direction = direction * -1
         await this.sleep(lfo.rate)
