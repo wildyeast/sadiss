@@ -2,7 +2,7 @@
   "scripts": {
     "build": "webpack",
     "serve": "webpack-dev-server",
-    "lint": "./node_modules/eslint/bin/eslint.js ."
+    "lint": "./node_modules/eslint/bin/eslint.js --ext .js,.vue src"
   },
   "devDependencies": {
     "@babel/core": "^7.8.7",

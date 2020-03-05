@@ -12,6 +12,9 @@
 /* global getOscillator */
 import Lfo from './components/Lfo.vue'
 import { operations } from './constants'
+
+
+
 export default {
   name: 'App',
   components: { Lfo },
