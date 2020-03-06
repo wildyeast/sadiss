@@ -1,6 +1,9 @@
 <template>
   <!-- oscillator[key].currentValue represents the oscillator parameter that is currently affecting thes sound -->
   <div>
+    
+    <SliderWithIndicator />
+
     Primary frequency: <input
       v-model="oscillator.freq.value"
       @input="$emit('change', 'freq')"
@@ -40,8 +43,12 @@
   </div>
 </template>
 <script>
+import Vue from 'vue'
+import SliderWithIndicator from 'vue-slider-with-indicator'
+
 export default {
   name: 'Oscillator',
+  components: { SliderWithIndicator },
   props: {
     oscillator: {
       type: Object,
