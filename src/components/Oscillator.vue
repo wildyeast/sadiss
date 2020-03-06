@@ -6,6 +6,7 @@
       v-model="oscillator.freq.value"
       @input="$emit('change', 'freq')"
       :sliderValue="+oscillator.freq.value"
+      :indicatorValue="+oscillator.freq.value + oscillator.freq.offset"
       :options="optionsPrimFreq"
     /><br>
     Modulation frequency: <input
