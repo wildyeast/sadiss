@@ -45,7 +45,7 @@ export default {
         console.error('Invalid oscillator input! key:', key, 'value:', value, 'offset:', offset, 'final:', finalValue)
       }
       this.osc[`set_${key}`](finalValue)
-      oscillator.currentValue = finalValue
+      oscillator[key].currentValue = finalValue
     },
     addToOffset (key, value) {
     //  this.modules.oscillators[0][key].offset += value

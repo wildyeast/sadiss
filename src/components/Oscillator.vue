@@ -1,5 +1,5 @@
 <template>
-  <!-- oscillator.currentValue represents the oscillator parameter that is currently affecting thes sound -->
+  <!-- oscillator[key].currentValue represents the oscillator parameter that is currently affecting thes sound -->
   <div>
     Primary frequency: <input
       v-model="oscillator.freq.value"
