@@ -29,6 +29,6 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.8.7",
-    "vue-slider-with-indicator": "^1.0.2"
+    "vue-slider-with-indicator": "^1.0.5"
   }
 }
