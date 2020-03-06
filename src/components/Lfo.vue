@@ -42,6 +42,11 @@ export default {
   }),
   mounted () {
     this.lfo.run(this.lfo)
+  },
+  computed: {
+    targets () {
+      
+    }
   }
 }
 </script>

@@ -1,35 +1,35 @@
 <template>
   <div>
     Primary frequency: <input
-      v-model="freq"
+      v-model="modules.osc1.freq.value"
       type="range"
-      :min="faderValues.freq.min"
-      :max="faderValues.freq.max"
-      :step="faderValues.freq.step"
+      :min="modules.osc1.freq.min"
+      :max="modules.osc1.freq.max"
+      :step="modules.osc1.freq.step"
       style="width: 400px"
     ><br>
     Modulation frequency: <input
-      v-model="mod"
+      v-model="modules.osc1.mod.value"
       type="range"
-      :min="faderValues.mod.min"
-      :max="faderValues.mod.max"
-      :step="faderValues.mod.step"
+      :min="modules.osc1.mod.min"
+      :max="modules.osc1.mod.max"
+      :step="modules.osc1.mod.step"
       style="width: 400px"
     ><br>
     Modulation amount: <input
-      v-model="amount"
+      v-model="modules.osc1.amount.value"
       type="range"
-      :min="faderValues.amount.min"
-      :max="faderValues.amount.max"
-      :step="faderValues.amount.step"
+      :min="modules.osc1.amount.min"
+      :max="modules.osc1.amount.max"
+      :step="modules.osc1.amount.step"
       style="width: 400px"
     ><br>
     Gain: <input
-      v-model="gain"
+      v-model="modules.osc1.gain.value"
       type="range"
-      :min="faderValues.gain.min"
-      :max="faderValues.gain.max"
-      :step="faderValues.gain.step"
+      :min="modules.osc1.gain.min"
+      :max="modules.osc1.gain.max"
+      :step="modules.osc1.gain.step"
       style="width: 400px"
     ><br>
     <Lfo
@@ -45,62 +45,62 @@
 <script>
 /* global getOscillator */
 import Lfo from './components/Lfo.vue'
-import { operations } from './constants'
 
 export default {
   name: 'App',
   components: { Lfo },
   data: () => ({
     osc: null,
-    operations,
-    freq: 0,
-    freqOffset: 0,
-    mod: 0,
-    modOffset: 0,
-    amount: 0,
-    amountOffset: 0,
-    gain: 0,
-    gainOffset: 0,
-    lfos: [],
-    faderValues: {
-      freq: {
-        init: 50,
-        min: 55,
-        max: 880,
-        step: 1
-      },
-      mod: {
-        init: 0,
-        min: 0,
-        max: 3,
-        step: 0.01
-      },
-      amount: {
-        init: 0,
-        min: 0,
-        max: 3,
-        step: 0.01
-      },
-      gain: {
-        init: 0.8,
-        min: 0,
-        max: 1,
-        step: 0.05
+    modules: {
+      osc1: {
+        freq: {
+          value: 0,
+          offset: 0,
+          init: 50,
+          min: 55,
+          max: 880,
+          step: 1
+        },
+        mod: {
+          value: 0,
+          offset: 0,
+          init: 0,
+          min: 0,
+          max: 3,
+          step: 0.01
+        },
+        amount: {
+          value: 0,
+          offset: 0,
+          init: 0,
+          min: 0,
+          max: 3,
+          step: 0.01
+        },
+        gain: {
+          value: 0,
+          offset: 0,
+          init: 0.8,
+          min: 0,
+          max: 1,
+          step: 0.05
+        }
       }
-    }
+    },
+    lfos: [],
   }),
   watch: {
-    freq: function (to) {
-      this.setOscValue('freq', Number(to))
+    'modules.osc1.freq.value': function (to) {
+      this.setOsc1Value('freq', Number(to))
     },
-    mod: function (to) {
-      this.setOscValue('mod', Number(to))
+    'modules.osc1.mod.value': function (to) {
+      this.setOsc1Value('mod', Number(to))
     },
-    amount: function (to) {
-      this.setOscValue('amount', Number(to))
+    'modules.osc1.amount.value': function (to) {
+      this.setOsc1Value('amount', Number(to))
     },
-    gain: function (to) {
-      this.setOscValue('gain', Number(to))
+    'modules.osc1.gain.value': function (to) {
+      this.setOsc1Value('gain', Number(to))
     }
   },
   async mounted () {
@@ -112,15 +112,20 @@ export default {
   },
   methods: {
     // Call wasm oscillator function
-    setOscValue (key, value) {
-      this.osc[`set_${key}`](Number(value) + Number(this[`${key}Offset`]))
+    setOsc1Value (key, value) {
+      const offset = Number(this.modules.osc1[key].offset)
+      const finalValue = Number(value) + offset
+      if (isNaN(finalValue)) {
+        console.error('Invalid oscillator input! key:', key, 'value:', value, 'offset:', offset, 'final:', finalValue)
+      }
+      this.osc[`set_${key}`](finalValue)
     },
     addToOffset (key, value) {
-      this[`${key}Offset`] += value
-      this.setOscValue(key, this[key])
+      this.modules.osc1[key].offset += value
+      this.setOsc1Value(key, this.modules.osc1[key].value)
     },
     async sleep (ms) {
-      // TODO Move timing mechanism to Wasm for more accuracy
+      // TODO Move timing mechanism to Rust for more accuracy
       await new Promise(resolve => setTimeout(resolve, ms))
     },
     addLfo () {
@@ -135,7 +140,7 @@ export default {
     async runLfo (lfo) {
       let direction = -1
       while (true) {
-        const depth = (this.faderValues[lfo.target].max - this.faderValues[lfo.target].min) * lfo.depth
+        const depth = (this.modules.osc1[lfo.target].max - this.modules.osc1[lfo.target].min) * lfo.depth
         this.addToOffset(lfo.target, (depth * direction)) // offset
         direction = direction * -1
         await this.sleep(lfo.rate)
@@ -144,8 +149,8 @@ export default {
     // Start oscillator
     init () {
       this.osc = getOscillator()
-      for (const key of Object.keys(this.faderValues)) {
-        this[key] = this.faderValues[key].init
+      for (const key of Object.keys(this.modules.osc1)) {
+        this.modules.osc1[key].value = this.modules.osc1[key].init
       }
     }
   }
