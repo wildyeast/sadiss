@@ -3,11 +3,10 @@
     LFO waveform: <select><option>square</option></select><br>
     LFO target: <select v-model="lfo.target">
       <option
-        v-for="operation of operations"
-        :key="operation"
-        :value="operation"
+        v-for="target of targets"
+        :value="target"
       >
-        {{ operation }}
+        {{ target.name }}
       </option>
     </select><br>
     LFO rate: <input
@@ -28,7 +27,7 @@
   </div>
 </template>
 <script>
-import { operations } from '../constants'
+import { modules } from '../constants'
 export default {
   name: 'Lfo',
   props: {
@@ -37,15 +36,26 @@ export default {
       required: true
     }
   },
-  data: () => ({
-    operations
-  }),
   mounted () {
-    this.lfo.run(this.lfo)
+    this.lfo.target = this.targets[0]
+    this.$nextTick(() => {
+      this.lfo.run(this.lfo)
+    })
   },
   computed: {
     targets () {
-      
+      const targets = []
+      for (const oscillator of modules.oscillators) {
+        for (const key of Object.keys(oscillator)) {
+          if (key === 'id') continue
+          const target = { ...oscillator[key] }
+          target.name = `osc${oscillator.id}${key}`
+          target.key = key
+          target.oscillator = oscillator
+          targets.push(target)
+        }
+      }
+      return targets
     }
   }
 }
