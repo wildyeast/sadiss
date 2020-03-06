@@ -10,20 +10,20 @@
       </option>
     </select><br>
     LFO rate: <input
-      v-model="lfo.rate"
+      v-model="lfo.rate.value"
       type="range"
       min="0"
       max="1000"
       style="width: 400px"
-    > {{ lfo.rate }}<br>
+    > {{ lfo.rate.value }}<br>
     LFO depth: <input
-      v-model="lfo.depth"
+      v-model="lfo.depth.value"
       type="range"
       min="0"
       max="1"
       step="0.05"
       style="width: 400px"
-    > {{ lfo.depth }}<br>
+    > {{ lfo.depth.value }}<br>
   </div>
 </template>
 <script>
@@ -36,15 +36,10 @@ export default {
       required: true
     }
   },
-  mounted () {
-    this.lfo.target = this.targets[0]
-    this.$nextTick(() => {
-      this.lfo.run(this.lfo)
-    })
-  },
   computed: {
     targets () {
       const targets = []
+      // Add oscillator targets
       for (const oscillator of modules.oscillators) {
         for (const key of Object.keys(oscillator)) {
           if (key === 'id') continue
@@ -55,8 +50,25 @@ export default {
           targets.push(target)
         }
       }
+      // Add LFO targets
+      for (const lfo of modules.lfos) {
+        if (lfo === this.lfo) continue
+        for (const key of ['depth', 'rate']) {
+          if (['id', 'run'].includes(key)) continue
+          const target = lfo[key]
+          target.name = `lfo${lfo.id}${key}`
+          target.key = key
+          targets.push(target)
+        }
+      }
       return targets
     }
+  },
+  mounted () {
+    this.lfo.target = this.targets[0]
+    this.$nextTick(() => {
+      this.lfo.run(this.lfo)
+    })
   }
 }
 </script>

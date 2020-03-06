@@ -11,7 +11,9 @@
       :key="`lfo${lfo.id}`"
       :lfo="lfo"
     />
-    <button @click="addLfo">add lfo</button>
+    <button @click="addLfo">
+      add lfo
+    </button>
   </div>
 </template>
 <script>
@@ -46,10 +48,6 @@ export default {
       this.osc[`set_${key}`](finalValue)
       oscillator[key].currentValue = finalValue
     },
-    addToOffset (key, value) {
-    //  this.modules.oscillators[0][key].offset += value
-      // this.setOsc1Value(key)
-    },
     async sleep (ms) {
       // TODO Move timing mechanism to Rust for more accuracy
       await new Promise(resolve => setTimeout(resolve, ms))
@@ -57,20 +55,38 @@ export default {
     addLfo () {
       modules.lfos.push({
         id: modules.lfos.length,
-        depth: 0,
-        rate: 0,
+        rate: {
+          value: 0,
+          offset: 0,
+          min: 0,
+          max: 1000,
+          step: 1
+        },
+        depth: {
+          value: 0,
+          offset: 0,
+          min: 0,
+          max: 1,
+          step: 0.1
+        },
         run: this.runLfo
       })
     },
     async runLfo (lfo) {
       let direction = -1
       while (true) {
-        const depth = (lfo.target.max - lfo.target.min) * lfo.depth
-        this.addToOffset(lfo.target, (depth * direction)) // offset
+        const depth = (lfo.target.max - lfo.target.min) * lfo.depth.value
         lfo.target.offset += depth * direction
-        this.callOscillator(lfo.target.oscillator, lfo.target.key)
+        if (lfo.target.oscillator) {
+          this.callOscillator(lfo.target.oscillator, lfo.target.key)
+        } else {
+          let value = Number(lfo.target.value) + Number(lfo.target.offset)
+          if (value < lfo.target.min) value = lfo.target.min
+          if (value > lfo.target.max) value = lfo.target.max
+          lfo.target.value = value
+        }
         direction = direction * -1
-        await this.sleep(lfo.rate)
+        await this.sleep(lfo.rate.value)
       }
     },
     init () {
