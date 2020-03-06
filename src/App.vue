@@ -37,7 +37,7 @@ export default {
   methods: {
     // Call wasm oscillator function
     callOscillator (oscillator, key) {
-      console.log(oscillator, key)
+      // console.log(oscillator, key)
       const value = Number(oscillator[key].value)
       const offset = Number(oscillator[key].offset)
       const finalValue = Number(value) + offset
