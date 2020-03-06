@@ -2,17 +2,12 @@
   <!-- oscillator[key].currentValue represents the oscillator parameter that is currently affecting thes sound -->
   <div>
     
-    <SliderWithIndicator />
-
-    Primary frequency: <input
+    Primary frequency: <SliderWithIndicator
       v-model="oscillator.freq.value"
       @input="$emit('change', 'freq')"
-      type="range"
-      :min="oscillator.freq.min"
-      :max="oscillator.freq.max"
-      :step="oscillator.freq.step"
-      style="width: 400px"
-    ><br>
+      :sliderValue="+oscillator.freq.value"
+      :options="optionsPrimFreq"
+    /><br>
     Modulation frequency: <input
       v-model="oscillator.mod.value"
       @input="$emit('change', 'mod')"
@@ -53,6 +48,15 @@ export default {
     oscillator: {
       type: Object,
       required: true
+    }
+  },
+  computed: {
+    optionsPrimFreq () {
+      return {
+        min: this.oscillator.freq.min,
+        max: this.oscillator.freq.max,
+        step: this.oscillator.freq.step
+      }
     }
   }
 }
