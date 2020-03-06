@@ -48,7 +48,7 @@ export default {
       for (const oscillator of modules.oscillators) {
         for (const key of Object.keys(oscillator)) {
           if (key === 'id') continue
-          const target = { ...oscillator[key] }
+          const target = oscillator[key]
           target.name = `osc${oscillator.id}${key}`
           target.key = key
           target.oscillator = oscillator

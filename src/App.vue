@@ -37,7 +37,6 @@ export default {
   methods: {
     // Call wasm oscillator function
     callOscillator (oscillator, key) {
-      console.log(oscillator, key)
       const value = Number(oscillator[key].value)
       const offset = Number(oscillator[key].offset)
       const finalValue = Number(value) + offset
@@ -64,7 +63,6 @@ export default {
       })
     },
     async runLfo (lfo) {
-      console.log('run', lfo)
       let direction = -1
       while (true) {
         const depth = (lfo.target.max - lfo.target.min) * lfo.depth
