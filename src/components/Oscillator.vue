@@ -1,5 +1,4 @@
 <template>
-  <!-- oscillator[key].currentValue represents the oscillator parameter that is currently affecting thes sound -->
   <div>
     Primary frequency: <SliderWithIndicator
       v-model="oscillator.freq.value"

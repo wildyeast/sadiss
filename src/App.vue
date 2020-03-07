@@ -1,16 +1,20 @@
 <template>
   <div class="app">
-    <Oscillator
-      v-for="oscillator of modules.oscillators"
-      :key="`oscillator${oscillator.id}`"
-      :oscillator="oscillator"
-      @change="callOscillator(oscillator, $event)"
-    />
-    <Lfo
-      v-for="lfo of modules.lfos"
-      :key="`lfo${lfo.id}`"
-      :lfo="lfo"
-    />
+    <div class="oscillators">
+      <Oscillator
+        v-for="oscillator of modules.oscillators"
+        :key="`oscillator${oscillator.id}`"
+        :oscillator="oscillator"
+        @change="callOscillator(oscillator, $event)"
+      />
+    </div>
+    <div class="lfos">
+      <Lfo
+        v-for="lfo of modules.lfos"
+        :key="`lfo${lfo.id}`"
+        :lfo="lfo"
+      />
+    </div>
     <button @click="addLfo">
       add lfo
     </button>
@@ -45,7 +49,7 @@ export default {
       if (isNaN(finalValue)) {
         console.error('Invalid oscillator input! key:', key, 'value:', value, 'offset:', offset, 'final:', finalValue)
       }
-      this.osc[`set_${key}`](finalValue)
+      oscillator.engine[`set_${key}`](finalValue)
       oscillator[key].currentValue = finalValue
     },
     async sleep (ms) {
@@ -98,7 +102,6 @@ export default {
             position = position * -1
             break
           case 'sawUp':
-            // rate pos
             position += 0.1
             if (position >= 1) position = -1
             break
@@ -126,10 +129,8 @@ export default {
       }
     },
     init () {
-      // Run oscillator
-      this.osc = getOscillator()
-      // Initialize oscillator
       for (const oscillator of modules.oscillators) {
+        oscillator.engine = getOscillator()
         for (const key of Object.keys(oscillator)) {
           if (key === 'id') continue
           oscillator[key].value = oscillator[key].init
@@ -140,6 +141,9 @@ export default {
 }
 </script>
 <style>
-.app {
+.oscillators, .lfos {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: space-between;
 }
 </style>
