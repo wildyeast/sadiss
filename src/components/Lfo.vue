@@ -1,7 +1,17 @@
 <template>
   <div>
-    LFO waveform: <select><option>square</option></select><br>
-    LFO target: <select v-model="lfo.target">
+    LFO waveform: <select v-model="lfo.shape">
+      <option
+        v-for="shape of shapes"
+        :value="shape"
+      >
+        {{ shape }}
+      </option>
+    </select><br>
+    LFO target: <select
+      v-model="lfo.target"
+      @input="changeTarget"
+    >
       <option
         v-for="target of targets"
         :value="target"
@@ -39,7 +49,8 @@ export default {
     }
   },
   data: () => ({
-    targets: []
+    targets: [],
+    shapes: ['triangle', 'square', 'sawUp', 'sawDown', 'random']
   }),
   computed: {
     optionsLfoRate () {
@@ -58,6 +69,7 @@ export default {
   },
   mounted () {
     this.targets = this.getTargets()
+    this.lfo.shape = 'triangle'
     this.lfo.target = this.targets[0]
     this.lfo.run(this.lfo)
   },
@@ -87,6 +99,10 @@ export default {
         }
       }
       return targets
+    },
+    // Reset value of previous target
+    changeTarget () {
+      this.lfo.target.currentValue = this.lfo.target.value
     }
 
   }

@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="app">
     <Oscillator
       v-for="oscillator of modules.oscillators"
       :key="`oscillator${oscillator.id}`"
@@ -71,14 +71,17 @@ export default {
           step: 0.1,
           currentValue: 0
         },
+        shape: 'triangle',
         run: this.runLfo
       })
     },
     async runLfo (lfo) {
-      let direction = -1
+      // FEATURE Add phase
+      let position = -1
+      let direction = 1
       while (true) {
         const depth = (lfo.target.max - lfo.target.min) * lfo.depth.currentValue
-        lfo.target.offset = depth * direction
+        lfo.target.offset = depth * position
         if (lfo.target.oscillator) { // target is oscillator
           this.callOscillator(lfo.target.oscillator, lfo.target.key)
         } else { // target is lfo
@@ -89,7 +92,36 @@ export default {
           if (finalValue > lfo.target.max) finalValue = lfo.target.max
           lfo.target.currentValue = finalValue
         }
-        direction = direction * -1
+        // FEATURE Add sine wave
+        switch (lfo.shape) {
+          case 'square':
+            position = position * -1
+            break
+          case 'sawUp':
+            // rate pos
+            position += 0.1
+            if (position >= 1) position = -1
+            break
+          case 'sawDown':
+            if (position <= -1) position = 1
+            position -= 0.1
+            break
+          case 'triangle':
+            if (direction < 0) {
+              position -= 0.1
+            } else {
+              position += 0.1
+            }
+            if (position > 1 || position < -1) {
+              direction *= -1
+            }
+            break
+          case 'random':
+            position = Math.random() * 2 - 1
+            break
+          default:
+            console.error('Bad LFO shape:', lfo.shape)
+        }
         await this.sleep(lfo.rate.currentValue)
       }
     },
@@ -107,3 +139,7 @@ export default {
   }
 }
 </script>
+<style>
+.app {
+}
+</style>
