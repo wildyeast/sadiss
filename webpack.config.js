@@ -22,7 +22,7 @@ module.exports = {
         exclude: /node_modules/,
         loader: 'vue-loader'
       },
-      // The following is needed make us of the style tag of vue components
+      // The following is needed make use of the style tag of vue components
       // https://stackoverflow.com/questions/50822212/webpack-you-may-need-an-appropriate-loader-to-handle-this-file-type-with-sue
       {
         test: /\.css$/,
