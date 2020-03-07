@@ -76,10 +76,10 @@ export default {
       let direction = -1
       while (true) {
         const depth = (lfo.target.max - lfo.target.min) * lfo.depth.value
-        lfo.target.offset += depth * direction
-        if (lfo.target.oscillator) {
+        lfo.target.offset = depth * direction
+        if (lfo.target.oscillator) { // target is oscillator
           this.callOscillator(lfo.target.oscillator, lfo.target.key)
-        } else {
+        } else { // target is lfo
           let value = Number(lfo.target.value) + Number(lfo.target.offset)
           if (value < lfo.target.min) value = lfo.target.min
           if (value > lfo.target.max) value = lfo.target.max
