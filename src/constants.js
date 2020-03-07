@@ -7,7 +7,7 @@ export const modules = {
       freq: {
         value: 0,
         offset: 0,
-        init: 50,
+        init: 440,
         min: 55,
         max: 880,
         step: 1

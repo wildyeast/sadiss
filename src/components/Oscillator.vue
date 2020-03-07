@@ -35,7 +35,6 @@
 <script>
 import Vue from 'vue'
 import SliderWithIndicator from 'vue-slider-with-indicator'
-
 export default {
   name: 'Oscillator',
   components: { SliderWithIndicator },
