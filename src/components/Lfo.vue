@@ -21,7 +21,6 @@
       :indicator-value="+lfo.depth.currentValue"
       :options="optionsLfoDepth"
     /><br>
-    {{ lfo.depth }}
   </div>
 </template>
 <script>
@@ -37,8 +36,31 @@ export default {
       required: true
     }
   },
+  data: () => ({
+    targets: []
+  }),
   computed: {
-    targets () {
+    optionsLfoRate () {
+      return {
+        min: 0,
+        max: 1000
+      }
+    },
+    optionsLfoDepth () {
+      return {
+        min: 0,
+        max: 1,
+        step: 0.05
+      }
+    }
+  },
+  mounted () {
+    this.targets = this.getTargets()
+    this.lfo.target = this.targets[0]
+    this.lfo.run(this.lfo)
+  },
+  methods: {
+    getTargets () {
       const targets = []
       // Add oscillator targets
       for (const oscillator of modules.oscillators) {
@@ -64,25 +86,7 @@ export default {
       }
       return targets
     },
-    optionsLfoRate () {
-      return {
-        min: 0,
-        max: 1000
-      }
-    },
-    optionsLfoDepth () {
-      return {
-        min: 0,
-        max: 1,
-        step: 0.05
-      }
-    }
-  },
-  mounted () {
-    this.lfo.target = this.targets[0]
-    this.$nextTick(() => {
-      this.lfo.run(this.lfo)
-    })
+
   }
 }
 </script>

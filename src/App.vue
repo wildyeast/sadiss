@@ -62,14 +62,16 @@ export default {
           offset: 0,
           min: 0,
           max: 1000,
-          step: 1
+          step: 1,
+          currentValue: 0
         },
         depth: {
           value: 0,
           offset: 0,
           min: 0,
           max: 1,
-          step: 0.1
+          step: 0.1,
+          currentValue: 0
         },
         run: this.runLfo
       })
@@ -88,7 +90,6 @@ export default {
           if (finalValue < lfo.target.min) finalValue = lfo.target.min
           if (finalValue > lfo.target.max) finalValue = lfo.target.max
           lfo.target.currentValue = finalValue
-          console.log('lfo.target', lfo.target)
         }
         direction = direction * -1
         await this.sleep(lfo.rate.value)
