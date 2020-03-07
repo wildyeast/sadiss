@@ -41,12 +41,14 @@ export default {
     callOscillator (oscillator, key) {
       const value = Number(oscillator[key].value)
       const offset = Number(oscillator[key].offset)
-      const finalValue = Number(value) + offset
+      const finalValue = value + offset
       if (isNaN(finalValue)) {
         console.error('Invalid oscillator input! key:', key, 'value:', value, 'offset:', offset, 'final:', finalValue)
       }
       this.osc[`set_${key}`](finalValue)
       oscillator[key].currentValue = finalValue
+    },
+    callLfo (target) {
     },
     async sleep (ms) {
       // TODO Move timing mechanism to Rust for more accuracy
@@ -80,10 +82,13 @@ export default {
         if (lfo.target.oscillator) { // target is oscillator
           this.callOscillator(lfo.target.oscillator, lfo.target.key)
         } else { // target is lfo
-          let value = Number(lfo.target.value) + Number(lfo.target.offset)
-          if (value < lfo.target.min) value = lfo.target.min
-          if (value > lfo.target.max) value = lfo.target.max
-          lfo.target.value = value
+          const value = Number(lfo.target.value)
+          const offset = Number(lfo.target.offset)
+          let finalValue = value + offset
+          if (finalValue < lfo.target.min) finalValue = lfo.target.min
+          if (finalValue > lfo.target.max) finalValue = lfo.target.max
+          lfo.target.currentValue = finalValue
+          console.log('lfo.target', lfo.target)
         }
         direction = direction * -1
         await this.sleep(lfo.rate.value)

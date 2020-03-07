@@ -1,39 +1,37 @@
 <template>
   <!-- oscillator[key].currentValue represents the oscillator parameter that is currently affecting thes sound -->
   <div>
-    
     Primary frequency: <SliderWithIndicator
       v-model="oscillator.freq.value"
-      @input="$emit('change', 'freq')"
-      :sliderValue="+oscillator.freq.value"
-      :indicatorValue="+oscillator.freq.value + oscillator.freq.offset"
+      :slider-value="+oscillator.freq.value"
+      :indicator-value="+oscillator.freq.value + oscillator.freq.offset"
       :options="optionsPrimFreq"
+      @input="$emit('change', 'freq')"
     /><br>
     Modulation frequency: <SliderWithIndicator
       v-model="oscillator.mod.value"
-      @input="$emit('change', 'mod')"
-      :sliderValue="+oscillator.mod.value"
-      :indicatorValue="+oscillator.mod.value + oscillator.mod.offset"
+      :slider-value="+oscillator.mod.value"
+      :indicator-value="+oscillator.mod.value + oscillator.mod.offset"
       :options="optionsModFreq"
+      @input="$emit('change', 'mod')"
     /><br>
     Modulation amount: <SliderWithIndicator
       v-model="oscillator.amount.value"
-      @input="$emit('change', 'amount')"
-      :sliderValue="+oscillator.amount.value"
-      :indicatorValue="+oscillator.amount.value + oscillator.amount.offset"
+      :slider-value="+oscillator.amount.value"
+      :indicator-value="+oscillator.amount.value + oscillator.amount.offset"
       :options="optionsModAmount"
+      @input="$emit('change', 'amount')"
     /><br>
     Gain: <SliderWithIndicator
       v-model="oscillator.gain.value"
-      @input="$emit('change', 'gain')"
-      :sliderValue="+oscillator.gain.value"
-      :indicatorValue="+oscillator.gain.value + oscillator.gain.offset"
+      :slider-value="+oscillator.gain.value"
+      :indicator-value="+oscillator.gain.value + oscillator.gain.offset"
       :options="optionsGain"
+      @input="$emit('change', 'gain')"
     /><br>
   </div>
 </template>
 <script>
-import Vue from 'vue'
 import SliderWithIndicator from 'vue-slider-with-indicator'
 
 export default {

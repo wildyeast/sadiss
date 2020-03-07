@@ -11,16 +11,17 @@
     </select><br>
     LFO rate: <SliderWithIndicator
       v-model="lfo.rate.value"
-      :sliderValue="+lfo.rate.value"
-      :indicatorValue="+lfo.rate.value"
+      :slider-value="+lfo.rate.value"
+      :indicator-value="+lfo.rate.currentValue"
       :options="optionsLfoRate"
     /><br>
     LFO depth: <SliderWithIndicator
       v-model="lfo.depth.value"
-      :sliderValue="+lfo.depth.value"
-      :indicatorValue="+lfo.depth.value"
+      :slider-value="+lfo.depth.value"
+      :indicator-value="+lfo.depth.currentValue"
       :options="optionsLfoDepth"
     /><br>
+    {{ lfo.depth }}
   </div>
 </template>
 <script>
