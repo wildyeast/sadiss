@@ -48,8 +48,6 @@ export default {
       this.osc[`set_${key}`](finalValue)
       oscillator[key].currentValue = finalValue
     },
-    callLfo (target) {
-    },
     async sleep (ms) {
       // TODO Move timing mechanism to Rust for more accuracy
       await new Promise(resolve => setTimeout(resolve, ms))
@@ -79,7 +77,7 @@ export default {
     async runLfo (lfo) {
       let direction = -1
       while (true) {
-        const depth = (lfo.target.max - lfo.target.min) * lfo.depth.value
+        const depth = (lfo.target.max - lfo.target.min) * lfo.depth.currentValue
         lfo.target.offset = depth * direction
         if (lfo.target.oscillator) { // target is oscillator
           this.callOscillator(lfo.target.oscillator, lfo.target.key)
@@ -92,7 +90,7 @@ export default {
           lfo.target.currentValue = finalValue
         }
         direction = direction * -1
-        await this.sleep(lfo.rate.value)
+        await this.sleep(lfo.rate.currentValue)
       }
     },
     init () {

@@ -14,12 +14,14 @@
       :slider-value="+lfo.rate.value"
       :indicator-value="+lfo.rate.currentValue"
       :options="optionsLfoRate"
+      @input="lfo.rate.currentValue = lfo.rate.value"
     /><br>
     LFO depth: <SliderWithIndicator
       v-model="lfo.depth.value"
       :slider-value="+lfo.depth.value"
       :indicator-value="+lfo.depth.currentValue"
       :options="optionsLfoDepth"
+      @input="lfo.depth.currentValue = lfo.depth.value"
     /><br>
   </div>
 </template>
@@ -85,7 +87,7 @@ export default {
         }
       }
       return targets
-    },
+    }
 
   }
 }
