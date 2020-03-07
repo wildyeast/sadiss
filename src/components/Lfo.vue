@@ -91,7 +91,7 @@ export default {
       for (const lfo of modules.lfos) {
         if (lfo === this.lfo) continue
         for (const key of ['rate', 'depth']) {
-          if (['id', 'run'].includes(key)) continue
+          if (['id', 'run', 'engine'].includes(key)) continue
           const target = lfo[key]
           target.name = `lfo${lfo.id}${key}`
           target.key = key
