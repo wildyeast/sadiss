@@ -9,27 +9,27 @@
         {{ target.name }}
       </option>
     </select><br>
-    LFO rate: <input
+    LFO rate: <SliderWithIndicator
       v-model="lfo.rate.value"
-      type="range"
-      min="0"
-      max="1000"
-      style="width: 400px"
-    > {{ lfo.rate.value }}<br>
-    LFO depth: <input
+      :sliderValue="+lfo.rate.value"
+      :indicatorValue="+lfo.rate.value"
+      :options="optionsLfoRate"
+    /><br>
+    LFO depth: <SliderWithIndicator
       v-model="lfo.depth.value"
-      type="range"
-      min="0"
-      max="1"
-      step="0.05"
-      style="width: 400px"
-    > {{ lfo.depth.value }}<br>
+      :sliderValue="+lfo.depth.value"
+      :indicatorValue="+lfo.depth.value"
+      :options="optionsLfoDepth"
+    /><br>
   </div>
 </template>
 <script>
+import SliderWithIndicator from 'vue-slider-with-indicator'
 import { modules } from '../constants'
+
 export default {
   name: 'Lfo',
+  components: { SliderWithIndicator },
   props: {
     lfo: {
       type: Object,
@@ -62,6 +62,19 @@ export default {
         }
       }
       return targets
+    },
+    optionsLfoRate () {
+      return {
+        min: 0,
+        max: 1000
+      }
+    },
+    optionsLfoDepth () {
+      return {
+        min: 0,
+        max: 1,
+        step: 0.05
+      }
     }
   },
   mounted () {
