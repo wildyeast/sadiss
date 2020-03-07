@@ -11,6 +11,7 @@
     "@babel/preset-env": "^7.8.7",
     "@wasm-tool/wasm-pack-plugin": "1.0.1",
     "babel-loader": "^8.0.6",
+    "css-loader": "^3.4.2",
     "eslint": "^6.8.0",
     "eslint-config-standard": "^14.1.0",
     "eslint-plugin-import": "^2.20.1",
@@ -22,6 +23,7 @@
     "text-encoding": "^0.7.0",
     "vue": "^2.6.11",
     "vue-loader": "^15.9.0",
+    "vue-style-loader": "^4.1.2",
     "vue-template-compiler": "^2.6.11",
     "webpack": "^4.29.4",
     "webpack-cli": "^3.1.1",
@@ -29,6 +31,6 @@
   },
   "dependencies": {
     "@babel/runtime": "^7.8.7",
-    "vue-slider-with-indicator": "^1.0.5"
+    "vue-slider-with-indicator": "^1.0.10"
   }
 }
