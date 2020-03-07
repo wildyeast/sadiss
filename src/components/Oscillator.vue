@@ -57,21 +57,30 @@ export default {
       return {
         min: this.oscillator.mod.min,
         max: this.oscillator.mod.max,
-        step: this.oscillator.mod.step
+        step: this.oscillator.mod.step,
+        style: {
+          sliderHeight: '20px'
+        }
       }
     },
     optionsModAmount () {
       return {
         min: this.oscillator.amount.min,
         max: this.oscillator.amount.max,
-        step: this.oscillator.amount.step
+        step: this.oscillator.amount.step,
+        style: {
+          sliderHeight: '20px'
+        }
       }
     },
     optionsGain () {
       return {
         min: this.oscillator.gain.min,
         max: this.oscillator.gain.max,
-        step: this.oscillator.gain.step
+        step: this.oscillator.gain.step,
+        style: {
+          sliderHeight: '20px'
+        }
       }
     }
   }
