@@ -78,8 +78,7 @@ export default {
       const targets = []
       // Add oscillator targets
       for (const oscillator of modules.oscillators) {
-        for (const key of Object.keys(oscillator)) {
-          if (key === 'id') continue
+        for (const key of ['freq', 'mod', 'amount', 'gain']) {
           const target = oscillator[key]
           target.name = `osc${oscillator.id}${key}`
           target.key = key
@@ -91,7 +90,6 @@ export default {
       for (const lfo of modules.lfos) {
         if (lfo === this.lfo) continue
         for (const key of ['rate', 'depth']) {
-          if (['id', 'run', 'engine'].includes(key)) continue
           const target = lfo[key]
           target.name = `lfo${lfo.id}${key}`
           target.key = key
