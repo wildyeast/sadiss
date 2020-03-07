@@ -31,7 +31,7 @@ export const modules = {
       gain: {
         value: 0,
         offset: 0,
-        init: 0.8,
+        init: 0.1,
         min: 0,
         max: 1,
         step: 0.05

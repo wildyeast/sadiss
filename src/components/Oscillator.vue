@@ -9,33 +9,27 @@
       :indicatorValue="+oscillator.freq.value + oscillator.freq.offset"
       :options="optionsPrimFreq"
     /><br>
-    Modulation frequency: <input
+    Modulation frequency: <SliderWithIndicator
       v-model="oscillator.mod.value"
-      type="range"
-      :min="oscillator.mod.min"
-      :max="oscillator.mod.max"
-      :step="oscillator.mod.step"
-      style="width: 400px"
       @input="$emit('change', 'mod')"
-    ><br>
-    Modulation amount: <input
+      :sliderValue="+oscillator.mod.value"
+      :indicatorValue="+oscillator.mod.value + oscillator.mod.offset"
+      :options="optionsModFreq"
+    /><br>
+    Modulation amount: <SliderWithIndicator
       v-model="oscillator.amount.value"
-      type="range"
-      :min="oscillator.amount.min"
-      :max="oscillator.amount.max"
-      :step="oscillator.amount.step"
-      style="width: 400px"
       @input="$emit('change', 'amount')"
-    ><br>
-    Gain: <input
+      :sliderValue="+oscillator.amount.value"
+      :indicatorValue="+oscillator.amount.value + oscillator.amount.offset"
+      :options="optionsModAmount"
+    /><br>
+    Gain: <SliderWithIndicator
       v-model="oscillator.gain.value"
-      type="range"
-      :min="oscillator.gain.min"
-      :max="oscillator.gain.max"
-      :step="oscillator.gain.step"
-      style="width: 400px"
       @input="$emit('change', 'gain')"
-    >
+      :sliderValue="+oscillator.gain.value"
+      :indicatorValue="+oscillator.gain.value + oscillator.gain.offset"
+      :options="optionsGain"
+    /><br>
   </div>
 </template>
 <script>
@@ -57,6 +51,27 @@ export default {
         min: this.oscillator.freq.min,
         max: this.oscillator.freq.max,
         step: this.oscillator.freq.step
+      }
+    },
+    optionsModFreq () {
+      return {
+        min: this.oscillator.mod.min,
+        max: this.oscillator.mod.max,
+        step: this.oscillator.mod.step
+      }
+    },
+    optionsModAmount () {
+      return {
+        min: this.oscillator.amount.min,
+        max: this.oscillator.amount.max,
+        step: this.oscillator.amount.step
+      }
+    },
+    optionsGain () {
+      return {
+        min: this.oscillator.gain.min,
+        max: this.oscillator.gain.max,
+        step: this.oscillator.gain.step
       }
     }
   }
