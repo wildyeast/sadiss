@@ -1,6 +1,6 @@
 <template>
   <div class="lfo" style="borderColor: 'darkred';">
-    <div class="label">WELLE</div> <select v-model="lfo.shape">
+    <div class="label">Welle</div> <select v-model="lfo.shape">
       <option
         v-for="shape of shapes"
         :value="shape"
@@ -8,7 +8,7 @@
         {{ shape }}
       </option>
     </select>
-    <div class="label">GESCHWINDIGKEIT</div> <SliderWithIndicator
+    <div class="label">Geschwindigkeit</div> <SliderWithIndicator
       v-model="lfo.rate.value"
       :slider-value="+lfo.rate.value"
       :indicator-value="+lfo.rate.currentValue"
@@ -16,7 +16,7 @@
       @click.native="$emit('addLfo', lfo.rate)"
       @input="lfo.rate.currentValue = lfo.rate.value"
     />
-    <div class="label">TIEFE</div> <SliderWithIndicator
+    <div class="label">Tiefe</div> <SliderWithIndicator
       v-model="lfo.depth.value"
       :slider-value="+lfo.depth.value"
       :indicator-value="+lfo.depth.currentValue"

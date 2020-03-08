@@ -1,6 +1,6 @@
 <template>
   <div class="oscillator">
-    <div class="label">OSZILLATIONSFREQUENZ</div> <SliderWithIndicator
+    <div class="label">Hauptfrequenz</div> <SliderWithIndicator
       v-model="oscillator.freq.value"
       :slider-value="+oscillator.freq.value"
       :indicator-value="+oscillator.freq.value + oscillator.freq.offset"
@@ -8,7 +8,7 @@
       @click.native="$emit('addLfo', { oscillator, key: 'freq' })"
       @input="$emit('change', 'freq')"
     />
-    <div class="label">MODULATIONSFREQUENZ</div> <SliderWithIndicator
+    <div class="label">Modulationsfrequenz</div> <SliderWithIndicator
       v-model="oscillator.mod.value"
       :slider-value="+oscillator.mod.value"
       :indicator-value="+oscillator.mod.value + oscillator.mod.offset"
@@ -16,7 +16,7 @@
       @click.native="$emit('addLfo', { oscillator, key: 'mod' })"
       @input="$emit('change', 'mod')"
     />
-    <div class="label">MODULATIONSKRAFT</div> <SliderWithIndicator
+    <div class="label">Modulationskraft</div> <SliderWithIndicator
       v-model="oscillator.amount.value"
       :slider-value="+oscillator.amount.value"
       :indicator-value="+oscillator.amount.value + oscillator.amount.offset"
@@ -24,7 +24,7 @@
       @click.native="$emit('addLfo', { oscillator, key: 'amount' })"
       @input="$emit('change', 'amount')"
     />
-    <div class="label">LAUTSTÄRKE</div> <SliderWithIndicator
+    <div class="label">Lautstärke</div> <SliderWithIndicator
       v-model="oscillator.gain.value"
       :slider-value="+oscillator.gain.value"
       :indicator-value="+oscillator.gain.value + oscillator.gain.offset"

@@ -166,10 +166,12 @@ export default {
 </script>
 <style>
 .app {
-  --primaryColor: darkgreen;
+  --primaryColor: #11bd39;
   --secondaryColor: rgba(200, 200, 0, 0.8);
   --tertiaryColor: lightblue;
   color: var(--primaryColor);
+  font-family: 'UnifrakturCook', cursive;
+  font-size: 1.1em;
 }
 .oscillators, .lfos {
   display: flex;
