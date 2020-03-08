@@ -5,7 +5,7 @@
       :slider-value="+oscillator.freq.value"
       :indicator-value="+oscillator.freq.value + oscillator.freq.offset"
       :options="optionsPrimFreq"
-      @click.native="$emit('addLfo', oscillator.freq)"
+      @click.native="$emit('addLfo', { oscillator, key: 'freq' })"
       @input="$emit('change', 'freq')"
     />
     <div class="label">MODULATIONSFREQUENZ</div> <SliderWithIndicator
@@ -13,7 +13,7 @@
       :slider-value="+oscillator.mod.value"
       :indicator-value="+oscillator.mod.value + oscillator.mod.offset"
       :options="optionsModFreq"
-      @click.native="$emit('addLfo', oscillator.mod)"
+      @click.native="$emit('addLfo', { oscillator, key: 'mod' })"
       @input="$emit('change', 'mod')"
     />
     <div class="label">MODULATIONSKRAFT</div> <SliderWithIndicator
@@ -21,7 +21,7 @@
       :slider-value="+oscillator.amount.value"
       :indicator-value="+oscillator.amount.value + oscillator.amount.offset"
       :options="optionsModAmount"
-      @click.native="$emit('addLfo', oscillator.amount)"
+      @click.native="$emit('addLfo', { oscillator, key: 'amount' })"
       @input="$emit('change', 'amount')"
     />
     <div class="label">LAUTSTÄRKE</div> <SliderWithIndicator
@@ -29,7 +29,7 @@
       :slider-value="+oscillator.gain.value"
       :indicator-value="+oscillator.gain.value + oscillator.gain.offset"
       :options="optionsGain"
-      @click.native="$emit('addLfo', oscillator.gain)"
+      @click.native="$emit('addLfo', { oscillator, key: 'gain' })"
       @input="$emit('change', 'gain')"
     />
   </div>

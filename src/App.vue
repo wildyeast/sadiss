@@ -60,8 +60,18 @@ export default {
       // TODO Move timing mechanism to Rust for more accuracy
       await new Promise(resolve => setTimeout(resolve, ms))
     },
-    addLfo (target) {
+    addLfo (targetContainer) {
       if (!this.linking) return
+
+      let target
+      if (targetContainer.oscillator) {  // Target is oscillator
+        target = targetContainer.oscillator[targetContainer.key]
+        target.oscillator = targetContainer.oscillator 
+        target.key = targetContainer.key
+      } else { // Target is LFO
+        target = targetContainer
+      }
+
       this.linking = false
       modules.lfos.push({
         id: modules.lfos.length,
