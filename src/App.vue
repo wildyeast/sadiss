@@ -5,19 +5,23 @@
         v-for="oscillator of modules.oscillators"
         :key="`oscillator${oscillator.id}`"
         :oscillator="oscillator"
+        :linking="linking"
         @change="callOscillator(oscillator, $event)"
+        @addLfo="addLfo"
       />
     </div>
+    <button class="addLfo" @click="toggleLinking">
+      🐸
+    </button>
     <div class="lfos">
       <Lfo
         v-for="lfo of modules.lfos"
         :key="`lfo${lfo.id}`"
         :lfo="lfo"
+        :linking="linking"
+        @addLfo="addLfo"
       />
     </div>
-    <button @click="addLfo">
-      add lfo
-    </button>
   </div>
 </template>
 <script>
@@ -30,8 +34,8 @@ export default {
   name: 'App',
   components: { Oscillator, Lfo },
   data: () => ({
-    osc: null,
-    modules
+    modules,
+    linking: false
   }),
   async mounted () {
     // Wait until rust module loaded (see ../index.js)
@@ -56,7 +60,9 @@ export default {
       // TODO Move timing mechanism to Rust for more accuracy
       await new Promise(resolve => setTimeout(resolve, ms))
     },
-    addLfo () {
+    addLfo (target) {
+      if (!this.linking) return
+      this.linking = false
       modules.lfos.push({
         id: modules.lfos.length,
         rate: {
@@ -76,8 +82,12 @@ export default {
           currentValue: 0
         },
         shape: 'sine',
+        target,
         run: this.runLfo
       })
+    },
+    toggleLinking () {
+      this.linking = !this.linking
     },
     async runLfo (lfo) {
       // FEATURE Add phase
@@ -97,7 +107,6 @@ export default {
           if (finalValue > lfo.target.max) finalValue = lfo.target.max
           lfo.target.currentValue = finalValue
         }
-        // FEATURE Add sine wave
         switch (lfo.shape) {
           case 'sine':
             position = Math.sin(sineHelperValue)
@@ -146,9 +155,29 @@ export default {
 }
 </script>
 <style>
+.app {
+  --primaryColor: darkgreen;
+  --secondaryColor: rgba(200, 200, 0, 0.8);
+  --tertiaryColor: lightblue;
+  color: var(--primaryColor);
+}
 .oscillators, .lfos {
   display: flex;
   flex-flow: row nowrap;
   justify-content: space-between;
+}
+.label {
+  margin-top: 0.5em;
+}
+.addLfo {
+  display: flex;
+  flex-flow: row nowrap;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  font-size: 7em;
+  cursor: pointer;
+  background: none;
+  border: none;
 }
 </style>

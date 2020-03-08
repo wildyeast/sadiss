@@ -9,7 +9,7 @@ export const modules = {
         offset: 0,
         init: 440,
         min: 55,
-        max: 880,
+        max: 1760,
         step: 1
       },
       mod: {
@@ -44,7 +44,7 @@ export const modules = {
         offset: 0,
         init: 440,
         min: 55,
-        max: 880,
+        max: 1760,
         step: 1
       },
       mod: {

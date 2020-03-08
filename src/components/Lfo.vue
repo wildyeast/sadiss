@@ -1,38 +1,29 @@
 <template>
-  <div>
-    LFO waveform: <select v-model="lfo.shape">
+  <div class="lfo" style="borderColor: 'darkred';">
+    <div class="label">WELLE</div> <select v-model="lfo.shape">
       <option
         v-for="shape of shapes"
         :value="shape"
       >
         {{ shape }}
       </option>
-    </select><br>
-    LFO target: <select
-      v-model="lfo.target"
-      @input="changeTarget"
-    >
-      <option
-        v-for="target of targets"
-        :value="target"
-      >
-        {{ target.name }}
-      </option>
-    </select><br>
-    LFO rate: <SliderWithIndicator
+    </select>
+    <div class="label">GESCHWINDIGKEIT</div> <SliderWithIndicator
       v-model="lfo.rate.value"
       :slider-value="+lfo.rate.value"
       :indicator-value="+lfo.rate.currentValue"
       :options="optionsLfoRate"
+      @click.native="$emit('addLfo', lfo.rate)"
       @input="lfo.rate.currentValue = lfo.rate.value"
-    /><br>
-    LFO depth: <SliderWithIndicator
+    />
+    <div class="label">TIEFE</div> <SliderWithIndicator
       v-model="lfo.depth.value"
       :slider-value="+lfo.depth.value"
       :indicator-value="+lfo.depth.currentValue"
       :options="optionsLfoDepth"
+      @click.native="$emit('addLfo', lfo.depth)"
       @input="lfo.depth.currentValue = lfo.depth.value"
-    /><br>
+    />
   </div>
 </template>
 <script>
@@ -46,6 +37,10 @@ export default {
     lfo: {
       type: Object,
       required: true
+    },
+    linking: {
+      type: Boolean,
+      required: true
     }
   },
   data: () => ({
@@ -56,25 +51,36 @@ export default {
     optionsLfoRate () {
       return {
         min: 0,
-        max: 1000
+        max: 1000,
+        style: {
+          sliderHeight: '20px',
+          backgroundColor: this.linking ? 'darkblue' : 'darkgreen',
+          indicatorColor: 'darkred'
+        }
       }
     },
     optionsLfoDepth () {
       return {
         min: 0,
         max: 1,
-        step: 0.05
+        step: 0.05,
+        style: {
+          sliderHeight: '20px',
+          backgroundColor: this.linking ? 'darkblue' : 'darkgreen',
+          indicatorColor: 'darkred'
+        }
       }
     }
   },
   mounted () {
-    this.targets = this.getTargets()
+    // this.targets = this.getTargets()
     this.lfo.shape = 'sine'
-    this.lfo.target = this.targets[0]
+    // this.lfo.target = this.targets[0]
     this.lfo.run(this.lfo)
   },
   methods: {
     getTargets () {
+      if (window) return
       const targets = []
       // Add oscillator targets
       for (const oscillator of modules.oscillators) {
@@ -106,3 +112,11 @@ export default {
   }
 }
 </script>
+<style scoped>
+.lfo {
+  position: relative;
+  border: 1px dashed darkred;
+  padding: 0.5em;
+  margin: 0.5em;
+}
+</style>
