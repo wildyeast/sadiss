@@ -50,7 +50,7 @@ export default {
   },
   data: () => ({
     targets: [],
-    shapes: ['triangle', 'square', 'sawUp', 'sawDown', 'random']
+    shapes: ['sine', 'triangle', 'square', 'sawUp', 'sawDown', 'random']
   }),
   computed: {
     optionsLfoRate () {
@@ -69,7 +69,7 @@ export default {
   },
   mounted () {
     this.targets = this.getTargets()
-    this.lfo.shape = 'triangle'
+    this.lfo.shape = 'sine'
     this.lfo.target = this.targets[0]
     this.lfo.run(this.lfo)
   },

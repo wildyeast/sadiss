@@ -75,7 +75,7 @@ export default {
           step: 0.1,
           currentValue: 0
         },
-        shape: 'triangle',
+        shape: 'sine',
         run: this.runLfo
       })
     },
@@ -83,6 +83,7 @@ export default {
       // FEATURE Add phase
       let position = -1
       let direction = 1
+      let sineHelperValue = 0
       while (true) {
         const depth = (lfo.target.max - lfo.target.min) * lfo.depth.currentValue
         lfo.target.offset = depth * position
@@ -98,6 +99,10 @@ export default {
         }
         // FEATURE Add sine wave
         switch (lfo.shape) {
+          case 'sine':
+            position = Math.sin(sineHelperValue)
+            sineHelperValue += Math.PI / 10
+            break
           case 'square':
             position = position * -1
             break
