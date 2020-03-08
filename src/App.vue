@@ -101,24 +101,24 @@ export default {
         switch (lfo.shape) {
           case 'sine':
             position = Math.sin(sineHelperValue)
-            sineHelperValue += Math.PI / 10
+            sineHelperValue += Math.PI / 100
             break
           case 'square':
             position = position * -1
             break
           case 'sawUp':
-            position += 0.1
+            position += 0.01
             if (position >= 1) position = -1
             break
           case 'sawDown':
             if (position <= -1) position = 1
-            position -= 0.1
+            position -= 0.01
             break
           case 'triangle':
             if (direction < 0) {
-              position -= 0.1
+              position -= 0.01
             } else {
-              position += 0.1
+              position += 0.01
             }
             if (position > 1 || position < -1) {
               direction *= -1
