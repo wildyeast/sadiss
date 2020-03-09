@@ -60,11 +60,9 @@ export default {
       return {
         min: 0,
         max: 1000,
-        style: {
-          sliderHeight: '20px',
-          backgroundColor: this.linking ? 'white' : this.lfo.color,
-          indicatorColor: this.lfo.rate.color
-        }
+        sliderHeight: '20px',
+        backgroundColor: this.linking ? 'white' : this.lfo.color,
+        indicatorColor: this.lfo.rate.color
       }
     },
     optionsLfoDepth () {
@@ -72,11 +70,9 @@ export default {
         min: 0,
         max: 1,
         step: 0.05,
-        style: {
-          sliderHeight: '20px',
-          backgroundColor: this.linking ? 'white' : this.lfo.color,
-          indicatorColor: this.lfo.depth.color
-        }
+        sliderHeight: '20px',
+        backgroundColor: this.linking ? 'white' : this.lfo.color,
+        indicatorColor: this.lfo.depth.color
       }
     }
   },
