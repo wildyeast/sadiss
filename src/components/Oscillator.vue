@@ -1,6 +1,8 @@
 <template>
   <div class="oscillator">
-    <div class="label">Hauptfrequenz</div> <SliderWithIndicator
+    <div class="label">
+      Hauptfrequenz
+    </div> <SliderWithIndicator
       v-model="oscillator.freq.value"
       :slider-value="+oscillator.freq.value"
       :indicator-value="+oscillator.freq.value + oscillator.freq.offset"
@@ -8,7 +10,9 @@
       @click.native="$emit('addLfo', { oscillator, key: 'freq' })"
       @input="$emit('change', 'freq')"
     />
-    <div class="label">Modulationsfrequenz</div> <SliderWithIndicator
+    <div class="label">
+      Modulationsfrequenz
+    </div> <SliderWithIndicator
       v-model="oscillator.mod.value"
       :slider-value="+oscillator.mod.value"
       :indicator-value="+oscillator.mod.value + oscillator.mod.offset"
@@ -16,7 +20,9 @@
       @click.native="$emit('addLfo', { oscillator, key: 'mod' })"
       @input="$emit('change', 'mod')"
     />
-    <div class="label">Modulationskraft</div> <SliderWithIndicator
+    <div class="label">
+      Modulationskraft
+    </div> <SliderWithIndicator
       v-model="oscillator.amount.value"
       :slider-value="+oscillator.amount.value"
       :indicator-value="+oscillator.amount.value + oscillator.amount.offset"
@@ -24,7 +30,9 @@
       @click.native="$emit('addLfo', { oscillator, key: 'amount' })"
       @input="$emit('change', 'amount')"
     />
-    <div class="label">Lautstärke</div> <SliderWithIndicator
+    <div class="label">
+      Lautstärke
+    </div> <SliderWithIndicator
       v-model="oscillator.gain.value"
       :slider-value="+oscillator.gain.value"
       :indicator-value="+oscillator.gain.value + oscillator.gain.offset"
@@ -56,8 +64,11 @@ export default {
         min: this.oscillator.freq.min,
         max: this.oscillator.freq.max,
         step: this.oscillator.freq.step,
-        sliderHeight: '20px',
-        backgroundColor: this.linking ? 'darkblue' : 'darkgreen'
+        style: {
+          sliderHeight: '20px',
+          backgroundColor: this.linking ? 'darkblue' : 'darkgreen',
+          indicatorColor: this.oscillator.freq.color
+        }
       }
     },
     optionsModFreq () {
@@ -65,8 +76,11 @@ export default {
         min: this.oscillator.mod.min,
         max: this.oscillator.mod.max,
         step: this.oscillator.mod.step,
-        sliderHeight: '20px',
-        backgroundColor: this.linking ? 'darkblue' : 'darkgreen'
+        style: {
+          sliderHeight: '20px',
+          backgroundColor: this.linking ? 'darkblue' : 'darkgreen',
+          indicatorColor: this.oscillator.mod.color
+        }
       }
     },
     optionsModAmount () {
@@ -74,8 +88,11 @@ export default {
         min: this.oscillator.amount.min,
         max: this.oscillator.amount.max,
         step: this.oscillator.amount.step,
-        sliderHeight: '20px',
-        backgroundColor: this.linking ? 'darkblue' : 'darkgreen'
+        style: {
+          sliderHeight: '20px',
+          backgroundColor: this.linking ? 'darkblue' : 'darkgreen',
+          indicatorColor: this.oscillator.amount.color
+        }
       }
     },
     optionsGain () {
@@ -83,8 +100,11 @@ export default {
         min: this.oscillator.gain.min,
         max: this.oscillator.gain.max,
         step: this.oscillator.gain.step,
-        sliderHeight: '20px',
-        backgroundColor: this.linking ? 'darkblue' : 'darkgreen'
+        style: {
+          sliderHeight: '20px',
+          backgroundColor: this.linking ? 'darkblue' : 'darkgreen',
+          indicatorColor: this.oscillator.gain.color
+        }
       }
     }
   }
