@@ -35,7 +35,7 @@
   </div>
 </template>
 <script>
-import SliderWithIndicator from 'vue-slider-with-indicator'
+import SliderWithIndicator from 'D:/projects/npm/VueSliderWithIndicator/src/VueSliderWithIndicator.vue'
 
 export default {
   name: 'Oscillator',
@@ -56,10 +56,8 @@ export default {
         min: this.oscillator.freq.min,
         max: this.oscillator.freq.max,
         step: this.oscillator.freq.step,
-        style: {
-          sliderHeight: '20px',
-          backgroundColor: this.linking ? 'darkblue' : 'darkgreen',
-        }
+        sliderHeight: '20px',
+        backgroundColor: this.linking ? 'darkblue' : 'darkgreen'
       }
     },
     optionsModFreq () {
@@ -67,10 +65,8 @@ export default {
         min: this.oscillator.mod.min,
         max: this.oscillator.mod.max,
         step: this.oscillator.mod.step,
-        style: {
-          sliderHeight: '20px',
-          backgroundColor: this.linking ? 'darkblue' : 'darkgreen',
-        }
+        sliderHeight: '20px',
+        backgroundColor: this.linking ? 'darkblue' : 'darkgreen'
       }
     },
     optionsModAmount () {
@@ -78,10 +74,8 @@ export default {
         min: this.oscillator.amount.min,
         max: this.oscillator.amount.max,
         step: this.oscillator.amount.step,
-        style: {
-          sliderHeight: '20px',
-          backgroundColor: this.linking ? 'darkblue' : 'darkgreen',
-        }
+        sliderHeight: '20px',
+        backgroundColor: this.linking ? 'darkblue' : 'darkgreen'
       }
     },
     optionsGain () {
@@ -89,10 +83,8 @@ export default {
         min: this.oscillator.gain.min,
         max: this.oscillator.gain.max,
         step: this.oscillator.gain.step,
-        style: {
-          sliderHeight: '20px',
-          backgroundColor: this.linking ? 'darkblue' : 'darkgreen',
-        }
+        sliderHeight: '20px',
+        backgroundColor: this.linking ? 'darkblue' : 'darkgreen'
       }
     }
   }
