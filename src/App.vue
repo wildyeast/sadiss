@@ -1,29 +1,33 @@
 <template>
   <div class="app">
-    <div class="oscillators">
-      <Oscillator
-        v-for="oscillator of modules.oscillators"
-        :key="`oscillator${oscillator.id}`"
-        :oscillator="oscillator"
-        :linking="linking"
-        @change="callOscillator(oscillator, $event)"
-        @addLfo="addLfo"
-      />
+    <div class="topBar">
+      <button
+        class="addLfo"
+        @click="toggleLinking"
+      >
+        🐸
+      </button>
     </div>
-    <button
-      class="addLfo"
-      @click="toggleLinking"
-    >
-      🐸
-    </button>
-    <div class="lfos">
-      <Lfo
-        v-for="lfo of modules.lfos"
-        :key="`lfo${lfo.id}`"
-        :lfo="lfo"
-        :linking="linking"
-        @addLfo="addLfo"
-      />
+    <div class="modules">
+      <div class="oscillators">
+        <Oscillator
+          v-for="oscillator of modules.oscillators"
+          :key="`oscillator${oscillator.id}`"
+          :oscillator="oscillator"
+          :linking="linking"
+          @change="callOscillator(oscillator, $event)"
+          @addLfo="addLfo"
+        />
+      </div>
+      <div class="lfos">
+        <Lfo
+          v-for="lfo of modules.lfos"
+          :key="`lfo${lfo.id}`"
+          :lfo="lfo"
+          :linking="linking"
+          @addLfo="addLfo"
+        />
+      </div>
     </div>
   </div>
 </template>
@@ -107,7 +111,6 @@ export default {
       this.linking = !this.linking
     },
     async runLfo (lfo) {
-      // FEATURE Add phase
       let position = -1
       let direction = 1
       let sineHelperValue = 0
@@ -156,7 +159,7 @@ export default {
           default:
             console.error('Bad LFO shape:', lfo.shape)
         }
-        await this.sleep(lfo.rate.currentValue)
+        await this.sleep(1000 - lfo.rate.currentValue)
       }
     },
     init () {
@@ -174,19 +177,33 @@ export default {
 <style>
 .app {
   --primaryColor: #11bd39;
-  --secondaryColor: rgba(200, 200, 0, 0.8);
+  --secondaryColor: maroon;
   --tertiaryColor: lightblue;
   color: var(--primaryColor);
   font-family: 'UnifrakturCook', cursive;
   font-size: 1.1em;
-}
-.oscillators, .lfos {
   display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-between;
+  flex-flow: column;
+  align-items: center;
+  overflow: hidden;
+}
+.topBar {
+  height: 5em;
+  background: black;
+  width: 100%;
+}
+.modules {
+  position: absolute;
+  top: 5em;
+  height: calc(100% - 5em);
+  overflow-y: scroll;
+}
+.oscillator, .lfo {
+  width: 98vw;
 }
 .label {
   margin-top: 0.5em;
+  margin-left: 0.5em;
 }
 .addLfo {
   display: flex;
@@ -194,7 +211,7 @@ export default {
   justify-content: center;
   align-items: center;
   width: 100%;
-  font-size: 7em;
+  font-size: 4em;
   cursor: pointer;
   background: none;
   border: none;

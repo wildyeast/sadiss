@@ -7,7 +7,7 @@
       :slider-value="+oscillator.freq.value"
       :indicator-value="+oscillator.freq.value + oscillator.freq.offset"
       :options="optionsPrimFreq"
-      @click.native="$emit('addLfo', { oscillator, key: 'freq' })"
+      @click.native.prevent="$emit('addLfo', { oscillator, key: 'freq' })"
       @input="$emit('change', 'freq')"
     />
     <div class="label">
@@ -65,7 +65,7 @@ export default {
         max: this.oscillator.freq.max,
         step: this.oscillator.freq.step,
         sliderHeight: '20px',
-        backgroundColor: this.linking ? 'darkblue' : 'darkgreen',
+        backgroundColor: this.linking ? 'darkred' : 'darkgreen',
         indicatorColor: this.oscillator.freq.color
       }
     },
@@ -75,7 +75,7 @@ export default {
         max: this.oscillator.mod.max,
         step: this.oscillator.mod.step,
         sliderHeight: '20px',
-        backgroundColor: this.linking ? 'darkblue' : 'darkgreen',
+        backgroundColor: this.linking ? 'darkred' : 'darkgreen',
         indicatorColor: this.oscillator.mod.color
       }
     },
@@ -85,7 +85,7 @@ export default {
         max: this.oscillator.amount.max,
         step: this.oscillator.amount.step,
         sliderHeight: '20px',
-        backgroundColor: this.linking ? 'darkblue' : 'darkgreen',
+        backgroundColor: this.linking ? 'darkred' : 'darkgreen',
         indicatorColor: this.oscillator.amount.color
       }
     },
@@ -95,7 +95,7 @@ export default {
         max: this.oscillator.gain.max,
         step: this.oscillator.gain.step,
         sliderHeight: '20px',
-        backgroundColor: this.linking ? 'darkblue' : 'darkgreen',
+        backgroundColor: this.linking ? 'darkred' : 'darkgreen',
         indicatorColor: this.oscillator.gain.color
       }
     }
@@ -104,8 +104,9 @@ export default {
 </script>
 <style scoped>
 .oscillator {
-  border: 1px dashed var(--secondaryColor);
+  border: 2px groove var(--secondaryColor);
+  background-color: #022;
+  margin: 1em;
   padding: 0.5em;
-  margin: 0.5em;
 }
 </style>

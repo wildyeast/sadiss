@@ -61,7 +61,7 @@ export default {
         min: 0,
         max: 1000,
         sliderHeight: '20px',
-        backgroundColor: this.linking ? 'white' : this.lfo.color,
+        backgroundColor: this.linking ? 'darkred' : this.lfo.color,
         indicatorColor: this.lfo.rate.color
       }
     },
@@ -71,7 +71,7 @@ export default {
         max: 1,
         step: 0.05,
         sliderHeight: '20px',
-        backgroundColor: this.linking ? 'white' : this.lfo.color,
+        backgroundColor: this.linking ? 'darkred' : this.lfo.color,
         indicatorColor: this.lfo.depth.color
       }
     }
@@ -84,9 +84,9 @@ export default {
 </script>
 <style scoped>
 .lfo {
-  position: relative;
-  border: 1px dashed darkred;
+  border: 2px groove var(--secondaryColor);
+  background-color: #022;
+  margin: 1em;
   padding: 0.5em;
-  margin: 0.5em;
 }
 </style>
