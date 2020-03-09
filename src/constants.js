@@ -1,5 +1,7 @@
 export const operations = ['freq', 'mod', 'amount', 'gain']
 
+export const colors = ['darkred', 'blue', 'purple', 'maroon', '#666600', 'saddlebrown', 'mediumvioletred']
+
 export const modules = {
   oscillators: [
     {

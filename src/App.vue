@@ -10,7 +10,10 @@
         @addLfo="addLfo"
       />
     </div>
-    <button class="addLfo" @click="toggleLinking">
+    <button
+      class="addLfo"
+      @click="toggleLinking"
+    >
       🐸
     </button>
     <div class="lfos">
@@ -26,7 +29,7 @@
 </template>
 <script>
 /* global getOscillator */
-import { modules } from './constants'
+import { modules, colors } from './constants'
 import Oscillator from './components/Oscillator.vue'
 import Lfo from './components/Lfo.vue'
 
@@ -64,13 +67,16 @@ export default {
       if (!this.linking) return
 
       let target
-      if (targetContainer.oscillator) {  // Target is oscillator
+      if (targetContainer.oscillator) { // Target is oscillator
         target = targetContainer.oscillator[targetContainer.key]
-        target.oscillator = targetContainer.oscillator 
+        target.oscillator = targetContainer.oscillator
         target.key = targetContainer.key
       } else { // Target is LFO
         target = targetContainer
       }
+
+      // Add indicator color
+      target.color = colors[modules.lfos.length]
 
       this.linking = false
       modules.lfos.push({
@@ -83,6 +89,7 @@ export default {
           step: 1,
           currentValue: 0
         },
+        color: colors[modules.lfos.length],
         depth: {
           value: 0,
           offset: 0,

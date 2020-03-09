@@ -1,14 +1,22 @@
 <template>
-  <div class="lfo" style="borderColor: 'darkred';">
-    <div class="label">Welle</div> <select v-model="lfo.shape">
+  <div
+    class="lfo"
+    :style="{ borderColor: lfo.color }"
+  >
+    <div class="label">
+      Welle
+    </div> <select v-model="lfo.shape">
       <option
         v-for="shape of shapes"
+        :key="shape"
         :value="shape"
       >
         {{ shape }}
       </option>
     </select>
-    <div class="label">Geschwindigkeit</div> <SliderWithIndicator
+    <div class="label">
+      Geschwindigkeit
+    </div> <SliderWithIndicator
       v-model="lfo.rate.value"
       :slider-value="+lfo.rate.value"
       :indicator-value="+lfo.rate.currentValue"
@@ -16,7 +24,9 @@
       @click.native="$emit('addLfo', lfo.rate)"
       @input="lfo.rate.currentValue = lfo.rate.value"
     />
-    <div class="label">Tiefe</div> <SliderWithIndicator
+    <div class="label">
+      Tiefe
+    </div> <SliderWithIndicator
       v-model="lfo.depth.value"
       :slider-value="+lfo.depth.value"
       :indicator-value="+lfo.depth.currentValue"
@@ -28,7 +38,6 @@
 </template>
 <script>
 import SliderWithIndicator from 'vue-slider-with-indicator'
-import { modules } from '../constants'
 
 export default {
   name: 'Lfo',
@@ -53,8 +62,8 @@ export default {
         max: 1000,
         style: {
           sliderHeight: '20px',
-          backgroundColor: this.linking ? 'darkblue' : 'darkgreen',
-          indicatorColor: 'darkred'
+          backgroundColor: this.linking ? 'white' : this.lfo.color,
+          indicatorColor: this.lfo.rate.color
         }
       }
     },
@@ -65,8 +74,8 @@ export default {
         step: 0.05,
         style: {
           sliderHeight: '20px',
-          backgroundColor: this.linking ? 'darkblue' : 'darkgreen',
-          indicatorColor: 'darkred'
+          backgroundColor: this.linking ? 'white' : this.lfo.color,
+          indicatorColor: this.lfo.depth.color
         }
       }
     }
