@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
+use App\Http\Controllers\TrackController;
 
 /*
 |--------------------------------------------------------------------------
@@ -27,5 +28,12 @@ Route::get('/', function () {
 Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
+
+Route::post('/track/create', [TrackController::class, 'create'])
+  ->name('track.create');
+
+Route::get('/tracks', [TrackController::class, 'get']);
+
+Route::get('/track/$id', [TrackController::class, 'get']);
 
 require __DIR__.'/auth.php';

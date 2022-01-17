@@ -111,7 +111,6 @@
         </div>
     </div>
 </template>
-
 <style scoped>
     .bg-gray-100 {
         background-color: #f7fafc;

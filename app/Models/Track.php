@@ -30,4 +30,9 @@ class Track extends Model
      */
     protected $casts = [
     ];
+
+    public function performances()
+    {
+        return $this->belongsToMany(Performance::class);
+    }
 }
