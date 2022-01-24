@@ -19,6 +19,21 @@
                                     Dashboard
                                 </BreezeNavLink>
                             </div>
+                            <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                                <BreezeNavLink :href="route('tracks')" :active="route().current('tracks')">
+                                    Tracks
+                                </BreezeNavLink>
+                            </div>
+                            <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                                <BreezeNavLink :href="route('composers')" :active="route().current('composers')">
+                                    Composers
+                                </BreezeNavLink>
+                            </div>
+                            <div class="hidden space-x-8 sm:-my-px sm:ml-10 sm:flex">
+                                <BreezeNavLink :href="route('performances')" :active="route().current('performances')">
+                                    Performances
+                                </BreezeNavLink>
+                            </div>
                         </div>
 
                         <div class="hidden sm:flex sm:items-center sm:ml-6">
@@ -63,6 +78,21 @@
                     <div class="pt-2 pb-3 space-y-1">
                         <BreezeResponsiveNavLink :href="route('dashboard')" :active="route().current('dashboard')">
                             Dashboard
+                        </BreezeResponsiveNavLink>
+                    </div>
+                    <div class="pt-2 pb-3 space-y-1">
+                        <BreezeResponsiveNavLink :href="route('tracks')" :active="route().current('tracks')">
+                            Tracks
+                        </BreezeResponsiveNavLink>
+                    </div>
+                    <div class="pt-2 pb-3 space-y-1">
+                        <BreezeResponsiveNavLink :href="route('composers')" :active="route().current('composers')">
+                            Composers
+                        </BreezeResponsiveNavLink>
+                    </div>
+                    <div class="pt-2 pb-3 space-y-1">
+                        <BreezeResponsiveNavLink :href="route('performances')" :active="route().current('performances')">
+                            Performances
                         </BreezeResponsiveNavLink>
                     </div>
 

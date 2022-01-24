@@ -32,7 +32,37 @@ Route::get('/dashboard', function () {
 Route::post('/track/create', [TrackController::class, 'create'])
   ->name('track.create');
 
-Route::get('/tracks', [TrackController::class, 'get']);
+Route::get('/tracks', function () {
+    return Inertia::render('ListPage');
+})->middleware(['auth', 'verified'])->name('tracks');
+
+Route::get('/composers', function () {
+    return Inertia::render('ListPage');
+})->middleware(['auth', 'verified'])->name('composers');
+
+Route::get('/performances', function () {
+    return Inertia::render('ListPage');
+})->middleware(['auth', 'verified'])->name('performances');
+
+Route::inertia('/tracks/add', 'AddOrEditComponent')
+  ->middleware(['auth', 'verified'])
+  ->name('tracks.add');
+Route::inertia('/composers/add', 'AddOrEditComponent')
+  ->middleware(['auth', 'verified'])
+  ->name('composers.add');
+Route::inertia('/performances/add', 'AddOrEditComponent')
+  ->middleware(['auth', 'verified'])
+  ->name('performances.add');
+  
+Route::inertia('/tracks/edit', 'AddOrEditComponent')
+  ->middleware(['auth', 'verified'])
+  ->name('tracks.edit');
+Route::inertia('/composers/edit', 'AddOrEditComponent')
+  ->middleware(['auth', 'verified'])
+  ->name('composers.edit');
+Route::inertia('/performances/edit', 'AddOrEditComponent')
+  ->middleware(['auth', 'verified'])
+  ->name('performances.edit');
 
 Route::get('/track/$id', [TrackController::class, 'get']);
 

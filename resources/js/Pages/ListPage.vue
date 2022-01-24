@@ -1,0 +1,199 @@
+<template>
+    <div>
+        <Head :title="title" />
+
+        <BreezeAuthenticatedLayout>
+            <template #header>
+              <div class="flex justify-between">
+                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+                    {{ title }}
+                </h2>
+                <Link class="hover:underline" :href="route(`${pathname}.add`)">Add</Link>
+              </div>
+            </template>
+            <!-- Below is adapted from Example 4 from here https://larainfo.com/blogs/tailwind-css-simple-table-example -->
+            <div class="flex flex-col mt-8 max-w-7xl mx-auto">
+                <div class="py-2 -my-2 overflow-x-auto sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+                    <div class="inline-block min-w-full overflow-hidden align-middle border-b border-gray-200 shadow sm:rounded-lg">
+                        <table class="min-w-full">
+                            <thead>
+                                <tr>
+                                    <th class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                                        v-for="value in columnHeaders" :key="value">
+                                        {{ value }}
+                                    </th>
+                                </tr>
+                            </thead>
+
+                            <tbody class="bg-white">
+                                <tr v-for="entry in columnData" :key="entry.id">
+                                    <!-- <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                        <div class="flex items-center">
+                                            <div class="flex-shrink-0 w-10 h-10">
+                                                <img class="w-10 h-10 rounded-full" src="https://source.unsplash.com/user/erondu"
+                                                    alt="admin dashboard ui">
+                                            </div>
+
+                                            <div>
+                                                <div class="text-sm font-medium leading-5 text-gray-900">
+                                                    {{ entry.id }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </td> -->
+
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200"
+                                        v-for="(field, idx) in entry"
+                                        :key="idx">
+                                        <div class="text-sm leading-5 text-gray-500"> {{ field }} </div>
+                                    </td>
+
+                                    <!-- <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                        <div class="text-sm leading-5 text-gray-500"> {{ entry.id }} </div>
+                                    </td>
+
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                        <div class="text-sm leading-5 text-gray-500"> {{ entry.title }} </div>
+                                    </td>
+
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                        <span class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">Active</span>
+                                        <div class="text-sm leading-5 text-gray-500"> {{ entry.description }} </div>
+                                    </td>
+
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                        <div class="text-sm leading-5 text-gray-500"> {{ entry.year }} </div>
+                                    </td>
+
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                        <div class="text-sm leading-5 text-gray-500"> {{ entry.composer }} </div>
+                                    </td>
+
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
+                                        <div class="text-sm leading-5 text-gray-500"> {{ entry.added_on }} </div>
+                                    </td> -->
+
+                                    <td
+                                        class="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200">
+                                        <Link :href="route(`${pathname}.edit`, {id: entry.id})">
+                                          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-blue-400" fill="none"
+                                              viewBox="0 0 24 24" stroke="currentColor">
+                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                                          </svg>
+                                        </Link>
+                                    </td>
+                                    <td
+                                        class="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-400" fill="none"
+                                            viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                        </svg>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </BreezeAuthenticatedLayout>
+    </div>
+</template>
+
+<script>
+import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
+import { Head, Link } from '@inertiajs/inertia-vue3'
+import { onMounted, ref } from 'vue'
+
+export default {
+    components: {
+        BreezeAuthenticatedLayout,
+        Head,
+        Link
+    },
+    setup () {
+        const columnData = []
+        const columnHeaders = []
+        const pathname = window.location.pathname.replace('/', '')
+        let title = ref('')
+
+        onMounted(() => {
+          title.value = formatPageTitle(pathname)
+          getData(pathname)
+        })
+
+        function addInvariableColumnHeaders() {
+          columnHeaders.push('Edit')
+          columnHeaders.push('Delete')
+        }
+
+        function addData (dataArr) {
+            for (const header of Object.keys(dataArr[0])) {
+              columnHeaders.push(header)
+            }
+            addInvariableColumnHeaders()
+  
+            for (const entry of dataArr) {
+              columnData.push(entry)
+            }
+        }
+
+        function getData (pathname) {
+          switch (pathname) {
+            case 'tracks':
+              getTracksData()
+              break
+            case 'composers':
+              getComposersData()
+              break
+            case 'performances':
+              getPerformancesData()
+              break
+          }
+        }
+
+        function getComposersData () {
+          const dummyData = [
+            {id: 1, Name: 'Wolf Mozert', description: 'Lorem', photo: 'link-to-photo.com', website: 'wolfi@mozert.at', is_active: false},
+            {id: 2, Name: 'Sigfried Beathoven', description: 'Lorem Lorem Lorem', photo: 'link-to-photo.com', website: 'sig.beats@bro.de', is_active: true},
+          ]
+
+          addData(dummyData)
+        }
+
+        function getPerformancesData () {
+          const dummyData = [
+            {id: 1, location: 'AEC Linz', description: 'Lorem', start_date: '2022/20/1', end_date: '2022/23/1'},
+            {id: 2, location: 'Kunsthaus Wien', description: 'Lorem', start_date: '2022/21/1', end_date: '2022/22/1'},
+            {id: 3, location: 'MOMA St. Petersburg', description: 'Lorem', start_date: '2022/5/2', end_date: '2022/3/7'},
+          ]
+
+          addData(dummyData)
+        }
+
+        function getTracksData () {
+          const dummyData = [
+            {id: 1, title: 'Title1', description: 'Lorem', year: 2022, composer: 'testcomposer', added_on: '2022/1/18'},
+            {id: 2, title: 'Title2', description: 'Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem ', year: 2022, composer: 'testcomposer', added_on: '2022/1/18'},
+            {id: 3, title: 'Title3', description: 'Lorem', year: 2022, composer: 'testcomposer', added_on: '2022/1/18'},
+            {id: 4, title: 'Title4', description: 'Lorem', year: 2022, composer: 'testcomposer', added_on: '2022/1/18'}
+          ]
+
+          addData(dummyData)
+        }
+
+        function formatPageTitle (pathname) {
+          // pathname = pathname.replace('/', '')
+          return `${pathname[0].toUpperCase()}${pathname.slice(1)}`
+        }
+
+        return {
+          columnHeaders,
+          columnData,
+          pathname,
+          title,
+        }
+    }
+}
+</script>
