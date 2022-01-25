@@ -113,7 +113,8 @@ export default {
             for (const entry of dataArr) {
               if (Object.keys(entry).includes('created_at')) {
                 entry['created_at'] = formatDateTime(entry['created_at'])
-              } else if (Object.keys(entry).includes('updated_at')) {
+              }
+              if (Object.keys(entry).includes('updated_at')) {
                 entry['updated_at'] = formatDateTime(entry['updated_at'])
               }
               columnData.value.push(entry)

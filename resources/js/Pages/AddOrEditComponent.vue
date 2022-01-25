@@ -73,7 +73,9 @@ export default {
     ]
 
     onMounted (async () => {
-      await getData(pathname)
+      if (addOrEdit == 'edit') {
+        await getData(pathname)
+      }
       const data = await axios.get('/track/columns');
       dbColumnInfo.value.push(data)
       loadingFinished.value = true

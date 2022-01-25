@@ -9560,19 +9560,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              _context.next = 2;
+              if (!(addOrEdit == 'edit')) {
+                _context.next = 3;
+                break;
+              }
+
+              _context.next = 3;
               return getData(pathname);
 
-            case 2:
-              _context.next = 4;
+            case 3:
+              _context.next = 5;
               return axios.get('/track/columns');
 
-            case 4:
+            case 5:
               data = _context.sent;
               dbColumnInfo.value.push(data);
               loadingFinished.value = true;
 
-            case 7:
+            case 8:
             case "end":
               return _context.stop();
           }
@@ -10145,7 +10150,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
           if (Object.keys(entry).includes('created_at')) {
             entry['created_at'] = formatDateTime(entry['created_at']);
-          } else if (Object.keys(entry).includes('updated_at')) {
+          }
+
+          if (Object.keys(entry).includes('updated_at')) {
             entry['updated_at'] = formatDateTime(entry['updated_at']);
           }
 
