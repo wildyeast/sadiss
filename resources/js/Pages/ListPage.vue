@@ -108,7 +108,6 @@ export default {
               columnHeaders.value.push(header)
             }
             addInvariableColumnHeaders()
-            console.log(columnHeaders.value)
   
             for (const entry of dataArr) {
               if (Object.keys(entry).includes('created_at')) {

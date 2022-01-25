@@ -14,6 +14,7 @@ class TrackController extends Controller
     if (!$request->file('sourcefile')) {
       // TODO Handle error
     }
+
     $sourcefile = file_get_contents($request->file('sourcefile')->getRealPath());
     $converted = $this->convert_source_file($sourcefile);
     $track = new Track;
@@ -36,15 +37,6 @@ class TrackController extends Controller
   public function get_track_column_info (Request $request) {
     $columns = DB::select( DB::raw('SHOW COLUMNS FROM tracks'));
     return $columns;
-    // foreach($columns as $column) {
-    //     $name = $column->Name;
-    //     $type = $column->Type;
-    // }
-    // Get column with types https://stackoverflow.com/questions/18562684/how-to-get-database-field-type-in-laravel/46574742
-    // $get_first = function($x) {
-    //   return $x[0];
-    // };
-    // dd(array_map($get_first, $request->headers->all()));
   }
 
   private function convert_source_file($sourcefile)

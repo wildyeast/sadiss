@@ -11,21 +11,22 @@
           </div>
         </template>
         <!-- TODO: Replace dbColumnInfo[0] with loadingFinished bool -->
-        <!-- <div v-if="dbColumnInfo[0]" class="mt-8 max-w-7xl mx-auto py-2 -my-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8 bg-white border-b border-gray-200 shadow sm:rounded-lg"> -->
         <div v-if="dbColumnInfo[0]" class="mt-8 max-w-7xl mx-auto py-6 -my-2 sm:px-6 lg:px-8 bg-white border-gray-200 shadow sm:rounded-lg">
           <div v-for="field in dbColumnInfo[0].data" :key="field">
             <div class="flex flex-col">
               <label :for="field.Field">{{ formatLabel(field.Field) }}</label>
-              <div v-if="field.Type !== 'text'">
-                <input v-if="addOrEdit === 'edit'" :type="getInputType(field.Type)" :name="field.Field" :placeholder="field.Field" :value="dbData[id - 1]['data'][field.Field]">
-                <input v-else :type="getInputType(field.Type)" :name="field.Field" :placeholder="field.Field">
+              <div v-if="field.Field === 'partials'">
+                <PartialsUpload @fileInput="onPartialsFileInput"/>
+              </div>
+              <div v-else-if="field.Type !== 'text'">
+                <input :type="getInputType(field.Type)" :name="field.Field" :placeholder="field.Field" v-model="form[field.Field]">
               </div>
               <div v-else>
-                <textarea v-if="addOrEdit === 'edit'" :placeholder="field.Field" :value="dbData[id - 1]['data'][field.Field]"/>
-                <textarea v-else :placeholder="field.Field" />
+                <textarea :placeholder="field.Field" v-model="form[field.Field]"/>
               </div>
             </div>
           </div>
+          <button @click="submit">Submit</button>
         </div>
         <div v-else>
           <span>Loading...</span>
@@ -36,13 +37,15 @@
 
 <script>
 import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
-import { Head } from '@inertiajs/inertia-vue3'
+import { Head, useForm } from '@inertiajs/inertia-vue3'
 import { onMounted, ref } from 'vue'
+import PartialsUpload from '@/Components/PartialsUpload'
 
 export default {
   components: {
       BreezeAuthenticatedLayout,
       Head,
+      PartialsUpload
   },
   setup () {
     let addOrEdit = ''
@@ -52,6 +55,8 @@ export default {
     const loadingFinished = ref(false)
     const pathname = window.location.pathname.replace('/', '')
     let title = formatPageTitle(pathname)
+    const form = useForm({
+    })
     // Dummy data
     const tracksFields = ['id', 'title', 'description', 'year', 'composer', 'added_on']
     const trackData = [
@@ -78,6 +83,17 @@ export default {
       }
       const data = await axios.get('/track/columns');
       dbColumnInfo.value.push(data)
+
+      for (const column of dbColumnInfo.value[0].data) {
+        form[column.Field] = null
+      }
+
+      if (dbData.value.length > 0) {
+        for (const column of Object.keys(dbData.value[0].data)) {
+          form[column] = dbData.value[0].data[column]
+        }
+      }
+
       loadingFinished.value = true
     })
 
@@ -122,16 +138,28 @@ export default {
       return `${addOrEdit[0].toUpperCase()}${addOrEdit.slice(1)} ${category[0].toUpperCase()}${category.slice(1, category.length - 1)}`
     }
 
+    function onPartialsFileInput (value) {
+      form['sourcefile'] = value
+      console.log(form['sourcefile'])
+    }
+
+    function submit () {
+      form.post('/track/create')
+    }
+
     return {
       addOrEdit,
       dbColumnInfo,
       dbData,
+      form,
       formatLabel,
       getInputType,
       id,
       loadingFinished,
       title,
-      trackData
+      trackData,
+      onPartialsFileInput,
+      submit
     }
   }
 }
