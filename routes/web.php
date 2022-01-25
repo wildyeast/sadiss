@@ -64,6 +64,8 @@ Route::inertia('/performances/edit', 'AddOrEditComponent')
   ->middleware(['auth', 'verified'])
   ->name('performances.edit');
 
-Route::get('/track/$id', [TrackController::class, 'get']);
+Route::get('/track/columns', [TrackController::class, 'get_track_column_info']);
+Route::get('/track', [TrackController::class, 'get']);
+Route::get('/track/{id}', [TrackController::class, 'get']);
 
 require __DIR__.'/auth.php';
