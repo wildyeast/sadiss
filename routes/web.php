@@ -64,6 +64,7 @@ Route::inertia('/performances/edit', 'AddOrEditComponent')
   ->middleware(['auth', 'verified'])
   ->name('performances.edit');
 
+// TODO: track/columns and and track/{id} should probably be in api.php
 Route::get('/track/columns', [TrackController::class, 'get_track_column_info']);
 Route::get('/track', [TrackController::class, 'get']);
 Route::get('/track/{id}', [TrackController::class, 'get']);

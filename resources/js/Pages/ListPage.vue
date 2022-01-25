@@ -42,36 +42,11 @@
                                         </div>
                                     </td> -->
 
-                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200"
+                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 max-w-min"
                                         v-for="(field, idx) in entry"
                                         :key="idx">
                                         <div class="text-sm leading-5 text-gray-500"> {{ field }} </div>
                                     </td>
-
-                                    <!-- <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
-                                        <div class="text-sm leading-5 text-gray-500"> {{ entry.id }} </div>
-                                    </td>
-
-                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
-                                        <div class="text-sm leading-5 text-gray-500"> {{ entry.title }} </div>
-                                    </td>
-
-                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
-                                        <span class="inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full">Active</span>
-                                        <div class="text-sm leading-5 text-gray-500"> {{ entry.description }} </div>
-                                    </td>
-
-                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
-                                        <div class="text-sm leading-5 text-gray-500"> {{ entry.year }} </div>
-                                    </td>
-
-                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
-                                        <div class="text-sm leading-5 text-gray-500"> {{ entry.composer }} </div>
-                                    </td>
-
-                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
-                                        <div class="text-sm leading-5 text-gray-500"> {{ entry.added_on }} </div>
-                                    </td> -->
 
                                     <td
                                         class="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200">
@@ -113,36 +88,42 @@ export default {
         Link
     },
     setup () {
-        const columnData = []
-        const columnHeaders = []
+        const columnData = ref([])
+        const columnHeaders = ref([])
         const pathname = window.location.pathname.replace('/', '')
         let title = ref('')
 
-        onMounted(() => {
+        onMounted(async () => {
           title.value = formatPageTitle(pathname)
-          getData(pathname)
+          await getData(pathname)
         })
 
         function addInvariableColumnHeaders() {
-          columnHeaders.push('Edit')
-          columnHeaders.push('Delete')
+          columnHeaders.value.push('Edit')
+          columnHeaders.value.push('Delete')
         }
 
         function addData (dataArr) {
             for (const header of Object.keys(dataArr[0])) {
-              columnHeaders.push(header)
+              columnHeaders.value.push(header)
             }
             addInvariableColumnHeaders()
+            console.log(columnHeaders.value)
   
             for (const entry of dataArr) {
-              columnData.push(entry)
+              if (Object.keys(entry).includes('created_at')) {
+                entry['created_at'] = formatDateTime(entry['created_at'])
+              } else if (Object.keys(entry).includes('updated_at')) {
+                entry['updated_at'] = formatDateTime(entry['updated_at'])
+              }
+              columnData.value.push(entry)
             }
         }
 
-        function getData (pathname) {
+        async function getData (pathname) {
           switch (pathname) {
             case 'tracks':
-              getTracksData()
+              await getTracksData()
               break
             case 'composers':
               getComposersData()
@@ -172,15 +153,17 @@ export default {
           addData(dummyData)
         }
 
-        function getTracksData () {
-          const dummyData = [
-            {id: 1, title: 'Title1', description: 'Lorem', year: 2022, composer: 'testcomposer', added_on: '2022/1/18'},
-            {id: 2, title: 'Title2', description: 'Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem ', year: 2022, composer: 'testcomposer', added_on: '2022/1/18'},
-            {id: 3, title: 'Title3', description: 'Lorem', year: 2022, composer: 'testcomposer', added_on: '2022/1/18'},
-            {id: 4, title: 'Title4', description: 'Lorem', year: 2022, composer: 'testcomposer', added_on: '2022/1/18'}
-          ]
+        async function getTracksData () {
+          const data = await axios.get(`/track`)
+          addData(data.data)
+        }
 
-          addData(dummyData)
+        function formatDateTime (mysqlTimestamp) {
+          // Split timestamp into [ Y, M, D, h, m, s ]
+          const t = mysqlTimestamp.split(/[- : T Z]/)
+          console.log(t)
+          // Apply each element to the Date function
+          return new Date(Date.UTC(t[0], t[1]-1, t[2], t[3], t[4], t[5])).toString().slice(4, 21)
         }
 
         function formatPageTitle (pathname) {

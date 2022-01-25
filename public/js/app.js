@@ -9650,9 +9650,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 2:
                 data = _context3.sent;
                 dbData.value.push(data);
-                console.log(data);
 
-              case 5:
+              case 4:
               case "end":
                 return _context3.stop();
             }
@@ -10075,9 +10074,11 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (__WEBPACK_DEFAULT_EXPORT__)
 /* harmony export */ });
-/* harmony import */ var _Layouts_Authenticated_vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @/Layouts/Authenticated.vue */ "./resources/js/Layouts/Authenticated.vue");
-/* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
-/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! @babel/runtime/regenerator */ "./node_modules/@babel/runtime/regenerator/index.js");
+/* harmony import */ var _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var _Layouts_Authenticated_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/Layouts/Authenticated.vue */ "./resources/js/Layouts/Authenticated.vue");
+/* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
+/* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -10086,35 +10087,54 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 
 
 
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+
+
 
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
-    BreezeAuthenticatedLayout: _Layouts_Authenticated_vue__WEBPACK_IMPORTED_MODULE_0__["default"],
-    Head: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.Head,
-    Link: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.Link
+    BreezeAuthenticatedLayout: _Layouts_Authenticated_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
+    Head: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.Head,
+    Link: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.Link
   },
   setup: function setup() {
-    var columnData = [];
-    var columnHeaders = [];
+    var columnData = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
+    var columnHeaders = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
     var pathname = window.location.pathname.replace('/', '');
-    var title = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)('');
-    (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
-      title.value = formatPageTitle(pathname);
-      getData(pathname);
-    });
+    var title = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)('');
+    (0,vue__WEBPACK_IMPORTED_MODULE_3__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              title.value = formatPageTitle(pathname);
+              _context.next = 3;
+              return getData(pathname);
+
+            case 3:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    })));
 
     function addInvariableColumnHeaders() {
-      columnHeaders.push('Edit');
-      columnHeaders.push('Delete');
+      columnHeaders.value.push('Edit');
+      columnHeaders.value.push('Delete');
     }
 
     function addData(dataArr) {
       for (var _i = 0, _Object$keys = Object.keys(dataArr[0]); _i < _Object$keys.length; _i++) {
         var header = _Object$keys[_i];
-        columnHeaders.push(header);
+        columnHeaders.value.push(header);
       }
 
       addInvariableColumnHeaders();
+      console.log(columnHeaders.value);
 
       var _iterator = _createForOfIteratorHelper(dataArr),
           _step;
@@ -10122,7 +10142,14 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       try {
         for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var entry = _step.value;
-          columnData.push(entry);
+
+          if (Object.keys(entry).includes('created_at')) {
+            entry['created_at'] = formatDateTime(entry['created_at']);
+          } else if (Object.keys(entry).includes('updated_at')) {
+            entry['updated_at'] = formatDateTime(entry['updated_at']);
+          }
+
+          columnData.value.push(entry);
         }
       } catch (err) {
         _iterator.e(err);
@@ -10131,20 +10158,43 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
       }
     }
 
-    function getData(pathname) {
-      switch (pathname) {
-        case 'tracks':
-          getTracksData();
-          break;
+    function getData(_x) {
+      return _getData.apply(this, arguments);
+    }
 
-        case 'composers':
-          getComposersData();
-          break;
+    function _getData() {
+      _getData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(pathname) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.t0 = pathname;
+                _context2.next = _context2.t0 === 'tracks' ? 3 : _context2.t0 === 'composers' ? 6 : _context2.t0 === 'performances' ? 8 : 10;
+                break;
 
-        case 'performances':
-          getPerformancesData();
-          break;
-      }
+              case 3:
+                _context2.next = 5;
+                return getTracksData();
+
+              case 5:
+                return _context2.abrupt("break", 10);
+
+              case 6:
+                getComposersData();
+                return _context2.abrupt("break", 10);
+
+              case 8:
+                getPerformancesData();
+                return _context2.abrupt("break", 10);
+
+              case 10:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2);
+      }));
+      return _getData.apply(this, arguments);
     }
 
     function getComposersData() {
@@ -10190,36 +10240,39 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
     }
 
     function getTracksData() {
-      var dummyData = [{
-        id: 1,
-        title: 'Title1',
-        description: 'Lorem',
-        year: 2022,
-        composer: 'testcomposer',
-        added_on: '2022/1/18'
-      }, {
-        id: 2,
-        title: 'Title2',
-        description: 'Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem ',
-        year: 2022,
-        composer: 'testcomposer',
-        added_on: '2022/1/18'
-      }, {
-        id: 3,
-        title: 'Title3',
-        description: 'Lorem',
-        year: 2022,
-        composer: 'testcomposer',
-        added_on: '2022/1/18'
-      }, {
-        id: 4,
-        title: 'Title4',
-        description: 'Lorem',
-        year: 2022,
-        composer: 'testcomposer',
-        added_on: '2022/1/18'
-      }];
-      addData(dummyData);
+      return _getTracksData.apply(this, arguments);
+    }
+
+    function _getTracksData() {
+      _getTracksData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
+        var data;
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return axios.get("/track");
+
+              case 2:
+                data = _context3.sent;
+                addData(data.data);
+
+              case 4:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
+      }));
+      return _getTracksData.apply(this, arguments);
+    }
+
+    function formatDateTime(mysqlTimestamp) {
+      // Split timestamp into [ Y, M, D, h, m, s ]
+      var t = mysqlTimestamp.split(/[- : T Z]/);
+      console.log(t); // Apply each element to the Date function
+
+      return new Date(Date.UTC(t[0], t[1] - 1, t[2], t[3], t[4], t[5])).toString().slice(4, 21);
     }
 
     function formatPageTitle(pathname) {
@@ -11961,14 +12014,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           key: entry.id
         }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td class=\"px-6 py-4 whitespace-no-wrap border-b border-gray-200\">\r\n                                        <div class=\"flex items-center\">\r\n                                            <div class=\"flex-shrink-0 w-10 h-10\">\r\n                                                <img class=\"w-10 h-10 rounded-full\" src=\"https://source.unsplash.com/user/erondu\"\r\n                                                    alt=\"admin dashboard ui\">\r\n                                            </div>\r\n\r\n                                            <div>\r\n                                                <div class=\"text-sm font-medium leading-5 text-gray-900\">\r\n                                                    {{ entry.id }}\r\n                                                </div>\r\n                                            </div>\r\n                                        </div>\r\n                                    </td> "), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(entry, function (field, idx) {
           return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", {
-            "class": "px-6 py-4 whitespace-no-wrap border-b border-gray-200",
+            "class": "px-6 py-4 whitespace-no-wrap border-b border-gray-200 max-w-min",
             key: idx
           }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(field), 1
           /* TEXT */
           )]);
         }), 128
         /* KEYED_FRAGMENT */
-        )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td class=\"px-6 py-4 whitespace-no-wrap border-b border-gray-200\">\r\n                                        <div class=\"text-sm leading-5 text-gray-500\"> {{ entry.id }} </div>\r\n                                    </td>\r\n\r\n                                    <td class=\"px-6 py-4 whitespace-no-wrap border-b border-gray-200\">\r\n                                        <div class=\"text-sm leading-5 text-gray-500\"> {{ entry.title }} </div>\r\n                                    </td>\r\n\r\n                                    <td class=\"px-6 py-4 whitespace-no-wrap border-b border-gray-200\">\r\n                                        <span class=\"inline-flex px-2 text-xs font-semibold leading-5 text-green-800 bg-green-100 rounded-full\">Active</span>\r\n                                        <div class=\"text-sm leading-5 text-gray-500\"> {{ entry.description }} </div>\r\n                                    </td>\r\n\r\n                                    <td class=\"px-6 py-4 whitespace-no-wrap border-b border-gray-200\">\r\n                                        <div class=\"text-sm leading-5 text-gray-500\"> {{ entry.year }} </div>\r\n                                    </td>\r\n\r\n                                    <td class=\"px-6 py-4 whitespace-no-wrap border-b border-gray-200\">\r\n                                        <div class=\"text-sm leading-5 text-gray-500\"> {{ entry.composer }} </div>\r\n                                    </td>\r\n\r\n                                    <td class=\"px-6 py-4 whitespace-no-wrap border-b border-gray-200\">\r\n                                        <div class=\"text-sm leading-5 text-gray-500\"> {{ entry.added_on }} </div>\r\n                                    </td> "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
+        )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
           href: _ctx.route("".concat($setup.pathname, ".edit"), {
             id: entry.id
           })

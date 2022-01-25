@@ -108,7 +108,6 @@ export default {
     async function getFieldsToDisplay(fields) {
       const data = await axios.get(`/track/${id}`)
       dbData.value.push(data)
-      console.log(data)
     }
 
     function formatLabel(labelText) {
