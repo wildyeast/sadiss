@@ -104,70 +104,50 @@ export default {
         }
 
         function addData (dataArr) {
-            for (const header of Object.keys(dataArr[0])) {
-              columnHeaders.value.push(header)
+          for (const header of Object.keys(dataArr[0])) {
+            columnHeaders.value.push(header)
+          }
+          addInvariableColumnHeaders()
+
+          for (const entry of dataArr) {
+            if (Object.keys(entry).includes('created_at')) {
+              entry['created_at'] = formatDateTime(entry['created_at'])
             }
-            addInvariableColumnHeaders()
-  
-            for (const entry of dataArr) {
-              if (Object.keys(entry).includes('created_at')) {
-                entry['created_at'] = formatDateTime(entry['created_at'])
-              }
-              if (Object.keys(entry).includes('updated_at')) {
-                entry['updated_at'] = formatDateTime(entry['updated_at'])
-              }
-              columnData.value.push(entry)
+            if (Object.keys(entry).includes('updated_at')) {
+              entry['updated_at'] = formatDateTime(entry['updated_at'])
             }
+            columnData.value.push(entry)
+          }
         }
 
         async function getData (pathname) {
+          let response
           switch (pathname) {
             case 'tracks':
-              await getTracksData()
+              response = await axios.get('/api/track')
+              addData(response.data)
               break
             case 'composers':
-              getComposersData()
+              response = await axios.get('/api/composer')
+              addData(response.data)
               break
             case 'performances':
-              getPerformancesData()
+              response = await axios.get('/api/performance')
+              addData(response.data)
               break
           }
         }
 
-        function getComposersData () {
-          const dummyData = [
-            {id: 1, Name: 'Wolf Mozert', description: 'Lorem', photo: 'link-to-photo.com', website: 'wolfi@mozert.at', is_active: false},
-            {id: 2, Name: 'Sigfried Beathoven', description: 'Lorem Lorem Lorem', photo: 'link-to-photo.com', website: 'sig.beats@bro.de', is_active: true},
-          ]
-
-          addData(dummyData)
-        }
-
-        function getPerformancesData () {
-          const dummyData = [
-            {id: 1, location: 'AEC Linz', description: 'Lorem', start_date: '2022/20/1', end_date: '2022/23/1'},
-            {id: 2, location: 'Kunsthaus Wien', description: 'Lorem', start_date: '2022/21/1', end_date: '2022/22/1'},
-            {id: 3, location: 'MOMA St. Petersburg', description: 'Lorem', start_date: '2022/5/2', end_date: '2022/3/7'},
-          ]
-
-          addData(dummyData)
-        }
-
-        async function getTracksData () {
-          const data = await axios.get(`/track`)
-          addData(data.data)
-        }
+        // Helper functions
 
         function formatDateTime (mysqlTimestamp) {
           // Split timestamp into [ Y, M, D, h, m, s ]
           const t = mysqlTimestamp.split(/[- : T Z]/)
-          console.log(t)
           // Apply each element to the Date function
           return new Date(Date.UTC(t[0], t[1]-1, t[2], t[3], t[4], t[5])).toString().slice(4, 21)
         }
 
         function formatPageTitle (pathname) {
-          // pathname = pathname.replace('/', '')
           return `${pathname[0].toUpperCase()}${pathname.slice(1)}`
         }
 

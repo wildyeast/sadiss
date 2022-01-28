@@ -9505,248 +9505,271 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     PartialsUpload: _Components_PartialsUpload__WEBPACK_IMPORTED_MODULE_4__["default"]
   },
   setup: function setup() {
-    var addOrEdit = '';
-    var dbColumnInfo = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
-    var dbData = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
-    var id = window.location.toString().split('=')[1]; // TODO: This is silly. Find different way to get route parameters.
+    var _this = this;
 
-    var loadingFinished = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)(false);
-    var pathname = window.location.pathname.replace('/', '');
-    var title = formatPageTitle(pathname);
-    var form = (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.useForm)({}); // Dummy data
+    return _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
+      var addOrEdit, dbColumnInfo, dbData, id, loadingFinished, pathname, title, form, tracksFields, trackData, composersFields, composerData, performancesFields, performancesData, getInputType, getData, _getData, getFieldsToDisplay, _getFieldsToDisplay, formatLabel, formatPageTitle, onPartialsFileInput, submit;
 
-    var tracksFields = ['id', 'title', 'description', 'year', 'composer', 'added_on'];
-    var trackData = [{
-      id: 1,
-      title: 'Title1',
-      description: 'Lorem',
-      year: 2022,
-      composer: 'testcomposer',
-      added_on: '2022/1/18'
-    }, {
-      id: 2,
-      title: 'Title2',
-      description: 'Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem ',
-      year: 2022,
-      composer: 'testcomposer',
-      added_on: '2022/1/18'
-    }, {
-      id: 3,
-      title: 'Title3',
-      description: 'Lorem',
-      year: 2022,
-      composer: 'testcomposer',
-      added_on: '2022/1/18'
-    }, {
-      id: 4,
-      title: 'Title4',
-      description: 'Lorem',
-      year: 2022,
-      composer: 'testcomposer',
-      added_on: '2022/1/18'
-    }];
-    var composersFields = ['id', 'name', 'description', 'photo', 'website', 'is_active'];
-    var composerData = [{
-      id: 1,
-      Name: 'Wolf Mozert',
-      description: 'Lorem',
-      photo: 'link-to-photo.com',
-      website: 'wolfi@mozert.at',
-      is_active: false
-    }, {
-      id: 2,
-      Name: 'Sigfried Beathoven',
-      description: 'Lorem Lorem Lorem',
-      photo: 'link-to-photo.com',
-      website: 'sig.beats@bro.de',
-      is_active: true
-    }];
-    var performancesFields = ['id', 'location', 'description', 'start_date', 'end_date'];
-    var performancesData = [{
-      id: 1,
-      location: 'AEC Linz',
-      description: 'Lorem',
-      start_date: '2022/20/1',
-      end_date: '2022/23/1'
-    }, {
-      id: 2,
-      location: 'Kunsthaus Wien',
-      description: 'Lorem',
-      start_date: '2022/21/1',
-      end_date: '2022/22/1'
-    }, {
-      id: 3,
-      location: 'MOMA St. Petersburg',
-      description: 'Lorem',
-      start_date: '2022/5/2',
-      end_date: '2022/3/7'
-    }];
-    (0,vue__WEBPACK_IMPORTED_MODULE_3__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-      var data, _iterator, _step, _column, _i, _Object$keys, column;
-
-      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
         while (1) {
-          switch (_context.prev = _context.next) {
+          switch (_context4.prev = _context4.next) {
             case 0:
-              if (!(addOrEdit == 'edit')) {
-                _context.next = 3;
-                break;
-              }
+              submit = function _submit() {
+                form.post('api/track/create');
+              };
 
-              _context.next = 3;
-              return getData(pathname);
+              onPartialsFileInput = function _onPartialsFileInput(value) {
+                form[0]['sourcefile'] = value;
+                console.log(form[0]['sourcefile']);
+              };
 
-            case 3:
-              _context.next = 5;
-              return axios.get('/track/columns');
+              formatPageTitle = function _formatPageTitle(pathname) {
+                var category = pathname.split('/')[0];
+                addOrEdit = pathname.split('/')[1];
+                return "".concat(addOrEdit[0].toUpperCase()).concat(addOrEdit.slice(1), " ").concat(category[0].toUpperCase()).concat(category.slice(1, category.length - 1));
+              };
 
-            case 5:
-              data = _context.sent;
-              dbColumnInfo.value.push(data);
-              _iterator = _createForOfIteratorHelper(dbColumnInfo.value[0].data);
+              formatLabel = function _formatLabel(labelText) {
+                return "".concat(labelText[0].toUpperCase()).concat(labelText.slice(1)).replace('_', ' ');
+              };
 
-              try {
-                for (_iterator.s(); !(_step = _iterator.n()).done;) {
-                  _column = _step.value;
-                  form[_column.Field] = null;
+              _getFieldsToDisplay = function _getFieldsToDisplay3() {
+                _getFieldsToDisplay = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3(fields) {
+                  var data;
+                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+                    while (1) {
+                      switch (_context3.prev = _context3.next) {
+                        case 0:
+                          _context3.next = 2;
+                          return axios.get("api/track/".concat(id));
+
+                        case 2:
+                          data = _context3.sent;
+                          dbData.value.push(data);
+
+                        case 4:
+                        case "end":
+                          return _context3.stop();
+                      }
+                    }
+                  }, _callee3);
+                }));
+                return _getFieldsToDisplay.apply(this, arguments);
+              };
+
+              getFieldsToDisplay = function _getFieldsToDisplay2(_x2) {
+                return _getFieldsToDisplay.apply(this, arguments);
+              };
+
+              _getData = function _getData3() {
+                _getData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(pathname) {
+                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+                    while (1) {
+                      switch (_context2.prev = _context2.next) {
+                        case 0:
+                          _context2.t0 = pathname.split('/')[0];
+                          _context2.next = _context2.t0 === 'tracks' ? 3 : _context2.t0 === 'composers' ? 6 : _context2.t0 === 'performances' ? 8 : 10;
+                          break;
+
+                        case 3:
+                          _context2.next = 5;
+                          return getFieldsToDisplay(tracksFields);
+
+                        case 5:
+                          return _context2.abrupt("break", 10);
+
+                        case 6:
+                          getFieldsToDisplay(composersFields);
+                          return _context2.abrupt("break", 10);
+
+                        case 8:
+                          getFieldsToDisplay(performancesFields);
+                          return _context2.abrupt("break", 10);
+
+                        case 10:
+                        case "end":
+                          return _context2.stop();
+                      }
+                    }
+                  }, _callee2);
+                }));
+                return _getData.apply(this, arguments);
+              };
+
+              getData = function _getData2(_x) {
+                return _getData.apply(this, arguments);
+              };
+
+              getInputType = function _getInputType(dbType) {
+                switch (dbType) {
+                  case 'bigint unsigned':
+                  case 'id':
+                    return 'number';
+
+                  case 'timestamp':
+                    return 'datetime-local';
+
+                  case 'varchar(255)':
+                    return 'text';
                 }
-              } catch (err) {
-                _iterator.e(err);
-              } finally {
-                _iterator.f();
-              }
+              };
 
-              if (dbData.value.length > 0) {
-                for (_i = 0, _Object$keys = Object.keys(dbData.value[0].data); _i < _Object$keys.length; _i++) {
-                  column = _Object$keys[_i];
-                  form[column] = dbData.value[0].data[column];
-                }
-              }
+              addOrEdit = '';
+              dbColumnInfo = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
+              dbData = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
+              id = _this.$route.params.id; // TODO: This is silly. Find different way to get route parameters.
 
-              loadingFinished.value = true;
+              loadingFinished = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)(false);
+              pathname = window.location.pathname.replace('/', '');
+              title = formatPageTitle(pathname); // const dataTest = await axios.get('/track/columns')
+              // const formObj = {}
+              // for (const value of dataTest.data) {
+              //   console.log(value.Field)
+              //   formObj[value.Field] = ''
+              //   console.log(formObj)
+              // }
 
-            case 11:
+              form = (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.useForm)({}); // Dummy data
+
+              tracksFields = ['id', 'title', 'description', 'year', 'composer', 'added_on'];
+              trackData = [{
+                id: 1,
+                title: 'Title1',
+                description: 'Lorem',
+                year: 2022,
+                composer: 'testcomposer',
+                added_on: '2022/1/18'
+              }, {
+                id: 2,
+                title: 'Title2',
+                description: 'Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem ',
+                year: 2022,
+                composer: 'testcomposer',
+                added_on: '2022/1/18'
+              }, {
+                id: 3,
+                title: 'Title3',
+                description: 'Lorem',
+                year: 2022,
+                composer: 'testcomposer',
+                added_on: '2022/1/18'
+              }, {
+                id: 4,
+                title: 'Title4',
+                description: 'Lorem',
+                year: 2022,
+                composer: 'testcomposer',
+                added_on: '2022/1/18'
+              }];
+              composersFields = ['id', 'name', 'description', 'photo', 'website', 'is_active'];
+              composerData = [{
+                id: 1,
+                Name: 'Wolf Mozert',
+                description: 'Lorem',
+                photo: 'link-to-photo.com',
+                website: 'wolfi@mozert.at',
+                is_active: false
+              }, {
+                id: 2,
+                Name: 'Sigfried Beathoven',
+                description: 'Lorem Lorem Lorem',
+                photo: 'link-to-photo.com',
+                website: 'sig.beats@bro.de',
+                is_active: true
+              }];
+              performancesFields = ['id', 'location', 'description', 'start_date', 'end_date'];
+              performancesData = [{
+                id: 1,
+                location: 'AEC Linz',
+                description: 'Lorem',
+                start_date: '2022/20/1',
+                end_date: '2022/23/1'
+              }, {
+                id: 2,
+                location: 'Kunsthaus Wien',
+                description: 'Lorem',
+                start_date: '2022/21/1',
+                end_date: '2022/22/1'
+              }, {
+                id: 3,
+                location: 'MOMA St. Petersburg',
+                description: 'Lorem',
+                start_date: '2022/5/2',
+                end_date: '2022/3/7'
+              }];
+              (0,vue__WEBPACK_IMPORTED_MODULE_3__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+                var data, _iterator, _step, _column, _i, _Object$keys, column;
+
+                return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+                  while (1) {
+                    switch (_context.prev = _context.next) {
+                      case 0:
+                        if (!(addOrEdit == 'edit')) {
+                          _context.next = 3;
+                          break;
+                        }
+
+                        _context.next = 3;
+                        return getData(pathname);
+
+                      case 3:
+                        _context.next = 5;
+                        return axios.get('api/track/columns');
+
+                      case 5:
+                        data = _context.sent;
+                        dbColumnInfo.value.push(data);
+                        _iterator = _createForOfIteratorHelper(dbColumnInfo.value[0].data);
+
+                        try {
+                          for (_iterator.s(); !(_step = _iterator.n()).done;) {
+                            _column = _step.value;
+                            form[0][_column.Field] = null;
+                          }
+                        } catch (err) {
+                          _iterator.e(err);
+                        } finally {
+                          _iterator.f();
+                        }
+
+                        if (dbData.value.length > 0) {
+                          for (_i = 0, _Object$keys = Object.keys(dbData.value[0].data); _i < _Object$keys.length; _i++) {
+                            column = _Object$keys[_i];
+                            form[0][column] = dbData.value[0].data[column];
+                          }
+                        }
+
+                        loadingFinished.value = true;
+
+                      case 11:
+                      case "end":
+                        return _context.stop();
+                    }
+                  }
+                }, _callee);
+              })));
+              return _context4.abrupt("return", {
+                addOrEdit: addOrEdit,
+                dbColumnInfo: dbColumnInfo,
+                dbData: dbData,
+                form: form,
+                formatLabel: formatLabel,
+                getInputType: getInputType,
+                id: id,
+                loadingFinished: loadingFinished,
+                title: title,
+                trackData: trackData,
+                onPartialsFileInput: onPartialsFileInput,
+                submit: submit
+              });
+
+            case 25:
             case "end":
-              return _context.stop();
+              return _context4.stop();
           }
         }
-      }, _callee);
-    })));
-
-    function getInputType(dbType) {
-      switch (dbType) {
-        case 'bigint unsigned':
-        case 'id':
-          return 'number';
-
-        case 'timestamp':
-          return 'datetime-local';
-
-        case 'varchar(255)':
-          return 'text';
-      }
-    }
-
-    function getData(_x) {
-      return _getData.apply(this, arguments);
-    }
-
-    function _getData() {
-      _getData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(pathname) {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                _context2.t0 = pathname.split('/')[0];
-                _context2.next = _context2.t0 === 'tracks' ? 3 : _context2.t0 === 'composers' ? 6 : _context2.t0 === 'performances' ? 8 : 10;
-                break;
-
-              case 3:
-                _context2.next = 5;
-                return getFieldsToDisplay(tracksFields);
-
-              case 5:
-                return _context2.abrupt("break", 10);
-
-              case 6:
-                getFieldsToDisplay(composersFields);
-                return _context2.abrupt("break", 10);
-
-              case 8:
-                getFieldsToDisplay(performancesFields);
-                return _context2.abrupt("break", 10);
-
-              case 10:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2);
-      }));
-      return _getData.apply(this, arguments);
-    }
-
-    function getFieldsToDisplay(_x2) {
-      return _getFieldsToDisplay.apply(this, arguments);
-    }
-
-    function _getFieldsToDisplay() {
-      _getFieldsToDisplay = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3(fields) {
-        var data;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                _context3.next = 2;
-                return axios.get("/track/".concat(id));
-
-              case 2:
-                data = _context3.sent;
-                dbData.value.push(data);
-
-              case 4:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3);
-      }));
-      return _getFieldsToDisplay.apply(this, arguments);
-    }
-
-    function formatLabel(labelText) {
-      return "".concat(labelText[0].toUpperCase()).concat(labelText.slice(1)).replace('_', ' ');
-    }
-
-    function formatPageTitle(pathname) {
-      var category = pathname.split('/')[0];
-      addOrEdit = pathname.split('/')[1];
-      return "".concat(addOrEdit[0].toUpperCase()).concat(addOrEdit.slice(1), " ").concat(category[0].toUpperCase()).concat(category.slice(1, category.length - 1));
-    }
-
-    function onPartialsFileInput(value) {
-      form['sourcefile'] = value;
-      console.log(form['sourcefile']);
-    }
-
-    function submit() {
-      form.post('/track/create');
-    }
-
-    return {
-      addOrEdit: addOrEdit,
-      dbColumnInfo: dbColumnInfo,
-      dbData: dbData,
-      form: form,
-      formatLabel: formatLabel,
-      getInputType: getInputType,
-      id: id,
-      loadingFinished: loadingFinished,
-      title: title,
-      trackData: trackData,
-      onPartialsFileInput: onPartialsFileInput,
-      submit: submit
-    };
+      }, _callee4);
+    }))();
   }
 });
 
@@ -10226,34 +10249,48 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
     function getData(_x) {
       return _getData.apply(this, arguments);
-    }
+    } // Helper functions
+
 
     function _getData() {
       _getData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(pathname) {
+        var response;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.t0 = pathname;
-                _context2.next = _context2.t0 === 'tracks' ? 3 : _context2.t0 === 'composers' ? 6 : _context2.t0 === 'performances' ? 8 : 10;
+                _context2.next = _context2.t0 === 'tracks' ? 3 : _context2.t0 === 'composers' ? 8 : _context2.t0 === 'performances' ? 13 : 18;
                 break;
 
               case 3:
                 _context2.next = 5;
-                return getTracksData();
+                return axios.get('/api/track');
 
               case 5:
-                return _context2.abrupt("break", 10);
-
-              case 6:
-                getComposersData();
-                return _context2.abrupt("break", 10);
+                response = _context2.sent;
+                addData(response.data);
+                return _context2.abrupt("break", 18);
 
               case 8:
-                getPerformancesData();
-                return _context2.abrupt("break", 10);
+                _context2.next = 10;
+                return axios.get('/api/composer');
 
               case 10:
+                response = _context2.sent;
+                addData(response.data);
+                return _context2.abrupt("break", 18);
+
+              case 13:
+                _context2.next = 15;
+                return axios.get('/api/performance');
+
+              case 15:
+                response = _context2.sent;
+                addData(response.data);
+                return _context2.abrupt("break", 18);
+
+              case 18:
               case "end":
                 return _context2.stop();
             }
@@ -10263,86 +10300,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return _getData.apply(this, arguments);
     }
 
-    function getComposersData() {
-      var dummyData = [{
-        id: 1,
-        Name: 'Wolf Mozert',
-        description: 'Lorem',
-        photo: 'link-to-photo.com',
-        website: 'wolfi@mozert.at',
-        is_active: false
-      }, {
-        id: 2,
-        Name: 'Sigfried Beathoven',
-        description: 'Lorem Lorem Lorem',
-        photo: 'link-to-photo.com',
-        website: 'sig.beats@bro.de',
-        is_active: true
-      }];
-      addData(dummyData);
-    }
-
-    function getPerformancesData() {
-      var dummyData = [{
-        id: 1,
-        location: 'AEC Linz',
-        description: 'Lorem',
-        start_date: '2022/20/1',
-        end_date: '2022/23/1'
-      }, {
-        id: 2,
-        location: 'Kunsthaus Wien',
-        description: 'Lorem',
-        start_date: '2022/21/1',
-        end_date: '2022/22/1'
-      }, {
-        id: 3,
-        location: 'MOMA St. Petersburg',
-        description: 'Lorem',
-        start_date: '2022/5/2',
-        end_date: '2022/3/7'
-      }];
-      addData(dummyData);
-    }
-
-    function getTracksData() {
-      return _getTracksData.apply(this, arguments);
-    }
-
-    function _getTracksData() {
-      _getTracksData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
-        var data;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                _context3.next = 2;
-                return axios.get("/track");
-
-              case 2:
-                data = _context3.sent;
-                addData(data.data);
-
-              case 4:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3);
-      }));
-      return _getTracksData.apply(this, arguments);
-    }
-
     function formatDateTime(mysqlTimestamp) {
       // Split timestamp into [ Y, M, D, h, m, s ]
-      var t = mysqlTimestamp.split(/[- : T Z]/);
-      console.log(t); // Apply each element to the Date function
+      var t = mysqlTimestamp.split(/[- : T Z]/); // Apply each element to the Date function
 
       return new Date(Date.UTC(t[0], t[1] - 1, t[2], t[3], t[4], t[5])).toString().slice(4, 21);
     }
 
     function formatPageTitle(pathname) {
-      // pathname = pathname.replace('/', '')
       return "".concat(pathname[0].toUpperCase()).concat(pathname.slice(1));
     }
 
@@ -11181,19 +11146,24 @@ var _hoisted_9 = {
   key: 2
 };
 var _hoisted_10 = ["placeholder", "onUpdate:modelValue"];
-var _hoisted_11 = {
+
+var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Submit");
+
+var _hoisted_12 = {
   key: 1
 };
 
-var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Loading...", -1
+var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Loading...", -1
 /* HOISTED */
 );
 
-var _hoisted_13 = [_hoisted_12];
+var _hoisted_14 = [_hoisted_13];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Head = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Head");
 
   var _component_PartialsUpload = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("PartialsUpload");
+
+  var _component_Button = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Button");
 
   var _component_BreezeAuthenticatedLayout = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("BreezeAuthenticatedLayout");
 
@@ -11208,7 +11178,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       )])];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [$setup.dbColumnInfo[0] ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.dbColumnInfo[0].data, function (field) {
+      return [$setup.dbColumnInfo[0] ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
+        onSubmit: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+          return $setup.submit && $setup.submit.apply($setup, arguments);
+        }, ["prevent"]))
+      }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.dbColumnInfo[0].data, function (field) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
           key: field
         }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
@@ -11224,25 +11198,30 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           name: field.Field,
           placeholder: field.Field,
           "onUpdate:modelValue": function onUpdateModelValue($event) {
-            return $setup.form[field.Field] = $event;
+            return $setup.form[0][field.Field] = $event;
           }
         }, null, 8
         /* PROPS */
-        , _hoisted_8), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelDynamic, $setup.form[field.Field]]])])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+        , _hoisted_8), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelDynamic, $setup.form[0][field.Field]]])])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
           placeholder: field.Field,
           "onUpdate:modelValue": function onUpdateModelValue($event) {
-            return $setup.form[field.Field] = $event;
+            return $setup.form[0][field.Field] = $event;
           }
         }, null, 8
         /* PROPS */
-        , _hoisted_10), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $setup.form[field.Field]]])]))])]);
+        , _hoisted_10), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $setup.form[0][field.Field]]])]))])]);
       }), 128
       /* KEYED_FRAGMENT */
-      )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-        onClick: _cache[0] || (_cache[0] = function () {
-          return $setup.submit && $setup.submit.apply($setup, arguments);
-        })
-      }, "Submit")])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_11, _hoisted_13))];
+      )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, null, {
+        "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
+          return [_hoisted_11];
+        }),
+        _: 1
+        /* STABLE */
+
+      }), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <progress\r\n            v-if=\"form.progress\"\r\n            :value=\"form.progress.percentage\"\r\n            max=\"100\">\r\n            {{ form.progress.percentage }}%\r\n            </progress> ")], 32
+      /* HYDRATE_EVENTS */
+      ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <button @click=\"submit\">Submit</button> ")])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_12, _hoisted_14))];
     }),
     _: 1
     /* STABLE */

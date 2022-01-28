@@ -2,6 +2,9 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\TrackController;
+use App\Http\Controllers\PerformanceController;
+use App\Http\Controllers\ComposerController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,4 +20,19 @@ use Illuminate\Support\Facades\Route;
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+Route::get('/track/columns', [TrackController::class, 'get_column_info']);
+Route::post('/track/create', [TrackController::class, 'create'])
+  ->name('track.create');
+Route::get('/track', [TrackController::class, 'get']);
+Route::get('/track/{id}', [TrackController::class, 'get']);
+
+Route::get('/performance/columns', [PerformanceController::class, 'get_column_info']);
+Route::get('/performance', [PerformanceController::class, 'get']);
+Route::get('/performance/{id}', [PerformanceController::class, 'get']);
+
+Route::get('/composer/columns', [ComposerController::class, 'get_column_info']);
+Route::get('/composer', [ComposerController::class, 'get']);
+Route::get('/composer/{id}', [ComposerController::class, 'get']);
+
 

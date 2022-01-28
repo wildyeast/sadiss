@@ -29,9 +29,6 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::post('/track/create', [TrackController::class, 'create'])
-  ->name('track.create');
-
 Route::get('/tracks', function () {
     return Inertia::render('ListPage');
 })->middleware(['auth', 'verified'])->name('tracks');
@@ -63,10 +60,5 @@ Route::inertia('/composers/edit', 'AddOrEditComponent')
 Route::inertia('/performances/edit', 'AddOrEditComponent')
   ->middleware(['auth', 'verified'])
   ->name('performances.edit');
-
-// TODO: track/columns and and track/{id} should probably be in api.php
-Route::get('/track/columns', [TrackController::class, 'get_track_column_info']);
-Route::get('/track', [TrackController::class, 'get']);
-Route::get('/track/{id}', [TrackController::class, 'get']);
 
 require __DIR__.'/auth.php';

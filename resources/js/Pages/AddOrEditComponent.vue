@@ -12,6 +12,7 @@
         </template>
         <!-- TODO: Replace dbColumnInfo[0] with loadingFinished bool -->
         <div v-if="dbColumnInfo[0]" class="mt-8 max-w-7xl mx-auto py-6 -my-2 sm:px-6 lg:px-8 bg-white border-gray-200 shadow sm:rounded-lg">
+          <form @submit.prevent="submit">
           <div v-for="field in dbColumnInfo[0].data" :key="field">
             <div class="flex flex-col">
               <label :for="field.Field">{{ formatLabel(field.Field) }}</label>
@@ -19,14 +20,22 @@
                 <PartialsUpload @fileInput="onPartialsFileInput"/>
               </div>
               <div v-else-if="field.Type !== 'text'">
-                <input :type="getInputType(field.Type)" :name="field.Field" :placeholder="field.Field" v-model="form[field.Field]">
+                <input :type="getInputType(field.Type)" :name="field.Field" :placeholder="field.Field" v-model="form[0][field.Field]">
               </div>
               <div v-else>
-                <textarea :placeholder="field.Field" v-model="form[field.Field]"/>
+                <textarea :placeholder="field.Field" v-model="form[0][field.Field]"/>
               </div>
             </div>
           </div>
-          <button @click="submit">Submit</button>
+          <Button>Submit</Button>
+          <!-- <progress
+            v-if="form.progress"
+            :value="form.progress.percentage"
+            max="100">
+            {{ form.progress.percentage }}%
+            </progress> -->
+          </form>
+          <!-- <button @click="submit">Submit</button> -->
         </div>
         <div v-else>
           <span>Loading...</span>
@@ -47,16 +56,22 @@ export default {
       Head,
       PartialsUpload
   },
-  setup () {
+  async setup () {
     let addOrEdit = ''
     const dbColumnInfo = ref([])
     const dbData = ref([])
-    const id = window.location.toString().split('=')[1] // TODO: This is silly. Find different way to get route parameters.
+    const id = this.$route.params.id // TODO: This is silly. Find different way to get route parameters.
     const loadingFinished = ref(false)
     const pathname = window.location.pathname.replace('/', '')
     let title = formatPageTitle(pathname)
-    const form = useForm({
-    })
+    // const dataTest = await axios.get('/track/columns')
+    // const formObj = {}
+    // for (const value of dataTest.data) {
+    //   console.log(value.Field)
+    //   formObj[value.Field] = ''
+    //   console.log(formObj)
+    // }
+    const form = useForm({})
     // Dummy data
     const tracksFields = ['id', 'title', 'description', 'year', 'composer', 'added_on']
     const trackData = [
@@ -81,19 +96,18 @@ export default {
       if (addOrEdit == 'edit') {
         await getData(pathname)
       }
-      const data = await axios.get('/track/columns');
+      const data = await axios.get('api/track/columns');
       dbColumnInfo.value.push(data)
 
       for (const column of dbColumnInfo.value[0].data) {
-        form[column.Field] = null
+        form[0][column.Field] = null
       }
 
       if (dbData.value.length > 0) {
         for (const column of Object.keys(dbData.value[0].data)) {
-          form[column] = dbData.value[0].data[column]
+          form[0][column] = dbData.value[0].data[column]
         }
       }
-
       loadingFinished.value = true
     })
 
@@ -124,7 +138,7 @@ export default {
     }
 
     async function getFieldsToDisplay(fields) {
-      const data = await axios.get(`/track/${id}`)
+      const data = await axios.get(`api/track/${id}`)
       dbData.value.push(data)
     }
 
@@ -139,12 +153,12 @@ export default {
     }
 
     function onPartialsFileInput (value) {
-      form['sourcefile'] = value
-      console.log(form['sourcefile'])
+      form[0]['sourcefile'] = value
+      console.log(form[0]['sourcefile'])
     }
 
     function submit () {
-      form.post('/track/create')
+      form.post('api/track/create')
     }
 
     return {

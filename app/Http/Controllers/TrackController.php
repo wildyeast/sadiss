@@ -14,7 +14,7 @@ class TrackController extends Controller
     if (!$request->file('sourcefile')) {
       // TODO Handle error
     }
-
+    dd($request->file('sourcefile'));
     $sourcefile = file_get_contents($request->file('sourcefile')->getRealPath());
     $converted = $this->convert_source_file($sourcefile);
     $track = new Track;
@@ -34,7 +34,7 @@ class TrackController extends Controller
     return Track::all();
   }
 
-  public function get_track_column_info (Request $request) {
+  public function get_column_info (Request $request) {
     $columns = DB::select( DB::raw('SHOW COLUMNS FROM tracks'));
     return $columns;
   }
