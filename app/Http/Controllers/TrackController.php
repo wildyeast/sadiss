@@ -14,7 +14,7 @@ class TrackController extends Controller
     if (!$request->file('sourcefile')) {
       // TODO Handle error
     }
-    dd($request->file('sourcefile'));
+    // dd($request->file('sourcefile'));
     $sourcefile = file_get_contents($request->file('sourcefile')->getRealPath());
     $converted = $this->convert_source_file($sourcefile);
     $track = new Track;

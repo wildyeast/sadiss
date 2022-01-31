@@ -10,32 +10,25 @@
             </h2>
           </div>
         </template>
-        <!-- TODO: Replace dbColumnInfo[0] with loadingFinished bool -->
-        <div v-if="dbColumnInfo[0]" class="mt-8 max-w-7xl mx-auto py-6 -my-2 sm:px-6 lg:px-8 bg-white border-gray-200 shadow sm:rounded-lg">
+        <div v-if="loadingFinished" class="mt-8 max-w-7xl mx-auto py-6 -my-2 sm:px-6 lg:px-8 bg-white border-gray-200 shadow sm:rounded-lg">
           <form @submit.prevent="submit">
-          <div v-for="field in dbColumnInfo[0].data" :key="field">
+          <div v-for="field in fields[0]" :key="field">
+            <!-- 1: {{form[field[Field]]}} 2: {{field.Field}} 3: {{form}} -->
             <div class="flex flex-col">
               <label :for="field.Field">{{ formatLabel(field.Field) }}</label>
               <div v-if="field.Field === 'partials'">
                 <PartialsUpload @fileInput="onPartialsFileInput"/>
               </div>
               <div v-else-if="field.Type !== 'text'">
-                <input :type="getInputType(field.Type)" :name="field.Field" :placeholder="field.Field" v-model="form[0][field.Field]">
+                <input :type="getInputType(field.Type)" :name="form.Field" :placeholder="field.Field" v-model="form[field.Field]">
               </div>
               <div v-else>
-                <textarea :placeholder="field.Field" v-model="form[0][field.Field]"/>
+                <textarea :placeholder="field.Field" v-model="form[field.Field]"/>
               </div>
             </div>
           </div>
           <Button>Submit</Button>
-          <!-- <progress
-            v-if="form.progress"
-            :value="form.progress.percentage"
-            max="100">
-            {{ form.progress.percentage }}%
-            </progress> -->
           </form>
-          <!-- <button @click="submit">Submit</button> -->
         </div>
         <div v-else>
           <span>Loading...</span>
@@ -47,7 +40,7 @@
 <script>
 import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
 import { Head, useForm } from '@inertiajs/inertia-vue3'
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import PartialsUpload from '@/Components/PartialsUpload'
 
 export default {
@@ -56,58 +49,107 @@ export default {
       Head,
       PartialsUpload
   },
-  async setup () {
+  setup () {
     let addOrEdit = ''
     const dbColumnInfo = ref([])
     const dbData = ref([])
-    const id = this.$route.params.id // TODO: This is silly. Find different way to get route parameters.
+    const id = window.location.toString().split('=')[1] // TODO: $route is undefined, need to expose somehow?
     const loadingFinished = ref(false)
     const pathname = window.location.pathname.replace('/', '')
+    const category = pathname.split('/')[0]
     let title = formatPageTitle(pathname)
-    // const dataTest = await axios.get('/track/columns')
-    // const formObj = {}
-    // for (const value of dataTest.data) {
-    //   console.log(value.Field)
-    //   formObj[value.Field] = ''
-    //   console.log(formObj)
-    // }
-    const form = useForm({})
-    // Dummy data
-    const tracksFields = ['id', 'title', 'description', 'year', 'composer', 'added_on']
-    const trackData = [
-      {id: 1, title: 'Title1', description: 'Lorem', year: 2022, composer: 'testcomposer', added_on: '2022/1/18'},
-      {id: 2, title: 'Title2', description: 'Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem Lorem ', year: 2022, composer: 'testcomposer', added_on: '2022/1/18'},
-      {id: 3, title: 'Title3', description: 'Lorem', year: 2022, composer: 'testcomposer', added_on: '2022/1/18'},
-      {id: 4, title: 'Title4', description: 'Lorem', year: 2022, composer: 'testcomposer', added_on: '2022/1/18'}
-    ]
-    const composersFields = ['id', 'name', 'description', 'photo', 'website', 'is_active']
-    const composerData = [
-      {id: 1, Name: 'Wolf Mozert', description: 'Lorem', photo: 'link-to-photo.com', website: 'wolfi@mozert.at', is_active: false},
-      {id: 2, Name: 'Sigfried Beathoven', description: 'Lorem Lorem Lorem', photo: 'link-to-photo.com', website: 'sig.beats@bro.de', is_active: true},
-    ]
-    const performancesFields = ['id', 'location', 'description', 'start_date', 'end_date']
-    const performancesData = [
-      {id: 1, location: 'AEC Linz', description: 'Lorem', start_date: '2022/20/1', end_date: '2022/23/1'},
-      {id: 2, location: 'Kunsthaus Wien', description: 'Lorem', start_date: '2022/21/1', end_date: '2022/22/1'},
-      {id: 3, location: 'MOMA St. Petersburg', description: 'Lorem', start_date: '2022/5/2', end_date: '2022/3/7'},
-    ]
+    const trackForm = {
+      id: null,
+      created_at: null,
+      updated_at: null,
+      title: '',
+      description: '',
+      partials: ''
+    }
+    const composerForm = {
+      id: null,
+      created_at: null,
+      updated_at: null,
+      name: '',
+      description: '',
+      photo: '',
+      website_url: '',
+      is_active: null
+    }
+    const performanceForm = {
+      id: null,
+      created_at: null,
+      updated_at: null,
+      location: '',
+      start_time: null,
+      end_time: null,
+      is_active: null
+    }
+    const trackFields = Object.keys(trackForm)
+    const composerFields = Object.keys(composerForm)
+    const performanceFields = Object.keys(performanceForm)
+    let form = ref({})
+    // computed(() => {
+    //   let formToUse
+    //   switch (category) {
+    //     case 'tracks':
+    //       formToUse = trackForm
+    //       break
+    //     case 'composers':
+    //       formToUse = composerForm
+    //       break
+    //     case 'performances':
+    //       formToUse = performanceForm
+    //       break
+    //   }
+    //   return useForm(formToUse)
+    // })
+    // const fields = computed(() => {
+    //   let fieldsToUse
+    //   switch (category) {
+    //     case 'tracks':
+    //       fieldsToUse = trackFields
+    //       break
+    //     case 'composers':
+    //       fieldsToUse = composerFields
+    //       break
+    //     case 'performances':
+    //       fieldsToUse = performanceFields
+    //       break
+    //   }
+    //   return fieldsToUse
+    // })
+    const fields = ref([])
 
     onMounted (async () => {
+      switch (category) {
+        case 'tracks':
+          form.value = trackForm
+          break
+        case 'composers':
+          form.value = composerForm
+          break
+        case 'performances':
+          form.value = performanceForm
+          break
+      }
+
       if (addOrEdit == 'edit') {
         await getData(pathname)
       }
-      const data = await axios.get('api/track/columns');
-      dbColumnInfo.value.push(data)
 
-      for (const column of dbColumnInfo.value[0].data) {
-        form[0][column.Field] = null
-      }
+      const response = await axios.get('/api/track/columns');
+      fields.value.push(response.data)
 
-      if (dbData.value.length > 0) {
-        for (const column of Object.keys(dbData.value[0].data)) {
-          form[0][column] = dbData.value[0].data[column]
-        }
-      }
+      // for (const column of dbColumnInfo.value[0].data) {
+      //   form[0][column.Field] = null
+      // }
+
+      // if (dbData.value.length > 0) {
+      //   for (const column of Object.keys(dbData.value[0].data)) {
+      //     form[0][column] = dbData.value[0].data[column]
+      //   }
+      // }
       loadingFinished.value = true
     })
 
@@ -124,22 +166,26 @@ export default {
     }
 
     async function getData (pathname) {
-      switch (pathname.split('/')[0]) {
+      let routeCategory
+      let formToUse
+      switch (category) {
         case 'tracks':
-          await getFieldsToDisplay(tracksFields)
+          routeCategory = 'track'
+          formToUse = trackForm
           break
         case 'composers':
-          getFieldsToDisplay(composersFields)
+          routeCategory = 'composer'
+          formToUse = composerForm
           break
         case 'performances':
-          getFieldsToDisplay(performancesFields)
+          routeCategory = 'performance'
+          formToUse = performanceForm
           break
       }
-    }
-
-    async function getFieldsToDisplay(fields) {
-      const data = await axios.get(`api/track/${id}`)
-      dbData.value.push(data)
+      const response = await axios.get(`/api/${routeCategory}/${id}`)
+      for (const field of Object.keys(response.data)) {
+        formToUse[field] = response.data[field]
+      }
     }
 
     function formatLabel(labelText) {
@@ -153,12 +199,11 @@ export default {
     }
 
     function onPartialsFileInput (value) {
-      form[0]['sourcefile'] = value
-      console.log(form[0]['sourcefile'])
+      form.value['sourcefile'] = value
     }
 
     function submit () {
-      form.post('api/track/create')
+      useForm(form.value).post('/api/track/create')
     }
 
     return {
@@ -171,9 +216,9 @@ export default {
       id,
       loadingFinished,
       title,
-      trackData,
       onPartialsFileInput,
-      submit
+      submit,
+      fields
     }
   }
 }
