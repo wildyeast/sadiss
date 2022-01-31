@@ -11,23 +11,25 @@
           </div>
         </template>
         <div v-if="loadingFinished" class="mt-8 max-w-7xl mx-auto py-6 -my-2 sm:px-6 lg:px-8 bg-white border-gray-200 shadow sm:rounded-lg">
+          <div v-if="addOrEdit === 'edit'">
+            <p v-for="field in Object.keys(form).filter(item => !geteditableFields(item))" :key="field">{{ field }}: {{ form[field] }}</p>
+          </div>
           <form @submit.prevent="submit">
-          <div v-for="field in fields[0]" :key="field">
-            <!-- 1: {{form[field[Field]]}} 2: {{field.Field}} 3: {{form}} -->
-            <div class="flex flex-col">
-              <label :for="field.Field">{{ formatLabel(field.Field) }}</label>
-              <div v-if="field.Field === 'partials'">
-                <PartialsUpload @fileInput="onPartialsFileInput"/>
-              </div>
-              <div v-else-if="field.Type !== 'text'">
-                <input :type="getInputType(field.Type)" :name="form.Field" :placeholder="field.Field" v-model="form[field.Field]">
-              </div>
-              <div v-else>
-                <textarea :placeholder="field.Field" v-model="form[field.Field]"/>
+            <div v-for="field in editableFields[0]" :key="field">
+              <div class="flex flex-col">
+                <label :for="field.Field">{{ formatLabel(field.Field) }}</label>
+                <div v-if="field.Field === 'partials'">
+                  <PartialsUpload @fileInput="onPartialsFileInput"/>
+                </div>
+                <div v-else-if="field.Type !== 'text'">
+                  <input :type="getInputType(field.Type)" :name="form.Field" :placeholder="field.Field" v-model="form[field.Field]">
+                </div>
+                <div v-else>
+                  <textarea :placeholder="field.Field" v-model="form[field.Field]"/>
+                </div>
               </div>
             </div>
-          </div>
-          <Button>Submit</Button>
+            <Button>Submit</Button>
           </form>
         </div>
         <div v-else>
@@ -85,11 +87,12 @@ export default {
       end_time: null,
       is_active: null
     }
-    const trackFields = Object.keys(trackForm)
-    const composerFields = Object.keys(composerForm)
-    const performanceFields = Object.keys(performanceForm)
+    // const trackFields = Object.keys(trackForm)
+    // const composerFields = Object.keys(composerForm)
+    // const performanceFields = Object.keys(performanceForm)
+    const nonEditableFields = ref([])
+    const editableFields = ref([])
     const form = ref({})
-    const fields = ref([])
 
     onMounted (async () => {
       let routeCategory
@@ -109,7 +112,8 @@ export default {
       }
 
       const response = await axios.get(`/api/${routeCategory}/columns`);
-      fields.value.push(response.data)
+      nonEditableFields.value.push(response.data.filter(item => !geteditableFields(item.Field)))
+      editableFields.value.push(response.data.filter(item => geteditableFields(item.Field)))
 
       if (addOrEdit == 'edit') {
         await getData(routeCategory)
@@ -152,6 +156,11 @@ export default {
       }
     }
 
+    function geteditableFields(field) {
+      const nonEditableFields = ['id', 'created_at', 'updated_at']
+      return !nonEditableFields.includes(field)
+    }
+
     function formatLabel(labelText) {
       return `${labelText[0].toUpperCase()}${labelText.slice(1)}`.replace('_', ' ')
     }
@@ -182,7 +191,8 @@ export default {
       title,
       onPartialsFileInput,
       submit,
-      fields
+      geteditableFields,
+      editableFields
     }
   }
 }
