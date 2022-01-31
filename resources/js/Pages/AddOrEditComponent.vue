@@ -12,7 +12,7 @@
         </template>
         <div v-if="loadingFinished" class="mt-8 max-w-7xl mx-auto py-6 -my-2 sm:px-6 lg:px-8 bg-white border-gray-200 shadow sm:rounded-lg">
           <div v-if="addOrEdit === 'edit'">
-            <p v-for="field in Object.keys(form).filter(item => !geteditableFields(item))" :key="field">{{ field }}: {{ form[field] }}</p>
+            <p v-for="field in Object.keys(form).filter(item => !checkIfEditable(item))" :key="field">{{ field }}: {{ form[field] }}</p>
           </div>
           <form @submit.prevent="submit">
             <div v-for="field in editableFields[0]" :key="field">
@@ -112,8 +112,8 @@ export default {
       }
 
       const response = await axios.get(`/api/${routeCategory}/columns`);
-      nonEditableFields.value.push(response.data.filter(item => !geteditableFields(item.Field)))
-      editableFields.value.push(response.data.filter(item => geteditableFields(item.Field)))
+      nonEditableFields.value.push(response.data.filter(item => !checkIfEditable(item.Field)))
+      editableFields.value.push(response.data.filter(item => checkIfEditable(item.Field)))
 
       if (addOrEdit == 'edit') {
         await getData(routeCategory)
@@ -156,7 +156,7 @@ export default {
       }
     }
 
-    function geteditableFields(field) {
+    function checkIfEditable(field) {
       const nonEditableFields = ['id', 'created_at', 'updated_at']
       return !nonEditableFields.includes(field)
     }
@@ -191,7 +191,7 @@ export default {
       title,
       onPartialsFileInput,
       submit,
-      geteditableFields,
+      checkIfEditable,
       editableFields
     }
   }

@@ -9573,10 +9573,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 14:
               response = _context.sent;
               nonEditableFields.value.push(response.data.filter(function (item) {
-                return !geteditableFields(item.Field);
+                return !checkIfEditable(item.Field);
               }));
               editableFields.value.push(response.data.filter(function (item) {
-                return geteditableFields(item.Field);
+                return checkIfEditable(item.Field);
               }));
 
               if (!(addOrEdit == 'edit')) {
@@ -9665,7 +9665,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return _getData.apply(this, arguments);
     }
 
-    function geteditableFields(field) {
+    function checkIfEditable(field) {
       var nonEditableFields = ['id', 'created_at', 'updated_at'];
       return !nonEditableFields.includes(field);
     }
@@ -9700,7 +9700,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       title: title,
       onPartialsFileInput: onPartialsFileInput,
       submit: submit,
-      geteditableFields: geteditableFields,
+      checkIfEditable: checkIfEditable,
       editableFields: editableFields
     };
   }
@@ -11115,7 +11115,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [$setup.loadingFinished ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [$setup.addOrEdit === 'edit' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(Object.keys($setup.form).filter(function (item) {
-        return !$setup.geteditableFields(item);
+        return !$setup.checkIfEditable(item);
       }), function (field) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
           key: field
