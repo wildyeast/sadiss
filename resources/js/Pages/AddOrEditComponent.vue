@@ -88,68 +88,33 @@ export default {
     const trackFields = Object.keys(trackForm)
     const composerFields = Object.keys(composerForm)
     const performanceFields = Object.keys(performanceForm)
-    let form = ref({})
-    // computed(() => {
-    //   let formToUse
-    //   switch (category) {
-    //     case 'tracks':
-    //       formToUse = trackForm
-    //       break
-    //     case 'composers':
-    //       formToUse = composerForm
-    //       break
-    //     case 'performances':
-    //       formToUse = performanceForm
-    //       break
-    //   }
-    //   return useForm(formToUse)
-    // })
-    // const fields = computed(() => {
-    //   let fieldsToUse
-    //   switch (category) {
-    //     case 'tracks':
-    //       fieldsToUse = trackFields
-    //       break
-    //     case 'composers':
-    //       fieldsToUse = composerFields
-    //       break
-    //     case 'performances':
-    //       fieldsToUse = performanceFields
-    //       break
-    //   }
-    //   return fieldsToUse
-    // })
+    const form = ref({})
     const fields = ref([])
 
     onMounted (async () => {
+      let routeCategory
       switch (category) {
         case 'tracks':
+          routeCategory = 'track'
           form.value = trackForm
           break
         case 'composers':
+          routeCategory = 'composer'
           form.value = composerForm
           break
         case 'performances':
+          routeCategory = 'performance'
           form.value = performanceForm
           break
       }
 
-      if (addOrEdit == 'edit') {
-        await getData(pathname)
-      }
-
-      const response = await axios.get('/api/track/columns');
+      const response = await axios.get(`/api/${routeCategory}/columns`);
       fields.value.push(response.data)
 
-      // for (const column of dbColumnInfo.value[0].data) {
-      //   form[0][column.Field] = null
-      // }
+      if (addOrEdit == 'edit') {
+        await getData(routeCategory)
+      }
 
-      // if (dbData.value.length > 0) {
-      //   for (const column of Object.keys(dbData.value[0].data)) {
-      //     form[0][column] = dbData.value[0].data[column]
-      //   }
-      // }
       loadingFinished.value = true
     })
 
@@ -165,8 +130,7 @@ export default {
       }
     }
 
-    async function getData (pathname) {
-      let routeCategory
+    async function getData (routeCategory) {
       let formToUse
       switch (category) {
         case 'tracks':

@@ -9538,87 +9538,53 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var trackFields = Object.keys(trackForm);
     var composerFields = Object.keys(composerForm);
     var performanceFields = Object.keys(performanceForm);
-    var form = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)({}); // computed(() => {
-    //   let formToUse
-    //   switch (category) {
-    //     case 'tracks':
-    //       formToUse = trackForm
-    //       break
-    //     case 'composers':
-    //       formToUse = composerForm
-    //       break
-    //     case 'performances':
-    //       formToUse = performanceForm
-    //       break
-    //   }
-    //   return useForm(formToUse)
-    // })
-    // const fields = computed(() => {
-    //   let fieldsToUse
-    //   switch (category) {
-    //     case 'tracks':
-    //       fieldsToUse = trackFields
-    //       break
-    //     case 'composers':
-    //       fieldsToUse = composerFields
-    //       break
-    //     case 'performances':
-    //       fieldsToUse = performanceFields
-    //       break
-    //   }
-    //   return fieldsToUse
-    // })
-
+    var form = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)({});
     var fields = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
     (0,vue__WEBPACK_IMPORTED_MODULE_3__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-      var response;
+      var routeCategory, response;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               _context.t0 = category;
-              _context.next = _context.t0 === 'tracks' ? 3 : _context.t0 === 'composers' ? 5 : _context.t0 === 'performances' ? 7 : 9;
+              _context.next = _context.t0 === 'tracks' ? 3 : _context.t0 === 'composers' ? 6 : _context.t0 === 'performances' ? 9 : 12;
               break;
 
             case 3:
+              routeCategory = 'track';
               form.value = trackForm;
-              return _context.abrupt("break", 9);
+              return _context.abrupt("break", 12);
 
-            case 5:
+            case 6:
+              routeCategory = 'composer';
               form.value = composerForm;
-              return _context.abrupt("break", 9);
-
-            case 7:
-              form.value = performanceForm;
-              return _context.abrupt("break", 9);
+              return _context.abrupt("break", 12);
 
             case 9:
-              if (!(addOrEdit == 'edit')) {
-                _context.next = 12;
-                break;
-              }
-
-              _context.next = 12;
-              return getData(pathname);
+              routeCategory = 'performance';
+              form.value = performanceForm;
+              return _context.abrupt("break", 12);
 
             case 12:
               _context.next = 14;
-              return axios.get('/api/track/columns');
+              return axios.get("/api/".concat(routeCategory, "/columns"));
 
             case 14:
               response = _context.sent;
-              fields.value.push(response.data); // for (const column of dbColumnInfo.value[0].data) {
-              //   form[0][column.Field] = null
-              // }
-              // if (dbData.value.length > 0) {
-              //   for (const column of Object.keys(dbData.value[0].data)) {
-              //     form[0][column] = dbData.value[0].data[column]
-              //   }
-              // }
+              fields.value.push(response.data);
 
+              if (!(addOrEdit == 'edit')) {
+                _context.next = 19;
+                break;
+              }
+
+              _context.next = 19;
+              return getData(routeCategory);
+
+            case 19:
               loadingFinished.value = true;
 
-            case 17:
+            case 20:
             case "end":
               return _context.stop();
           }
@@ -9645,8 +9611,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function _getData() {
-      _getData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(pathname) {
-        var routeCategory, formToUse, response, _i, _Object$keys, field;
+      _getData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(routeCategory) {
+        var formToUse, response, _i, _Object$keys, field;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
           while (1) {
