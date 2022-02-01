@@ -53,8 +53,6 @@ export default {
   },
   setup () {
     let addOrEdit = ''
-    const dbColumnInfo = ref([])
-    const dbData = ref([])
     const id = window.location.toString().split('=')[1] // TODO: $route is undefined, need to expose somehow?
     const loadingFinished = ref(false)
     const pathname = window.location.pathname.replace('/', '')
@@ -99,6 +97,7 @@ export default {
         case 'id':
           return 'number'
         case 'timestamp':
+        case 'datetime':
           return 'datetime-local';
         case 'varchar(255)':
           return 'text'
@@ -150,8 +149,6 @@ export default {
 
     return {
       addOrEdit,
-      dbColumnInfo,
-      dbData,
       fields,
       form,
       formatLabel,

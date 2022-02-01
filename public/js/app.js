@@ -9506,8 +9506,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   setup: function setup() {
     var addOrEdit = '';
-    var dbColumnInfo = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
-    var dbData = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
     var id = window.location.toString().split('=')[1]; // TODO: $route is undefined, need to expose somehow?
 
     var loadingFinished = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)(false);
@@ -9587,6 +9585,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           return 'number';
 
         case 'timestamp':
+        case 'datetime':
           return 'datetime-local';
 
         case 'varchar(255)':
@@ -9672,8 +9671,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
     return {
       addOrEdit: addOrEdit,
-      dbColumnInfo: dbColumnInfo,
-      dbData: dbData,
       fields: fields,
       form: form,
       formatLabel: formatLabel,
