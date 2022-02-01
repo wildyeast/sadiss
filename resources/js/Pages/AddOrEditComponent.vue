@@ -12,20 +12,20 @@
         </template>
         <div v-if="loadingFinished" class="mt-8 max-w-7xl mx-auto py-6 -my-2 sm:px-6 lg:px-8 bg-white border-gray-200 shadow sm:rounded-lg">
           <div v-if="addOrEdit === 'edit'">
-            <p v-for="field in Object.keys(form).filter(item => !checkIfEditable(item))" :key="field">{{ field }}: {{ form[field] }}</p>
+            <p v-for="field in Object.keys(fields).filter(field => !fields[field].editable)" :key="field">{{ field }}: {{ form[field] }}</p>
           </div>
           <form @submit.prevent="submit">
-            <div v-for="field in editableFields[0]" :key="field">
-              <div class="flex flex-col">
-                <label :for="field.Field">{{ formatLabel(field.Field) }}</label>
-                <div v-if="field.Field === 'partials'">
+            <div v-for="field in Object.keys(fields)" :key="field">
+              <div class="flex flex-col" v-if="fields[field].editable">
+                <label :for="field">{{ formatLabel(field) }}</label>
+                <div v-if="field === 'partials'">
                   <PartialsUpload @fileInput="onPartialsFileInput"/>
                 </div>
-                <div v-else-if="field.Type !== 'text'">
-                  <input :type="getInputType(field.Type)" :name="form.Field" :placeholder="field.Field" v-model="form[field.Field]">
+                <div v-else-if="fields[field].type !== 'text'">
+                  <input :type="getInputType(fields[field].type)" :name="form.Field" :placeholder="field" v-model="form[field]">
                 </div>
                 <div v-else>
-                  <textarea :placeholder="field.Field" v-model="form[field.Field]"/>
+                  <textarea :placeholder="field" v-model="form[field]"/>
                 </div>
               </div>
             </div>
@@ -42,7 +42,7 @@
 <script>
 import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
 import { Head, useForm } from '@inertiajs/inertia-vue3'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import PartialsUpload from '@/Components/PartialsUpload'
 
 export default {
@@ -60,60 +60,31 @@ export default {
     const pathname = window.location.pathname.replace('/', '')
     const category = pathname.split('/')[0]
     let title = formatPageTitle(pathname)
-    const trackForm = {
-      id: null,
-      created_at: null,
-      updated_at: null,
-      title: '',
-      description: '',
-      partials: ''
-    }
-    const composerForm = {
-      id: null,
-      created_at: null,
-      updated_at: null,
-      name: '',
-      description: '',
-      photo: '',
-      website_url: '',
-      is_active: null
-    }
-    const performanceForm = {
-      id: null,
-      created_at: null,
-      updated_at: null,
-      location: '',
-      start_time: null,
-      end_time: null,
-      is_active: null
-    }
-    // const trackFields = Object.keys(trackForm)
-    // const composerFields = Object.keys(composerForm)
-    // const performanceFields = Object.keys(performanceForm)
-    const nonEditableFields = ref([])
-    const editableFields = ref([])
-    const form = ref({})
+    const fields = reactive({})
+    const form = reactive({})
 
     onMounted (async () => {
       let routeCategory
       switch (category) {
         case 'tracks':
           routeCategory = 'track'
-          form.value = trackForm
           break
         case 'composers':
           routeCategory = 'composer'
-          form.value = composerForm
           break
         case 'performances':
           routeCategory = 'performance'
-          form.value = performanceForm
           break
       }
 
       const response = await axios.get(`/api/${routeCategory}/columns`);
-      nonEditableFields.value.push(response.data.filter(item => !checkIfEditable(item.Field)))
-      editableFields.value.push(response.data.filter(item => checkIfEditable(item.Field)))
+
+      for (const field of response.data) {
+        fields[field.Field] = {
+          type: field.Type,
+          editable: isEditable(field.Field)
+        }
+      }
 
       if (addOrEdit == 'edit') {
         await getData(routeCategory)
@@ -135,28 +106,24 @@ export default {
     }
 
     async function getData (routeCategory) {
-      let formToUse
       switch (category) {
         case 'tracks':
           routeCategory = 'track'
-          formToUse = trackForm
           break
         case 'composers':
           routeCategory = 'composer'
-          formToUse = composerForm
           break
         case 'performances':
           routeCategory = 'performance'
-          formToUse = performanceForm
           break
       }
       const response = await axios.get(`/api/${routeCategory}/${id}`)
       for (const field of Object.keys(response.data)) {
-        formToUse[field] = response.data[field]
+        form[field] = response.data[field]
       }
     }
 
-    function checkIfEditable(field) {
+    function isEditable(field) {
       const nonEditableFields = ['id', 'created_at', 'updated_at']
       return !nonEditableFields.includes(field)
     }
@@ -172,27 +139,27 @@ export default {
     }
 
     function onPartialsFileInput (value) {
-      form.value['sourcefile'] = value
+      form['sourcefile'] = value
     }
 
     function submit () {
-      useForm(form.value).post('/api/track/create')
+      useForm(form).post('/api/track/create')
     }
 
     return {
       addOrEdit,
       dbColumnInfo,
       dbData,
+      fields,
       form,
       formatLabel,
       getInputType,
       id,
+      isEditable,
       loadingFinished,
       title,
       onPartialsFileInput,
       submit,
-      checkIfEditable,
-      editableFields
     }
   }
 }

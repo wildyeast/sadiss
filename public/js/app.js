@@ -9484,6 +9484,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Components_PartialsUpload__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! @/Components/PartialsUpload */ "./resources/js/Components/PartialsUpload.vue");
 
 
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
@@ -9508,89 +9514,65 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var pathname = window.location.pathname.replace('/', '');
     var category = pathname.split('/')[0];
     var title = formatPageTitle(pathname);
-    var trackForm = {
-      id: null,
-      created_at: null,
-      updated_at: null,
-      title: '',
-      description: '',
-      partials: ''
-    };
-    var composerForm = {
-      id: null,
-      created_at: null,
-      updated_at: null,
-      name: '',
-      description: '',
-      photo: '',
-      website_url: '',
-      is_active: null
-    };
-    var performanceForm = {
-      id: null,
-      created_at: null,
-      updated_at: null,
-      location: '',
-      start_time: null,
-      end_time: null,
-      is_active: null
-    }; // const trackFields = Object.keys(trackForm)
-    // const composerFields = Object.keys(composerForm)
-    // const performanceFields = Object.keys(performanceForm)
-
-    var nonEditableFields = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
-    var editableFields = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
-    var form = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)({});
+    var fields = (0,vue__WEBPACK_IMPORTED_MODULE_3__.reactive)({});
+    var form = (0,vue__WEBPACK_IMPORTED_MODULE_3__.reactive)({});
     (0,vue__WEBPACK_IMPORTED_MODULE_3__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-      var routeCategory, response;
+      var routeCategory, response, _iterator, _step, field;
+
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               _context.t0 = category;
-              _context.next = _context.t0 === 'tracks' ? 3 : _context.t0 === 'composers' ? 6 : _context.t0 === 'performances' ? 9 : 12;
+              _context.next = _context.t0 === 'tracks' ? 3 : _context.t0 === 'composers' ? 5 : _context.t0 === 'performances' ? 7 : 9;
               break;
 
             case 3:
               routeCategory = 'track';
-              form.value = trackForm;
-              return _context.abrupt("break", 12);
+              return _context.abrupt("break", 9);
 
-            case 6:
+            case 5:
               routeCategory = 'composer';
-              form.value = composerForm;
-              return _context.abrupt("break", 12);
+              return _context.abrupt("break", 9);
+
+            case 7:
+              routeCategory = 'performance';
+              return _context.abrupt("break", 9);
 
             case 9:
-              routeCategory = 'performance';
-              form.value = performanceForm;
-              return _context.abrupt("break", 12);
-
-            case 12:
-              _context.next = 14;
+              _context.next = 11;
               return axios.get("/api/".concat(routeCategory, "/columns"));
 
-            case 14:
+            case 11:
               response = _context.sent;
-              nonEditableFields.value.push(response.data.filter(function (item) {
-                return !checkIfEditable(item.Field);
-              }));
-              editableFields.value.push(response.data.filter(function (item) {
-                return checkIfEditable(item.Field);
-              }));
+              _iterator = _createForOfIteratorHelper(response.data);
+
+              try {
+                for (_iterator.s(); !(_step = _iterator.n()).done;) {
+                  field = _step.value;
+                  fields[field.Field] = {
+                    type: field.Type,
+                    editable: isEditable(field.Field)
+                  };
+                }
+              } catch (err) {
+                _iterator.e(err);
+              } finally {
+                _iterator.f();
+              }
 
               if (!(addOrEdit == 'edit')) {
-                _context.next = 20;
+                _context.next = 17;
                 break;
               }
 
-              _context.next = 20;
+              _context.next = 17;
               return getData(routeCategory);
 
-            case 20:
+            case 17:
               loadingFinished.value = true;
 
-            case 21:
+            case 18:
             case "end":
               return _context.stop();
           }
@@ -9618,44 +9600,41 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
     function _getData() {
       _getData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(routeCategory) {
-        var formToUse, response, _i, _Object$keys, field;
+        var response, _i, _Object$keys, field;
 
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _context2.t0 = category;
-                _context2.next = _context2.t0 === 'tracks' ? 3 : _context2.t0 === 'composers' ? 6 : _context2.t0 === 'performances' ? 9 : 12;
+                _context2.next = _context2.t0 === 'tracks' ? 3 : _context2.t0 === 'composers' ? 5 : _context2.t0 === 'performances' ? 7 : 9;
                 break;
 
               case 3:
                 routeCategory = 'track';
-                formToUse = trackForm;
-                return _context2.abrupt("break", 12);
+                return _context2.abrupt("break", 9);
 
-              case 6:
+              case 5:
                 routeCategory = 'composer';
-                formToUse = composerForm;
-                return _context2.abrupt("break", 12);
+                return _context2.abrupt("break", 9);
+
+              case 7:
+                routeCategory = 'performance';
+                return _context2.abrupt("break", 9);
 
               case 9:
-                routeCategory = 'performance';
-                formToUse = performanceForm;
-                return _context2.abrupt("break", 12);
-
-              case 12:
-                _context2.next = 14;
+                _context2.next = 11;
                 return axios.get("/api/".concat(routeCategory, "/").concat(id));
 
-              case 14:
+              case 11:
                 response = _context2.sent;
 
                 for (_i = 0, _Object$keys = Object.keys(response.data); _i < _Object$keys.length; _i++) {
                   field = _Object$keys[_i];
-                  formToUse[field] = response.data[field];
+                  form[field] = response.data[field];
                 }
 
-              case 16:
+              case 13:
               case "end":
                 return _context2.stop();
             }
@@ -9665,7 +9644,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return _getData.apply(this, arguments);
     }
 
-    function checkIfEditable(field) {
+    function isEditable(field) {
       var nonEditableFields = ['id', 'created_at', 'updated_at'];
       return !nonEditableFields.includes(field);
     }
@@ -9681,27 +9660,27 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function onPartialsFileInput(value) {
-      form.value['sourcefile'] = value;
+      form['sourcefile'] = value;
     }
 
     function submit() {
-      (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.useForm)(form.value).post('/api/track/create');
+      (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.useForm)(form).post('/api/track/create');
     }
 
     return {
       addOrEdit: addOrEdit,
       dbColumnInfo: dbColumnInfo,
       dbData: dbData,
+      fields: fields,
       form: form,
       formatLabel: formatLabel,
       getInputType: getInputType,
       id: id,
+      isEditable: isEditable,
       loadingFinished: loadingFinished,
       title: title,
       onPartialsFileInput: onPartialsFileInput,
-      submit: submit,
-      checkIfEditable: checkIfEditable,
-      editableFields: editableFields
+      submit: submit
     };
   }
 });
@@ -11068,6 +11047,7 @@ var _hoisted_4 = {
   key: 0
 };
 var _hoisted_5 = {
+  key: 0,
   "class": "flex flex-col"
 };
 var _hoisted_6 = ["for"];
@@ -11114,8 +11094,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       )])];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [$setup.loadingFinished ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [$setup.addOrEdit === 'edit' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(Object.keys($setup.form).filter(function (item) {
-        return !$setup.checkIfEditable(item);
+      return [$setup.loadingFinished ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [$setup.addOrEdit === 'edit' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(Object.keys($setup.fields).filter(function (field) {
+        return !$setup.fields[field].editable;
       }), function (field) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
           key: field
@@ -11128,34 +11108,34 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         onSubmit: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
           return $setup.submit && $setup.submit.apply($setup, arguments);
         }, ["prevent"]))
-      }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.editableFields[0], function (field) {
+      }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(Object.keys($setup.fields), function (field) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
           key: field
-        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-          "for": field.Field
-        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.formatLabel(field.Field)), 9
+        }, [$setup.fields[field].editable ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+          "for": field
+        }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.formatLabel(field)), 9
         /* TEXT, PROPS */
-        , _hoisted_6), field.Field === 'partials' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_PartialsUpload, {
+        , _hoisted_6), field === 'partials' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_PartialsUpload, {
           onFileInput: $setup.onPartialsFileInput
         }, null, 8
         /* PROPS */
-        , ["onFileInput"])])) : field.Type !== 'text' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
-          type: $setup.getInputType(field.Type),
+        , ["onFileInput"])])) : $setup.fields[field].type !== 'text' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+          type: $setup.getInputType($setup.fields[field].type),
           name: $setup.form.Field,
-          placeholder: field.Field,
+          placeholder: field,
           "onUpdate:modelValue": function onUpdateModelValue($event) {
-            return $setup.form[field.Field] = $event;
+            return $setup.form[field] = $event;
           }
         }, null, 8
         /* PROPS */
-        , _hoisted_9), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelDynamic, $setup.form[field.Field]]])])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
-          placeholder: field.Field,
+        , _hoisted_9), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelDynamic, $setup.form[field]]])])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("textarea", {
+          placeholder: field,
           "onUpdate:modelValue": function onUpdateModelValue($event) {
-            return $setup.form[field.Field] = $event;
+            return $setup.form[field] = $event;
           }
         }, null, 8
         /* PROPS */
-        , _hoisted_11), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $setup.form[field.Field]]])]))])]);
+        , _hoisted_11), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $setup.form[field]]])]))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
       }), 128
       /* KEYED_FRAGMENT */
       )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, null, {
