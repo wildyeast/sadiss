@@ -19,7 +19,7 @@
                             <thead>
                                 <tr>
                                     <th class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
-                                        v-for="value in columnHeaders" :key="value">
+                                        v-for="value in columnNames" :key="value">
                                         {{ value }}
                                     </th>
                                 </tr>
@@ -89,9 +89,9 @@ export default {
     },
     setup () {
         const columnData = ref([])
-        const columnHeaders = ref([])
+        const columnNames = ref([])
         const pathname = window.location.pathname.replace('/', '')
-        let title = ref('')
+        const title = ref('')
 
         onMounted(async () => {
           title.value = formatPageTitle(pathname)
@@ -99,13 +99,13 @@ export default {
         })
 
         function addInvariableColumnHeaders() {
-          columnHeaders.value.push('Edit')
-          columnHeaders.value.push('Delete')
+          columnNames.value.push('Edit')
+          columnNames.value.push('Delete')
         }
 
         function addData (dataArr) {
           for (const header of Object.keys(dataArr[0])) {
-            columnHeaders.value.push(header)
+            columnNames.value.push(header)
           }
           addInvariableColumnHeaders()
 
@@ -152,7 +152,7 @@ export default {
         }
 
         return {
-          columnHeaders,
+          columnNames,
           columnData,
           pathname,
           title,

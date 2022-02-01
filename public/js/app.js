@@ -10123,7 +10123,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   setup: function setup() {
     var columnData = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
-    var columnHeaders = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
+    var columnNames = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
     var pathname = window.location.pathname.replace('/', '');
     var title = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)('');
     (0,vue__WEBPACK_IMPORTED_MODULE_3__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
@@ -10144,14 +10144,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     })));
 
     function addInvariableColumnHeaders() {
-      columnHeaders.value.push('Edit');
-      columnHeaders.value.push('Delete');
+      columnNames.value.push('Edit');
+      columnNames.value.push('Delete');
     }
 
     function addData(dataArr) {
       for (var _i = 0, _Object$keys = Object.keys(dataArr[0]); _i < _Object$keys.length; _i++) {
         var header = _Object$keys[_i];
-        columnHeaders.value.push(header);
+        columnNames.value.push(header);
       }
 
       addInvariableColumnHeaders();
@@ -10245,7 +10245,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     return {
-      columnHeaders: columnHeaders,
+      columnNames: columnNames,
       columnData: columnData,
       pathname: pathname,
       title: title
@@ -12035,7 +12035,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       , ["href"])])];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.columnHeaders, function (value) {
+      return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.columnNames, function (value) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", {
           "class": "px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50",
           key: value
