@@ -9591,6 +9591,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
         case 'varchar(255)':
           return 'text';
+
+        case 'tinyint(1)':
+          return 'checkbox';
       }
     }
 

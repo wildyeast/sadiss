@@ -102,6 +102,8 @@ export default {
           return 'datetime-local';
         case 'varchar(255)':
           return 'text'
+        case 'tinyint(1)':
+          return 'checkbox'
       }
     }
 
