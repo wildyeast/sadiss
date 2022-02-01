@@ -8,6 +8,19 @@ use App\Models\Performance;
 
 class PerformanceController extends Controller
 {
+    public function create(Request $request)
+    {
+      $performance = new Performance;
+      $performance->location = $request->location;
+      $performance->start_time = $request->start_time;
+      $performance->end_time = $request->end_time;
+      $performance->is_active = $request->is_active;
+      $performance->save();
+      return back()->with('flash', [
+          'message' => 'success',
+      ]);
+    }
+
     public function get(Request $request, $id=null) {
       if (isset($id)) {
         return Performance::where('id', $id)->firstOrFail();

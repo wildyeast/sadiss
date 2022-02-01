@@ -9514,8 +9514,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var title = formatPageTitle(pathname);
     var fields = (0,vue__WEBPACK_IMPORTED_MODULE_3__.reactive)({});
     var form = (0,vue__WEBPACK_IMPORTED_MODULE_3__.reactive)({});
+    var routeCategory = '';
     (0,vue__WEBPACK_IMPORTED_MODULE_3__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-      var routeCategory, response, _iterator, _step, field;
+      var response, _iterator, _step, field;
 
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
@@ -9608,27 +9609,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                _context2.t0 = category;
-                _context2.next = _context2.t0 === 'tracks' ? 3 : _context2.t0 === 'composers' ? 5 : _context2.t0 === 'performances' ? 7 : 9;
-                break;
-
-              case 3:
-                routeCategory = 'track';
-                return _context2.abrupt("break", 9);
-
-              case 5:
-                routeCategory = 'composer';
-                return _context2.abrupt("break", 9);
-
-              case 7:
-                routeCategory = 'performance';
-                return _context2.abrupt("break", 9);
-
-              case 9:
-                _context2.next = 11;
+                _context2.next = 2;
                 return axios.get("/api/".concat(routeCategory, "/").concat(id));
 
-              case 11:
+              case 2:
                 response = _context2.sent;
 
                 for (_i = 0, _Object$keys = Object.keys(response.data); _i < _Object$keys.length; _i++) {
@@ -9636,7 +9620,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   form[field] = response.data[field];
                 }
 
-              case 13:
+              case 4:
               case "end":
                 return _context2.stop();
             }
@@ -9666,7 +9650,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function submit() {
-      (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.useForm)(form).post('/api/track/create');
+      (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.useForm)(form).post("/api/".concat(routeCategory, "/create"));
     }
 
     return {

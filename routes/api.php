@@ -28,10 +28,14 @@ Route::get('/track', [TrackController::class, 'get']);
 Route::get('/track/{id}', [TrackController::class, 'get']);
 
 Route::get('/performance/columns', [PerformanceController::class, 'get_column_info']);
+Route::post('/performance/create', [PerformanceController::class, 'create'])
+  ->name('performance.create');
 Route::get('/performance', [PerformanceController::class, 'get']);
 Route::get('/performance/{id}', [PerformanceController::class, 'get']);
 
 Route::get('/composer/columns', [ComposerController::class, 'get_column_info']);
+Route::post('/composer/create', [ComposerController::class, 'create'])
+  ->name('composer.create');
 Route::get('/composer', [ComposerController::class, 'get']);
 Route::get('/composer/{id}', [ComposerController::class, 'get']);
 

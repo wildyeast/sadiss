@@ -60,9 +60,9 @@ export default {
     let title = formatPageTitle(pathname)
     const fields = reactive({})
     const form = reactive({})
+    let routeCategory = ''
 
     onMounted (async () => {
-      let routeCategory
       switch (category) {
         case 'tracks':
           routeCategory = 'track'
@@ -107,17 +107,6 @@ export default {
     }
 
     async function getData (routeCategory) {
-      switch (category) {
-        case 'tracks':
-          routeCategory = 'track'
-          break
-        case 'composers':
-          routeCategory = 'composer'
-          break
-        case 'performances':
-          routeCategory = 'performance'
-          break
-      }
       const response = await axios.get(`/api/${routeCategory}/${id}`)
       for (const field of Object.keys(response.data)) {
         form[field] = response.data[field]
@@ -144,7 +133,7 @@ export default {
     }
 
     function submit () {
-      useForm(form).post('/api/track/create')
+      useForm(form).post(`/api/${routeCategory}/create`)
     }
 
     return {
