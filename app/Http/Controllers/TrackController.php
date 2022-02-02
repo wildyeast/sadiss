@@ -27,6 +27,13 @@ class TrackController extends Controller
     ]);
   }
 
+  public function delete(Request $request, $id) {
+    Track::where('id', $id)->delete();
+    return back()->with('flash', [
+      'message' => 'success',
+  ]);
+  }
+
   public function get(Request $request, $id=null) {
     if (isset($id)) {
       return Track::where('id', $id)->firstOrFail();

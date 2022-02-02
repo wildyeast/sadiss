@@ -24,6 +24,8 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
 Route::get('/track/columns', [TrackController::class, 'get_column_info']);
 Route::post('/track/create', [TrackController::class, 'create'])
   ->name('track.create');
+Route::post('/track/delete/{id}', [TrackController::class, 'delete'])
+  ->name('track.delete');
 Route::get('/track', [TrackController::class, 'get']);
 Route::get('/track/{id}', [TrackController::class, 'get']);
 

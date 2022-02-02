@@ -9640,7 +9640,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function formatPageTitle(pathname) {
-      var category = pathname.split('/')[0];
       addOrEdit = pathname.split('/')[1];
       return "".concat(addOrEdit[0].toUpperCase()).concat(addOrEdit.slice(1), " ").concat(category[0].toUpperCase()).concat(category.slice(1, category.length - 1));
     }
@@ -10063,13 +10062,13 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _Layouts_Authenticated_vue__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @/Layouts/Authenticated.vue */ "./resources/js/Layouts/Authenticated.vue");
 /* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
+
+
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
 function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
-
-
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -10088,112 +10087,145 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var columnData = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
     var columnNames = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
     var pathname = window.location.pathname.replace('/', '');
+    var category = pathname.split('/')[0];
+    var routeCategory = '';
     var title = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)('');
     (0,vue__WEBPACK_IMPORTED_MODULE_3__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+      var response, _iterator, _step, column;
+
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
               title.value = formatPageTitle(pathname);
-              _context.next = 3;
-              return getData(pathname);
+              _context.t0 = category;
+              _context.next = _context.t0 === 'tracks' ? 4 : _context.t0 === 'composers' ? 6 : _context.t0 === 'performances' ? 8 : 10;
+              break;
 
-            case 3:
+            case 4:
+              routeCategory = 'track';
+              return _context.abrupt("break", 10);
+
+            case 6:
+              routeCategory = 'composer';
+              return _context.abrupt("break", 10);
+
+            case 8:
+              routeCategory = 'performance';
+              return _context.abrupt("break", 10);
+
+            case 10:
+              _context.next = 12;
+              return axios.get("/api/".concat(routeCategory, "/columns"));
+
+            case 12:
+              response = _context.sent;
+              _iterator = _createForOfIteratorHelper(response.data);
+
+              try {
+                for (_iterator.s(); !(_step = _iterator.n()).done;) {
+                  column = _step.value;
+                  columnNames.value.push(column.Field);
+                }
+              } catch (err) {
+                _iterator.e(err);
+              } finally {
+                _iterator.f();
+              }
+
+              addAdditionColumns();
+              _context.next = 18;
+              return addData();
+
+            case 18:
             case "end":
               return _context.stop();
           }
         }
       }, _callee);
-    })));
+    }))); // Adds columns that are not present in the database
 
-    function addInvariableColumnHeaders() {
+    function addAdditionColumns() {
       columnNames.value.push('Edit');
       columnNames.value.push('Delete');
     }
 
-    function addData(dataArr) {
-      for (var _i = 0, _Object$keys = Object.keys(dataArr[0]); _i < _Object$keys.length; _i++) {
-        var header = _Object$keys[_i];
-        columnNames.value.push(header);
-      }
-
-      addInvariableColumnHeaders();
-
-      var _iterator = _createForOfIteratorHelper(dataArr),
-          _step;
-
-      try {
-        for (_iterator.s(); !(_step = _iterator.n()).done;) {
-          var entry = _step.value;
-
-          if (Object.keys(entry).includes('created_at')) {
-            entry['created_at'] = formatDateTime(entry['created_at']);
-          }
-
-          if (Object.keys(entry).includes('updated_at')) {
-            entry['updated_at'] = formatDateTime(entry['updated_at']);
-          }
-
-          columnData.value.push(entry);
-        }
-      } catch (err) {
-        _iterator.e(err);
-      } finally {
-        _iterator.f();
-      }
+    function addData() {
+      return _addData.apply(this, arguments);
     }
 
-    function getData(_x) {
-      return _getData.apply(this, arguments);
-    } // Helper functions
+    function _addData() {
+      _addData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
+        var response, _iterator2, _step2, entry;
 
-
-    function _getData() {
-      _getData = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2(pathname) {
-        var response;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                _context2.t0 = pathname;
-                _context2.next = _context2.t0 === 'tracks' ? 3 : _context2.t0 === 'composers' ? 8 : _context2.t0 === 'performances' ? 13 : 18;
-                break;
+                _context2.next = 2;
+                return axios.get("/api/".concat(routeCategory));
 
-              case 3:
-                _context2.next = 5;
-                return axios.get('/api/track');
+              case 2:
+                response = _context2.sent;
+                _iterator2 = _createForOfIteratorHelper(response.data);
+
+                try {
+                  for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+                    entry = _step2.value;
+
+                    if (Object.keys(entry).includes('created_at')) {
+                      entry['created_at'] = formatDateTime(entry['created_at']);
+                    }
+
+                    if (Object.keys(entry).includes('updated_at')) {
+                      entry['updated_at'] = formatDateTime(entry['updated_at']);
+                    }
+
+                    columnData.value.push(entry);
+                  }
+                } catch (err) {
+                  _iterator2.e(err);
+                } finally {
+                  _iterator2.f();
+                }
 
               case 5:
-                response = _context2.sent;
-                addData(response.data);
-                return _context2.abrupt("break", 18);
-
-              case 8:
-                _context2.next = 10;
-                return axios.get('/api/composer');
-
-              case 10:
-                response = _context2.sent;
-                addData(response.data);
-                return _context2.abrupt("break", 18);
-
-              case 13:
-                _context2.next = 15;
-                return axios.get('/api/performance');
-
-              case 15:
-                response = _context2.sent;
-                addData(response.data);
-                return _context2.abrupt("break", 18);
-
-              case 18:
               case "end":
                 return _context2.stop();
             }
           }
         }, _callee2);
       }));
-      return _getData.apply(this, arguments);
+      return _addData.apply(this, arguments);
+    }
+
+    function deleteRow(_x) {
+      return _deleteRow.apply(this, arguments);
+    } // Helper functions
+
+
+    function _deleteRow() {
+      _deleteRow = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3(id) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                if (!confirm("Do you really want to delete this track? This cannot be reversed.")) {
+                  _context3.next = 3;
+                  break;
+                }
+
+                _context3.next = 3;
+                return axios.post("/api/track/delete/".concat(id));
+
+              case 3:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3);
+      }));
+      return _deleteRow.apply(this, arguments);
     }
 
     function formatDateTime(mysqlTimestamp) {
@@ -10210,6 +10242,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     return {
       columnNames: columnNames,
       columnData: columnData,
+      deleteRow: deleteRow,
       pathname: pathname,
       title: title
     };
@@ -11952,23 +11985,21 @@ var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", {
+var _hoisted_12 = {
   "class": "px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("svg", {
-  xmlns: "http://www.w3.org/2000/svg",
-  "class": "w-6 h-6 text-red-400",
-  fill: "none",
-  viewBox: "0 0 24 24",
-  stroke: "currentColor"
-}, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
+};
+var _hoisted_13 = ["onClick"];
+
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("path", {
   "stroke-linecap": "round",
   "stroke-linejoin": "round",
   "stroke-width": "2",
   d: "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-})])], -1
+}, null, -1
 /* HOISTED */
 );
 
+var _hoisted_15 = [_hoisted_14];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Head = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Head");
 
@@ -12033,7 +12064,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
         }, 1032
         /* PROPS, DYNAMIC_SLOTS */
-        , ["href"])]), _hoisted_12]);
+        , ["href"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_12, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("svg", {
+          xmlns: "http://www.w3.org/2000/svg",
+          "class": "w-6 h-6 text-red-400 cursor-pointer",
+          fill: "none",
+          viewBox: "0 0 24 24",
+          stroke: "currentColor",
+          onClick: function onClick($event) {
+            return $setup.deleteRow(entry.id);
+          }
+        }, _hoisted_15, 8
+        /* PROPS */
+        , _hoisted_13))])]);
       }), 128
       /* KEYED_FRAGMENT */
       ))])])])])])];

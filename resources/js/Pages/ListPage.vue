@@ -60,11 +60,11 @@
                                     </td>
                                     <td
                                         class="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-400" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
+                                          <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-red-400 cursor-pointer" fill="none"
+                                              viewBox="0 0 24 24" stroke="currentColor" @click="deleteRow(entry.id)" >
+                                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                  d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                          </svg>
                                     </td>
                                 </tr>
                             </tbody>
@@ -91,25 +91,43 @@ export default {
         const columnData = ref([])
         const columnNames = ref([])
         const pathname = window.location.pathname.replace('/', '')
+        const category = pathname.split('/')[0]
+        let routeCategory = ''
         const title = ref('')
 
         onMounted(async () => {
           title.value = formatPageTitle(pathname)
-          await getData(pathname)
+
+          switch (category) {
+            case 'tracks':
+              routeCategory = 'track'
+              break
+            case 'composers':
+              routeCategory = 'composer'
+              break
+            case 'performances':
+              routeCategory = 'performance'
+              break
+          }
+
+          const response = await axios.get(`/api/${routeCategory}/columns`);
+          for (const column of response.data) {
+            columnNames.value.push(column.Field)
+          }
+          addAdditionColumns()
+
+          await addData()
         })
 
-        function addInvariableColumnHeaders() {
+        // Adds columns that are not present in the database
+        function addAdditionColumns() {
           columnNames.value.push('Edit')
           columnNames.value.push('Delete')
         }
 
-        function addData (dataArr) {
-          for (const header of Object.keys(dataArr[0])) {
-            columnNames.value.push(header)
-          }
-          addInvariableColumnHeaders()
-
-          for (const entry of dataArr) {
+        async function addData () {
+          const response = await axios.get(`/api/${routeCategory}`)
+          for (const entry of response.data) {
             if (Object.keys(entry).includes('created_at')) {
               entry['created_at'] = formatDateTime(entry['created_at'])
             }
@@ -120,21 +138,9 @@ export default {
           }
         }
 
-        async function getData (pathname) {
-          let response
-          switch (pathname) {
-            case 'tracks':
-              response = await axios.get('/api/track')
-              addData(response.data)
-              break
-            case 'composers':
-              response = await axios.get('/api/composer')
-              addData(response.data)
-              break
-            case 'performances':
-              response = await axios.get('/api/performance')
-              addData(response.data)
-              break
+        async function deleteRow(id) {
+          if (confirm("Do you really want to delete this track? This cannot be reversed.")) {
+            await axios.post(`/api/track/delete/${id}`)
           }
         }
 
@@ -154,6 +160,7 @@ export default {
         return {
           columnNames,
           columnData,
+          deleteRow,
           pathname,
           title,
         }

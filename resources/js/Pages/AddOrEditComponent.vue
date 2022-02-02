@@ -123,7 +123,6 @@ export default {
     }
 
     function formatPageTitle (pathname) {
-      const category = pathname.split('/')[0]
       addOrEdit = pathname.split('/')[1]
       return `${addOrEdit[0].toUpperCase()}${addOrEdit.slice(1)} ${category[0].toUpperCase()}${category.slice(1, category.length - 1)}`
     }
