@@ -10214,7 +10214,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                if (!confirm('Do you really want to delete this track? This cannot be reversed.')) {
+                if (!confirm("Do you really want to delete this ".concat(routeCategory, "? This cannot be reversed."))) {
                   _context3.next = 3;
                   break;
                 }
