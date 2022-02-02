@@ -22,6 +22,26 @@ class ComposerController extends Controller
       ]);
     }
 
+    public function delete(Request $request, $id) {
+      Composer::where('id', $id)->delete();
+      return back()->with('flash', [
+        'message' => 'success',
+      ]);
+    }
+  
+    public function edit(Request $request, $id) {
+      $composer = Composer::where('id', $id)->firstOrFail();
+      $composer->name = $request->name;
+      $composer->description = $request->description;
+      $composer->photo = $request->photo;
+      $composer->website_url = $request->website_url;
+      $composer->is_active = $request->is_active;
+      $composer->save();
+      return back()->with('flash', [
+        'message' => 'success',
+      ]);
+    }
+
     public function get(Request $request, $id=null) {
       if (isset($id)) {
         return Composer::where('id', $id)->firstOrFail();

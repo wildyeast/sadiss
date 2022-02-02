@@ -139,8 +139,8 @@ export default {
         }
 
         async function deleteRow(id) {
-          if (confirm("Do you really want to delete this track? This cannot be reversed.")) {
-            await axios.post(`/api/track/delete/${id}`)
+          if (confirm('Do you really want to delete this track? This cannot be reversed.')) {
+            await axios.post(`/api/${routeCategory}/delete/${id}`)
           }
         }
 

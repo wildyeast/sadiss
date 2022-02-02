@@ -14,7 +14,6 @@ class TrackController extends Controller
     if (!$request->file('sourcefile')) {
       // TODO Handle error
     }
-    // dd($request->file('sourcefile'));
     $sourcefile = file_get_contents($request->file('sourcefile')->getRealPath());
     $converted = $this->convert_source_file($sourcefile);
     $track = new Track;
@@ -31,7 +30,22 @@ class TrackController extends Controller
     Track::where('id', $id)->delete();
     return back()->with('flash', [
       'message' => 'success',
-  ]);
+    ]);
+  }
+
+  public function edit(Request $request, $id) {
+    $track = Track::where('id', $id)->firstOrFail();
+    $track->title = $request->title;
+    $track->description = $request->description;
+    if ($request->file('sourcefile')) {
+      $sourcefile = file_get_contents($request->file('sourcefile')->getRealPath());
+      $converted = $this->convert_source_file($sourcefile);
+      $track->partials = $converted;
+    }
+    $track->save();
+    return back()->with('flash', [
+      'message' => 'success',
+    ]);
   }
 
   public function get(Request $request, $id=null) {
