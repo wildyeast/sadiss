@@ -135,7 +135,6 @@ export default {
       if (addOrEdit === 'add') {
         useForm(form).post(`/api/${routeCategory}/create`)
       } else if (addOrEdit === 'edit') {
-        // console.log(form)
         useForm(form).post(`/api/${routeCategory}/edit/${id}`)
       }
     }

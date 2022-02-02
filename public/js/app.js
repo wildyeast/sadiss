@@ -9652,7 +9652,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       if (addOrEdit === 'add') {
         (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.useForm)(form).post("/api/".concat(routeCategory, "/create"));
       } else if (addOrEdit === 'edit') {
-        // console.log(form)
         (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.useForm)(form).post("/api/".concat(routeCategory, "/edit/").concat(id));
       }
     }
