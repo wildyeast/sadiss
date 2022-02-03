@@ -15,7 +15,9 @@ class Composer extends Model
      * @var array<string, string>
      */
     protected $casts = [
-      'is_active' => 'boolean',
+        'is_active' => 'boolean',
+        'created_at' => 'datetime:d.m.Y H:m',
+        'updated_at' => 'datetime:d.m.Y H:m',
     ];
 
 }

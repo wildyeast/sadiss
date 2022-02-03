@@ -9617,7 +9617,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 for (_i = 0, _Object$keys = Object.keys(response.data); _i < _Object$keys.length; _i++) {
                   field = _Object$keys[_i];
-                  form[field] = response.data[field];
+
+                  if (field === 'start_time' || field == 'end_time') {
+                    form[field] = formatDateForDatetimePicker(response.data[field]);
+                  } else {
+                    form[field] = response.data[field];
+                  }
                 }
 
               case 4:
@@ -9633,6 +9638,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     function isEditable(field) {
       var nonEditableFields = ['id', 'created_at', 'updated_at'];
       return !nonEditableFields.includes(field);
+    }
+
+    function formatDateForDatetimePicker(datestring) {
+      var d = datestring.split(/[. :]/);
+      return "".concat(d[2], "-").concat(d[1], "-").concat(d[0], "T").concat(d[3], ":").concat(d[4]);
     }
 
     function formatLabel(labelText) {
@@ -10176,15 +10186,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 try {
                   for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
                     entry = _step2.value;
-
-                    if (Object.keys(entry).includes('created_at')) {
-                      entry['created_at'] = formatDateTime(entry['created_at']);
-                    }
-
-                    if (Object.keys(entry).includes('updated_at')) {
-                      entry['updated_at'] = formatDateTime(entry['updated_at']);
-                    }
-
+                    // if (Object.keys(entry).includes('created_at')) {
+                    //   entry['created_at'] = formatDateTime(entry['created_at'])
+                    // }
+                    // if (Object.keys(entry).includes('updated_at')) {
+                    //   entry['updated_at'] = formatDateTime(entry['updated_at'])
+                    // }
                     columnData.value.push(entry);
                   }
                 } catch (err) {
@@ -10206,6 +10213,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     function deleteRow(_x) {
       return _deleteRow.apply(this, arguments);
     } // Helper functions
+    // function formatDateTime (mysqlTimestamp) {
+    //   // Split timestamp into [ Y, M, D, h, m, s ]
+    //   const t = mysqlTimestamp.split(/[- : T Z]/)
+    //   // Apply each element to the Date function
+    //   return new Date(Date.UTC(t[0], t[1]-1, t[2], t[3], t[4], t[5])).toString().slice(4, 21)
+    // }
 
 
     function _deleteRow() {
@@ -10230,13 +10243,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }, _callee3);
       }));
       return _deleteRow.apply(this, arguments);
-    }
-
-    function formatDateTime(mysqlTimestamp) {
-      // Split timestamp into [ Y, M, D, h, m, s ]
-      var t = mysqlTimestamp.split(/[- : T Z]/); // Apply each element to the Date function
-
-      return new Date(Date.UTC(t[0], t[1] - 1, t[2], t[3], t[4], t[5])).toString().slice(4, 21);
     }
 
     function formatPageTitle(pathname) {

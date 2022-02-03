@@ -128,12 +128,12 @@ export default {
         async function addData () {
           const response = await axios.get(`/api/${routeCategory}`)
           for (const entry of response.data) {
-            if (Object.keys(entry).includes('created_at')) {
-              entry['created_at'] = formatDateTime(entry['created_at'])
-            }
-            if (Object.keys(entry).includes('updated_at')) {
-              entry['updated_at'] = formatDateTime(entry['updated_at'])
-            }
+            // if (Object.keys(entry).includes('created_at')) {
+            //   entry['created_at'] = formatDateTime(entry['created_at'])
+            // }
+            // if (Object.keys(entry).includes('updated_at')) {
+            //   entry['updated_at'] = formatDateTime(entry['updated_at'])
+            // }
             columnData.value.push(entry)
           }
         }
@@ -146,12 +146,12 @@ export default {
 
         // Helper functions
 
-        function formatDateTime (mysqlTimestamp) {
-          // Split timestamp into [ Y, M, D, h, m, s ]
-          const t = mysqlTimestamp.split(/[- : T Z]/)
-          // Apply each element to the Date function
-          return new Date(Date.UTC(t[0], t[1]-1, t[2], t[3], t[4], t[5])).toString().slice(4, 21)
-        }
+        // function formatDateTime (mysqlTimestamp) {
+        //   // Split timestamp into [ Y, M, D, h, m, s ]
+        //   const t = mysqlTimestamp.split(/[- : T Z]/)
+        //   // Apply each element to the Date function
+        //   return new Date(Date.UTC(t[0], t[1]-1, t[2], t[3], t[4], t[5])).toString().slice(4, 21)
+        // }
 
         function formatPageTitle (pathname) {
           return `${pathname[0].toUpperCase()}${pathname.slice(1)}`

@@ -109,13 +109,22 @@ export default {
     async function getData (routeCategory) {
       const response = await axios.get(`/api/${routeCategory}/${id}`)
       for (const field of Object.keys(response.data)) {
-        form[field] = response.data[field]
+        if (field === 'start_time' || field == 'end_time') {
+          form[field] = formatDateForDatetimePicker(response.data[field])
+        } else {
+          form[field] = response.data[field]
+        }
       }
     }
 
     function isEditable(field) {
       const nonEditableFields = ['id', 'created_at', 'updated_at']
       return !nonEditableFields.includes(field)
+    }
+
+    function formatDateForDatetimePicker(datestring) {
+      const d = datestring.split(/[. :]/)
+      return `${d[2]}-${d[1]}-${d[0]}T${d[3]}:${d[4]}`
     }
 
     function formatLabel(labelText) {
