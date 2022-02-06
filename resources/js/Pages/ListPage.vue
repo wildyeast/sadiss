@@ -127,7 +127,6 @@ export default {
 
         async function addData () {
           const response = await axios.get(`/api/${routeCategory}`)
-          console.log(response.data)
           for (const entry of response.data) {
             // if (Object.keys(entry).includes('created_at')) {
             //   entry['created_at'] = formatDateTime(entry['created_at'])

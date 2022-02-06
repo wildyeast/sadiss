@@ -9667,7 +9667,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
         if (field === 'start_time' || field == 'end_time') {
           var d = form[field];
-          formattedForm[field] = "".concat(d.getYear(), "-").concat(d.getMonth(), "-").concat(d.getDate(), " ").concat(d.getHours(), ":").concat(d.getMinutes(), ":").concat(d.getSeconds());
+          formattedForm[field] = "".concat(d.getFullYear(), "-").concat(d.getMonth(), "-").concat(d.getDate(), " ").concat(d.getHours(), ":").concat(d.getMinutes(), ":").concat(d.getSeconds());
         } else {
           formattedForm[field] = form[field];
         }
@@ -10195,7 +10195,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 2:
                 response = _context2.sent;
-                console.log(response.data);
                 _iterator2 = _createForOfIteratorHelper(response.data);
 
                 try {
@@ -10215,7 +10214,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   _iterator2.f();
                 }
 
-              case 6:
+              case 5:
               case "end":
                 return _context2.stop();
             }

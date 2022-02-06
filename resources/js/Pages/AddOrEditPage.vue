@@ -150,7 +150,7 @@ export default {
       for (const field of Object.keys(form)) {
         if (field === 'start_time' || field == 'end_time') {
           const d = form[field]
-          formattedForm[field] = `${d.getYear()}-${d.getMonth()}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
+          formattedForm[field] = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
         } else {
           formattedForm[field] = form[field]
         }
