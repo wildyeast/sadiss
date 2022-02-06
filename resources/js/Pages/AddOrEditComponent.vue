@@ -21,8 +21,11 @@
                 <div v-if="field === 'partials'">
                   <PartialsUpload @fileInput="onPartialsFileInput"/>
                 </div>
+                <div v-else-if="fields[field].type === 'datetime'">
+                  <o-datetimepicker rounded placeholder="Click to select..." locale="en-GB" v-model="form[field]" />
+                </div>
                 <div v-else-if="fields[field].type !== 'text'">
-                  <input :type="getInputType(fields[field].type)" :name="form.Field" :placeholder="field" v-model="form[field]">
+                  <input :type="getInputType(fields[field].type)" :name="form[field]" :placeholder="field" v-model="form[field]">
                 </div>
                 <div v-else>
                   <textarea :placeholder="field" v-model="form[field]"/>
@@ -97,8 +100,8 @@ export default {
         case 'id':
           return 'number'
         case 'timestamp':
-        case 'datetime':
-          return 'datetime-local';
+        // case 'datetime':
+        //   return 'datetime-local';
         case 'varchar(255)':
           return 'text'
         case 'tinyint(1)':
@@ -124,7 +127,7 @@ export default {
 
     function formatDateForDatetimePicker(datestring) {
       const d = datestring.split(/[. :]/)
-      return `${d[2]}-${d[1]}-${d[0]}T${d[3]}:${d[4]}`
+      return new Date(d[2], d[1], d[0], d[3], d[4])
     }
 
     function formatLabel(labelText) {
@@ -141,10 +144,21 @@ export default {
     }
 
     function submit () {
+      // TODO: Do formatting somewhere else (during v-model?)
+      // Oruga datetimepicker has a datetimeFormatter prop, maybe this helps https://oruga.io/components/datetimepicker.html
+      const formattedForm = {}
+      for (const field of Object.keys(form)) {
+        if (field === 'start_time' || field == 'end_time') {
+          const d = form[field]
+          formattedForm[field] = `${d.getYear()}-${d.getMonth()}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
+        } else {
+          formattedForm[field] = form[field]
+        }
+      }
       if (addOrEdit === 'add') {
-        useForm(form).post(`/api/${routeCategory}/create`)
+        useForm(formattedForm).post(`/api/${routeCategory}/create`)
       } else if (addOrEdit === 'edit') {
-        useForm(form).post(`/api/${routeCategory}/edit/${id}`)
+        useForm(formattedForm).post(`/api/${routeCategory}/edit/${id}`)
       }
     }
 
