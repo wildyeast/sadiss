@@ -130,15 +130,6 @@ export default {
       return new Date(d[2], d[1], d[0], d[3], d[4])
     }
 
-    function formatLabel(labelText) {
-      return `${labelText[0].toUpperCase()}${labelText.slice(1)}`.replace('_', ' ')
-    }
-
-    function formatPageTitle (pathname) {
-      addOrEdit = pathname.split('/')[1]
-      return `${addOrEdit[0].toUpperCase()}${addOrEdit.slice(1)} ${category[0].toUpperCase()}${category.slice(1, category.length - 1)}`
-    }
-
     function onPartialsFileInput (value) {
       form['sourcefile'] = value
     }
@@ -160,6 +151,16 @@ export default {
       } else if (addOrEdit === 'edit') {
         useForm(formattedForm).post(`/api/${routeCategory}/edit/${id}`)
       }
+    }
+
+    // Helper functions
+    function formatLabel(labelText) {
+      return `${labelText[0].toUpperCase()}${labelText.slice(1)}`.replace('_', ' ')
+    }
+
+    function formatPageTitle (pathname) {
+      addOrEdit = pathname.split('/')[1]
+      return `${addOrEdit[0].toUpperCase()}${addOrEdit.slice(1)} ${category[0].toUpperCase()}${category.slice(1, category.length - 1)}`
     }
 
     return {

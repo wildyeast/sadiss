@@ -146,14 +146,6 @@ export default {
         }
 
         // Helper functions
-
-        // function formatDateTime (mysqlTimestamp) {
-        //   // Split timestamp into [ Y, M, D, h, m, s ]
-        //   const t = mysqlTimestamp.split(/[- : T Z]/)
-        //   // Apply each element to the Date function
-        //   return new Date(Date.UTC(t[0], t[1]-1, t[2], t[3], t[4], t[5])).toString().slice(4, 21)
-        // }
-
         function formatPageTitle (pathname) {
           return `${pathname[0].toUpperCase()}${pathname.slice(1)}`
         }

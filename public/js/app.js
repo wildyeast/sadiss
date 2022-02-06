@@ -9644,15 +9644,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return new Date(d[2], d[1], d[0], d[3], d[4]);
     }
 
-    function formatLabel(labelText) {
-      return "".concat(labelText[0].toUpperCase()).concat(labelText.slice(1)).replace('_', ' ');
-    }
-
-    function formatPageTitle(pathname) {
-      addOrEdit = pathname.split('/')[1];
-      return "".concat(addOrEdit[0].toUpperCase()).concat(addOrEdit.slice(1), " ").concat(category[0].toUpperCase()).concat(category.slice(1, category.length - 1));
-    }
-
     function onPartialsFileInput(value) {
       form['sourcefile'] = value;
     }
@@ -9678,6 +9669,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       } else if (addOrEdit === 'edit') {
         (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.useForm)(formattedForm).post("/api/".concat(routeCategory, "/edit/").concat(id));
       }
+    } // Helper functions
+
+
+    function formatLabel(labelText) {
+      return "".concat(labelText[0].toUpperCase()).concat(labelText.slice(1)).replace('_', ' ');
+    }
+
+    function formatPageTitle(pathname) {
+      addOrEdit = pathname.split('/')[1];
+      return "".concat(addOrEdit[0].toUpperCase()).concat(addOrEdit.slice(1), " ").concat(category[0].toUpperCase()).concat(category.slice(1, category.length - 1));
     }
 
     return {
@@ -10227,12 +10228,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     function deleteRow(_x) {
       return _deleteRow.apply(this, arguments);
     } // Helper functions
-    // function formatDateTime (mysqlTimestamp) {
-    //   // Split timestamp into [ Y, M, D, h, m, s ]
-    //   const t = mysqlTimestamp.split(/[- : T Z]/)
-    //   // Apply each element to the Date function
-    //   return new Date(Date.UTC(t[0], t[1]-1, t[2], t[3], t[4], t[5])).toString().slice(4, 21)
-    // }
 
 
     function _deleteRow() {
