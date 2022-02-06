@@ -41,23 +41,23 @@ Route::get('/performances', function () {
     return Inertia::render('ListPage');
 })->middleware(['auth', 'verified'])->name('performances');
 
-Route::inertia('/tracks/add', 'AddOrEditComponent')
+Route::inertia('/tracks/add', 'AddOrEditPage')
   ->middleware(['auth', 'verified'])
   ->name('tracks.add');
-Route::inertia('/composers/add', 'AddOrEditComponent')
+Route::inertia('/composers/add', 'AddOrEditPage')
   ->middleware(['auth', 'verified'])
   ->name('composers.add');
-Route::inertia('/performances/add', 'AddOrEditComponent')
+Route::inertia('/performances/add', 'AddOrEditPage')
   ->middleware(['auth', 'verified'])
   ->name('performances.add');
   
-Route::inertia('/tracks/edit', 'AddOrEditComponent')
+Route::inertia('/tracks/edit', 'AddOrEditPage')
   ->middleware(['auth', 'verified'])
   ->name('tracks.edit');
-Route::inertia('/composers/edit', 'AddOrEditComponent')
+Route::inertia('/composers/edit', 'AddOrEditPage')
   ->middleware(['auth', 'verified'])
   ->name('composers.edit');
-Route::inertia('/performances/edit', 'AddOrEditComponent')
+Route::inertia('/performances/edit', 'AddOrEditPage')
   ->middleware(['auth', 'verified'])
   ->name('performances.edit');
 
