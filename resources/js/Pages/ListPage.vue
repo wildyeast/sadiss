@@ -141,6 +141,7 @@ export default {
         async function deleteRow (id) {
           if (confirm(`Do you really want to delete this ${routeCategory}? This cannot be reversed.`)) {
             await axios.post(`/api/${routeCategory}/delete/${id}`)
+            columnData.value = columnData.value.filter(row => row.id !== id)
           }
         }
 

@@ -10242,7 +10242,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context3.prev = _context3.next) {
               case 0:
                 if (!confirm("Do you really want to delete this ".concat(routeCategory, "? This cannot be reversed."))) {
-                  _context3.next = 3;
+                  _context3.next = 4;
                   break;
                 }
 
@@ -10250,6 +10250,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return axios.post("/api/".concat(routeCategory, "/delete/").concat(id));
 
               case 3:
+                columnData.value = columnData.value.filter(function (row) {
+                  return row.id !== id;
+                });
+
+              case 4:
               case "end":
                 return _context3.stop();
             }
