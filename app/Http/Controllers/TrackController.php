@@ -14,7 +14,6 @@ class TrackController extends Controller
     if (!$request->file('sourcefile')) {
       // TODO Handle error
     }
-
     $sourcefile = file_get_contents($request->file('sourcefile')->getRealPath());
     $converted = $this->convert_source_file($sourcefile);
     $track = new Track;
@@ -27,6 +26,28 @@ class TrackController extends Controller
     ]);
   }
 
+  public function delete(Request $request, $id) {
+    Track::where('id', $id)->delete();
+    return back()->with('flash', [
+      'message' => 'success',
+    ]);
+  }
+
+  public function edit(Request $request, $id) {
+    $track = Track::where('id', $id)->firstOrFail();
+    $track->title = $request->title;
+    $track->description = $request->description;
+    if ($request->file('sourcefile')) {
+      $sourcefile = file_get_contents($request->file('sourcefile')->getRealPath());
+      $converted = $this->convert_source_file($sourcefile);
+      $track->partials = $converted;
+    }
+    $track->save();
+    return back()->with('flash', [
+      'message' => 'success',
+    ]);
+  }
+
   public function get(Request $request, $id=null) {
     if (isset($id)) {
       return Track::where('id', $id)->firstOrFail();
@@ -34,7 +55,7 @@ class TrackController extends Controller
     return Track::all();
   }
 
-  public function get_track_column_info (Request $request) {
+  public function get_column_info (Request $request) {
     $columns = DB::select( DB::raw('SHOW COLUMNS FROM tracks'));
     return $columns;
   }

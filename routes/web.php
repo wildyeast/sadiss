@@ -29,9 +29,6 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::post('/track/create', [TrackController::class, 'create'])
-  ->name('track.create');
-
 Route::get('/tracks', function () {
     return Inertia::render('ListPage');
 })->middleware(['auth', 'verified'])->name('tracks');
@@ -44,29 +41,24 @@ Route::get('/performances', function () {
     return Inertia::render('ListPage');
 })->middleware(['auth', 'verified'])->name('performances');
 
-Route::inertia('/tracks/add', 'AddOrEditComponent')
+Route::inertia('/tracks/add', 'AddOrEditPage')
   ->middleware(['auth', 'verified'])
   ->name('tracks.add');
-Route::inertia('/composers/add', 'AddOrEditComponent')
+Route::inertia('/composers/add', 'AddOrEditPage')
   ->middleware(['auth', 'verified'])
   ->name('composers.add');
-Route::inertia('/performances/add', 'AddOrEditComponent')
+Route::inertia('/performances/add', 'AddOrEditPage')
   ->middleware(['auth', 'verified'])
   ->name('performances.add');
   
-Route::inertia('/tracks/edit', 'AddOrEditComponent')
+Route::inertia('/tracks/edit', 'AddOrEditPage')
   ->middleware(['auth', 'verified'])
   ->name('tracks.edit');
-Route::inertia('/composers/edit', 'AddOrEditComponent')
+Route::inertia('/composers/edit', 'AddOrEditPage')
   ->middleware(['auth', 'verified'])
   ->name('composers.edit');
-Route::inertia('/performances/edit', 'AddOrEditComponent')
+Route::inertia('/performances/edit', 'AddOrEditPage')
   ->middleware(['auth', 'verified'])
   ->name('performances.edit');
-
-// TODO: track/columns and and track/{id} should probably be in api.php
-Route::get('/track/columns', [TrackController::class, 'get_track_column_info']);
-Route::get('/track', [TrackController::class, 'get']);
-Route::get('/track/{id}', [TrackController::class, 'get']);
 
 require __DIR__.'/auth.php';

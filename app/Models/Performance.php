@@ -17,8 +17,11 @@ class Performance extends Model
      * @var array
      */
     protected $casts = [
-        'start_time' => 'datetime',
-        'end_time' => 'datetime'
+        'is_active' => 'boolean',
+        'start_time' => 'datetime:d.m.Y H:m',
+        'end_time' => 'datetime:d.m.Y H:m',
+        'created_at' => 'datetime:d.m.Y H:m',
+        'updated_at' => 'datetime:d.m.Y H:m',
     ];
 
     public function tracks()
