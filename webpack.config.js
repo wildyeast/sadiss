@@ -6,4 +6,7 @@ module.exports = {
             '@': path.resolve('resources/js'),
         },
     },
+    stats: {
+      children: true
+    },
 };

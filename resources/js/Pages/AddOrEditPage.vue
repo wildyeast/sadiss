@@ -45,7 +45,7 @@
 <script>
 import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
 import { Head, useForm } from '@inertiajs/inertia-vue3'
-import { computed, onMounted, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref, inject } from 'vue'
 import PartialsUpload from '@/Components/PartialsUpload'
 
 export default {
@@ -55,6 +55,8 @@ export default {
       PartialsUpload
   },
   setup () {
+    const oruga = inject('oruga')
+
     let addOrEdit = ''
     const id = window.location.toString().split('=')[1] // TODO: $route is undefined, need to expose somehow?
     const loadingFinished = ref(false)
@@ -151,6 +153,13 @@ export default {
       } else if (addOrEdit === 'edit') {
         useForm(formattedForm).post(`/api/${routeCategory}/edit/${id}`)
       }
+      oruga.notification.open({
+        message: 'Success!',
+        rootClass: 'toast-notification',
+        position: 'bottom',
+        queue: true,
+        duration: 4000
+      })
     }
 
     // Helper functions
@@ -179,3 +188,16 @@ export default {
   }
 }
 </script>
+
+<style>
+  .toast-notification {
+    margin: 0.5em 0;
+    text-align: center;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 12%), 0 0 6px rgb(0 0 0 / 4%);
+    border-radius: 2em;
+    padding: 0.75em 1.5em;
+    pointer-events: auto;
+    color: rgba(0, 0, 0, 0.7);
+    background: #f0ead6;
+  }
+</style>
