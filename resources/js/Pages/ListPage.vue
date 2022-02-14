@@ -54,7 +54,7 @@
                                         </Link>
                                     </td>
                                     <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200">
-                                        <span class="material-icons mi-delete text-rose-500" @click="deleteRow(entry.id)" />
+                                        <span class="material-icons mi-delete text-rose-500 cursor-pointer" @click="deleteRow(entry.id)" />
                                     </td>
                                 </tr>
                             </tbody>

@@ -12591,7 +12591,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         }, 1032
         /* PROPS, DYNAMIC_SLOTS */
         , ["href"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
-          "class": "material-icons mi-delete text-rose-500",
+          "class": "material-icons mi-delete text-rose-500 cursor-pointer",
           onClick: function onClick($event) {
             return $setup.deleteRow(entry.id);
           }
