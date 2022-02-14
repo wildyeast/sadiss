@@ -12513,7 +12513,7 @@ var _hoisted_9 = {
   "class": "text-sm leading-5 text-gray-500"
 };
 var _hoisted_10 = {
-  "class": "px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200"
+  "class": "px-6 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200"
 };
 
 var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -12523,7 +12523,7 @@ var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 var _hoisted_12 = {
-  "class": "px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200"
+  "class": "px-6 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200"
 };
 var _hoisted_13 = ["onClick"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {

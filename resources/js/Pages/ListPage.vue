@@ -48,12 +48,12 @@
                                         <div class="text-sm leading-5 text-gray-500"> {{ field }} </div>
                                     </td>
 
-                                    <td class="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200">
+                                    <td class="px-6 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200">
                                         <Link :href="route(`${pathname}.edit`, {id: entry.id})">
                                           <span class="material-icons mi-edit text-blue-500" />
                                         </Link>
                                     </td>
-                                    <td class="px-6 py-4 text-sm leading-5 text-gray-500 whitespace-no-wrap border-b border-gray-200">
+                                    <td class="px-6 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200">
                                         <span class="material-icons mi-delete text-rose-500" @click="deleteRow(entry.id)" />
                                     </td>
                                 </tr>
