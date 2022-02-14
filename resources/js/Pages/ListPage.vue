@@ -15,10 +15,10 @@
             <div class="flex flex-col mt-8 max-w-7xl mx-auto">
                 <div class="py-2 -my-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
                     <div class="inline-block min-w-full overflow-hidden align-middle border-b border-gray-200 shadow sm:rounded-lg">
-                        <table class="min-w-full">
+                        <table class="min-w-full text-center">
                             <thead>
                                 <tr>
-                                  <th class="px-2 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                                  <th class="px-2 py-3 text-xs font-medium leading-4 tracking-wider text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
                                       v-for="value in columnNames" :key="value">
                                       {{ value }}
                                   </th>
