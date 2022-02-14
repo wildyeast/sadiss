@@ -12513,7 +12513,7 @@ var _hoisted_9 = {
   "class": "text-sm leading-5 text-gray-500"
 };
 var _hoisted_10 = {
-  "class": "px-6 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200"
+  "class": "px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200"
 };
 
 var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
@@ -12523,7 +12523,7 @@ var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 var _hoisted_12 = {
-  "class": "px-6 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200"
+  "class": "px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200"
 };
 var _hoisted_13 = ["onClick"];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -12558,7 +12558,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
       return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("table", _hoisted_7, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("thead", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tr", null, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.columnNames, function (value) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("th", {
-          "class": "px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50",
+          "class": "px-2 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50",
           key: value
         }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(value), 1
         /* TEXT */
@@ -12570,7 +12570,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           key: entry.id
         }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td class=\"px-6 py-4 whitespace-no-wrap border-b border-gray-200\">\r\n                                        <div class=\"flex items-center\">\r\n                                            <div class=\"flex-shrink-0 w-10 h-10\">\r\n                                                <img class=\"w-10 h-10 rounded-full\" src=\"https://source.unsplash.com/user/erondu\"\r\n                                                    alt=\"admin dashboard ui\">\r\n                                            </div>\r\n\r\n                                            <div>\r\n                                                <div class=\"text-sm font-medium leading-5 text-gray-900\">\r\n                                                    {{ entry.id }}\r\n                                                </div>\r\n                                            </div>\r\n                                        </div>\r\n                                    </td> "), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(entry, function (field, idx) {
           return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", {
-            "class": "px-6 py-4 whitespace-no-wrap border-b border-gray-200 max-w-min",
+            "class": "px-2 py-4 whitespace-no-wrap border-b border-gray-200 max-w-min",
             key: idx
           }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(field), 1
           /* TEXT */

@@ -18,10 +18,10 @@
                         <table class="min-w-full">
                             <thead>
                                 <tr>
-                                    <th class="px-6 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
-                                        v-for="value in columnNames" :key="value">
-                                        {{ value }}
-                                    </th>
+                                  <th class="px-2 py-3 text-xs font-medium leading-4 tracking-wider text-left text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
+                                      v-for="value in columnNames" :key="value">
+                                      {{ value }}
+                                  </th>
                                 </tr>
                             </thead>
 
@@ -42,18 +42,18 @@
                                         </div>
                                     </td> -->
 
-                                    <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200 max-w-min"
+                                    <td class="px-2 py-4 whitespace-no-wrap border-b border-gray-200 max-w-min"
                                         v-for="(field, idx) in entry"
                                         :key="idx">
                                         <div class="text-sm leading-5 text-gray-500"> {{ field }} </div>
                                     </td>
 
-                                    <td class="px-6 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200">
+                                    <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200">
                                         <Link :href="route(`${pathname}.edit`, {id: entry.id})">
                                           <span class="material-icons mi-edit text-blue-500" />
                                         </Link>
                                     </td>
-                                    <td class="px-6 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200">
+                                    <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200">
                                         <span class="material-icons mi-delete text-rose-500" @click="deleteRow(entry.id)" />
                                     </td>
                                 </tr>
