@@ -35,7 +35,9 @@
                 </div>
               </div>
             </div>
-            <Button>Submit</Button>
+            <div class="flex justify-center mt-2">
+              <o-button>Submit</o-button>
+            </div>
           </form>
         </div>
         <div v-else>
