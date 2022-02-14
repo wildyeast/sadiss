@@ -27,6 +27,7 @@
         "vue-loader": "^16.1.2"
     },
     "dependencies": {
-        "@oruga-ui/oruga-next": "^0.5.3"
+        "@oruga-ui/oruga-next": "^0.5.3",
+        "@oruga-ui/theme-bulma": "^0.2.1"
     }
 }

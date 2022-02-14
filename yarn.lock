@@ -970,6 +970,13 @@
   "resolved" "https://registry.npmjs.org/@oruga-ui/oruga-next/-/oruga-next-0.5.3.tgz"
   "version" "0.5.3"
 
+"@oruga-ui/theme-bulma@^0.2.1":
+  "integrity" "sha512-d94H0GjLO36XgPubiblLge4GvlD0vnPBnpBlp9ph8x0PAx9D2Dv535WBNW1iN7eBt4oQexR9CoqVgrAc13W0vA=="
+  "resolved" "https://registry.npmjs.org/@oruga-ui/theme-bulma/-/theme-bulma-0.2.1.tgz"
+  "version" "0.2.1"
+  dependencies:
+    "bulma" "0.9.3"
+
 "@tailwindcss/forms@^0.4.0":
   "integrity" "sha512-DeaQBx6EgEeuZPQACvC+mKneJsD8am1uiJugjgQK1+/Vt+Ai0GpFBC2T2fqnUad71WgOxyrZPE6BG1VaI6YqfQ=="
   "resolved" "https://registry.npmjs.org/@tailwindcss/forms/-/forms-0.4.0.tgz"
@@ -1894,6 +1901,11 @@
   "integrity" "sha1-hZgoeOIbmOHGZCXgPQF0eI9Wnug="
   "resolved" "https://registry.npmjs.org/builtin-status-codes/-/builtin-status-codes-3.0.0.tgz"
   "version" "3.0.0"
+
+"bulma@0.9.3":
+  "integrity" "sha512-0d7GNW1PY4ud8TWxdNcP6Cc8Bu7MxcntD/RRLGWuiw/s0a9P+XlH/6QoOIrmbj6o8WWJzJYhytiu9nFjTszk1g=="
+  "resolved" "https://registry.npmjs.org/bulma/-/bulma-0.9.3.tgz"
+  "version" "0.9.3"
 
 "bytes@3.0.0":
   "integrity" "sha1-0ygVQE1olpn4Wk6k+odV3ROpYEg="
