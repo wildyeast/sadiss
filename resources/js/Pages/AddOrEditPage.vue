@@ -24,11 +24,14 @@
                 <div v-else-if="fields[field].type === 'datetime'">
                   <o-datetimepicker rounded placeholder="Click to select..." locale="en-GB" v-model="form[field]" />
                 </div>
+                <div v-else-if="getInputType(fields[field].type) === 'checkbox'">
+                  <o-switch rounded v-model="form[field]" />
+                </div>
                 <div v-else-if="fields[field].type !== 'text'">
-                  <input :type="getInputType(fields[field].type)" :name="form[field]" :placeholder="field" v-model="form[field]">
+                  <o-input rounded :type="getInputType(fields[field].type)" v-model="form[field]" />
                 </div>
                 <div v-else>
-                  <textarea :placeholder="field" v-model="form[field]"/>
+                  <o-input rounded type="textarea" v-model="form[field]"/>
                 </div>
               </div>
             </div>
