@@ -10,7 +10,7 @@
             </h2>
           </div>
         </template>
-        <div v-if="loadingFinished" class="flex w-100 m-auto px-2 py-2 md:max-w-7xl md:px-6 md:justify-center">
+        <div v-if="loadingFinished" class="flex w-100 mt-2 px-2 py-8 bg-white border border-gray-200 shadow md:px-6 md:justify-center">
           <div v-if="addOrEdit === 'edit'">
             <p v-for="field in Object.keys(fields).filter(field => !fields[field].editable)" :key="field">{{ field }}: {{ form[field] }}</p>
           </div>
