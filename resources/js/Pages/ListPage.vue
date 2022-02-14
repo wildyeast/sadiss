@@ -69,7 +69,7 @@
 <script>
 import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
 import { Head, Link } from '@inertiajs/inertia-vue3'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, inject } from 'vue'
 
 export default {
     components: {
@@ -78,6 +78,8 @@ export default {
         Link
     },
     setup () {
+        const oruga = inject('oruga')
+
         const columnData = ref([])
         const columnNames = ref([])
         const pathname = window.location.pathname.replace('/', '')
@@ -133,6 +135,13 @@ export default {
             await axios.post(`/api/${routeCategory}/delete/${id}`)
             columnData.value = columnData.value.filter(row => row.id !== id)
           }
+          oruga.notification.open({
+            message: 'Deletion successful!',
+            rootClass: 'toast-notification',
+            position: 'bottom',
+            queue: true,
+            duration: 4000
+          })
         }
 
         // Helper functions
@@ -150,3 +159,16 @@ export default {
     }
 }
 </script>
+
+<style>
+  .toast-notification {
+    margin: 0.5em 0;
+    text-align: center;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 12%), 0 0 6px rgb(0 0 0 / 4%);
+    border-radius: 2em;
+    padding: 0.75em 1.5em;
+    pointer-events: auto;
+    color: rgba(0, 0, 0, 0.7);
+    background: #f0ead6;
+  }
+</style>

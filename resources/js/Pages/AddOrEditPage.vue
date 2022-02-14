@@ -36,7 +36,7 @@
               </div>
             </div>
             <div class="flex justify-center mt-2">
-              <o-button>Submit</o-button>
+              <Button><o-button>Submit</o-button></Button>
             </div>
           </form>
         </div>
