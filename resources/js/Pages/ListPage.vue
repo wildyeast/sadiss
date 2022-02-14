@@ -56,6 +56,11 @@
                                     <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200">
                                         <span class="material-icons mi-delete text-rose-500 cursor-pointer" @click="deleteRow(entry.id)" />
                                     </td>
+                                    <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200">
+                                        <Link :href="route(`${pathname}.show`, {id: entry.id})">
+                                          <span class="material-icons mi-arrow-forward-ios text-gray-500" />
+                                        </Link>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -115,6 +120,7 @@ export default {
         function addAdditionColumns() {
           columnNames.value.push('Edit')
           columnNames.value.push('Delete')
+          columnNames.value.push('Details')
         }
 
         async function addData () {
