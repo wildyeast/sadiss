@@ -1,4 +1,5 @@
 window._ = require('lodash');
+window._ = require('material-icons'); //TODO: This is probably not needed, we import the icons in app.css anyway
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests

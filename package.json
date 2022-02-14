@@ -28,6 +28,7 @@
     },
     "dependencies": {
         "@oruga-ui/oruga-next": "^0.5.3",
-        "@oruga-ui/theme-bulma": "^0.2.1"
+        "@oruga-ui/theme-bulma": "^0.2.1",
+        "material-icons": "^1.10.6"
     }
 }

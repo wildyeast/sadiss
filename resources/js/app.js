@@ -9,13 +9,23 @@ import '@oruga-ui/theme-bulma/dist/bulma.css'
 
 const appName = window.document.getElementsByTagName('title')[0]?.innerText || 'Laravel';
 
+const customBulmaConfig  =  {
+  ...bulmaConfig,
+  iconPack: 'material-icons',
+  customIconPacks: {
+    'material-icons': {
+      iconPrefix: 'mi-',
+    },
+  },
+}
+
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,
     resolve: (name) => require(`./Pages/${name}.vue`),
     setup({ el, app, props, plugin }) {
         const App = createApp({ render: () => h(app, props) })
           .use(plugin)
-          .use(Oruga, bulmaConfig)
+          .use(Oruga, customBulmaConfig)
           .mixin({ methods: { route } })
         App.mount(el)
         return App

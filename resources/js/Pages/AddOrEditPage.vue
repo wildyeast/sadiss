@@ -22,7 +22,7 @@
                   <PartialsUpload @fileInput="onPartialsFileInput" />
                 </div>
                 <div v-else-if="fields[field].type === 'datetime'">
-                  <o-datetimepicker placeholder="Click to select..." locale="en-GB" v-model="form[field]" />
+                  <o-datetimepicker placeholder="Click to select..." locale="en-GB" icon="event" v-model="form[field]" />
                 </div>
                 <div v-else-if="getInputType(fields[field].type) === 'checkbox'">
                   <o-switch v-model="form[field]" />
