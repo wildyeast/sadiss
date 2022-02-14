@@ -623,6 +623,9 @@ select {
 .z-50 {
   z-index: 50;
 }
+.m-auto {
+  margin: auto;
+}
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -760,9 +763,6 @@ select {
 .w-10 {
   width: 2.5rem;
 }
-.w-1\/2 {
-  width: 50%;
-}
 .min-w-full {
   min-width: 100%;
 }
@@ -857,24 +857,13 @@ select {
 .overflow-x-auto {
   overflow-x: auto;
 }
-.rounded-md {
-  border-radius: 0.375rem;
-}
-.rounded {
-  border-radius: 0.25rem;
-}
-.rounded-full {
-  border-radius: 9999px;
-}
-.rounded-l-md {
-  border-top-left-radius: 0.375rem;
-  border-bottom-left-radius: 0.375rem;
-}
-.rounded-r-md {
-  border-top-right-radius: 0.375rem;
-  border-bottom-right-radius: 0.375rem;
+.rounded-bulma-input-border-radius {
+  border-radius: 4px;
 }
 .border {
+  border-width: 1px;
+}
+.border-1 {
   border-width: 1px;
 }
 .border-t {
@@ -886,11 +875,11 @@ select {
 .border-b-2 {
   border-bottom-width: 2px;
 }
-.border-b {
-  border-bottom-width: 1px;
-}
 .border-l-4 {
   border-left-width: 4px;
+}
+.border-b {
+  border-bottom-width: 1px;
 }
 .border-gray-300 {
   --tw-border-opacity: 1;
@@ -910,6 +899,10 @@ select {
 .border-indigo-400 {
   --tw-border-opacity: 1;
   border-color: rgb(129 140 248 / var(--tw-border-opacity));
+}
+.border-bulma-input-border {
+  --tw-border-opacity: 1;
+  border-color: rgb(219 219 219 / var(--tw-border-opacity));
 }
 .border-gray-100 {
   --tw-border-opacity: 1;
@@ -3419,6 +3412,10 @@ html {
   --tw-border-opacity: 1;
   border-color: rgb(209 213 219 / var(--tw-border-opacity));
 }
+.hover\:border-bulma-input-border-hover:hover {
+  --tw-border-opacity: 1;
+  border-color: rgb(181 181 181 / var(--tw-border-opacity));
+}
 .hover\:bg-gray-700:hover {
   --tw-bg-opacity: 1;
   background-color: rgb(55 65 81 / var(--tw-bg-opacity));
@@ -3634,10 +3631,6 @@ html {
     justify-content: space-between;
   }
 
-  .sm\:rounded-lg {
-    border-radius: 0.5rem;
-  }
-
   .sm\:px-6 {
     padding-left: 1.5rem;
     padding-right: 1.5rem;
@@ -3657,8 +3650,20 @@ html {
 }
 @media (min-width: 768px) {
 
+  .md\:w-1\/2 {
+    width: 50%;
+  }
+
+  .md\:max-w-7xl {
+    max-width: 80rem;
+  }
+
   .md\:grid-cols-2 {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .md\:justify-center {
+    justify-content: center;
   }
 
   .md\:border-t-0 {
@@ -3667,6 +3672,11 @@ html {
 
   .md\:border-l {
     border-left-width: 1px;
+  }
+
+  .md\:px-6 {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
   }
 }
 @media (min-width: 1024px) {

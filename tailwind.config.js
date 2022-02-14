@@ -10,9 +10,19 @@ module.exports = {
 
     theme: {
         extend: {
+            borderWidth: {
+                '1': '1px',
+            },
+            colors: {
+                'bulma-input-border': '#dbdbdb',
+                'bulma-input-border-hover': '#b5b5b5',
+            },
             fontFamily: {
                 sans: ['Nunito', ...defaultTheme.fontFamily.sans],
             },
+        },
+        borderRadius: {
+          'bulma-input-border-radius': '4px',
         },
     },
 

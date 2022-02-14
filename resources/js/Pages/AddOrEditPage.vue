@@ -10,28 +10,28 @@
             </h2>
           </div>
         </template>
-        <div v-if="loadingFinished" class="mt-8 max-w-7xl mx-auto py-6 -my-2 sm:px-6 lg:px-8 bg-white border-gray-200 shadow sm:rounded-lg">
+        <div v-if="loadingFinished" class="flex w-100 m-auto px-2 py-2 md:max-w-7xl md:px-6 md:justify-center">
           <div v-if="addOrEdit === 'edit'">
             <p v-for="field in Object.keys(fields).filter(field => !fields[field].editable)" :key="field">{{ field }}: {{ form[field] }}</p>
           </div>
-          <form @submit.prevent="submit">
+          <form @submit.prevent="submit" class="inline-block w-full md:w-1/2">
             <div v-for="field in Object.keys(fields)" :key="field">
               <div class="flex flex-col" v-if="fields[field].editable">
                 <label :for="field">{{ formatLabel(field) }}</label>
                 <div v-if="field === 'partials'">
-                  <PartialsUpload @fileInput="onPartialsFileInput"/>
+                  <PartialsUpload @fileInput="onPartialsFileInput" />
                 </div>
                 <div v-else-if="fields[field].type === 'datetime'">
-                  <o-datetimepicker rounded placeholder="Click to select..." locale="en-GB" v-model="form[field]" />
+                  <o-datetimepicker placeholder="Click to select..." locale="en-GB" v-model="form[field]" />
                 </div>
                 <div v-else-if="getInputType(fields[field].type) === 'checkbox'">
-                  <o-switch rounded v-model="form[field]" />
+                  <o-switch v-model="form[field]" />
                 </div>
                 <div v-else-if="fields[field].type !== 'text'">
-                  <o-input rounded :type="getInputType(fields[field].type)" v-model="form[field]" />
+                  <o-input :type="getInputType(fields[field].type)" v-model="form[field]" />
                 </div>
                 <div v-else>
-                  <o-input rounded type="textarea" v-model="form[field]"/>
+                  <o-input type="textarea" v-model="form[field]" />
                 </div>
               </div>
             </div>
