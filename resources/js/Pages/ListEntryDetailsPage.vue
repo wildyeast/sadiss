@@ -11,11 +11,33 @@
 
             <div v-if="Object.keys(data).length > 0" class="w-100 mt-2 py-8 bg-white border border-gray-200 shadow md:px-6 md:justify-center">
               <div class="flex flex-col max-w-7xl mx-auto px-4">
-                <div class="flex justify-between w-1/3 mb-4 text-slate-600 text-sm">
-                  <span>Id: {{data['id']}}</span>
-                  <span>Created at: {{ data['created_at'] }}</span>
-                  <span>Updated at: {{ data['updated_at'] }}</span>
+                <div class="flex mb-4 text-slate-400 text-xs">
+                  <div class="flex flex-col mr-4">
+                    <span>Id: </span>
+                    <span>Created at:</span>
+                    <span>Updated at:</span>
+                  </div>
+                  <div class="flex flex-col">
+                    <span>{{ data['id'] }}</span>
+                    <span>{{ data['created_at'] }}</span>
+                    <span>{{ data['updated_at'] }}</span>
+                  </div>
                 </div>
+                <!-- Track -->
+                <template v-if="category === 'tracks'">
+                  <div class="flex">
+                    <!-- Left hand side -->
+                    <div class="flex-1">
+                      <p class="mb-4 text-2xl">{{ data['title'] }}</p>
+                      <p class="text-justify">{{ data['description'] }}</p>
+                    </div>
+                    <!-- Right hand side -->
+                    <div class="flex-1">
+                      <p class="text-justify">{{ data['partials'] }}</p>
+                    </div>
+                  </div>
+                </template>
+                <!-- Composer -->
                 <template v-if="category === 'composers'">
                   <div class="flex">
                     <!-- Left hand side -->
@@ -29,6 +51,22 @@
                       <div class="flex flex-col items-center w-1/2 border border-bulma-input-border rounded-bulma-input-border-radius">
                         <p class="py-4 border-b border-bulma-input-border">Website</p>
                         <a :href="data['website_url']" class="py-4 text-center">{{ data['website_url'] }}</a>
+                      </div>
+                    </div>
+                  </div>
+                </template>
+                <!-- Performance -->
+                <template v-if="category === 'performances'">
+                  <div class="w-full">
+                    <p class="mb-4 text-2xl">{{ data['location'] }}</p>
+                    <div class="flex">
+                      <div class="mr-4">
+                        <p>Start time:</p>
+                        <p>End time:</p>
+                      </div>
+                      <div>
+                        <p>{{ data['start_time'] }}</p>
+                        <p>{{ data['end_time'] }}</p>
                       </div>
                     </div>
                   </div>
