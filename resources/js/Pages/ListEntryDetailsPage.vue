@@ -47,7 +47,11 @@
                   <div class="flex">
                     <!-- Left hand side -->
                     <div class="flex-1">
-                      <p class="mb-4 text-2xl">{{ data['name'] }}</p>
+                      <div class="flex justify-between items-center mb-4">
+                        <p class="text-2xl">{{ data['name'] }}</p>
+                        <p v-if="data['is_active']" class="text-green-700" >Active</p>
+                        <p v-else class="text-rose-500">Inactive</p>
+                      </div>
                       <p class="text-justify">{{ data['description'] }}</p>
                     </div>
                     <!-- Right hand side -->
@@ -63,7 +67,11 @@
                 <!-- Performance -->
                 <template v-if="category === 'performances'">
                   <div class="w-full">
-                    <p class="mb-4 text-2xl">{{ data['location'] }}</p>
+                    <div class="flex justify-between items-center mb-4">
+                      <p class="text-2xl">{{ data['location'] }}</p>
+                      <p v-if="data['is_active']" class="text-green-700" >Active</p>
+                      <p v-else class="text-rose-500">Inactive</p>
+                    </div>
                     <div class="flex">
                       <div class="mr-4">
                         <p>Start time:</p>

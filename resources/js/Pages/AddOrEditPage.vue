@@ -165,6 +165,7 @@ export default {
         queue: true,
         duration: 4000
       })
+      window.history.back();
     }
 
     // Helper functions
