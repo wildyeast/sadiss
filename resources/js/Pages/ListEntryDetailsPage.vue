@@ -9,8 +9,8 @@
                 </h2>
             </template>
 
-            <div class="flex w-100 mt-2 px-8 py-8 bg-white border border-gray-200 shadow md:px-6 md:justify-center">
-              <template v-if="category === 'composers' && Object.keys(data).length > 0">
+            <div v-if="Object.keys(data).length > 0" class="flex w-100 mt-2 px-8 py-8 bg-white border border-gray-200 shadow md:px-6 md:justify-center">
+              <template v-if="category === 'composers'">
                 <!-- Left hand side -->
                 <div class="flex-1">
                   <div class="flex justify-between w-2/3 text-slate-600 text-sm">
@@ -19,6 +19,7 @@
                     <span>Updated at: {{ data['updated_at'] }}</span>
                   </div>
                   <p class="mt-4 text-2xl">{{ data['name'] }}</p>
+                  <p class="mt-4 text-2xl">{{ data['description'] }}</p>
                 </div>
                 <!-- Right hand side -->
                 <div class="flex-1">

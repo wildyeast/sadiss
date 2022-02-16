@@ -45,7 +45,7 @@ Route::get('/composer/columns', [ComposerController::class, 'get_column_info']);
 Route::post('/composer/create', [ComposerController::class, 'create'])
   ->name('composer.create');
 Route::post('/composer/delete/{id}', [ComposerController::class, 'delete'])
-  ->name('composercomposer.delete');
+  ->name('composer.delete');
 Route::post('/composer/edit/{id}', [ComposerController::class, 'edit'])
   ->name('composer.edit');
 Route::get('/composer', [ComposerController::class, 'get']);

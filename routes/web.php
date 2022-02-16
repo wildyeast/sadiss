@@ -29,23 +29,14 @@ Route::get('/dashboard', function () {
     return Inertia::render('Dashboard');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/tracks/{id}', function () {
-  return Inertia::render('ListEntryDetailsPage');
-})->middleware(['auth', 'verified'])->name('tracks.show');
 Route::get('/tracks', function () {
     return Inertia::render('ListPage');
 })->middleware(['auth', 'verified'])->name('tracks');
 
-Route::get('/composers/{id}', function () {
-  return Inertia::render('ListEntryDetailsPage');
-})->middleware(['auth', 'verified'])->name('composers.show');
 Route::get('/composers', function () {
     return Inertia::render('ListPage');
 })->middleware(['auth', 'verified'])->name('composers');
 
-Route::get('/performances/{id}', function () {
-  return Inertia::render('ListEntryDetailsPage');
-})->middleware(['auth', 'verified'])->name('performances.show');
 Route::get('/performances', function () {
     return Inertia::render('ListPage');
 })->middleware(['auth', 'verified'])->name('performances');
@@ -69,5 +60,15 @@ Route::inertia('/composers/edit', 'AddOrEditPage')
 Route::inertia('/performances/edit', 'AddOrEditPage')
   ->middleware(['auth', 'verified'])
   ->name('performances.edit');
+
+Route::inertia('/tracks/{id}', 'ListEntryDetailsPage')
+  ->middleware(['auth', 'verified'])
+  ->name('tracks.show');
+Route::inertia('/composers/{id}', 'ListEntryDetailsPage')
+  ->middleware(['auth', 'verified'])
+  ->name('composers.show');
+Route::inertia('/performances/{id}', 'ListEntryDetailsPage')
+  ->middleware(['auth', 'verified'])
+  ->name('performances.show');
 
 require __DIR__.'/auth.php';
