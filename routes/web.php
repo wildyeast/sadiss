@@ -25,50 +25,38 @@ Route::get('/', function () {
     ]);
 });
 
-Route::get('/dashboard', function () {
-    return Inertia::render('Dashboard');
-})->middleware(['auth', 'verified'])->name('dashboard');
-
-Route::get('/tracks', function () {
-    return Inertia::render('ListPage');
-})->middleware(['auth', 'verified'])->name('tracks');
-
-Route::get('/composers', function () {
-    return Inertia::render('ListPage');
-})->middleware(['auth', 'verified'])->name('composers');
-
-Route::get('/performances', function () {
-    return Inertia::render('ListPage');
-})->middleware(['auth', 'verified'])->name('performances');
-
-Route::inertia('/tracks/add', 'AddOrEditPage')
-  ->middleware(['auth', 'verified'])
-  ->name('tracks.add');
-Route::inertia('/composers/add', 'AddOrEditPage')
-  ->middleware(['auth', 'verified'])
-  ->name('composers.add');
-Route::inertia('/performances/add', 'AddOrEditPage')
-  ->middleware(['auth', 'verified'])
-  ->name('performances.add');
+Route::middleware(['auth', 'verified'])->group(function () {
+  Route::inertia('dashboard', 'Dashboard')
+    ->name('dashboard');
   
-Route::inertia('/tracks/edit', 'AddOrEditPage')
-  ->middleware(['auth', 'verified'])
-  ->name('tracks.edit');
-Route::inertia('/composers/edit', 'AddOrEditPage')
-  ->middleware(['auth', 'verified'])
-  ->name('composers.edit');
-Route::inertia('/performances/edit', 'AddOrEditPage')
-  ->middleware(['auth', 'verified'])
-  ->name('performances.edit');
+  Route::inertia('/tracks', 'ListPage')
+    ->name('tracks');
+  Route::inertia('/composers', 'ListPage')
+    ->name('composers');
+  Route::inertia('/performances', 'ListPage')
+    ->name('performances');
+  
+  Route::inertia('/tracks/add', 'AddOrEditPage')
+    ->name('tracks.add');
+  Route::inertia('/composers/add', 'AddOrEditPage')
+    ->name('composers.add');
+  Route::inertia('/performances/add', 'AddOrEditPage')
+    ->name('performances.add');
+    
+  Route::inertia('/tracks/edit', 'AddOrEditPage')
+    ->name('tracks.edit');
+  Route::inertia('/composers/edit', 'AddOrEditPage')
+    ->name('composers.edit');
+  Route::inertia('/performances/edit', 'AddOrEditPage')
+    ->name('performances.edit');
+  
+  Route::inertia('/tracks/{id}', 'ListEntryDetailsPage')
+    ->name('tracks.show');
+  Route::inertia('/composers/{id}', 'ListEntryDetailsPage')
+    ->name('composers.show');
+  Route::inertia('/performances/{id}', 'ListEntryDetailsPage')
+    ->name('performances.show');
+});
 
-Route::inertia('/tracks/{id}', 'ListEntryDetailsPage')
-  ->middleware(['auth', 'verified'])
-  ->name('tracks.show');
-Route::inertia('/composers/{id}', 'ListEntryDetailsPage')
-  ->middleware(['auth', 'verified'])
-  ->name('composers.show');
-Route::inertia('/performances/{id}', 'ListEntryDetailsPage')
-  ->middleware(['auth', 'verified'])
-  ->name('performances.show');
 
 require __DIR__.'/auth.php';
