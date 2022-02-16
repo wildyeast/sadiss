@@ -11671,10 +11671,11 @@ var _hoisted_2 = {
 };
 var _hoisted_3 = {
   key: 0,
-  "class": "flex w-100 mt-2 px-2 py-8 bg-white border border-gray-200 shadow md:px-6 md:justify-center"
+  "class": "flex flex-col items-center mt-2 px-2 py-8 bg-white border border-gray-200 shadow md:px-6 md:justify-center"
 };
 var _hoisted_4 = {
-  key: 0
+  key: 0,
+  "class": "inline-block w-full mb-4 text-slate-400 text-xs md:w-1/2"
 };
 var _hoisted_5 = {
   key: 0,

@@ -10,8 +10,8 @@
             </h2>
           </div>
         </template>
-        <div v-if="loadingFinished" class="flex w-100 mt-2 px-2 py-8 bg-white border border-gray-200 shadow md:px-6 md:justify-center">
-          <div v-if="addOrEdit === 'edit'">
+        <div v-if="loadingFinished" class="flex flex-col items-center mt-2 px-2 py-8 bg-white border border-gray-200 shadow md:px-6 md:justify-center">
+          <div v-if="addOrEdit === 'edit'" class="inline-block w-full mb-4 text-slate-400 text-xs md:w-1/2">
             <p v-for="field in Object.keys(fields).filter(field => !fields[field].editable)" :key="field">{{ field }}: {{ form[field] }}</p>
           </div>
           <form @submit.prevent="submit" class="inline-block w-full md:w-1/2">
