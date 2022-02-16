@@ -36,13 +36,15 @@ Route::middleware(['auth', 'verified'])->group(function () {
   Route::inertia('/performances', 'ListPage')
     ->name('performances');
   
+  // Routes to 'add'
   Route::inertia('/tracks/add', 'AddOrEditPage')
     ->name('tracks.add');
   Route::inertia('/composers/add', 'AddOrEditPage')
     ->name('composers.add');
   Route::inertia('/performances/add', 'AddOrEditPage')
     ->name('performances.add');
-    
+  
+  // Routes to 'edit'
   Route::inertia('/tracks/edit', 'AddOrEditPage')
     ->name('tracks.edit');
   Route::inertia('/composers/edit', 'AddOrEditPage')
@@ -50,6 +52,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
   Route::inertia('/performances/edit', 'AddOrEditPage')
     ->name('performances.edit');
   
+  // Routes to DetailsPage
   Route::inertia('/tracks/{id}', 'ListEntryDetailsPage')
     ->name('tracks.show');
   Route::inertia('/composers/{id}', 'ListEntryDetailsPage')
