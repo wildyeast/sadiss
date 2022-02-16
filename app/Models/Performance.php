@@ -29,4 +29,9 @@ class Performance extends Model
         return $this->belongsToMany(Track::class);
     }
 
+    public function clients()
+    {
+      return $this->hasMany(Client::class);
+    }
+
 }
