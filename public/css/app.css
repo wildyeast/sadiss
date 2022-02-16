@@ -623,9 +623,6 @@ select {
 .z-50 {
   z-index: 50;
 }
-.m-auto {
-  margin: auto;
-}
 .mx-auto {
   margin-left: auto;
   margin-right: auto;
@@ -733,9 +730,6 @@ select {
 .h-10 {
   height: 2.5rem;
 }
-.h-96 {
-  height: 24rem;
-}
 .min-h-screen {
   min-height: 100vh;
 }
@@ -763,20 +757,11 @@ select {
 .w-20 {
   width: 5rem;
 }
-.w-10 {
-  width: 2.5rem;
-}
-.w-2\/5 {
-  width: 40%;
-}
-.w-4\/5 {
-  width: 80%;
-}
-.w-8\/12 {
-  width: 66.666667%;
-}
 .w-2\/3 {
   width: 66.666667%;
+}
+.w-10 {
+  width: 2.5rem;
 }
 .min-w-full {
   min-width: 100%;
@@ -940,14 +925,6 @@ select {
   --tw-bg-opacity: 1;
   background-color: rgb(249 250 251 / var(--tw-bg-opacity));
 }
-.bg-slate-100 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(241 245 249 / var(--tw-bg-opacity));
-}
-.bg-slate-900 {
-  --tw-bg-opacity: 1;
-  background-color: rgb(15 23 42 / var(--tw-bg-opacity));
-}
 .fill-current {
   fill: currentColor;
 }
@@ -993,21 +970,21 @@ select {
   padding-top: 1.5rem;
   padding-bottom: 1.5rem;
 }
-.py-12 {
-  padding-top: 3rem;
-  padding-bottom: 3rem;
-}
-.py-3 {
-  padding-top: 0.75rem;
-  padding-bottom: 0.75rem;
-}
 .py-8 {
   padding-top: 2rem;
   padding-bottom: 2rem;
 }
+.py-12 {
+  padding-top: 3rem;
+  padding-bottom: 3rem;
+}
 .px-8 {
   padding-left: 2rem;
   padding-right: 2rem;
+}
+.py-3 {
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
 }
 .pt-8 {
   padding-top: 2rem;
@@ -1150,6 +1127,10 @@ select {
   --tw-text-opacity: 1;
   color: rgb(31 41 55 / var(--tw-text-opacity));
 }
+.text-slate-600 {
+  --tw-text-opacity: 1;
+  color: rgb(71 85 105 / var(--tw-text-opacity));
+}
 .text-blue-500 {
   --tw-text-opacity: 1;
   color: rgb(59 130 246 / var(--tw-text-opacity));
@@ -1161,14 +1142,6 @@ select {
 .text-green-600 {
   --tw-text-opacity: 1;
   color: rgb(22 163 74 / var(--tw-text-opacity));
-}
-.text-slate-100 {
-  --tw-text-opacity: 1;
-  color: rgb(241 245 249 / var(--tw-text-opacity));
-}
-.text-slate-600 {
-  --tw-text-opacity: 1;
-  color: rgb(71 85 105 / var(--tw-text-opacity));
 }
 .underline {
   -webkit-text-decoration-line: underline;
@@ -10364,10 +10337,6 @@ html {
 
   .md\:w-1\/2 {
     width: 50%;
-  }
-
-  .md\:max-w-7xl {
-    max-width: 80rem;
   }
 
   .md\:grid-cols-2 {
