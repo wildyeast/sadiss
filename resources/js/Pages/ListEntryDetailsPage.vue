@@ -11,17 +11,22 @@
 
             <div v-if="Object.keys(data).length > 0" class="w-100 mt-2 py-8 bg-white border border-gray-200 shadow md:px-6 md:justify-center">
               <div class="flex flex-col max-w-7xl mx-auto px-4">
-                <div class="flex mb-4 text-slate-400 text-xs">
-                  <div class="flex flex-col mr-4">
-                    <span>Id: </span>
-                    <span>Created at:</span>
-                    <span>Updated at:</span>
+                <div class="flex justify-between">
+                  <div class="flex mb-4 text-slate-400 text-xs">
+                    <div class="flex flex-col mr-4">
+                      <span>Id: </span>
+                      <span>Created at:</span>
+                      <span>Updated at:</span>
+                    </div>
+                    <div class="flex flex-col">
+                      <span>{{ data['id'] }}</span>
+                      <span>{{ data['created_at'] }}</span>
+                      <span>{{ data['updated_at'] }}</span>
+                    </div>
                   </div>
-                  <div class="flex flex-col">
-                    <span>{{ data['id'] }}</span>
-                    <span>{{ data['created_at'] }}</span>
-                    <span>{{ data['updated_at'] }}</span>
-                  </div>
+                  <Link :href="route(`${category}.edit`, {id: id})">
+                    <span class="material-icons mi-edit text-blue-500" />
+                  </Link>
                 </div>
                 <!-- Track -->
                 <template v-if="category === 'tracks'">
@@ -79,13 +84,14 @@
 
 <script>
 import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
-import { Head, useForm } from '@inertiajs/inertia-vue3'
+import { Head, useForm, Link } from '@inertiajs/inertia-vue3'
 import { onMounted, reactive, toRefs } from 'vue'
 
 export default {
   components: {
     BreezeAuthenticatedLayout,
     Head,
+    Link
   },
   setup () {
     const pathname = window.location.pathname.replace('/', '')
@@ -115,7 +121,8 @@ export default {
 
     return {
       category,
-      data
+      data,
+      id,
     }
   }
 }
