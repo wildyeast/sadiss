@@ -10702,6 +10702,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var columnNames = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)([]);
     var pathname = window.location.pathname.replace('/', '');
     var category = pathname.split('/')[0];
+    var descriptionToDisplay = (0,vue__WEBPACK_IMPORTED_MODULE_3__.computed)(function () {
+      var description = ''; // TODO: Refactor columnData with reactive() to get rid of the [0]s here. Do columnNames as well while you are at it.
+
+      if (columnData.value[0]['description']) {
+        if (columnData.value[0]['description'].length > 50) {
+          description = columnData.value[0]['description'].substring(0, 50) + '...';
+        } else {
+          description = columnData.value[0]['description'];
+        }
+      }
+
+      return description;
+    });
     var routeCategory = '';
     var title = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)('');
     (0,vue__WEBPACK_IMPORTED_MODULE_3__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
@@ -10787,12 +10800,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 try {
                   for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
                     entry = _step2.value;
-                    // if (Object.keys(entry).includes('created_at')) {
-                    //   entry['created_at'] = formatDateTime(entry['created_at'])
-                    // }
-                    // if (Object.keys(entry).includes('updated_at')) {
-                    //   entry['updated_at'] = formatDateTime(entry['updated_at'])
-                    // }
                     columnData.value.push(entry);
                   }
                 } catch (err) {
@@ -10862,6 +10869,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       columnNames: columnNames,
       columnData: columnData,
       deleteRow: deleteRow,
+      descriptionToDisplay: descriptionToDisplay,
       pathname: pathname,
       title: title
     };
@@ -12827,27 +12835,32 @@ var _hoisted_8 = {
   "class": "bg-white"
 };
 var _hoisted_9 = {
+  key: 0,
   "class": "text-sm leading-5 text-gray-500"
 };
 var _hoisted_10 = {
-  "class": "px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200"
+  key: 1,
+  "class": "text-sm leading-5 text-gray-500"
+};
+var _hoisted_11 = {
+  "class": "px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 align-middle"
 };
 
-var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "material-icons mi-edit text-blue-500"
 }, null, -1
 /* HOISTED */
 );
 
-var _hoisted_12 = {
-  "class": "px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200"
+var _hoisted_13 = {
+  "class": "px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 align-middle"
 };
-var _hoisted_13 = ["onClick"];
-var _hoisted_14 = {
-  "class": "px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200"
+var _hoisted_14 = ["onClick"];
+var _hoisted_15 = {
+  "class": "px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 align-middle"
 };
 
-var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+var _hoisted_16 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
   "class": "material-icons mi-arrow-forward-ios text-gray-500"
 }, null, -1
 /* HOISTED */
@@ -12895,42 +12908,44 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       ))])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("tbody", _hoisted_8, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.columnData, function (entry) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("tr", {
           key: entry.id
-        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td class=\"px-6 py-4 whitespace-no-wrap border-b border-gray-200\">\r\n                                        <div class=\"flex items-center\">\r\n                                            <div class=\"flex-shrink-0 w-10 h-10\">\r\n                                                <img class=\"w-10 h-10 rounded-full\" src=\"https://source.unsplash.com/user/erondu\"\r\n                                                    alt=\"admin dashboard ui\">\r\n                                            </div>\r\n\r\n                                            <div>\r\n                                                <div class=\"text-sm font-medium leading-5 text-gray-900\">\r\n                                                    {{ entry.id }}\r\n                                                </div>\r\n                                            </div>\r\n                                        </div>\r\n                                    </td> "), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(entry, function (field, idx) {
+        }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <td class=\"px-6 py-4 whitespace-no-wrap border-b border-gray-200\">\r\n                                        <div class=\"flex items-center\">\r\n                                            <div class=\"flex-shrink-0 w-10 h-10\">\r\n                                                <img class=\"w-10 h-10 rounded-full\" src=\"https://source.unsplash.com/user/erondu\"\r\n                                                    alt=\"admin dashboard ui\">\r\n                                            </div>\r\n\r\n                                            <div>\r\n                                                <div class=\"text-sm font-medium leading-5 text-gray-900\">\r\n                                                    {{ entry.id }}\r\n                                                </div>\r\n                                            </div>\r\n                                        </div>\r\n                                    </td> "), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(Object.keys(entry), function (field, idx) {
           return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("td", {
-            "class": "px-2 py-4 whitespace-no-wrap border-b border-gray-200 max-w-min",
+            "class": "px-2 py-4 whitespace-no-wrap border-b border-gray-200 max-w-min center align-middle",
             key: idx
-          }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(field), 1
+          }, [field === 'description' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.descriptionToDisplay), 1
           /* TEXT */
-          )]);
+          )) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(entry[field]), 1
+          /* TEXT */
+          ))]);
         }), 128
         /* KEYED_FRAGMENT */
-        )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
+        )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
           href: _ctx.route("".concat($setup.pathname, ".edit"), {
             id: entry.id
           })
         }, {
           "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-            return [_hoisted_11];
+            return [_hoisted_12];
           }),
           _: 2
           /* DYNAMIC */
 
         }, 1032
         /* PROPS, DYNAMIC_SLOTS */
-        , ["href"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
+        , ["href"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", {
           "class": "material-icons mi-delete text-rose-500 cursor-pointer",
           onClick: function onClick($event) {
             return $setup.deleteRow(entry.id);
           }
         }, null, 8
         /* PROPS */
-        , _hoisted_13)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
+        , _hoisted_14)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("td", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Link, {
           href: _ctx.route("".concat($setup.pathname, ".show"), {
             id: entry.id
           })
         }, {
           "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-            return [_hoisted_15];
+            return [_hoisted_16];
           }),
           _: 2
           /* DYNAMIC */

@@ -42,21 +42,22 @@
                                         </div>
                                     </td> -->
 
-                                    <td class="px-2 py-4 whitespace-no-wrap border-b border-gray-200 max-w-min"
-                                        v-for="(field, idx) in entry"
+                                    <td class="px-2 py-4 whitespace-no-wrap border-b border-gray-200 max-w-min center align-middle"
+                                        v-for="(field, idx) in Object.keys(entry)"
                                         :key="idx">
-                                        <div class="text-sm leading-5 text-gray-500"> {{ field }} </div>
+                                        <div v-if="field === 'description'" class="text-sm leading-5 text-gray-500">{{ descriptionToDisplay }}</div>
+                                        <div v-else class="text-sm leading-5 text-gray-500"> {{ entry[field] }} </div>
                                     </td>
 
-                                    <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200">
+                                    <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 align-middle">
                                         <Link :href="route(`${pathname}.edit`, {id: entry.id})">
                                           <span class="material-icons mi-edit text-blue-500" />
                                         </Link>
                                     </td>
-                                    <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200">
+                                    <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 align-middle">
                                         <span class="material-icons mi-delete text-rose-500 cursor-pointer" @click="deleteRow(entry.id)" />
                                     </td>
-                                    <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200">
+                                    <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 align-middle">
                                         <Link :href="route(`${pathname}.show`, {id: entry.id})">
                                           <span class="material-icons mi-arrow-forward-ios text-gray-500" />
                                         </Link>
@@ -74,7 +75,7 @@
 <script>
 import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
 import { Head, Link } from '@inertiajs/inertia-vue3'
-import { onMounted, ref, inject } from 'vue'
+import { onMounted, ref, inject, computed } from 'vue'
 
 export default {
     components: {
@@ -89,6 +90,18 @@ export default {
         const columnNames = ref([])
         const pathname = window.location.pathname.replace('/', '')
         const category = pathname.split('/')[0]
+        const descriptionToDisplay = computed(() => {
+          let description = ''
+          // TODO: Refactor columnData with reactive() to get rid of the [0]s here. Do columnNames as well while you are at it.
+          if (columnData.value[0]['description']) {
+            if (columnData.value[0]['description'].length > 50) {
+              description = columnData.value[0]['description'].substring(0, 50) + '...'
+            } else {
+              description = columnData.value[0]['description']
+            }
+          }
+          return description
+        })
         let routeCategory = ''
         const title = ref('')
 
@@ -126,12 +139,6 @@ export default {
         async function addData () {
           const response = await axios.get(`/api/${routeCategory}`)
           for (const entry of response.data) {
-            // if (Object.keys(entry).includes('created_at')) {
-            //   entry['created_at'] = formatDateTime(entry['created_at'])
-            // }
-            // if (Object.keys(entry).includes('updated_at')) {
-            //   entry['updated_at'] = formatDateTime(entry['updated_at'])
-            // }
             columnData.value.push(entry)
           }
         }
@@ -159,6 +166,7 @@ export default {
           columnNames,
           columnData,
           deleteRow,
+          descriptionToDisplay,
           pathname,
           title,
         }
