@@ -15,7 +15,7 @@ class ComposerController extends Controller
       $composer->description = $request->description;
       $composer->photo = $request->photo;
       $composer->website_url = $request->website_url;
-      $composer->is_active = $request->is_active;
+      $composer->is_active = $request->is_active ? true : false;
       $composer->save();
       return back()->with('flash', [
           'message' => 'success',
