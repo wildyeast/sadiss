@@ -19,13 +19,24 @@ export default {
     while (!window.getOscillator) {
       await this.sleep(100)
     }
+
+    // Fetch breakpoints from server
+    const res = await fetch ('http://8hz.at/api/track/1')
+    const json = await res.json()
+    const partialData = JSON.parse(json.partials)
+    const breakpoints = partialData[0].breakpoints
+
     // Initialises oscillator
     this.init()
+
     // Just an example breakpoint loaded from ./constants
-    for (const bp of bps) {
+    // for (const bp of bps) {
+    //   await this.write(1, bp.freq, bp.amp)
+    // }
+
+    for (const bp of breakpoints) {
       await this.write(1, bp.freq, bp.amp)
     }
-    // TODO Call the server api to fetch breakpoints instead.
   },
   methods: {
     /* To give instructions to oscillator, use
