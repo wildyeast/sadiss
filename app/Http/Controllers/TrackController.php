@@ -90,7 +90,7 @@ class TrackController extends Controller
       }
       array_push($partials, $partial);
       $partial = [];
-      return json_encode($partials);
     }
+    return json_encode($partials);
   }
 }
