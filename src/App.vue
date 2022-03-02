@@ -12,7 +12,8 @@ export default {
   data: () => ({
     modules,
     linking: false,
-    osc: null
+    osc: null,
+    oscillators: []
   }),
   async mounted () {
     // Wait until rust module loaded (see ../index.js)
@@ -21,21 +22,36 @@ export default {
     }
 
     // Fetch breakpoints from server
-    const res = await fetch ('http://8hz.at/api/track/1')
+    const res = await fetch ('http://8hz.at/api/track/7')
     const json = await res.json()
     const partialData = JSON.parse(json.partials)
     const breakpoints = partialData[0].breakpoints
 
-    // Initialises oscillator
-    this.init()
+    let oscIndex = 0
+    const allBreakpoints = []
+    for (const partial of partialData) {
+      for (const bps of partial.breakpoints) {
+        bps.oscIndex = oscIndex
+        allBreakpoints.push(bps)
+      }
+      oscIndex++
+    }
+
+    allBreakpoints.sort((a, b) => a.time - b.time)
+    console.log(allBreakpoints)
+
+    // Initialise oscillators
+    for (let i = 0; i < partialData.length; i++) {
+      this.oscillators.push(this.init())
+    }
 
     // Just an example breakpoint loaded from ./constants
     // for (const bp of bps) {
     //   await this.write(1, bp.freq, bp.amp)
     // }
 
-    for (const bp of breakpoints) {
-      await this.write(1, bp.freq, bp.amp)
+    for (const bp of allBreakpoints) {
+      await this.write(bp.oscIndex, 1, bp.freq, bp.amp)
     }
   },
   methods: {
@@ -50,9 +66,9 @@ export default {
 
          Currently, oscillators are initialized with zero gain. 
      */
-    async write (time, freq, gain) {
-      this.osc.engine['set_gain'](gain)
-      this.osc.engine['set_freq'](freq)
+    async write (oscIndex, time, freq, gain) {
+      this.oscillators[oscIndex].engine['set_gain'](gain)
+      this.oscillators[oscIndex].engine['set_freq'](freq)
       await this.sleep(10)
     },
     /* Cheap js sleep function. Is not timing-accurate. We should try to
@@ -62,14 +78,16 @@ export default {
     },
     /* Initialises oscillators. Should be 1 oscillator per partial */
     init () {
-      for (const oscillator of modules.oscillators) {
+      // for (const oscillator of modules.oscillators) {
+        const oscillator = {...modules.oscillators[0]}
         oscillator.engine = getOscillator()
-        this.osc = oscillator
+        // this.osc = oscillator
         for (const key of Object.keys(oscillator)) {
           if (key === 'id') continue
           oscillator[key].value = oscillator[key].init
         }
-      }
+        return oscillator
+      // }
     }
   }
 }
