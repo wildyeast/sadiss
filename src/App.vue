@@ -38,7 +38,6 @@ export default {
     }
 
     allBreakpoints.sort((a, b) => a.time - b.time)
-    console.log(allBreakpoints)
 
     // Initialise oscillators
     for (let i = 0; i < partialData.length; i++) {
