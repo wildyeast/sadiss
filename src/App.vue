@@ -1,5 +1,6 @@
 <template>
   <div class="app">
+    <button @click="play">Play</button>
   </div>
 </template>
 <script>
@@ -13,7 +14,8 @@ export default {
     modules,
     linking: false,
     osc: null,
-    oscillators: []
+    oscillators: [],
+    allBreakpoints: []
   }),
   async mounted () {
     // Wait until rust module loaded (see ../index.js)
@@ -22,7 +24,7 @@ export default {
     }
 
     // Fetch breakpoints from server
-    const res = await fetch ('http://8hz.at/api/track/7')
+    const res = await fetch ('http://8hz.at/api/track/9')
     const json = await res.json()
     const partialData = JSON.parse(json.partials)
     const breakpoints = partialData[0].breakpoints
@@ -32,12 +34,12 @@ export default {
     for (const partial of partialData) {
       for (const bps of partial.breakpoints) {
         bps.oscIndex = oscIndex
-        allBreakpoints.push(bps)
+        this.allBreakpoints.push(bps)
       }
       oscIndex++
     }
 
-    allBreakpoints.sort((a, b) => a.time - b.time)
+    this.allBreakpoints.sort((a, b) => a.time - b.time)
 
     // Initialise oscillators
     for (let i = 0; i < partialData.length; i++) {
@@ -48,10 +50,6 @@ export default {
     // for (const bp of bps) {
     //   await this.write(1, bp.freq, bp.amp)
     // }
-
-    for (const bp of allBreakpoints) {
-      await this.write(bp.oscIndex, 1, bp.freq, bp.amp)
-    }
   },
   methods: {
     /* To give instructions to oscillator, use
@@ -68,7 +66,7 @@ export default {
     async write (oscIndex, time, freq, gain) {
       this.oscillators[oscIndex].engine['set_gain'](gain)
       this.oscillators[oscIndex].engine['set_freq'](freq)
-      await this.sleep(10)
+      await this.sleep(time)
     },
     /* Cheap js sleep function. Is not timing-accurate. We should try to
       implement a timer as a Rust function as early as possible */
@@ -87,6 +85,18 @@ export default {
         }
         return oscillator
       // }
+    },
+    async play () {
+      let bpIndex = 0
+      for (const bp of this.allBreakpoints) {
+        let sleepTime = 0
+        if (bpIndex < this.allBreakpoints.length - 1) {
+          sleepTime = (this.allBreakpoints[bpIndex + 1].time - bp.time) * 0.1
+        }
+
+        await this.write(bp.oscIndex, sleepTime, bp.freq, bp.amp)
+        bpIndex += 1
+      }
     }
   }
 }
