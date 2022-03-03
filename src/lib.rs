@@ -137,3 +137,37 @@ impl FmOsc {
             .set_value(self.fm_freq_ratio * self.primary.frequency().value());
     }
 }
+
+// The following makes printing to browser console from rust code possible.
+// Like so: log($s)
+// Copied from here: https://rustwasm.github.io/wasm-bindgen/examples/console-log.html
+#[wasm_bindgen]
+extern "C" {
+    // Use `js_namespace` here to bind `console.log(..)` instead of just
+    // `log(..)`
+    #[wasm_bindgen(js_namespace = console)]
+    fn log(s: &str);
+
+    // The `console.log` is quite polymorphic, so we can bind it with multiple
+    // signatures. Note that we need to use `js_name` to ensure we always call
+    // `log` in JS.
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_u32(a: u32);
+
+    // Multiple arguments too!
+    #[wasm_bindgen(js_namespace = console, js_name = log)]
+    fn log_many(a: &str, b: &str);
+}
+
+// Importing JS performance.now()
+#[link(wasm_import_module = "PerformanceNow")]
+extern { fn performanceNow(); }
+
+pub unsafe fn test () {
+    return performanceNow();
+}
+
+#[wasm_bindgen]
+pub fn play () {
+    log("Test");
+}

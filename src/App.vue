@@ -15,13 +15,16 @@ export default {
     linking: false,
     osc: null,
     oscillators: [],
-    allBreakpoints: []
+    allBreakpoints: [],
+    wasm: null
   }),
   async mounted () {
     // Wait until rust module loaded (see ../index.js)
     while (!window.getOscillator) {
       await this.sleep(100)
     }
+
+    this.wasm = await import('../pkg/index.js')
 
     // Fetch breakpoints from server
     const res = await fetch ('http://8hz.at/api/track/9')
@@ -87,16 +90,17 @@ export default {
       // }
     },
     async play () {
-      let bpIndex = 0
-      for (const bp of this.allBreakpoints) {
-        let sleepTime = 0
-        if (bpIndex < this.allBreakpoints.length - 1) {
-          sleepTime = (this.allBreakpoints[bpIndex + 1].time - bp.time) * 0.1
-        }
+      // let bpIndex = 0
+      // for (const bp of this.allBreakpoints) {
+      //   let sleepTime = 0
+      //   if (bpIndex < this.allBreakpoints.length - 1) {
+      //     sleepTime = (this.allBreakpoints[bpIndex + 1].time - bp.time) * 0.1
+      //   }
 
-        await this.write(bp.oscIndex, sleepTime, bp.freq, bp.amp)
-        bpIndex += 1
-      }
+      //   await this.write(bp.oscIndex, sleepTime, bp.freq, bp.amp)
+      //   bpIndex += 1
+      // }
+      this.wasm.play()
     }
   }
 }
