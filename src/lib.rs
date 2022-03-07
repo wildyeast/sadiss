@@ -168,7 +168,7 @@ extern { fn performanceNow(); }
 
 pub fn test () {
     let value = unsafe {performanceNow()};
-    log(value);
+    // log(value);
     return value;
 }
 

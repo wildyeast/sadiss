@@ -12,10 +12,12 @@ export default {
   components: { },
   data: () => ({
     modules,
+    audioContext: null,
+    now: null,
     linking: false,
     osc: null,
     oscillators: [],
-    allBreakpoints: [],
+    // allBreakpoints: [],
     wasm: null
   }),
   async mounted () {
@@ -24,48 +26,60 @@ export default {
       await this.sleep(100)
     }
 
-    this.wasm = await import('../pkg/index.js')
+    // this.wasm = await import('../pkg/index.js')
 
     // Fetch breakpoints from server
-    const res = await fetch ('http://8hz.at/api/track/9')
+    const res = await fetch ('http://8hz.at/api/track/11')
     const json = await res.json()
     const partialData = JSON.parse(json.partials)
     const breakpoints = partialData[0].breakpoints
 
-    let oscIndex = 0
-    const allBreakpoints = []
+    this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
+    this.now = this.audioContext.currentTime;
+
     for (const partial of partialData) {
-      for (const bps of partial.breakpoints) {
-        bps.oscIndex = oscIndex
-        this.allBreakpoints.push(bps)
+      const osc = this.setupOscillator(partial, partial.startTime)
+      const oscObj = {
+        osc,
+        startTime: partial.startTime,
+        endTime: partial.endTime
       }
-      oscIndex++
+      this.oscillators.push(oscObj)
     }
 
-    this.allBreakpoints.sort((a, b) => a.time - b.time)
 
-    // Initialise oscillators
-    // for (let i = 0; i < partialData.length; i++) {
-    //   this.oscillators.push(this.init())
-    // }
 
-    // Just an example breakpoint loaded from ./constants
-    // for (const bp of bps) {
-    //   await this.write(1, bp.freq, bp.amp)
-    // }
   },
   methods: {
-    /* To give instructions to oscillator, use
 
-         oscillator.engine[command](value) 
+    setupOscillator(partial, startTime) {
+      const osc = this.audioContext.createOscillator()
+      const gain = this.audioContext.createGain()
 
-         Possible commands are:
-           'set_gain' to set amplitude 
-           'set_freq' to set frequency 
-         There are more (see ./lib.rs) but we will not need the others
+      console.log(partial)
 
-         Currently, oscillators are initialized with zero gain. 
-     */
+      osc.frequency.value = 0
+      gain.gain.value = 0
+
+      let time = this.now + Number(startTime);
+      console.log(time)
+
+      for (let i = 0; i < partial.breakpoints.length; i++) {
+        const currentBreakpoint = partial.breakpoints[i]
+        // if (times[i] - times[i-1] < 0) continue
+
+        if (i > 0) {
+          time += (currentBreakpoint.time - partial.breakpoints[i-1].time)
+        }
+
+        osc.frequency.setValueAtTime(currentBreakpoint.freq, time);
+        gain.gain.setValueAtTime(currentBreakpoint.amp, time);
+      }
+
+      return osc
+
+    },
+
     async write (oscIndex, time, freq, gain) {
       this.oscillators[oscIndex].engine['set_gain'](gain)
       this.oscillators[oscIndex].engine['set_freq'](freq)
@@ -90,19 +104,11 @@ export default {
       // }
     },
     async play () {
-      // let bpIndex = 0
-      // for (const bp of this.allBreakpoints) {
-      //   let sleepTime = 0
-      //   if (bpIndex < this.allBreakpoints.length - 1) {
-      //     sleepTime = (this.allBreakpoints[bpIndex + 1].time - bp.time) * 0.1
-      //   }
-
-      //   await this.write(bp.oscIndex, sleepTime, bp.freq, bp.amp)
-      //   bpIndex += 1
-      // }
-      // this.wasm.play(JSON.stringify(this.allBreakpoints))
-      // this.wasm.play(JSON.stringify({breakpoints: this.allBreakpoints}))
-      this.wasm.play(JSON.stringify(this.allBreakpoints))
+      for (const oscObj of this.oscillators) {
+        oscObj.osc.connect(this.audioContext.destination); 
+        oscObj.osc.start(this.now + Number(oscObj.startTime));
+        oscObj.osc.stop(this.now + Number(oscObj.endTime))
+      }
     }
   }
 }
