@@ -45,9 +45,9 @@ export default {
     this.allBreakpoints.sort((a, b) => a.time - b.time)
 
     // Initialise oscillators
-    for (let i = 0; i < partialData.length; i++) {
-      this.oscillators.push(this.init())
-    }
+    // for (let i = 0; i < partialData.length; i++) {
+    //   this.oscillators.push(this.init())
+    // }
 
     // Just an example breakpoint loaded from ./constants
     // for (const bp of bps) {
@@ -100,7 +100,9 @@ export default {
       //   await this.write(bp.oscIndex, sleepTime, bp.freq, bp.amp)
       //   bpIndex += 1
       // }
-      this.wasm.play()
+      // this.wasm.play(JSON.stringify(this.allBreakpoints))
+      // this.wasm.play(JSON.stringify({breakpoints: this.allBreakpoints}))
+      this.wasm.play(JSON.stringify(this.allBreakpoints))
     }
   }
 }

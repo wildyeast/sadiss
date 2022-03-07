@@ -1,3 +1,6 @@
+extern crate console_error_panic_hook;
+use std::panic;
+
 use wasm_bindgen::prelude::*;
 use web_sys::{AudioContext, OscillatorType};
 
@@ -163,11 +166,87 @@ extern "C" {
 #[link(wasm_import_module = "PerformanceNow")]
 extern { fn performanceNow(); }
 
-pub unsafe fn test () {
-    return performanceNow();
+pub fn test () {
+    let value = unsafe {performanceNow()};
+    log(value);
+    return value;
 }
 
+// https://stackoverflow.com/questions/55375588/what-is-the-rust-equivalent-of-a-javascript-object-when-encoding-with-msgpack
+use rmp_serde::{Deserializer, Serializer};
+use serde::{Deserialize, Serialize};
+use serde_json;
+
+use std::collections::HashMap;
+
+#[derive(Debug, Serialize, Deserialize)]
+pub struct Breakpoint {
+    time: f32,
+    freq: f32,
+    amp: f32,
+    oscIndex: u8
+}
+
+use std::any::type_name;
+fn print_type_of<T>(_: &T) {
+    println!("{}", std::any::type_name::<T>())
+}
+
+
 #[wasm_bindgen]
-pub fn play () {
-    log("Test");
+pub fn play (all_breakpoints: &str) {
+    // log(string);
+    // let osc = FmOsc{};
+    // let testValue = unsafe {test();};
+    // log(testValue)
+    panic::set_hook(Box::new(console_error_panic_hook::hook));
+    // let mut buf = Vec::new();
+
+    // let test: HashMap<&str, &str> = Deserialize::deserialize(&mut Deserializer::new(&buf[..])).unwrap();
+    // let b = serde_json::from_str(all_breakpoints).unwrap();
+    // log(serde_json::from_str(all_breakpoints).unwrap());
+    // log(all_breakpoints);
+
+    untyped_example(all_breakpoints);
+
+    // for name in names.iter() {
+    //     match name {
+    //         &"Ferris" => println!("There is a rustacean among us!"),
+    //         // TODO ^ Try deleting the & and matching just "Ferris"
+    //         _ => println!("Hello {}", name),
+    //     }
+    // }
+
+
+
+}
+
+// use serde_json::{Result, Value};
+use std::fmt;
+fn untyped_example(all_breakpoints: &str) -> serde_json::Result<()> {
+    // Some JSON input data as a &str. Maybe this comes from the user.
+    // let data = r#"
+    //     {
+    //         "name": "John Doe",
+    //         "age": 43,
+    //         "phones": [
+    //             "+44 1234567",
+    //             "+44 2345678"
+    //         ]
+    //     }"#;
+
+    // Parse the string of data into serde_json::Value.
+    // let v: serde_json::Value = serde_json::from_str(all_breakpoints)?;
+    let v: Vec<serde_json::Value> = serde_json::from_str(all_breakpoints)?;
+
+    log(&v.len().to_string());
+
+    for item in &v {
+        log(&item["amp"].to_string());
+    }
+
+    // Access parts of the data by indexing with square brackets.
+    // log(&(&serde_json::Value::to_string(&v["breakpoints"][0]["amp"])));
+
+    Ok(())
 }

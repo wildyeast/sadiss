@@ -1,5 +1,5 @@
 function performanceNow () {
-  return performance.now();
+  return performance.now().toString();
 }
 
 export { performanceNow }

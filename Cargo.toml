@@ -8,7 +8,11 @@ edition = "2018"
 crate-type = ["cdylib"]
 
 [dependencies]
-wasm-bindgen = "0.2.58"
+wasm-bindgen = "0.2.79"
+serde = { version = "1.0.136", features = ["derive"] }
+rmp-serde = "1.0.0"
+console_error_panic_hook = "0.1.7"
+serde_json = "1.0.59"
 
 [dependencies.web-sys]
 version = "0.3.4"
