@@ -17,6 +17,7 @@ export default {
     linking: false,
     osc: null,
     oscillators: [],
+    partialData: null,
     // allBreakpoints: [],
     wasm: null
   }),
@@ -29,23 +30,24 @@ export default {
     // this.wasm = await import('../pkg/index.js')
 
     // Fetch breakpoints from server
-    const res = await fetch ('http://8hz.at/api/track/11')
+    const res = await fetch ('http://8hz.at/api/track/8')
     const json = await res.json()
-    const partialData = JSON.parse(json.partials)
-    const breakpoints = partialData[0].breakpoints
+    this.partialData = JSON.parse(json.partials)
+    // const breakpoints = this.partialData[0].breakpoints
 
-    this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
-    this.now = this.audioContext.currentTime;
+    // this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
+    // this.now = this.audioContext.currentTime;
 
-    for (const partial of partialData) {
-      const osc = this.setupOscillator(partial, partial.startTime)
-      const oscObj = {
-        osc,
-        startTime: partial.startTime,
-        endTime: partial.endTime
-      }
-      this.oscillators.push(oscObj)
-    }
+    // for (const partial of partialData) {
+    //   const osc = this.setupOscillator(partial, partial.startTime)
+    //   const oscObj = {
+    //     osc: osc.osc,
+    //     gain: osc.gain,
+    //     startTime: partial.startTime,
+    //     endTime: partial.endTime
+    //   }
+    //   this.oscillators.push(oscObj)
+    // }
 
 
 
@@ -62,7 +64,6 @@ export default {
       gain.gain.value = 0
 
       let time = this.now + Number(startTime);
-      console.log(time)
 
       for (let i = 0; i < partial.breakpoints.length; i++) {
         const currentBreakpoint = partial.breakpoints[i]
@@ -76,7 +77,7 @@ export default {
         gain.gain.setValueAtTime(currentBreakpoint.amp, time);
       }
 
-      return osc
+      return {osc, gain}
 
     },
 
@@ -104,9 +105,28 @@ export default {
       // }
     },
     async play () {
+    // https://www.html5rocks.com/en/tutorials/audio/scheduling/
+    this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
+    this.now = this.audioContext.currentTime;
+
+    for (const partial of this.partialData) {
+      const osc = this.setupOscillator(partial, partial.startTime)
+      const oscObj = {
+        osc: osc.osc,
+        gain: osc.gain,
+        startTime: partial.startTime,
+        endTime: partial.endTime
+      }
+      this.oscillators.push(oscObj)
+    }
       for (const oscObj of this.oscillators) {
-        oscObj.osc.connect(this.audioContext.destination); 
-        oscObj.osc.start(this.now + Number(oscObj.startTime));
+        // Connect osc and gain to destination
+        oscObj.gain.connect(this.audioContext.destination)
+        oscObj.osc.connect(this.audioContext.destination)
+        // Connect gain to osc 
+        oscObj.osc.connect(oscObj.gain);
+
+        oscObj.osc.start(this.now)
         oscObj.osc.stop(this.now + Number(oscObj.endTime))
       }
     }
