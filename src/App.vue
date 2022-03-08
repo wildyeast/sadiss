@@ -23,9 +23,9 @@ export default {
   }),
   async mounted () {
     // Wait until rust module loaded (see ../index.js)
-    while (!window.getOscillator) {
-      await this.sleep(100)
-    }
+    // while (!window.getOscillator) {
+    //   await this.sleep(100)
+    // }
 
     // this.wasm = await import('../pkg/index.js')
 

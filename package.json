@@ -1,37 +1,16 @@
 {
+  "name": "sadiss_client",
+  "version": "0.0.0",
   "scripts": {
-    "build": "webpack",
-    "serve": "webpack-dev-server",
-    "lint": "./node_modules/eslint/bin/eslint.js --ext .js,.vue src",
-    "fix": "./node_modules/eslint/bin/eslint.js --ext .js,.vue --fix src"
-  },
-  "license": "GPL-3.0-or-later",
-  "devDependencies": {
-    "@babel/core": "^7.8.7",
-    "@babel/plugin-transform-runtime": "^7.8.3",
-    "@babel/preset-env": "^7.8.7",
-    "@wasm-tool/wasm-pack-plugin": "1.0.1",
-    "babel-loader": "^8.0.6",
-    "css-loader": "^3.4.2",
-    "eslint": "^6.8.0",
-    "eslint-config-standard": "^14.1.0",
-    "eslint-plugin-import": "^2.20.1",
-    "eslint-plugin-node": "^11.0.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.1",
-    "eslint-plugin-vue": "^6.2.1",
-    "html-webpack-plugin": "^3.2.0",
-    "text-encoding": "^0.7.0",
-    "vue": "^2.6.11",
-    "vue-loader": "^15.9.0",
-    "vue-style-loader": "^4.1.2",
-    "vue-template-compiler": "^2.6.11",
-    "webpack": "^4.29.4",
-    "webpack-cli": "^3.1.1",
-    "webpack-dev-server": "^3.1.0"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview --port 5050"
   },
   "dependencies": {
-    "@babel/runtime": "^7.8.7",
-    "vue-slider-with-indicator": "^1.0.10"
+    "vue": "^3.2.31"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-vue": "^2.2.2",
+    "vite": "^2.8.4"
   }
 }
