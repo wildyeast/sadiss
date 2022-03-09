@@ -46,7 +46,7 @@
                                         v-for="(field, idx) in Object.keys(entry)"
                                         :key="idx">
                                         <div v-if="field === 'description'" class="text-sm leading-5 text-gray-500">{{ descriptionToDisplay }}</div>
-                                        <Player v-else-if="field === 'partials'"></Player>
+                                        <Player v-else-if="field === 'partials'" :partialData="entry[field]" />
                                         <div v-else class="text-sm leading-5 text-gray-500"> {{ entry[field] }} </div>
                                     </td>
 

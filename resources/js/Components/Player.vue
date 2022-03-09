@@ -1,16 +1,25 @@
 <template>
-  <div class="">
-    <span class="material-icons mi-play-arrow-rounded text-rose-500 cursor-pointer" />
-  </div>
+  <span class="material-icons mi-play-arrow cursor-pointer" @click="player.play" />
 </template>
 
 <script>
-import { onMounted, ref, inject, computed } from 'vue'
+import Player from '@/Player'
+import { onUpdated } from 'vue'
 export default {
-  setup () {
-    onMounted(() => {
-      console.log(123123)
-    })
+  props: {
+    partialData: String,
+  },
+  setup (props) {
+    let player = null
+
+    const parsedPartialData = JSON.parse(props.partialData)
+
+    player = new Player(parsedPartialData)
+
+    return {
+      player
+    }
+
   }
 }
 </script>
