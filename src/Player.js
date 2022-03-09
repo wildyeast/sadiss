@@ -27,7 +27,6 @@ class Player {
     }
 
     return {osc, gain}
-
   }
 
   play () {
