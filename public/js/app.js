@@ -13287,15 +13287,19 @@ var Player = /*#__PURE__*/function () {
       }
 
       this.oscillators = [];
+      this.endedSrc = [];
       this.playing = false;
     }
   }, {
     key: "ended",
     value: function ended(src) {
       this.endedSrc.push(src);
+      console.log(this.endedSrc, this.partialData.length);
 
       if (this.endedSrc.length === this.partialData.length) {
         this.playing = false;
+        this.oscillators = [];
+        this.endedSrc = [];
       }
     }
   }]);

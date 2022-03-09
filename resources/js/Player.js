@@ -64,6 +64,7 @@ export default class Player {
       oscObj.osc.disconnect(this.audioContext.destination)
     }
     this.oscillators = []
+    this.endedSrc = []
     this.playing = false
   }
 
@@ -71,8 +72,11 @@ export default class Player {
 
   ended (src) {
     this.endedSrc.push(src)
+    console.log(this.endedSrc, this.partialData.length)
     if (this.endedSrc.length === this.partialData.length) {
       this.playing = false
+      this.oscillators = []
+      this.endedSrc = []
     }
   }
 
