@@ -13176,6 +13176,8 @@ var Player = /*#__PURE__*/function () {
 
     _defineProperty(this, "oscillators", []);
 
+    _defineProperty(this, "endedSrc", []);
+
     this.playing = false;
     this.partialData = partialData;
     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
@@ -13209,6 +13211,8 @@ var Player = /*#__PURE__*/function () {
   }, {
     key: "play",
     value: function play() {
+      var _this = this;
+
       // https://www.html5rocks.com/en/tutorials/audio/scheduling/
       this.now = this.audioContext.currentTime;
 
@@ -13251,6 +13255,10 @@ var Player = /*#__PURE__*/function () {
           _oscObj.osc.start(this.now);
 
           _oscObj.osc.stop(this.now + Number(_oscObj.endTime));
+
+          _oscObj.osc.onended = function (src) {
+            return _this.ended(src);
+          };
         }
       } catch (err) {
         _iterator2.e(err);
@@ -13280,6 +13288,15 @@ var Player = /*#__PURE__*/function () {
 
       this.oscillators = [];
       this.playing = false;
+    }
+  }, {
+    key: "ended",
+    value: function ended(src) {
+      this.endedSrc.push(src);
+
+      if (this.endedSrc.length === this.partialData.length) {
+        this.playing = false;
+      }
     }
   }]);
 

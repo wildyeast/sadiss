@@ -53,6 +53,7 @@ export default class Player {
       
       oscObj.osc.start(this.now)
       oscObj.osc.stop(this.now + Number(oscObj.endTime))
+      oscObj.osc.onended = (src) => this.ended(src)
     }
     this.playing = true
   }
@@ -64,6 +65,15 @@ export default class Player {
     }
     this.oscillators = []
     this.playing = false
+  }
+
+  endedSrc = []
+
+  ended (src) {
+    this.endedSrc.push(src)
+    if (this.endedSrc.length === this.partialData.length) {
+      this.playing = false
+    }
   }
 
 }
