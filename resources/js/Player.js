@@ -1,6 +1,7 @@
 export default class Player {
 
   oscillators = []
+  endedSrc = []
 
   constructor (partialData) {
     this.playing = false
@@ -68,11 +69,8 @@ export default class Player {
     this.playing = false
   }
 
-  endedSrc = []
-
   ended (src) {
     this.endedSrc.push(src)
-    console.log(this.endedSrc, this.partialData.length)
     if (this.endedSrc.length === this.partialData.length) {
       this.playing = false
       this.oscillators = []
