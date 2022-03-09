@@ -1,20 +1,18 @@
 <template>
-  <span class="material-icons mi-play-arrow cursor-pointer" @click="player.play" />
+  <span v-if="player.playing" class="material-icons mi-pause cursor-pointer" @click="player.stop" />
+  <span v-else class="material-icons mi-play-arrow cursor-pointer" @click="player.play" />
 </template>
 
 <script>
 import Player from '@/Player'
-import { onUpdated } from 'vue'
+import { reactive } from 'vue'
 export default {
   props: {
     partialData: String,
   },
   setup (props) {
-    let player = null
-
     const parsedPartialData = JSON.parse(props.partialData)
-
-    player = new Player(parsedPartialData)
+    const player = reactive(new Player(parsedPartialData))
 
     return {
       player

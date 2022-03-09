@@ -9854,9 +9854,8 @@ __webpack_require__.r(__webpack_exports__);
     partialData: String
   },
   setup: function setup(props) {
-    var player = null;
     var parsedPartialData = JSON.parse(props.partialData);
-    player = new _Player__WEBPACK_IMPORTED_MODULE_0__["default"](parsedPartialData);
+    var player = (0,vue__WEBPACK_IMPORTED_MODULE_1__.reactive)(new _Player__WEBPACK_IMPORTED_MODULE_0__["default"](parsedPartialData));
     return {
       player: player
     };
@@ -11248,14 +11247,23 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
-    "class": "material-icons mi-play-arrow cursor-pointer",
+  return $setup.player.playing ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+    key: 0,
+    "class": "material-icons mi-pause cursor-pointer",
     onClick: _cache[0] || (_cache[0] = function () {
       var _$setup$player;
 
-      return $setup.player.play && (_$setup$player = $setup.player).play.apply(_$setup$player, arguments);
+      return $setup.player.stop && (_$setup$player = $setup.player).stop.apply(_$setup$player, arguments);
     })
-  });
+  })) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("span", {
+    key: 1,
+    "class": "material-icons mi-play-arrow cursor-pointer",
+    onClick: _cache[1] || (_cache[1] = function () {
+      var _$setup$player2;
+
+      return $setup.player.play && (_$setup$player2 = $setup.player).play.apply(_$setup$player2, arguments);
+    })
+  }));
 }
 
 /***/ }),
@@ -13168,6 +13176,7 @@ var Player = /*#__PURE__*/function () {
 
     _defineProperty(this, "oscillators", []);
 
+    this.playing = false;
     this.partialData = partialData;
     this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
   }
@@ -13201,7 +13210,6 @@ var Player = /*#__PURE__*/function () {
     key: "play",
     value: function play() {
       // https://www.html5rocks.com/en/tutorials/audio/scheduling/
-      console.log(123);
       this.now = this.audioContext.currentTime;
 
       var _iterator = _createForOfIteratorHelper(this.partialData),
@@ -13249,6 +13257,29 @@ var Player = /*#__PURE__*/function () {
       } finally {
         _iterator2.f();
       }
+
+      this.playing = true;
+    }
+  }, {
+    key: "stop",
+    value: function stop() {
+      var _iterator3 = _createForOfIteratorHelper(this.oscillators),
+          _step3;
+
+      try {
+        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+          var oscObj = _step3.value;
+          oscObj.osc.stop();
+          oscObj.osc.disconnect(this.audioContext.destination);
+        }
+      } catch (err) {
+        _iterator3.e(err);
+      } finally {
+        _iterator3.f();
+      }
+
+      this.oscillators = [];
+      this.playing = false;
     }
   }]);
 

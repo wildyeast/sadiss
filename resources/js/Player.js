@@ -3,6 +3,7 @@ export default class Player {
   oscillators = []
 
   constructor (partialData) {
+    this.playing = false
     this.partialData = partialData
     this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
   }
@@ -31,9 +32,8 @@ export default class Player {
 
   play () {
     // https://www.html5rocks.com/en/tutorials/audio/scheduling/
-    console.log(123)
     this.now = this.audioContext.currentTime;
-
+    
     for (const partial of this.partialData) {
       const osc = this.setupOscillator(partial, partial.startTime)
       const oscObj = {
@@ -50,9 +50,20 @@ export default class Player {
       oscObj.osc.connect(this.audioContext.destination)
       // Connect gain to osc 
       oscObj.osc.connect(oscObj.gain);
-
+      
       oscObj.osc.start(this.now)
       oscObj.osc.stop(this.now + Number(oscObj.endTime))
     }
+    this.playing = true
   }
+
+  stop () {
+    for (const oscObj of this.oscillators) {
+      oscObj.osc.stop()
+      oscObj.osc.disconnect(this.audioContext.destination)
+    }
+    this.oscillators = []
+    this.playing = false
+  }
+
 }
