@@ -46,9 +46,11 @@
                                         v-for="(field, idx) in Object.keys(entry)"
                                         :key="idx">
                                         <div v-if="field === 'description'" class="text-sm leading-5 text-gray-500">{{ descriptionToDisplay }}</div>
+                                        <Player v-else-if="field === 'partials'"></Player>
                                         <div v-else class="text-sm leading-5 text-gray-500"> {{ entry[field] }} </div>
                                     </td>
 
+                                    <!-- Edit, Delete, Details -->
                                     <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 align-middle">
                                         <Link :href="route(`${pathname}.edit`, {id: entry.id})">
                                           <span class="material-icons mi-edit text-blue-500" />
@@ -76,12 +78,14 @@
 import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
 import { Head, Link } from '@inertiajs/inertia-vue3'
 import { onMounted, ref, inject, computed } from 'vue'
+import Player from '@/Components/Player.vue'
 
 export default {
     components: {
         BreezeAuthenticatedLayout,
         Head,
-        Link
+        Link,
+        Player
     },
     setup () {
         const oruga = inject('oruga')
@@ -168,7 +172,7 @@ export default {
           deleteRow,
           descriptionToDisplay,
           pathname,
-          title,
+          title
         }
     }
 }
