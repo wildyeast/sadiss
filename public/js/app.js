@@ -13286,9 +13286,7 @@ var Player = /*#__PURE__*/function () {
         _iterator3.f();
       }
 
-      this.oscillators = [];
-      this.endedSrc = [];
-      this.playing = false;
+      this.reset();
     }
   }, {
     key: "ended",
@@ -13296,10 +13294,15 @@ var Player = /*#__PURE__*/function () {
       this.endedSrc.push(src);
 
       if (this.endedSrc.length === this.partialData.length) {
-        this.playing = false;
-        this.oscillators = [];
-        this.endedSrc = [];
+        this.reset();
       }
+    }
+  }, {
+    key: "reset",
+    value: function reset() {
+      this.oscillators = [];
+      this.endedSrc = [];
+      this.playing = false;
     }
   }]);
 

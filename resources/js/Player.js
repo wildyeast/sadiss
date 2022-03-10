@@ -64,18 +64,20 @@ export default class Player {
       oscObj.osc.stop()
       oscObj.osc.disconnect(this.audioContext.destination)
     }
-    this.oscillators = []
-    this.endedSrc = []
-    this.playing = false
+    this.reset()
   }
 
   ended (src) {
     this.endedSrc.push(src)
     if (this.endedSrc.length === this.partialData.length) {
-      this.playing = false
-      this.oscillators = []
-      this.endedSrc = []
+      this.reset()
     }
+  }
+
+  reset () {
+    this.oscillators = []
+    this.endedSrc = []
+    this.playing = false
   }
 
 }
