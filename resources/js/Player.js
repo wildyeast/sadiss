@@ -22,7 +22,7 @@ export default class Player {
       const currentBreakpoint = partial.breakpoints[i]
       // if (times[i] - times[i-1] < 0) continue
       if (i > 0) {
-        time += (currentBreakpoint.time - partial.breakpoints[i-1].time)
+        time += (currentBreakpoint.time - partial.breakpoints[i - 1].time)
       }
       osc.frequency.setValueAtTime(currentBreakpoint.freq, time)
       gain.gain.setValueAtTime(currentBreakpoint.amp, time)
