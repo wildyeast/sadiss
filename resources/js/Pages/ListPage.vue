@@ -45,8 +45,7 @@
                                     <td class="px-2 py-4 whitespace-no-wrap border-b border-gray-200 max-w-min center align-middle"
                                         v-for="(field, idx) in Object.keys(entry)"
                                         :key="idx">
-                                        <div v-if="field === 'description'" class="text-sm leading-5 text-gray-500">{{ descriptionToDisplay }}</div>
-                                        <Player v-else-if="field === 'partials'" :partialData="entry[field]" />
+                                        <Player v-if="field === 'partials'" :partialData="entry[field]" />
                                         <div v-else class="text-sm leading-5 text-gray-500"> {{ entry[field] }} </div>
                                     </td>
 
@@ -93,19 +92,7 @@ export default {
         const columnData = ref([])
         const columnNames = ref([])
         const pathname = window.location.pathname.replace('/', '')
-        const category = pathname.split('/')[0]
-        const descriptionToDisplay = computed(() => {
-          let description = ''
-          // TODO: Refactor columnData with reactive() to get rid of the [0]s here. Do columnNames as well while you are at it.
-          if (columnData.value[0]['description']) {
-            if (columnData.value[0]['description'].length > 50) {
-              description = columnData.value[0]['description'].substring(0, 50) + '...'
-            } else {
-              description = columnData.value[0]['description']
-            }
-          }
-          return description
-        })
+        const category = pathname.split('/')[0] 
         let routeCategory = ''
         const title = ref('')
 
@@ -143,6 +130,11 @@ export default {
         async function addData () {
           const response = await axios.get(`/api/${routeCategory}`)
           for (const entry of response.data) {
+            if (entry['description'] && entry['description'].length > 50) {
+              if (entry['description'].length > 50) {
+                entry['description'] = entry['description'].substring(0, 50) + '...'
+              }
+            }
             columnData.value.push(entry)
           }
         }
@@ -170,7 +162,6 @@ export default {
           columnNames,
           columnData,
           deleteRow,
-          descriptionToDisplay,
           pathname,
           title
         }
