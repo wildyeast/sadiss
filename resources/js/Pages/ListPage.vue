@@ -131,9 +131,7 @@ export default {
           const response = await axios.get(`/api/${routeCategory}`)
           for (const entry of response.data) {
             if (entry['description'] && entry['description'].length > 50) {
-              if (entry['description'].length > 50) {
-                entry['description'] = entry['description'].substring(0, 50) + '...'
-              }
+              entry['description'] = entry['description'].substring(0, 50) + '...'
             }
             columnData.value.push(entry)
           }

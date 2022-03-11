@@ -10822,9 +10822,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     entry = _step2.value;
 
                     if (entry['description'] && entry['description'].length > 50) {
-                      if (entry['description'].length > 50) {
-                        entry['description'] = entry['description'].substring(0, 50) + '...';
-                      }
+                      entry['description'] = entry['description'].substring(0, 50) + '...';
                     }
 
                     columnData.value.push(entry);
