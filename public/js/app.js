@@ -9783,9 +9783,75 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return _getRegisteredClients.apply(this, arguments);
     }
 
+    function removeClients() {
+      return _removeClients.apply(this, arguments);
+    }
+
+    function _removeClients() {
+      _removeClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
+        var _iterator2, _step2, client, response;
+
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _iterator2 = _createForOfIteratorHelper(registeredClients);
+                _context3.prev = 1;
+
+                _iterator2.s();
+
+              case 3:
+                if ((_step2 = _iterator2.n()).done) {
+                  _context3.next = 11;
+                  break;
+                }
+
+                client = _step2.value;
+                _context3.next = 7;
+                return axios.post("/api/client/delete/".concat(client.id));
+
+              case 7:
+                response = _context3.sent;
+                console.log(response);
+
+              case 9:
+                _context3.next = 3;
+                break;
+
+              case 11:
+                _context3.next = 16;
+                break;
+
+              case 13:
+                _context3.prev = 13;
+                _context3.t0 = _context3["catch"](1);
+
+                _iterator2.e(_context3.t0);
+
+              case 16:
+                _context3.prev = 16;
+
+                _iterator2.f();
+
+                return _context3.finish(16);
+
+              case 19:
+                getRegisteredClients();
+
+              case 20:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, null, [[1, 13, 16, 19]]);
+      }));
+      return _removeClients.apply(this, arguments);
+    }
+
     return {
       registeredClients: registeredClients,
-      startTrack: startTrack
+      startTrack: startTrack,
+      removeClients: removeClients
     };
   }
 });
@@ -11154,7 +11220,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[0] || (_cache[0] = function () {
       return $setup.startTrack && $setup.startTrack.apply($setup, arguments);
     })
-  }, "Start track"), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.registeredClients, function (client) {
+  }, "Start track"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    onClick: _cache[1] || (_cache[1] = function () {
+      return $setup.removeClients && $setup.removeClients.apply($setup, arguments);
+    })
+  }, "Remove all clients"), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.registeredClients, function (client) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
       key: client.id
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(client.id), 1

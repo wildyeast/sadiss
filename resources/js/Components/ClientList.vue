@@ -2,6 +2,7 @@
   <div>
     <div>
       <button @click="startTrack">Start track</button>
+      <button @click="removeClients">Remove all clients</button>
       <div v-for="client of registeredClients" :key="client.id">
         {{client.id}}
       </div>
@@ -44,9 +45,18 @@ export default {
       }
     }
 
+    async function removeClients () {
+      for (const client of registeredClients) {
+        const response = await axios.post(`/api/client/delete/${client.id}`)
+        console.log(response)
+      }
+      getRegisteredClients()
+    }
+
     return {
       registeredClients,
-      startTrack
+      startTrack,
+      removeClients
     }
 
   }
