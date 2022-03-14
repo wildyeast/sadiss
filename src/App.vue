@@ -15,7 +15,9 @@ export default {
   data: () => ({
     modules,
     player: null,
-    token: null
+    token: null,
+    partials: null,
+    startTime: null
   }),
   async mounted () {
     // Fetch breakpoints from server
@@ -42,7 +44,9 @@ export default {
         const clientData = await this.checkForStart();
         if (clientData['start_time']) {
           window.clearInterval(intervalId)
-          console.log(clientData['start_time'])
+          this.startTime = clientData['start_time']
+          this.partials = clientData['partials']
+          this.waitForStart()
         } else {
           console.log(clientData)
         }
@@ -53,6 +57,22 @@ export default {
       const response = await fetch(`http://sadiss.test.test/api/client/${this.token}`)
       const data = await response.json()
       return data
+    },
+    async waitForStart () {
+      const intervalId = window.setInterval(async () => {
+        // TODO: Hardcoding the offset is exceedingly silly, but I spent way too much time trying to make it work without it.
+        // The problem is that the start_time from db is UTC, while Date.now() is local, which is +1h
+        // hence the offset of 3600000ms which is one hour.
+        const nowWithOffset = Date.now() - 3600000
+        if (new Date(this.startTime).getTime() <= nowWithOffset) {
+          window.clearInterval(intervalId)
+          console.log('Starting')
+          this.player = new Player(this.partials)
+          this.player.play()
+        } else {
+          console.log(`Starting in: ${new Date(this.startTime).getTime() - nowWithOffset}ms`)
+        }
+      }, 10);
     }
 
   }

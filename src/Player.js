@@ -31,8 +31,12 @@ class Player {
 
   play () {
     // https://www.html5rocks.com/en/tutorials/audio/scheduling/
-    console.log(123)
     this.now = this.audioContext.currentTime;
+
+    // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
+    if (typeof this.partialData === 'string') {
+      this.partialData = JSON.parse(this.partialData)
+    }
 
     for (const partial of this.partialData) {
       const osc = this.setupOscillator(partial, partial.startTime)
