@@ -27,8 +27,10 @@ Route::post('/track/create', [TrackController::class, 'create'])
   ->name('track.create');
 Route::post('/track/delete/{id}', [TrackController::class, 'delete'])
   ->name('track.delete');
-  Route::post('/track/edit/{id}', [TrackController::class, 'edit'])
+Route::post('/track/edit/{id}', [TrackController::class, 'edit'])
   ->name('track.edit');
+Route::post('/track/{id}/start', [TrackController::class, 'start_track'])
+  ->name('track.start');
 Route::get('/track', [TrackController::class, 'get']);
 Route::get('/track/{id}', [TrackController::class, 'get']);
 

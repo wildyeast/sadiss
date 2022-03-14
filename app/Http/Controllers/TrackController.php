@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Track;
+use App\Models\Client;
+use Response;
 
 
 class TrackController extends Controller
@@ -58,6 +60,22 @@ class TrackController extends Controller
   public function get_column_info (Request $request) {
     $columns = DB::select( DB::raw('SHOW COLUMNS FROM tracks'));
     return $columns;
+  }
+
+  public function start_track (Request $request, $id) {
+    $clients = app('App\Http\Controllers\ClientController')->get($request);
+    $partials = json_decode(Track::where('id', $id)->firstOrFail()->partials);
+    $chunk_length = ceil(count($partials) / count($clients));
+    // TODO: Chunking needs improvements: Currently if e.g. 7 partials and 3 clients, the chunks are 3, 3, 1.
+    // 3, 2, 2 would be better
+    $chunks = array_chunk($partials, $chunk_length);
+    foreach($clients as $i=>$value) {
+      $client = Client::where('id', $value->id)->firstOrFail();
+      $client->partials = $chunks[$i];
+      $client->start_time = date('Y-m-d H:i:s', strtotime('+ 15 second'));
+      $client->save();
+    }
+    return Response::json(['data' => $chunks]);
   }
 
   private function convert_source_file($sourcefile)

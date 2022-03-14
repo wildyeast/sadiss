@@ -39,7 +39,7 @@
                     <!-- Right hand side -->
                     <div class="flex-1 flex flex-col items-center">
                       <Player :partialData="data['partials']"/>
-                      <ClientList />
+                      <ClientList :trackId="id" />
                     </div>
                   </div>
                 </template>
