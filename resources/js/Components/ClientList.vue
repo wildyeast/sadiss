@@ -1,8 +1,9 @@
 <template>
   <div>
-    <div>
-      <button @click="startTrack">Start track</button>
-      <button @click="removeClients">Remove all clients</button>
+    <div class="flex flex-col">
+      <button @click="startTrack" class="border border-1">Start track</button>
+      <button @click="removeClients" class="border border-1">Remove all registered clients</button>
+      <p>IDs of registered clients</p>
       <div v-for="client of registeredClients" :key="client.id">
         {{client.id}}
       </div>
