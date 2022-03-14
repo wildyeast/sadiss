@@ -1,7 +1,11 @@
 <template>
   <div class="app">
-    <button @click="player.play">Play</button>
-    <button @click="register">Register</button>
+    <div style="display: flex; flex-direction: column; justify-content: center">
+      <button @click="player.play">Play</button>
+      <button @click="register">Register</button>
+      <div v-if="countdownTime >= 0" style="display: flex; justify-content: center; font-size: 50px;">{{ countdownTime }}</div>
+      <div v-else>Track starting soon</div>
+    </div>
   </div>
 </template>
 <script>
@@ -18,8 +22,9 @@ export default {
     token: null,
     partials: null,
     startTime: null,
-    // hostUrl: 'http://sadiss.test.test',
-    hostUrl: 'http://8hz.at'
+    hostUrl: 'http://sadiss.test.test',
+    countdownTime: -1
+    // hostUrl: 'http://8hz.at'
   }),
   async mounted () {
     // Fetch breakpoints from server
@@ -73,6 +78,7 @@ export default {
           this.player.play()
         } else {
           console.log(`Starting in: ${new Date(this.startTime).getTime() - nowWithOffset}ms`)
+          this.countdownTime = Math.floor((new Date(this.startTime).getTime() - nowWithOffset) / 1000)
         }
       }, 10);
     }
@@ -81,6 +87,10 @@ export default {
 }
 </script>
 <style>
+html, body {
+  background-color: black;
+}
+
 .app {
   --primaryColor: #11bd39;
   --secondaryColor: maroon;
