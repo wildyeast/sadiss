@@ -1,6 +1,5 @@
 <template>
   <div>
-    <button @click="registerClient">Generate dummy client</button>
     <div>
       <div v-for="client of registeredClients" :key="client.id">
         {{client.id}}
@@ -35,7 +34,6 @@ export default {
     }
 
     return {
-      registerClient,
       registeredClients
     }
 

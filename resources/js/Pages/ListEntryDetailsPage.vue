@@ -37,8 +37,9 @@
                       <p class="text-justify">{{ data['description'] }}</p>
                     </div>
                     <!-- Right hand side -->
-                    <div class="flex-1 flex justify-center">
+                    <div class="flex-1 flex flex-col items-center">
                       <Player :partialData="data['partials']"/>
+                      <ClientList />
                     </div>
                   </div>
                 </template>
@@ -95,13 +96,15 @@ import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
 import { Head, useForm, Link } from '@inertiajs/inertia-vue3'
 import { onMounted, reactive, toRefs } from 'vue'
 import Player from '@/Components/Player.vue'
+import ClientList from '@/Components/ClientList.vue'
 
 export default {
   components: {
     BreezeAuthenticatedLayout,
     Head,
     Link,
-    Player
+    Player,
+    ClientList
   },
   setup () {
     const pathname = window.location.pathname.replace('/', '')

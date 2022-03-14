@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use App\Models\Client;
+use Response;
 
 class ClientController extends Controller
 {
@@ -15,9 +16,10 @@ class ClientController extends Controller
     $client->token = $this->create_token();
     $client->performance_id = $request->performance_id;
     $client->save();
-    return back()->with('flash', [
-        'message' => 'success',
-    ]);
+    // return back()->with('flash', [
+    //     'message' => 'success',
+    // ]);
+    return Response::json(['token' => $client->token]);
   }
 
   public function delete(Request $request, $id) {
