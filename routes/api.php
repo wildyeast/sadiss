@@ -5,6 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\TrackController;
 use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\ComposerController;
+use App\Http\Controllers\ClientController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,4 +52,8 @@ Route::post('/composer/edit/{id}', [ComposerController::class, 'edit'])
 Route::get('/composer', [ComposerController::class, 'get']);
 Route::get('/composer/{id}', [ComposerController::class, 'get']);
 
-
+Route::post('/client/create', [ClientController::class, 'create'])
+  ->name('client.create');
+Route::post('/client/delete/{id}', [ClientController::class, 'delete'])
+  ->name('composer.delete');
+Route::get('/client', [ClientController::class, 'get']);

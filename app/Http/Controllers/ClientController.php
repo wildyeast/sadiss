@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 use App\Models\Client;
 
 class ClientController extends Controller
@@ -11,7 +12,7 @@ class ClientController extends Controller
   public function create(Request $request)
   {
     $client = new Client;
-    $client->token = create_token();
+    $client->token = $this->create_token();
     $client->performance_id = $request->performance_id;
     $client->save();
     return back()->with('flash', [
@@ -26,8 +27,15 @@ class ClientController extends Controller
     ]);
   }
 
+  public function get(Request $request, $id=null) {
+    if (isset($id)) {
+      return Client::where('id', $id)->firstOrFail();
+    }
+    return Client::all();
+  }
+
   public function create_token() {
     // Make token unique? E.g. by making the field unique in db
-    return str_random(7);
+    return Str::random(7);
   }
 }
