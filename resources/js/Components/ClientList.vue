@@ -48,7 +48,7 @@ export default {
     async function removeClients () {
       for (const client of registeredClients) {
         const response = await axios.post(`/api/client/delete/${client.id}`)
-        console.log(response)
+        console.log("Removed client with id " + client.id)
       }
       getRegisteredClients()
     }

@@ -9812,7 +9812,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 7:
                 response = _context3.sent;
-                console.log(response);
+                console.log("Removed client with id " + client.id);
 
               case 9:
                 _context3.next = 3;
