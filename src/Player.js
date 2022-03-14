@@ -1,10 +1,10 @@
 class Player {
 
   oscillators = []
+  audioContext = null
 
   constructor (partialData) {
     this.partialData = partialData
-    this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
   }
 
   setupOscillator(partial, startTime) {
@@ -30,6 +30,7 @@ class Player {
   }
 
   play () {
+    this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
     // https://www.html5rocks.com/en/tutorials/audio/scheduling/
     this.now = this.audioContext.currentTime;
 

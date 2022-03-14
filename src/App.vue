@@ -17,7 +17,9 @@ export default {
     player: null,
     token: null,
     partials: null,
-    startTime: null
+    startTime: null,
+    // hostUrl: 'http://sadiss.test.test',
+    hostUrl: 'http://8hz.at'
   }),
   async mounted () {
     // Fetch breakpoints from server
@@ -29,7 +31,7 @@ export default {
   },
   methods: {
     async register () {
-      const response = await fetch('http://sadiss.test.test/api/client/create', {
+      const response = await fetch(this.hostUrl + '/api/client/create', {
         method: 'POST',
         mode: 'cors',
         headers: {
@@ -54,7 +56,7 @@ export default {
       
     },
     async checkForStart () {
-      const response = await fetch(`http://sadiss.test.test/api/client/${this.token}`)
+      const response = await fetch(`${this.hostUrl}/api/client/${this.token}`)
       const data = await response.json()
       return data
     },
