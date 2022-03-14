@@ -36,6 +36,10 @@ class ClientController extends Controller
     return Client::all();
   }
 
+  public function get_by_token(Request $request) {
+    return Client::where('token', $request->token)->firstOrFail();
+  }
+
   public function create_token() {
     // Make token unique? E.g. by making the field unique in db
     return Str::random(7);
