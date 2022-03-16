@@ -11,6 +11,10 @@
 <script>
 /* global getOscillator */
 import { modules, bps } from './constants'
+import dayjs from 'dayjs'
+import dayjsPluginUTC from 'dayjs/plugin/utc'
+dayjs.extend(dayjsPluginUTC)
+
 import { Player } from './Player'
 
 export default {
@@ -23,6 +27,7 @@ export default {
     partials: null,
     startTime: null,
     countdownTime: -1,
+    hasStarted: false,
     // hostUrl: 'http://sadiss.test.test',
     hostUrl: 'http://8hz.at'
   }),
@@ -44,6 +49,7 @@ export default {
         },
         body: JSON.stringify({performance_id: 1})
       })
+      console.log(response)
       const data = await response.json()
       this.token = data.token
 
@@ -57,8 +63,7 @@ export default {
         } else {
           console.log(clientData)
         }
-      }, 1000);
-      
+      }, 1500);
     },
     async checkForStart () {
       const response = await fetch(`${this.hostUrl}/api/client/${this.token}`)
@@ -67,20 +72,28 @@ export default {
     },
     async waitForStart () {
       const intervalId = window.setInterval(async () => {
-        // TODO: Hardcoding the offset is exceedingly silly, but I spent way too much time trying to make it work without it.
-        // The problem is that the start_time from db is UTC, while Date.now() is local, which is +1h
-        // hence the offset of 3600000ms which is one hour.
-        const nowWithOffset = Date.now() - 3600000
-        if (new Date(this.startTime).getTime() <= nowWithOffset) {
+        const nowServer = await this.getTimeFromServer();
+        const startTime = dayjs.utc(this.startTime).valueOf()
+        // console.log(startTime, nowServer, Date.now())
+        if (startTime <= nowServer) {
           window.clearInterval(intervalId)
-          console.log('Starting')
-          this.player = new Player(this.partials)
-          this.player.play()
+          if (!this.hasStarted) {
+            console.log('Starting')
+            this.player = new Player(this.partials)
+            this.player.play()
+            this.hasStarted = true;
+          }
         } else {
-          console.log(`Starting in: ${new Date(this.startTime).getTime() - nowWithOffset}ms`)
-          this.countdownTime = Math.floor((new Date(this.startTime).getTime() - nowWithOffset) / 1000)
+          console.log(`Starting in: ${startTime - nowServer}ms`)
+          this.countdownTime = Math.abs(Math.floor((nowServer - startTime) / 1000))
         }
       }, 10);
+    },
+
+    async getTimeFromServer () {
+      const response = await fetch(`${this.hostUrl}/api/time`)
+      const data = await response.json()
+      return data.time
     }
 
   }
