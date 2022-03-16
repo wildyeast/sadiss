@@ -90,7 +90,7 @@ class TrackController extends Controller
     foreach($clients as $i=>$value) {
       $client = Client::where('id', $value->id)->firstOrFail();
       $client->partials = $chunks[$i];
-      $client->start_time = date('Y-m-d H:i:s', strtotime('+ 5 second'));
+      $client->start_time = date('Y-m-d H:i:s', strtotime('+ 15 second'));
       $client->save();
     }
     return Response::json(['data' => $chunks]);
