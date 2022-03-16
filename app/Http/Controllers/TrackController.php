@@ -65,17 +65,57 @@ class TrackController extends Controller
   public function start_track (Request $request, $id) {
     $clients = app('App\Http\Controllers\ClientController')->get($request);
     $partials = json_decode(Track::where('id', $id)->firstOrFail()->partials);
-    $chunk_length = ceil(count($partials) / count($clients));
-    // TODO: Chunking needs improvements: Currently if e.g. 7 partials and 3 clients, the chunks are 3, 3, 1.
-    // 3, 2, 2 would be better
-    $chunks = array_chunk($partials, $chunk_length);
+
+    $unique_partials = $partials;
+
+    // If more clients than partials, duplicate original partials until this is no longer the case.
+    while (count($clients) > count($partials)) {
+      $partials = array_merge($partials, $unique_partials);
+    }
+    
+    // Array of chunk arrays, same length as registered clients array.
+    $chunks = array_fill(0, count($clients), []);
+
+    // Distribute partials between chunks.
+    // In conjuction with partial duplication above, this guarantees that all partials are played equally often.
+    // Not all clients get the same amount of partials though.
+    $counter = 0;
+    while ($partial = array_pop($partials)) {
+      array_push($chunks[$counter], $partial);
+      $counter++;
+      if ($counter > count($clients) - 1) {
+        $counter = 0;
+      }
+    }
     foreach($clients as $i=>$value) {
       $client = Client::where('id', $value->id)->firstOrFail();
       $client->partials = $chunks[$i];
-      $client->start_time = date('Y-m-d H:i:s', strtotime('+ 15 second'));
+      $client->start_time = date('Y-m-d H:i:s', strtotime('+ 5 second'));
       $client->save();
     }
     return Response::json(['data' => $chunks]);
+  }
+
+  /**
+   * 
+   * @param Array $list
+   * @param int $p
+   * @return multitype:multitype:
+   * @link http://www.php.net/manual/en/function.array-chunk.php#75022
+   * https://stackoverflow.com/a/15723262/16725862 is where I got this from
+   */
+  function partition(Array $list, $p) {
+    $listlen = count($list);
+    $partlen = floor($listlen / $p);
+    $partrem = $listlen % $p;
+    $partition = array();
+    $mark = 0;
+    for($px = 0; $px < $p; $px ++) {
+        $incr = ($px < $partrem) ? $partlen + 1 : $partlen;
+        $partition[$px] = array_slice($list, $mark, $incr);
+        $mark += $incr;
+    }
+    return $partition;
   }
 
   private function convert_source_file($sourcefile)

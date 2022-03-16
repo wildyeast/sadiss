@@ -9699,7 +9699,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     Button: _Button_vue__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
   props: {
-    trackId: Number
+    trackId: String
   },
   setup: function setup(props) {
     var registeredClients = (0,vue__WEBPACK_IMPORTED_MODULE_2__.reactive)([]);
