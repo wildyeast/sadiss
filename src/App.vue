@@ -15,7 +15,7 @@ import dayjs from 'dayjs'
 import dayjsPluginUTC from 'dayjs/plugin/utc'
 dayjs.extend(dayjsPluginUTC)
 
-import { Player } from './Player'
+import Player from './Player'
 
 export default {
   name: 'App',
