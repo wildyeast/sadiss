@@ -13392,7 +13392,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "default": () => (/* binding */ Player)
+/* harmony export */   "Player": () => (/* binding */ Player)
 /* harmony export */ });
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
@@ -13414,11 +13414,9 @@ var Player = /*#__PURE__*/function () {
 
     _defineProperty(this, "oscillators", []);
 
-    _defineProperty(this, "endedSrc", []);
+    _defineProperty(this, "audioContext", null);
 
-    this.playing = false;
     this.partialData = partialData;
-    this.audioContext = new (window.AudioContext || window.webkitAudioContext)();
   }
 
   _createClass(Player, [{
@@ -13449,10 +13447,13 @@ var Player = /*#__PURE__*/function () {
   }, {
     key: "play",
     value: function play() {
-      var _this = this;
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)(); // https://www.html5rocks.com/en/tutorials/audio/scheduling/
 
-      // https://www.html5rocks.com/en/tutorials/audio/scheduling/
-      this.now = this.audioContext.currentTime;
+      this.now = this.audioContext.currentTime; // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
+
+      if (typeof this.partialData === 'string') {
+        this.partialData = JSON.parse(this.partialData);
+      }
 
       var _iterator = _createForOfIteratorHelper(this.partialData),
           _step;
@@ -13493,54 +13494,12 @@ var Player = /*#__PURE__*/function () {
           _oscObj.osc.start(this.now);
 
           _oscObj.osc.stop(this.now + Number(_oscObj.endTime));
-
-          _oscObj.osc.onended = function (src) {
-            return _this.ended(src);
-          };
         }
       } catch (err) {
         _iterator2.e(err);
       } finally {
         _iterator2.f();
       }
-
-      this.playing = true;
-    }
-  }, {
-    key: "stop",
-    value: function stop() {
-      var _iterator3 = _createForOfIteratorHelper(this.oscillators),
-          _step3;
-
-      try {
-        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
-          var oscObj = _step3.value;
-          oscObj.osc.stop();
-          oscObj.osc.disconnect(this.audioContext.destination);
-        }
-      } catch (err) {
-        _iterator3.e(err);
-      } finally {
-        _iterator3.f();
-      }
-
-      this.reset();
-    }
-  }, {
-    key: "ended",
-    value: function ended(src) {
-      this.endedSrc.push(src);
-
-      if (this.endedSrc.length === this.partialData.length) {
-        this.reset();
-      }
-    }
-  }, {
-    key: "reset",
-    value: function reset() {
-      this.oscillators = [];
-      this.endedSrc = [];
-      this.playing = false;
     }
   }]);
 
