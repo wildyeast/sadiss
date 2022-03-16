@@ -13392,9 +13392,17 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 "use strict";
 __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
-/* harmony export */   "Player": () => (/* binding */ Player)
+/* harmony export */   "default": () => (/* binding */ Player)
 /* harmony export */ });
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e2) { throw _e2; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e3) { didErr = true; err = _e3; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
@@ -13414,7 +13422,13 @@ var Player = /*#__PURE__*/function () {
 
     _defineProperty(this, "oscillators", []);
 
+    _defineProperty(this, "endedSrc", []);
+
+    _defineProperty(this, "merger", null);
+
     _defineProperty(this, "audioContext", null);
+
+    _defineProperty(this, "playing", false);
 
     this.partialData = partialData;
   }
@@ -13447,6 +13461,8 @@ var Player = /*#__PURE__*/function () {
   }, {
     key: "play",
     value: function play() {
+      var _this = this;
+
       this.audioContext = new (window.AudioContext || window.webkitAudioContext)(); // https://www.html5rocks.com/en/tutorials/audio/scheduling/
 
       this.now = this.audioContext.currentTime; // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
@@ -13469,37 +13485,85 @@ var Player = /*#__PURE__*/function () {
             endTime: partial.endTime
           };
           this.oscillators.push(oscObj);
-        }
+        } // https://stackoverflow.com/questions/59347938/webaudio-playing-two-oscillator-sounds-in-a-same-time-causes-vibration-sound
+        // Create merger to merge all osc outputs into
+
       } catch (err) {
         _iterator.e(err);
       } finally {
         _iterator.f();
       }
 
-      var _iterator2 = _createForOfIteratorHelper(this.oscillators),
+      this.merger = this.audioContext.createChannelMerger(this.oscillators.length); // Connect merger to destination
+
+      this.merger.connect(this.audioContext.destination);
+
+      var _iterator2 = _createForOfIteratorHelper(this.oscillators.entries()),
           _step2;
 
       try {
         for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-          var _oscObj = _step2.value;
+          var _step2$value = _slicedToArray(_step2.value, 2),
+              i = _step2$value[0],
+              _oscObj = _step2$value[1];
 
-          // Connect osc and gain to destination
-          _oscObj.gain.connect(this.audioContext.destination);
-
-          _oscObj.osc.connect(this.audioContext.destination); // Connect gain to osc 
+          // Connect gain to osc 
+          _oscObj.osc.connect(_oscObj.gain); // Connect osc to merger (0 meaning all going to same merger output channel)
 
 
-          _oscObj.osc.connect(_oscObj.gain);
+          _oscObj.osc.connect(this.merger, 0, i);
 
           _oscObj.osc.start(this.now);
 
           _oscObj.osc.stop(this.now + Number(_oscObj.endTime));
+
+          _oscObj.osc.onended = function (src) {
+            return _this.ended(src);
+          };
         }
       } catch (err) {
         _iterator2.e(err);
       } finally {
         _iterator2.f();
       }
+
+      this.playing = true;
+    }
+  }, {
+    key: "stop",
+    value: function stop() {
+      var _iterator3 = _createForOfIteratorHelper(this.oscillators),
+          _step3;
+
+      try {
+        for (_iterator3.s(); !(_step3 = _iterator3.n()).done;) {
+          var oscObj = _step3.value;
+          oscObj.osc.stop();
+        }
+      } catch (err) {
+        _iterator3.e(err);
+      } finally {
+        _iterator3.f();
+      }
+
+      this.reset();
+    }
+  }, {
+    key: "ended",
+    value: function ended(src) {
+      this.endedSrc.push(src);
+
+      if (this.endedSrc.length === this.partialData.length) {
+        this.merger.disconnect(this.audioContext.destination);
+        this.reset();
+      }
+    }
+  }, {
+    key: "reset",
+    value: function reset() {
+      this.oscillators = [];
+      this.endedSrc = [];
+      this.playing = false;
     }
   }]);
 
