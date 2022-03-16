@@ -26,14 +26,15 @@ export default {
     token: null,
     partials: null,
     startTime: null,
+    serverTime: null,
     countdownTime: -1,
     hasStarted: false,
-    // hostUrl: 'http://sadiss.test.test',
-    hostUrl: 'http://8hz.at'
+    hostUrl: 'http://sadiss.test.test',
+    // hostUrl: 'http://8hz.at'
   }),
   async mounted () {
     // Fetch breakpoints from server
-    const res = await fetch ('http://8hz.at/api/track/3')
+    const res = await fetch (this.hostUrl + '/api/track/1')
     const json = await res.json()
     const partialData = JSON.parse(json.partials)
     // Initialize player
@@ -55,13 +56,14 @@ export default {
 
       const intervalId = window.setInterval(async () => {
         const clientData = await this.checkForStart();
-        if (clientData['start_time']) {
+        if (clientData.client['start_time']) {
           window.clearInterval(intervalId)
-          this.startTime = clientData['start_time']
-          this.partials = clientData['partials']
+          this.startTime = clientData.client['start_time']
+          this.partials = clientData.client['partials']
+          this.serverTime = clientData.time
           this.waitForStart()
         } else {
-          console.log(clientData)
+          console.log(clientData.client, clientData.time)
         }
       }, 1500);
     },
@@ -84,7 +86,7 @@ export default {
             this.hasStarted = true;
           }
         } else {
-          console.log(`Starting in: ${startTime - nowServer}ms`)
+          // console.log(`Starting in: ${startTime - nowServer}ms`)
           this.countdownTime = Math.abs(Math.floor((nowServer - startTime) / 1000))
         }
       }, 10);
@@ -94,8 +96,7 @@ export default {
       const response = await fetch(`${this.hostUrl}/api/time`)
       const data = await response.json()
       return data.time
-    }
-
+    },
   }
 }
 </script>
