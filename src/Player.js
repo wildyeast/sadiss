@@ -36,7 +36,9 @@ export default class Player {
     // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
     if (typeof this.partialData === 'string') {
       this.partialData = JSON.parse(this.partialData)
+      this.partialData.reverse()
     }
+    console.log(this.partialData)
 
     this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
     // https://www.html5rocks.com/en/tutorials/audio/scheduling/
@@ -59,19 +61,19 @@ export default class Player {
     // this.merger = this.audioContext.createChannelMerger(this.oscillators.length)
     this.merger = new ChannelMergerNode(this.audioContext, { numberOfInputs: this.oscillators.length })
     // Connect merger to destination
-    // this.merger.connect(this.audioContext.destination)
+    this.merger.connect(this.audioContext.destination)
 
     for (const [i, oscObj] of this.oscillators.entries()) {
       // Connect gain to osc 
       oscObj.osc.connect(oscObj.gain);
 
       // Connect osc to merger (0 meaning all going to same merger output channel)
-      // oscObj.osc.connect(this.merger, 0, i)
-      oscObj.osc.connect(this.audioContext.destination)
+      oscObj.osc.connect(this.merger, 0, i)
+      // oscObj.osc.connect(this.audioContext.destination)
 
       oscObj.osc.start(this.now)
       oscObj.osc.stop(this.now + Number(oscObj.endTime))
-      // oscObj.osc.onended = (src) => this.ended(src)
+      oscObj.osc.onended = (src) => this.ended(src)
     }
     this.playing = true
   }
@@ -86,7 +88,7 @@ export default class Player {
   ended (src) {
     this.endedSrc.push(src)
     if (this.endedSrc.length === this.partialData.length) {
-      this.merger.disconnect(this.audioContext.destination)
+      this.merger.disconnect(this.audioContext)
       this.reset()
     }
   }

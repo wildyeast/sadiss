@@ -29,8 +29,8 @@ export default {
     serverTime: null,
     countdownTime: -1,
     hasStarted: false,
-    hostUrl: 'http://sadiss.test.test',
-    // hostUrl: 'http://8hz.at'
+    // hostUrl: 'http://sadiss.test.test',
+    hostUrl: 'http://8hz.at'
   }),
   async mounted () {
     // Fetch breakpoints from server
