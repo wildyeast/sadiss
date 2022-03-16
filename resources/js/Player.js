@@ -1,12 +1,10 @@
-export default class Player {
+class Player {
 
   oscillators = []
-  endedSrc = []
+  audioContext = null
 
   constructor (partialData) {
-    this.playing = false
     this.partialData = partialData
-    this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
   }
 
   setupOscillator(partial, startTime) {
@@ -22,7 +20,7 @@ export default class Player {
       const currentBreakpoint = partial.breakpoints[i]
       // if (times[i] - times[i-1] < 0) continue
       if (i > 0) {
-        time += (currentBreakpoint.time - partial.breakpoints[i - 1].time)
+        time += (currentBreakpoint.time - partial.breakpoints[i-1].time)
       }
       osc.frequency.setValueAtTime(currentBreakpoint.freq, time)
       gain.gain.setValueAtTime(currentBreakpoint.amp, time)
@@ -32,9 +30,15 @@ export default class Player {
   }
 
   play () {
+    this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
     // https://www.html5rocks.com/en/tutorials/audio/scheduling/
     this.now = this.audioContext.currentTime;
-    
+
+    // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
+    if (typeof this.partialData === 'string') {
+      this.partialData = JSON.parse(this.partialData)
+    }
+
     for (const partial of this.partialData) {
       const osc = this.setupOscillator(partial, partial.startTime)
       const oscObj = {
@@ -51,33 +55,11 @@ export default class Player {
       oscObj.osc.connect(this.audioContext.destination)
       // Connect gain to osc 
       oscObj.osc.connect(oscObj.gain);
-      
+
       oscObj.osc.start(this.now)
       oscObj.osc.stop(this.now + Number(oscObj.endTime))
-      oscObj.osc.onended = (src) => this.ended(src)
-    }
-    this.playing = true
-  }
-
-  stop () {
-    for (const oscObj of this.oscillators) {
-      oscObj.osc.stop()
-      oscObj.osc.disconnect(this.audioContext.destination)
-    }
-    this.reset()
-  }
-
-  ended (src) {
-    this.endedSrc.push(src)
-    if (this.endedSrc.length === this.partialData.length) {
-      this.reset()
     }
   }
-
-  reset () {
-    this.oscillators = []
-    this.endedSrc = []
-    this.playing = false
-  }
-
 }
+
+export { Player }
