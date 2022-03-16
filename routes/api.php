@@ -2,6 +2,8 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Carbon\Carbon;
+
 use App\Http\Controllers\TrackController;
 use App\Http\Controllers\PerformanceController;
 use App\Http\Controllers\ComposerController;
@@ -61,3 +63,10 @@ Route::post('/client/delete/{id}', [ClientController::class, 'delete'])
 Route::get('/client/{token}', [ClientController::class, 'get_by_token'])
   ->name('client.get_by_token');
 Route::get('/client', [ClientController::class, 'get']);
+
+Route::group(['excluded_middleware' => 'throttle:api'], function () {
+  Route::get('/time', function () {
+    $current_date = Carbon::now()->getPreciseTimestamp(3);
+    return Response::json(['time' => $current_date]);
+  });
+});
