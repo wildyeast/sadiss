@@ -49,12 +49,19 @@ class Player {
       }
       this.oscillators.push(oscObj)
     }
-    for (const oscObj of this.oscillators) {
-      // Connect osc and gain to destination
-      oscObj.gain.connect(this.audioContext.destination)
-      oscObj.osc.connect(this.audioContext.destination)
+
+    // https://stackoverflow.com/questions/59347938/webaudio-playing-two-oscillator-sounds-in-a-same-time-causes-vibration-sound
+    // Create merger to merge all osc outputs into
+    const merger = this.audioContext.createChannelMerger(this.oscillators.length)
+    // Connect merger to destination
+    merger.connect(this.audioContext.destination)
+
+    for (const [i, oscObj] of this.oscillators.entries()) {
       // Connect gain to osc 
       oscObj.osc.connect(oscObj.gain);
+
+      // Connect osc to merger (0 meaning all going to same merger output channel)
+      oscObj.osc.connect(merger, 0, i)
 
       oscObj.osc.start(this.now)
       oscObj.osc.stop(this.now + Number(oscObj.endTime))
