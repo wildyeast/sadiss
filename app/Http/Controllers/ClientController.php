@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use App\Models\Client;
 use Response;
+use Carbon\Carbon;
+use App\Models\Client;
 
 class ClientController extends Controller
 {
@@ -37,7 +38,9 @@ class ClientController extends Controller
   }
 
   public function get_by_token(Request $request) {
-    return Client::where('token', $request->token)->firstOrFail();
+    $client = Client::where('token', $request->token)->firstOrFail();
+    $current_date = Carbon::now()->getPreciseTimestamp(3);
+    return Response::json(['client' => $client, 'time' => $current_date]);
   }
 
   public function create_token() {
