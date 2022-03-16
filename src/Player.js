@@ -59,8 +59,11 @@ export default class Player {
     // https://stackoverflow.com/questions/59347938/webaudio-playing-two-oscillator-sounds-in-a-same-time-causes-vibration-sound
     // Create merger to merge all osc outputs into
     // this.merger = this.audioContext.createChannelMerger(this.oscillators.length)
-    this.merger = new ChannelMergerNode(this.audioContext, { numberOfInputs: this.oscillators.length })
+    // this.merger = new ChannelMergerNode(this.audioContext, { numberOfInputs: this.oscillators.length})
+    // console.log(this.merger)
     // Connect merger to destination
+    
+    this.merger = new DynamicsCompressorNode(this.audioContext)
     this.merger.connect(this.audioContext.destination)
 
     for (const [i, oscObj] of this.oscillators.entries()) {
@@ -68,7 +71,7 @@ export default class Player {
       oscObj.osc.connect(oscObj.gain);
 
       // Connect osc to merger (0 meaning all going to same merger output channel)
-      oscObj.osc.connect(this.merger, 0, i)
+      oscObj.osc.connect(this.merger, 0, 0)
       // oscObj.osc.connect(this.audioContext.destination)
 
       oscObj.osc.start(this.now)
@@ -88,7 +91,7 @@ export default class Player {
   ended (src) {
     this.endedSrc.push(src)
     if (this.endedSrc.length === this.partialData.length) {
-      this.merger.disconnect(this.audioContext)
+      // this.merger.disconnect(this.audioContext)
       this.reset()
     }
   }

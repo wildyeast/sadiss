@@ -3,8 +3,12 @@
     <div style="display: flex; flex-direction: column; justify-content: center">
       <button @click="player.play">Play</button>
       <button @click="register">Register</button>
-      <div v-if="countdownTime >= 0" style="display: flex; justify-content: center; font-size: 50px;">{{ countdownTime }}</div>
-      <div v-else>Track starting soon</div>
+      <div v-if="countdownTime >= 0" style="display: flex; justify-content: center; font-size: 50px;">
+        {{ countdownTime }}
+      </div>
+      <div v-else>
+        Track starting soon
+      </div>
     </div>
   </div>
 </template>
@@ -26,7 +30,7 @@ export default {
     token: null,
     partials: null,
     startTime: null,
-    serverTime: null,
+    serverTimeOffset: null,
     countdownTime: -1,
     hasStarted: false,
     // hostUrl: 'http://sadiss.test.test',
@@ -34,7 +38,7 @@ export default {
   }),
   async mounted () {
     // Fetch breakpoints from server
-    const res = await fetch (this.hostUrl + '/api/track/1')
+    const res = await fetch (this.hostUrl + '/api/track/2')
     const json = await res.json()
     const partialData = JSON.parse(json.partials)
     // Initialize player
@@ -55,12 +59,18 @@ export default {
       this.token = data.token
 
       const intervalId = window.setInterval(async () => {
+        // const localNow = dayjs.utc().valueOf()
         const clientData = await this.checkForStart();
         if (clientData.client['start_time']) {
           window.clearInterval(intervalId)
           this.startTime = clientData.client['start_time']
           this.partials = clientData.client['partials']
-          this.serverTime = clientData.time
+          for (const partial of JSON.parse(this.partials)) {
+            console.log("Partial: " + partial.index)
+          }
+          // const oneWayLatency = (dayjs.utc().valueOf() - localNow) / 2
+          this.serverTimeOffset = dayjs.utc().valueOf() - clientData.time
+          console.log(this.serverTimeOffset, clientData.time - dayjs.utc().valueOf() + this.serverTimeOffset)
           this.waitForStart()
         } else {
           console.log(clientData.client, clientData.time)
@@ -74,10 +84,9 @@ export default {
     },
     async waitForStart () {
       const intervalId = window.setInterval(async () => {
-        const nowServer = await this.getTimeFromServer();
         const startTime = dayjs.utc(this.startTime).valueOf()
         // console.log(startTime, nowServer, Date.now())
-        if (startTime <= nowServer) {
+        if (startTime <= dayjs.utc().valueOf() - this.serverTimeOffset) {
           window.clearInterval(intervalId)
           if (!this.hasStarted) {
             console.log('Starting')
@@ -87,9 +96,9 @@ export default {
           }
         } else {
           // console.log(`Starting in: ${startTime - nowServer}ms`)
-          this.countdownTime = Math.abs(Math.floor((nowServer - startTime) / 1000))
+          this.countdownTime = Math.abs(Math.floor((dayjs.utc().valueOf() - this.serverTimeOffset - startTime) / 1000))
         }
-      }, 10);
+      }, 5);
     },
 
     async getTimeFromServer () {
