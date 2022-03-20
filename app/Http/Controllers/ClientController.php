@@ -20,7 +20,7 @@ class ClientController extends Controller
     // return back()->with('flash', [
     //     'message' => 'success',
     // ]);
-    return Response::json(['token' => $client->token]);
+    return Response::json(['token' => $client->token, 'id' => $client->id]);
   }
 
   public function delete(Request $request, $id) {
