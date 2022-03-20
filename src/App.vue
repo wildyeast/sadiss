@@ -86,10 +86,11 @@ export default {
       const intervalId = window.setInterval(async () => {
         const startTime = dayjs.utc(this.startTime).valueOf()
         // console.log(startTime, nowServer, Date.now())
-        if (startTime <= dayjs.utc().valueOf() - this.serverTimeOffset) {
+        const localNow = dayjs.utc().valueOf()
+        if (startTime <= localNow - this.serverTimeOffset) {
           window.clearInterval(intervalId)
           if (!this.hasStarted) {
-            console.log('Starting')
+            console.log('Starting. Server time should be: ', localNow - this.serverTimeOffset, "Compare this to the output of other connected devices to judge how accuractely synced the starting time is.")
             this.player = new Player(this.partials)
             this.player.play()
             this.hasStarted = true;
