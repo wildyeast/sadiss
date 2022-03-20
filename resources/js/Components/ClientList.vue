@@ -3,6 +3,7 @@
     <div class="flex flex-col">
       <button @click="startTrack" class="border border-1">Start track</button>
       <button @click="removeClients" class="border border-1">Remove all registered clients</button>
+      <button @click="getRegisteredClients" class="border border-1">Refresh list</button>
       <p>IDs of registered clients</p>
       <div v-for="client of registeredClients" :key="client.id">
         {{client.id}}
@@ -56,6 +57,7 @@ export default {
 
     return {
       registeredClients,
+      getRegisteredClients,
       startTrack,
       removeClients
     }

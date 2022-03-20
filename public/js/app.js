@@ -9850,6 +9850,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
     return {
       registeredClients: registeredClients,
+      getRegisteredClients: getRegisteredClients,
       startTrack: startTrack,
       removeClients: removeClients
     };
@@ -11234,7 +11235,12 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $setup.removeClients && $setup.removeClients.apply($setup, arguments);
     }),
     "class": "border border-1"
-  }, "Remove all registered clients"), _hoisted_2, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.registeredClients, function (client) {
+  }, "Remove all registered clients"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    onClick: _cache[2] || (_cache[2] = function () {
+      return $setup.getRegisteredClients && $setup.getRegisteredClients.apply($setup, arguments);
+    }),
+    "class": "border border-1"
+  }, "Refresh list"), _hoisted_2, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.registeredClients, function (client) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
       key: client.id
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(client.id), 1
