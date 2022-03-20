@@ -10051,7 +10051,8 @@ __webpack_require__.r(__webpack_exports__);
   },
   setup: function setup(props) {
     var parsedPartialData = JSON.parse(props.partialData);
-    var player = (0,vue__WEBPACK_IMPORTED_MODULE_1__.reactive)(new _Player__WEBPACK_IMPORTED_MODULE_0__["default"](parsedPartialData));
+    var player = (0,vue__WEBPACK_IMPORTED_MODULE_1__.reactive)(new _Player__WEBPACK_IMPORTED_MODULE_0__["default"]());
+    player.partialData = parsedPartialData;
     return {
       player: player
     };
@@ -13423,7 +13424,7 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
 
 var Player = /*#__PURE__*/function () {
-  function Player(partialData) {
+  function Player() {
     _classCallCheck(this, Player);
 
     _defineProperty(this, "oscillators", []);
@@ -13436,7 +13437,7 @@ var Player = /*#__PURE__*/function () {
 
     _defineProperty(this, "playing", false);
 
-    this.partialData = partialData;
+    _defineProperty(this, "partialData", null);
   }
 
   _createClass(Player, [{
@@ -13469,13 +13470,16 @@ var Player = /*#__PURE__*/function () {
     value: function play() {
       var _this = this;
 
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)(); // https://www.html5rocks.com/en/tutorials/audio/scheduling/
-
-      this.now = this.audioContext.currentTime; // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
-
+      // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
       if (typeof this.partialData === 'string') {
         this.partialData = JSON.parse(this.partialData);
+        this.partialData.reverse();
       }
+
+      console.log("Partial Data: ", this.partialData);
+      this.audioContext = new (window.AudioContext || window.webkitAudioContext)(); // https://www.html5rocks.com/en/tutorials/audio/scheduling/
+
+      this.now = this.audioContext.currentTime;
 
       var _iterator = _createForOfIteratorHelper(this.partialData),
           _step;
@@ -13491,8 +13495,30 @@ var Player = /*#__PURE__*/function () {
             endTime: partial.endTime
           };
           this.oscillators.push(oscObj);
-        } // https://stackoverflow.com/questions/59347938/webaudio-playing-two-oscillator-sounds-in-a-same-time-causes-vibration-sound
+        } // TODO:
+        // Problem: Connecting multiple oscillators to the destination directly produces really bad audio quality on phones.
+        // At this moment, I have discovered two ways of improving the audio quality on phones.
+        // 1. Using a ChannelMergerNode: This heavily improves the audio quality, making it sound like on laptop speakers.
+        //    At the same time, partials are lost. ATM I don't know how many partials are played when all oscillators are merged
+        //    with the same ChannelMergerNode, but e.g. 12 is too much.
+        //    UPDATE: ChannelMergerNode does not actually help. AFAICT CompressorNode is our best (and maybe only) option now.
+        // 2. Using a DynamicsCompressorNode: This improves audio quality, but there is still some buzzing/crackling. No partials
+        //    are lost using this approach.
+        // What we probably need is a lot of testing and a deeper understanding of how ChannelMergerNode and DynamicsCompressorNode
+        // work. One approach might be to use the Merger if the device has only a few partials to play and to use the Compressor if there
+        // are more.
+        // UPDATE: If there are two or less partials, we can assign one partial to the left channel and one to the right channel
+        // with ChannelMergerNode, resulting in really clean sound. The distortion problem arises when more than one partial is assigned to
+        // a channel, ChannelMergerNode does not help with that at all.
+        // Currently I haven't tested the Compressor with anything but default settings. These settings don't create too much of an
+        // audible difference (if any) in sound, but I can't be sure right now.
+        // https://stackoverflow.com/questions/59347938/webaudio-playing-two-oscillator-sounds-in-a-same-time-causes-vibration-sound
+        // https://stackoverflow.com/questions/29901577/distorted-audio-in-ios-7-1-with-webaudio-api
         // Create merger to merge all osc outputs into
+        // Use one of the next two lines for ChannelMergerNode (two methods yielding same result)
+        // this.merger = this.audioContext.createChannelMerger(this.oscillators.length)
+        // this.merger = new ChannelMergerNode(this.audioContext, { numberOfInputs: this.oscillators.length})
+        // Use next line for DynamicsCompressorNode
 
       } catch (err) {
         _iterator.e(err);
@@ -13500,7 +13526,7 @@ var Player = /*#__PURE__*/function () {
         _iterator.f();
       }
 
-      this.merger = this.audioContext.createChannelMerger(this.oscillators.length); // Connect merger to destination
+      this.merger = new DynamicsCompressorNode(this.audioContext); // Connect merger (which depending on code above can be Merger or Compressor)
 
       this.merger.connect(this.audioContext.destination);
 
@@ -13514,10 +13540,16 @@ var Player = /*#__PURE__*/function () {
               _oscObj = _step2$value[1];
 
           // Connect gain to osc 
-          _oscObj.osc.connect(_oscObj.gain); // Connect osc to merger (0 meaning all going to same merger output channel)
+          _oscObj.osc.connect(_oscObj.gain); // Use next line for ChannelMergerNode
+          // const outputChannel = i % 2;
+          // console.log(outputChannel)
+          // oscObj.osc.connect(this.merger, 0, outputChannel)
+          // Use next line for DynamicsCompressorNode
 
 
-          _oscObj.osc.connect(this.merger, 0, i);
+          _oscObj.osc.connect(this.merger, 0, 0); // Use next line for connecting oscillators to destination directly
+          // oscObj.osc.connect(this.audioContext.destination)
+
 
           _oscObj.osc.start(this.now);
 
@@ -13560,7 +13592,7 @@ var Player = /*#__PURE__*/function () {
       this.endedSrc.push(src);
 
       if (this.endedSrc.length === this.partialData.length) {
-        this.merger.disconnect(this.audioContext.destination);
+        // this.merger.disconnect(this.audioContext)
         this.reset();
       }
     }

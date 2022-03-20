@@ -12,7 +12,8 @@ export default {
   },
   setup (props) {
     const parsedPartialData = JSON.parse(props.partialData)
-    const player = reactive(new Player(parsedPartialData))
+    const player = reactive(new Player())
+    player.partialData = parsedPartialData
 
     return {
       player
