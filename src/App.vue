@@ -58,7 +58,6 @@ export default {
     trackId: 1,
     availableTrackIds: [],
     deviceRegistrationId: null,
-    partial: null,
     // hostUrl: 'http://sadiss.test.test',
     hostUrl: 'http://8hz.at'
   }),
