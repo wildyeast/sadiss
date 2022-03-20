@@ -18,7 +18,7 @@
     </div>
     <div class="md:w-1/2 w-11/12 border b-white p-4">
       <p>
-        Press Register below to register this device to receive partials if 'Start track' is pressed
+        Press Register below to register this device to receive partials when 'Start track' is pressed
         in the track details page of a track in the Admin Interface. The registration ID of the device displayed after
         pressing Register will be visible in the list of registered clients in the track details page in the Admin Interface.
         This ID changes with every registration.
