@@ -5,10 +5,7 @@ export default class Player {
   merger = null
   audioContext = null
   playing = false
-
-  constructor (partialData) {
-    this.partialData = partialData
-  }
+  partialData = null
 
   setupOscillator(partial, startTime) {
     const osc = this.audioContext.createOscillator()
