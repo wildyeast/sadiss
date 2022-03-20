@@ -2,7 +2,7 @@
   <div class="app">
     <div style="display: flex; flex-direction: column; justify-content: center" class="md:w-1/2 w-11/12 border b-white p-4">
       <p>
-        Select a track ID from the dropdown below and press play to play the selected track. All partials will
+        Select a track ID from the dropdown below and press Play to play the selected track. All partials will
         be played on this device. The ID corresponds to the tracks's ID in the database (check the
         <a :href="hostUrl + '/tracks'">Admin Interface</a> for a list of available tracks).
         If the dropdown is empty, add a track to the database via the Admin Interface and afterwards refresh this page.
@@ -16,13 +16,19 @@
         <button v-else @click="player.stop" class="border b-white p-2">Stop</button>
       </div>
     </div>
-    <div>
-      <button @click="register">Register</button>
-      <div v-if="countdownTime >= 0" style="display: flex; justify-content: center; font-size: 50px;">
-        {{ countdownTime }}
-      </div>
-      <div v-else>
-        Track starting soon
+    <div class="md:w-1/2 w-11/12 border b-white p-4">
+      <p>
+        Press Register below to register this device to receive partials if 'Start track' is pressed
+        in the track details page of a track in the Admin Interface. The registration ID of the device displayed after
+        pressing Register will be visible in the list of registered clients in the track details page in the Admin Interface.
+        This ID changes with every registration.
+      </p>
+      <button @click="register" class="border b-white p-2 mt-4">Register</button>
+      <div class="mt-4">
+        <p v-if="countdownTime > 0" style="display: flex; justify-content: center; font-size: 50px;">{{ countdownTime }}</p>
+        <p v-else-if="player && !player.playing && isRegistered">Device registered with ID {{ deviceRegistrationId }}. Waiting for track start.</p>
+        <p v-else-if="player && player.playing">Track currently playing.</p>
+        <p v-else>Device not registered.</p>
       </div>
     </div>
   </div>
@@ -48,8 +54,11 @@ export default {
     serverTimeOffset: null,
     countdownTime: -1,
     hasStarted: false,
+    isRegistered: false,
     trackId: 1,
     availableTrackIds: [],
+    deviceRegistrationId: null,
+    partial: null,
     // hostUrl: 'http://sadiss.test.test',
     hostUrl: 'http://8hz.at'
   }),
@@ -75,6 +84,7 @@ export default {
       console.log(response)
       const data = await response.json()
       this.token = data.token
+      this.deviceRegistrationId = data.id
 
       const intervalId = window.setInterval(async () => {
         // const localNow = dayjs.utc().valueOf()
@@ -83,6 +93,7 @@ export default {
           window.clearInterval(intervalId)
           this.startTime = clientData.client['start_time']
           this.partials = clientData.client['partials']
+          console.log(this.partials)
           for (const partial of JSON.parse(this.partials)) {
             console.log("Partial: " + partial.index)
           }
@@ -94,6 +105,7 @@ export default {
           console.log(clientData.client, clientData.time)
         }
       }, 1500);
+      this.isRegistered = true;
     },
     async checkForStart () {
       const response = await fetch(`${this.hostUrl}/api/client/${this.token}`)
@@ -108,14 +120,16 @@ export default {
         if (startTime <= localNow - this.serverTimeOffset) {
           window.clearInterval(intervalId)
           if (!this.hasStarted) {
-            console.log('Starting. Server time should be: ', localNow - this.serverTimeOffset, "Compare this to the output of other connected devices to judge how accuractely synced the starting time is.")
-            this.player = new Player(this.partials)
+            console.log('Starting. Server time should be: ', localNow - this.serverTimeOffset, "Compare this to the output of other registered devices to judge how accurately synced the starting time is.")
+            this.player = new Player()
+            this.player.partialData = this.partials
             this.player.play()
             this.hasStarted = true;
+            this.isRegistered = false;
           }
         } else {
-          // console.log(`Starting in: ${startTime - nowServer}ms`)
-          this.countdownTime = Math.abs(Math.floor((dayjs.utc().valueOf() - this.serverTimeOffset - startTime) / 1000))
+          this.countdownTime = Math.floor((startTime - localNow + this.serverTimeOffset) / 1000)
+          console.log(this.countdownTime)
         }
       }, 5);
     },
