@@ -1,7 +1,10 @@
 <template>
   <div class="app">
     <div style="display: flex; flex-direction: column; justify-content: center">
-      <button @click="player.play">Play</button>
+      <div>
+        
+      </div>
+      <button @click="play">Play</button>
       <button @click="register">Register</button>
       <div v-if="countdownTime >= 0" style="display: flex; justify-content: center; font-size: 50px;">
         {{ countdownTime }}
@@ -100,6 +103,10 @@ export default {
           this.countdownTime = Math.abs(Math.floor((dayjs.utc().valueOf() - this.serverTimeOffset - startTime) / 1000))
         }
       }, 5);
+    },
+
+    async play () {
+      this.player.play()
     },
 
     async getTimeFromServer () {
