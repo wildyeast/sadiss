@@ -64,6 +64,7 @@ Route::get('/client/{token}', [ClientController::class, 'get_by_token'])
   ->name('client.get_by_token');
 Route::get('/client', [ClientController::class, 'get']);
 
+// Adding routes in this group disables throttling for them, preventing 429 errors. Kinda dangerous though I guess.
 Route::group(['excluded_middleware' => 'throttle:api'], function () {
   Route::get('/time', function () {
     $current_date = Carbon::now()->getPreciseTimestamp(3);
