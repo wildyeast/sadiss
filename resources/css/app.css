@@ -1,8 +1,8 @@
+/* @import '@oruga-ui/oruga-next/dist/oruga'; */
+@import 'material-icons/css/material-icons.css';
 @import 'tailwindcss/base';
 @import 'tailwindcss/components';
 @import 'tailwindcss/utilities';
-@import '@oruga-ui/oruga-next/dist/oruga';
-@import 'material-icons/css/material-icons.css';
 
 /* Below is currently not applied globally. Same class can be found in all components that use notifications. */
 .toast-notification {

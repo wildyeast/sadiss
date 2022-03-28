@@ -32,15 +32,43 @@ class ClientController extends Controller
 
   public function get(Request $request, $id=null) {
     if (isset($id)) {
-      return Client::where('id', $id)->firstOrFail();
+      $client = Client::where('id', $id)->firstOrFail();
+      return $client;
     }
     return Client::all();
   }
 
+  // Watch out for side effects when using this function:
+  // Calling this sets last_listening_time for the client with requested token
   public function get_by_token(Request $request) {
     $client = Client::where('token', $request->token)->firstOrFail();
+    $client->last_listening_time = Carbon::now();
+    $client->save();
     $current_date = Carbon::now()->getPreciseTimestamp(3);
     return Response::json(['client' => $client, 'time' => $current_date]);
+  }
+
+  // Returns all clients that have made a listening call in the last $DOWNTIME_CUTOFF_IN_SEC seconds
+  // and deletes all others.
+  // TODO: There must be a better way to do this. 
+  public function get_active_clients_delete_others(Request $request) {
+    $DOWNTIME_CUTOFF_IN_SEC = 5;
+
+    $clients = Client::all();
+    $active_clients = [];
+    foreach($clients as $i=>$client) {
+      if ($client->last_listening_time == null) {
+        continue;
+      }
+      $diff = Carbon::parse($client->last_listening_time)->diffInSeconds(Carbon::now());
+      if ($diff <= $DOWNTIME_CUTOFF_IN_SEC) {
+        array_push($active_clients, $client);
+      } else {
+        $client->delete();
+      }
+    }
+    
+    return $active_clients;
   }
 
   public function create_token() {

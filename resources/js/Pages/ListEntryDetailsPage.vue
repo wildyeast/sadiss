@@ -30,7 +30,7 @@
                 </div>
                 <!-- Track -->
                 <template v-if="category === 'tracks'">
-                  <div class="flex">
+                  <div class="flex mb-4">
                     <!-- Left hand side -->
                     <div class="flex-1">
                       <p class="mb-4 text-2xl">{{ data['title'] }}</p>
@@ -38,9 +38,13 @@
                     </div>
                     <!-- Right hand side -->
                     <div class="flex-1 flex flex-col items-center">
+                      <p>Play track on this device</p>
                       <Player :partialData="data['partials']"/>
-                      <ClientList :trackId="id" />
                     </div>
+                  </div>
+                  <!-- Below -->
+                  <div>
+                    <ClientList :trackId="id" />
                   </div>
                 </template>
                 <!-- Composer -->

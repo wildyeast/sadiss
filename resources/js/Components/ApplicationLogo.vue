@@ -1,3 +1,5 @@
 <template>
-  SADISS
+  <div>
+    SADISS
+  </div>
 </template>

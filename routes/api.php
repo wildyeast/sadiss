@@ -60,6 +60,8 @@ Route::post('/client/create', [ClientController::class, 'create'])
   ->name('client.create');
 Route::post('/client/delete/{id}', [ClientController::class, 'delete'])
   ->name('client.delete');
+Route::get('/client/active', [ClientController::class, 'get_active_clients_delete_others'])
+  ->name('client.active');
 Route::get('/client/{token}', [ClientController::class, 'get_by_token'])
   ->name('client.get_by_token');
 Route::get('/client', [ClientController::class, 'get']);
