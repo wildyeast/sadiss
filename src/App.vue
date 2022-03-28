@@ -58,9 +58,10 @@ export default {
     trackId: 1,
     availableTrackIds: [],
     deviceRegistrationId: null,
-    // hostUrl: 'http://sadiss.test.test',
+    intervalId: null,
+    hostUrl: 'http://sadiss.test.test',
     // hostUrl: 'http://8hz.at',
-    hostUrl: 'https://sadiss.net'
+    // hostUrl: 'https://sadiss.net'
   }),
   async mounted () {
     const res = await fetch (this.hostUrl + '/api/track')
@@ -86,39 +87,41 @@ export default {
       this.token = data.token
       this.deviceRegistrationId = data.id
 
-      const intervalId = window.setInterval(async () => {
-        // const localNow = dayjs.utc().valueOf()
-        const clientData = await this.checkForStart();
-        if (clientData.client['start_time']) {
-          window.clearInterval(intervalId)
-          this.startTime = clientData.client['start_time']
-          this.partials = clientData.client['partials']
-          console.log(this.partials)
-          for (const partial of JSON.parse(this.partials)) {
-            console.log("Partial: " + partial.index)
-          }
-          // const oneWayLatency = (dayjs.utc().valueOf() - localNow) / 2
-          this.serverTimeOffset = dayjs.utc().valueOf() - clientData.time
-          console.log(this.serverTimeOffset, clientData.time - dayjs.utc().valueOf() + this.serverTimeOffset)
-          this.waitForStart()
-        } else {
-          console.log(clientData.client, clientData.time)
-        }
+      // Check for start immediately, afterwards check in intervals.
+      await this.checkForStart();
+
+      this.intervalId = window.setInterval(async () => {
+        await this.checkForStart();
       }, 1500);
       this.isRegistered = true;
     },
     async checkForStart () {
       const response = await fetch(`${this.hostUrl}/api/client/${this.token}`)
-      const data = await response.json()
-      return data
+      const clientData = await response.json()
+      if (clientData.client['start_time']) {
+        window.clearInterval(this.intervalId)
+        this.startTime = clientData.client['start_time']
+        this.partials = clientData.client['partials']
+        console.log(this.partials)
+        for (const partial of JSON.parse(this.partials)) {
+          console.log("Partial: " + partial.index)
+        }
+        // const oneWayLatency = (dayjs.utc().valueOf() - localNow) / 2
+        this.serverTimeOffset = dayjs.utc().valueOf() - clientData.time
+        console.log(this.serverTimeOffset, clientData.time - dayjs.utc().valueOf() + this.serverTimeOffset)
+        this.waitForStart()
+      } else {
+        console.log(clientData.client, clientData.time)
+      }
+      return clientData
     },
     async waitForStart () {
-      const intervalId = window.setInterval(async () => {
+      this.intervalId = window.setInterval(async () => {
         const startTime = dayjs.utc(this.startTime).valueOf()
         // console.log(startTime, nowServer, Date.now())
         const localNow = dayjs.utc().valueOf()
         if (startTime <= localNow - this.serverTimeOffset) {
-          window.clearInterval(intervalId)
+          window.clearInterval(this.intervalId)
           if (!this.hasStarted) {
             console.log('Starting. Server time should be: ', localNow - this.serverTimeOffset, "Compare this to the output of other registered devices to judge how accurately synced the starting time is.")
             this.player = new Player()
