@@ -7437,6 +7437,12 @@ select {
 .border-1 {
   border-width: 1px;
 }
+.border-2 {
+  border-width: 2px;
+}
+.border-4 {
+  border-width: 4px;
+}
 .border-t {
   border-top-width: 1px;
 }
@@ -7451,6 +7457,9 @@ select {
 }
 .border-l-4 {
   border-left-width: 4px;
+}
+.border-l {
+  border-left-width: 1px;
 }
 .border-solid {
   border-style: solid;
@@ -7493,6 +7502,25 @@ select {
   --tw-border-opacity: 1;
   border-color: rgb(243 244 246 / var(--tw-border-opacity));
 }
+.border-black {
+  --tw-border-opacity: 1;
+  border-color: rgb(0 0 0 / var(--tw-border-opacity));
+}
+.border-current {
+  border-color: currentColor;
+}
+.border-t-red-400 {
+  --tw-border-opacity: 1;
+  border-top-color: rgb(248 113 113 / var(--tw-border-opacity));
+}
+.border-b-red-400 {
+  --tw-border-opacity: 1;
+  border-bottom-color: rgb(248 113 113 / var(--tw-border-opacity));
+}
+.border-l-red-400 {
+  --tw-border-opacity: 1;
+  border-left-color: rgb(248 113 113 / var(--tw-border-opacity));
+}
 .bg-white {
   --tw-bg-opacity: 1;
   background-color: rgb(255 255 255 / var(--tw-bg-opacity));
@@ -7516,6 +7544,20 @@ select {
 .bg-gray-50 {
   --tw-bg-opacity: 1;
   background-color: rgb(249 250 251 / var(--tw-bg-opacity));
+}
+.bg-transparent {
+  background-color: transparent;
+}
+.bg-black {
+  --tw-bg-opacity: 1;
+  background-color: rgb(0 0 0 / var(--tw-bg-opacity));
+}
+.bg-red-400 {
+  --tw-bg-opacity: 1;
+  background-color: rgb(248 113 113 / var(--tw-bg-opacity));
+}
+.bg-red-400\/10 {
+  background-color: rgb(248 113 113 / 0.1);
 }
 .fill-current {
   fill: currentColor;
@@ -7755,6 +7797,9 @@ select {
 .opacity-25 {
   opacity: 0.25;
 }
+.opacity-10 {
+  opacity: 0.1;
+}
 .shadow-sm {
   --tw-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
   --tw-shadow-colored: 0 1px 2px 0 var(--tw-shadow-color);
@@ -7818,6 +7863,9 @@ select {
 }
 .ease-in {
   transition-timing-function: cubic-bezier(0.4, 0, 1, 1);
+}
+.ease-linear {
+  transition-timing-function: linear;
 }
 /* Below is currently not applied globally. Same class can be found in all components that use notifications. */
 .toast-notification {

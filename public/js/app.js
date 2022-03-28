@@ -9703,7 +9703,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   setup: function setup(props) {
     var registeredClients = (0,vue__WEBPACK_IMPORTED_MODULE_2__.reactive)([]);
-    var autoGetRegisteredClientsInterval = null;
+    var autoGetRegisteredClientsInterval = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(null);
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
       getRegisteredClients();
     });
@@ -9794,7 +9794,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
-                if (autoGetRegisteredClientsInterval) {
+                if (autoGetRegisteredClientsInterval.value) {
                   _context4.next = 6;
                   break;
                 }
@@ -9803,7 +9803,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return getRegisteredClients();
 
               case 3:
-                autoGetRegisteredClientsInterval = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
+                autoGetRegisteredClientsInterval.value = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
                   return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
                     while (1) {
                       switch (_context3.prev = _context3.next) {
@@ -9822,12 +9822,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 break;
 
               case 6:
-                autoGetRegisteredClientsInterval = null;
+                autoGetRegisteredClientsInterval.value = null;
 
               case 7:
-                console.log(123);
-
-              case 8:
               case "end":
                 return _context4.stop();
             }
@@ -11298,12 +11295,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[2] || (_cache[2] = function () {
       return $setup.getRegisteredClients && $setup.getRegisteredClients.apply($setup, arguments);
     }),
-    "class": "border border-dashed p-2"
-  }, "Refresh list"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["border p-2", $setup.autoGetRegisteredClientsInterval ? 'border-b-red-400 border-l-red-400 border-t-red-400' : 'border'])
+  }, " Refresh list ", 2
+  /* CLASS */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: _cache[3] || (_cache[3] = function () {
       return $setup.autoGetRegisteredClients && $setup.autoGetRegisteredClients.apply($setup, arguments);
     }),
-    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["border-b border-t border-r border-solid p-2 bg-slate-700", $setup.autoGetRegisteredClientsInterval ? 'border-red-400' : 'border-red-100'])
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["border-b border-t border-r p-2", $setup.autoGetRegisteredClientsInterval ? 'border-red-400' : 'border-b border-t border-r'])
   }, " Auto ", 2
   /* CLASS */
   )])]), _hoisted_2, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.registeredClients, function (client) {

@@ -4,10 +4,14 @@
       <button @click="startTrack" class="border p-2">Start track</button>
       <button @click="removeClients" class="border p-2">Remove all registered clients</button>
       <div>
-        <button @click="getRegisteredClients" class="border border-dashed p-2">Refresh list</button>
+        <button @click="getRegisteredClients"
+                class="border p-2"
+                :class="autoGetRegisteredClientsInterval ? 'border-b-red-400 border-l-red-400 border-t-red-400' : 'border'">
+                Refresh list
+        </button>
         <button @click="autoGetRegisteredClients"
-                class="border-b border-t border-r border-solid p-2 bg-slate-700"
-                :class="autoGetRegisteredClientsInterval ? 'border-red-400' : 'border-red-100'">
+                class="border-b border-t border-r p-2"
+                :class="autoGetRegisteredClientsInterval ? 'border-red-400' : 'border-b border-t border-r'">
                 Auto
         </button>
       </div>
@@ -21,7 +25,7 @@
 
 <script>
 import { useForm } from '@inertiajs/inertia-vue3'
-import { onMounted, reactive } from 'vue'
+import { onMounted, reactive, ref } from 'vue'
 import Button from './Button.vue'
 export default {
   components: { Button },
@@ -30,8 +34,8 @@ export default {
   },
   setup (props) {
 
-    let registeredClients = reactive([])
-    let autoGetRegisteredClientsInterval = null
+    const registeredClients = reactive([])
+    const autoGetRegisteredClientsInterval = ref(null)
 
     onMounted (() => {
       getRegisteredClients()
@@ -56,18 +60,16 @@ export default {
     }
 
     async function autoGetRegisteredClients() {
-      if (!autoGetRegisteredClientsInterval) {
+      if (!autoGetRegisteredClientsInterval.value) {
         await getRegisteredClients();
 
-        autoGetRegisteredClientsInterval = window.setInterval(async () => {
+        autoGetRegisteredClientsInterval.value = window.setInterval(async () => {
           await getRegisteredClients();
         }, 2000)
 
-
       } else {
-        autoGetRegisteredClientsInterval = null
+        autoGetRegisteredClientsInterval.value = null
       }
-      console.log(123)
     }
 
     async function removeClients () {
