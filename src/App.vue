@@ -58,9 +58,9 @@ export default {
     availableTrackIds: [],
     deviceRegistrationId: null,
     intervalId: null, // This variable is used for the id of two different intervals. They are never active at the same time, still probably not ideal though.
-    hostUrl: 'http://sadiss.test.test',
+    // hostUrl: 'http://sadiss.test.test',
     // hostUrl: 'http://8hz.at',
-    // hostUrl: 'https://sadiss.net'
+    hostUrl: 'https://sadiss.net'
   }),
   async mounted () {
     const res = await fetch (this.hostUrl + '/api/track')
