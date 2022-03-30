@@ -53,15 +53,14 @@ export default {
     startTime: null,
     serverTimeOffset: null,
     countdownTime: -1,
-    hasStarted: false,
     isRegistered: false,
     trackId: 1,
     availableTrackIds: [],
     deviceRegistrationId: null,
     intervalId: null, // This variable is used for the id of two different intervals. They are never active at the same time, still probably not ideal though.
-    // hostUrl: 'http://sadiss.test.test',
+    hostUrl: 'http://sadiss.test.test',
     // hostUrl: 'http://8hz.at',
-    hostUrl: 'https://sadiss.net'
+    // hostUrl: 'https://sadiss.net'
   }),
   async mounted () {
     const res = await fetch (this.hostUrl + '/api/track')
@@ -122,14 +121,11 @@ export default {
         const localNow = dayjs.utc().valueOf()
         if (startTime <= localNow - this.serverTimeOffset) {
           window.clearInterval(this.intervalId)
-          if (!this.hasStarted) {
-            console.log('Starting. Server time should be: ', localNow - this.serverTimeOffset, "Compare this to the output of other registered devices to judge how accurately synced the starting time is.")
-            this.player = new Player()
-            this.player.partialData = this.partials
-            this.player.play()
-            this.hasStarted = true;
-            this.isRegistered = false;
-          }
+          console.log('Starting. Server time should be: ', localNow - this.serverTimeOffset, "Compare this to the output of other registered devices to judge how accurately synced the starting time is.")
+          this.player = new Player()
+          this.player.partialData = this.partials
+          this.player.play()
+          this.isRegistered = false;
         } else {
           this.countdownTime = Math.floor((startTime - localNow + this.serverTimeOffset) / 1000)
           console.log(this.countdownTime)
