@@ -39,6 +39,7 @@ export default {
 
     onMounted (() => {
       getRegisteredClients()
+      autoGetRegisteredClients()
     })
 
     function registerClient () {
