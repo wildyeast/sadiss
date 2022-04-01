@@ -82,7 +82,7 @@ export default class Player {
     this.merger = new DynamicsCompressorNode(this.audioContext)
 
     // Connect merger (which depending on code above can be Merger or Compressor)
-    this.merger.connect(this.audioContext.destination)
+    // this.merger.connect(this.audioContext.destination)
 
     for (const [i, oscObj] of this.oscillators.entries()) {
       // Connect gain to osc 
@@ -94,10 +94,10 @@ export default class Player {
       // oscObj.osc.connect(this.merger, 0, outputChannel)
 
       // Use next line for DynamicsCompressorNode
-      oscObj.osc.connect(this.merger, 0, 0)
+      // oscObj.gain.connect(this.merger, 0, 0)
 
       // Use next line for connecting oscillators to destination directly
-      // oscObj.osc.connect(this.audioContext.destination)
+      oscObj.gain.connect(this.audioContext.destination)
 
       oscObj.osc.start(this.now)
       oscObj.osc.stop(this.now + Number(oscObj.endTime))
