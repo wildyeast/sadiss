@@ -35,7 +35,7 @@ export default {
   setup (props) {
 
     const registeredClients = reactive([])
-    const autoGetRegisteredClientsInterval = ref(null)
+    const autoGetRegisteredClientsInterval = ref(true)
 
     onMounted (() => {
       getRegisteredClients()
