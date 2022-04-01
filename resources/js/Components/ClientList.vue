@@ -16,7 +16,7 @@
         </button>
       </div>
     </div>
-    <p>IDs of registered clients</p>
+    <p>IDs of registered clients (Total: {{ registeredClients.length }})</p>
     <div v-for="client of registeredClients" :key="client.id">
       {{client.id}}
     </div>
