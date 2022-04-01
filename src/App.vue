@@ -128,6 +128,9 @@ export default {
           this.isRegistered = false;
         } else {
           this.countdownTime = Math.floor((startTime - localNow + this.serverTimeOffset) / 1000)
+          if (this.countdownTime <= 0) {
+            this.register()
+          }
           console.log(this.countdownTime)
         }
       }, 5);
