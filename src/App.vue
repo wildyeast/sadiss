@@ -126,6 +126,7 @@ export default {
           this.player.partialData = this.partials
           this.player.play()
           this.isRegistered = false;
+          await this.register()
         } else {
           this.countdownTime = Math.floor((startTime - localNow + this.serverTimeOffset) / 1000)
           console.log(this.countdownTime)
