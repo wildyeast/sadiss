@@ -29,11 +29,10 @@ export default class Player {
     } else {
       this.partialData = partialData
     }
-    // console.log(partialData)
     this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
-    for (const partial of partialData) {
+    for (const partial of this.partialData) {
+      console.log(partial)
       const { osc, gain } = this.setupOscillator()
-
       for (const breakpoint of partial.breakpoints) {
         breakpoint.oscIndex = partial.index
         this.mergedBreakpoints.push(breakpoint)
@@ -96,7 +95,7 @@ export default class Player {
     //   this.lastScheduledBreakpointIndex++
     // }
 
-    this.play()
+    // this.play()
 
   }
 
