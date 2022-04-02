@@ -121,6 +121,7 @@ export default {
       console.log("Servertime: ", serverTime)
       console.log("Local time: ", dayjs.utc().valueOf())
       const localAheadBy = dayjs.utc().valueOf() - serverTime
+      console.log("Local ahead of server by: ", localAheadBy)
       this.intervalId = window.setInterval(async () => {
         const startTime = dayjs.utc(this.startTime).valueOf()
         // console.log(startTime, nowServer, Date.now())
