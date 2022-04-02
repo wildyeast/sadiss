@@ -116,7 +116,7 @@ export default {
     },
     async waitForStart () {
       // const sTime = await this.getTimeFromServer()
-      // console.log("Servertime: ", sTime)
+      console.log("Servertime: ", sTime)
       this.player = new Player()
       this.player.mergeBreakpoints(this.partials)
       this.intervalId = window.setInterval(async () => {
