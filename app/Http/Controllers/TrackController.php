@@ -54,7 +54,7 @@ class TrackController extends Controller
     if (isset($id)) {
       return Track::where('id', $id)->firstOrFail();
     }
-    return Track::all();
+    return Track::orderBy('id', 'desc')->get();
   }
 
   public function get_column_info (Request $request) {
