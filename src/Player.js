@@ -1,5 +1,10 @@
 // https://www.html5rocks.com/en/tutorials/audio/scheduling/
 
+const SCHEDULE_TIME = 800
+const OVERLAP = 100
+
+let lastBreakpointTime = 0
+
 export default class Player {
 
   oscillators = []
@@ -15,7 +20,14 @@ export default class Player {
   minStartTime = null
 
   setup (partialData) {
-    this.partialData = partialData
+    // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
+    if (typeof partialData === 'string') {
+      this.partialData = JSON.parse(partialData)
+      this.partialData.reverse()
+    } else {
+      this.partialData = partialData
+    }
+    // console.log(partialData)
     this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
     for (const partial of partialData) {
       const { osc, gain } = this.setupOscillator()
@@ -43,7 +55,7 @@ export default class Player {
     this.mergedBreakpoints.sort((a, b) => b.time < a.time)
 
     // let time = this.audioContext.currentTime
-    const amountOfTimeToScheduleInitially = this.minStartTime + 0.05 // in seconds
+    const amountOfTimeToScheduleInitially = SCHEDULE_TIME / 1000 // in seconds
 
     const breakpointsToSchedule = this.mergedBreakpoints.filter(breakpoint => breakpoint.time < amountOfTimeToScheduleInitially)
     // console.log("Amount of breakpoints to schedule:", breakpointsToSchedule.length)
@@ -88,33 +100,13 @@ export default class Player {
     const osc = this.audioContext.createOscillator()
     const gain = this.audioContext.createGain()
 
-
     osc.frequency.value = 0
     gain.gain.value = 0
-
-    // let time = this.now + Number(startTime);
-
-    // console.log(partial.breakpoints.length)
-
-    // for (let i = 0; i < partial.breakpoints.length; i++) {
-    //   const currentBreakpoint = partial.breakpoints[i]
-    //   // if (times[i] - times[i-1] < 0) continue
-    //   if (i > 0) {
-    //     time += (currentBreakpoint.time - partial.breakpoints[i-1].time)
-    //   }
-    //   osc.frequency.setValueAtTime(currentBreakpoint.freq, time)
-    //   gain.gain.setValueAtTime(currentBreakpoint.amp, time)
-    // }
 
     return {osc, gain}
   }
 
   play () {
-    // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
-    // if (typeof this.partialData === 'string') {
-    //   this.partialData = JSON.parse(this.partialData)
-    //   this.partialData.reverse()
-    // }
     // console.log("Partial Data: ", this.partialData)
 
 
@@ -125,34 +117,7 @@ export default class Player {
       oscObj.osc.onended = (src) => this.ended(src)
     }
     this.playing = true
-
-
-
-    this.schedulingInterval = window.setInterval(() => {
-      const breakpointsToSchedule = this.mergedBreakpoints
-        .slice(this.lastScheduledBreakpointIndex)
-        .filter(breakpoint => breakpoint.time < this.audioContext.currentTime + 0.15)
-      console.log("Amount of breakpoints to schedule: ", breakpointsToSchedule.length)
-      console.log(this.audioContext.currentTime)
-
-      // console.log(breakpointsToSchedule.map(item => item.time), this.currentTime)
-
-      for (let i = 0; i < breakpointsToSchedule.length; i++) {
-        const currentBreakpoint = breakpointsToSchedule[i]
-        // time += Number(currentBreakpoint.time)
-        // console.log(time)
-        const oscIndex = currentBreakpoint.oscIndex
-        const oscObj = this.oscillators.filter(osc => osc.index === oscIndex)[0]
-        if (!oscObj) break;
-        oscObj.osc.frequency.setValueAtTime(currentBreakpoint.freq, Number(currentBreakpoint.time))
-        oscObj.gain.gain.setValueAtTime(currentBreakpoint.amp, Number(currentBreakpoint.time))
-
-        this.lastScheduledBreakpointIndex++
-      }
-      // this.currentTime += 0.150
-      // console.log(breakpointsToSchedule.length)
-    }, 75)
-
+    this.setSchedulingInterval(SCHEDULE_TIME / 1000, SCHEDULE_TIME - OVERLAP)
   }
 
   schedule (timeInSecToScheduleInAdvance) {
@@ -160,22 +125,26 @@ export default class Player {
         .slice(this.lastScheduledBreakpointIndex)
         .filter(breakpoint => breakpoint.time < this.audioContext.currentTime + timeInSecToScheduleInAdvance)
       console.log("Amount of breakpoints to schedule: ", breakpointsToSchedule.length)
-      console.log(this.audioContext.currentTime)
+      console.log("Time", parseFloat(this.audioContext.currentTime).toFixed(3), " (+", 
+        parseFloat(this.audioContext.currentTime - lastBreakpointTime).toFixed(3), ")")
+      lastBreakpointTime = this.audioContext.currentTime
+      console.log("")
 
-      // console.log(breakpointsToSchedule.map(item => item.time), this.currentTime)
-
-      for (let i = 0; i < breakpointsToSchedule.length; i++) {
-        const currentBreakpoint = breakpointsToSchedule[i]
-        // time += Number(currentBreakpoint.time)
-        // console.log(time)
+      for (const currentBreakpoint of breakpointsToSchedule) {
         const oscIndex = currentBreakpoint.oscIndex
-        const oscObj = this.oscillators.filter(osc => osc.index === oscIndex)[0]
+        const oscObj = this.oscillators.find(osc => osc.index === oscIndex)
         if (!oscObj) break;
         oscObj.osc.frequency.setValueAtTime(currentBreakpoint.freq, Number(currentBreakpoint.time))
         oscObj.gain.gain.setValueAtTime(currentBreakpoint.amp, Number(currentBreakpoint.time))
 
         this.lastScheduledBreakpointIndex++
       }
+  }
+
+  setSchedulingInterval (timeInSecToScheduleInAdvance, intervalTimeInMs) {
+    this.schedulingInterval = window.setInterval(() => {
+      this.schedule(timeInSecToScheduleInAdvance)
+    }, intervalTimeInMs)
   }
 
   stop () {

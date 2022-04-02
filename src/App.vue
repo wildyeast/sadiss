@@ -58,9 +58,9 @@ export default {
     availableTrackIds: [],
     deviceRegistrationId: null,
     intervalId: null, // This variable is used for the id of two different intervals. They are never active at the same time, still probably not ideal though.
-    // hostUrl: 'http://sadiss.test.test',
+    hostUrl: 'http://sadiss.test.test',
     // hostUrl: 'http://8hz.at',
-    hostUrl: 'https://sadiss.net'
+    // hostUrl: 'https://sadiss.net'
   }),
   async mounted () {
     const res = await fetch (this.hostUrl + '/api/track')
@@ -115,12 +115,12 @@ export default {
       return clientData
     },
     async waitForStart () {
+      this.player = new Player()
+      this.player.setup(this.partials)
       this.intervalId = window.setInterval(async () => {
         const startTime = dayjs.utc(this.startTime).valueOf()
         // console.log(startTime, nowServer, Date.now())
         const localNow = dayjs.utc().valueOf()
-        this.player = new Player()
-        this.player.setup(this.partials)
 
         if (startTime <= localNow - this.serverTimeOffset) {
           window.clearInterval(this.intervalId)
