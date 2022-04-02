@@ -119,13 +119,16 @@ export default {
         const startTime = dayjs.utc(this.startTime).valueOf()
         // console.log(startTime, nowServer, Date.now())
         const localNow = dayjs.utc().valueOf()
+        this.player = new Player()
+        this.player.setup(this.partials)
+
         if (startTime <= localNow - this.serverTimeOffset) {
           window.clearInterval(this.intervalId)
           console.log('Starting. Server time should be: ', localNow - this.serverTimeOffset, "Compare this to the output of other registered devices to judge how accurately synced the starting time is.")
-          this.player = new Player()
-          this.player.partialData = this.partials
-          this.player.play()
+          // this.player.partialData = this.partials
+          // this.player.play()
           this.isRegistered = false;
+          // Reregister when done
           await this.register()
         } else {
           this.countdownTime = Math.floor((startTime - localNow + this.serverTimeOffset) / 1000)
@@ -139,8 +142,7 @@ export default {
       const res = await fetch (this.hostUrl + '/api/track/' + this.trackId)
       const json = await res.json()
       const partialData = JSON.parse(json.partials)
-      this.player.partialData = partialData
-      this.player.play()
+      this.player.setup(partialData)
     },
 
     async getTimeFromServer () {
