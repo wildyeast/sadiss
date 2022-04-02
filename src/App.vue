@@ -115,8 +115,10 @@ export default {
       return clientData
     },
     async waitForStart () {
+      // const sTime = await this.getTimeFromServer()
+      // console.log("Servertime: ", sTime)
       this.player = new Player()
-      // this.player.setup(this.partials)
+      this.player.mergeBreakpoints(this.partials)
       this.intervalId = window.setInterval(async () => {
         const startTime = dayjs.utc(this.startTime).valueOf()
         // console.log(startTime, nowServer, Date.now())

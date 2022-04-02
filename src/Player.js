@@ -21,7 +21,7 @@ export default class Player {
   lastScheduledBreakpointIndex = 0
   minStartTime = null
 
-  setup (partialData) {
+  mergeBreakpoints(partialData) {
     // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
     if (typeof partialData === 'string') {
       this.partialData = JSON.parse(partialData)
@@ -29,14 +29,19 @@ export default class Player {
     } else {
       this.partialData = partialData
     }
-    this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
     for (const partial of this.partialData) {
-      console.log(partial)
-      const { osc, gain } = this.setupOscillator()
       for (const breakpoint of partial.breakpoints) {
         breakpoint.oscIndex = partial.index
         this.mergedBreakpoints.push(breakpoint)
       }
+    }
+  }
+
+  setup () {
+    this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
+    for (const partial of this.partialData) {
+      // console.log(partial)
+      const { osc, gain } = this.setupOscillator()
       
       const oscObj = {
         osc,
