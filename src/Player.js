@@ -1,9 +1,11 @@
 // https://www.html5rocks.com/en/tutorials/audio/scheduling/
 
 const SCHEDULE_TIME = 800
-const OVERLAP = 100
+const OVERLAP = 0
 
 let lastBreakpointTime = 0
+
+const prepared = []
 
 export default class Player {
 
@@ -120,10 +122,32 @@ export default class Player {
     this.setSchedulingInterval(SCHEDULE_TIME / 1000, SCHEDULE_TIME - OVERLAP)
   }
 
+  prepare (timeInSecToScheduleInAdvance) {
+
+    const breakpointsToSchedule = []
+    for (const bp of this.mergedBreakpoints) {
+      if (bp.time >= this.audioContext.currentTime && bp.time < this.audioContext.currentTime + timeInSecToScheduleInAdvance) {
+        breakpointsToSchedule.push(bp)
+      }
+    }
+
+    /*
+    const breakpointsToSchedule2 = this.mergedBreakpoints
+      .slice(this.lastScheduledBreakpointIndex)
+      .filter(breakpoint => breakpoint.time < this.audioContext.currentTime + timeInSecToScheduleInAdvance)
+    */
+    // prepared.push(breakpointsToSchedule)
+    console.log(' ')
+    //console.log('index', this.lastScheduledBreakpointIndex)
+    console.log(breakpointsToSchedule)
+    return breakpointsToSchedule
+    /*for (const currentBreakpoint of breakpointsToSchedule) {
+      this.lastScheduledBreakpointIndex++
+    }*/
+  }
+
   schedule (timeInSecToScheduleInAdvance) {
-    const breakpointsToSchedule = this.mergedBreakpoints
-        .slice(this.lastScheduledBreakpointIndex)
-        .filter(breakpoint => breakpoint.time < this.audioContext.currentTime + timeInSecToScheduleInAdvance)
+      const breakpointsToSchedule = this.prepare(timeInSecToScheduleInAdvance)
       console.log("Amount of breakpoints to schedule: ", breakpointsToSchedule.length)
       console.log("Time", parseFloat(this.audioContext.currentTime).toFixed(3), " (+", 
         parseFloat(this.audioContext.currentTime - lastBreakpointTime).toFixed(3), ")")
@@ -137,7 +161,7 @@ export default class Player {
         oscObj.osc.frequency.setValueAtTime(currentBreakpoint.freq, Number(currentBreakpoint.time))
         oscObj.gain.gain.setValueAtTime(currentBreakpoint.amp, Number(currentBreakpoint.time))
 
-        this.lastScheduledBreakpointIndex++
+        // this.lastScheduledBreakpointIndex++
       }
   }
 
@@ -158,6 +182,7 @@ export default class Player {
     this.endedSrc.push(src)
     if (this.endedSrc.length === this.partialData.length) {
       // this.merger.disconnect(this.audioContext)
+      console.log('prepared', prepared)
       this.reset()
     }
   }
