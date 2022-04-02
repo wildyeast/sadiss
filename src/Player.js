@@ -1,7 +1,7 @@
 // https://www.html5rocks.com/en/tutorials/audio/scheduling/
 
 const SCHEDULE_TIME = 800
-const OVERLAP = 0
+const OVERLAP = 200
 
 let lastBreakpointTime = 0
 
@@ -59,24 +59,26 @@ export default class Player {
     // let time = this.audioContext.currentTime
     const amountOfTimeToScheduleInitially = SCHEDULE_TIME / 1000 // in seconds
 
-    const breakpointsToSchedule = this.mergedBreakpoints.filter(breakpoint => breakpoint.time < amountOfTimeToScheduleInitially)
-    // console.log("Amount of breakpoints to schedule:", breakpointsToSchedule.length)
+    // const breakpointsToSchedule = this.mergedBreakpoints.filter(breakpoint => breakpoint.time < amountOfTimeToScheduleInitially)
+    // // console.log("Amount of breakpoints to schedule:", breakpointsToSchedule.length)
 
-    for (let i = 0; i < breakpointsToSchedule.length; i++) {
-      const currentBreakpoint = breakpointsToSchedule[i]
-      // time += Number(currentBreakpoint.time)
-      // console.log(time)
-      const oscIndex = currentBreakpoint.oscIndex
-      const oscObj = this.oscillators.filter(osc => osc.index === oscIndex)[0]
-      if (!oscObj) break;
-      oscObj.osc.frequency.setValueAtTime(currentBreakpoint.freq, Number(currentBreakpoint.time))
-      oscObj.gain.gain.setValueAtTime(currentBreakpoint.amp, Number(currentBreakpoint.time))
+    // for (let i = 0; i < breakpointsToSchedule.length; i++) {
+    //   const currentBreakpoint = breakpointsToSchedule[i]
+    //   // time += Number(currentBreakpoint.time)
+    //   // console.log(time)
+    //   const oscIndex = currentBreakpoint.oscIndex
+    //   const oscObj = this.oscillators.filter(osc => osc.index === oscIndex)[0]
+    //   if (!oscObj) break;
+    //   oscObj.osc.frequency.setValueAtTime(currentBreakpoint.freq, Number(currentBreakpoint.time))
+    //   oscObj.gain.gain.setValueAtTime(currentBreakpoint.amp, Number(currentBreakpoint.time))
 
-      this.lastScheduledBreakpointIndex++
-    }
+    //   this.lastScheduledBreakpointIndex++
+    // }
+
+    // this.schedule(SCHEDULE_TIME)
     
     // this.currentTime = amountOfTimeToScheduleInitially
-    console.log("Initial breakpoints set. Starting scheduling. lastScheduledBreakpointIndex:", this.lastScheduledBreakpointIndex)
+    // console.log("Initial breakpoints set. Starting scheduling. lastScheduledBreakpointIndex:", this.lastScheduledBreakpointIndex)
 
     // for (let i = 0; i < initiallySetBreakpointsCount; i++) {
     //   const currentBreakpoint = this.mergedBreakpoints[i]
@@ -130,6 +132,8 @@ export default class Player {
         breakpointsToSchedule.push(bp)
       }
     }
+
+    
 
     /*
     const breakpointsToSchedule2 = this.mergedBreakpoints

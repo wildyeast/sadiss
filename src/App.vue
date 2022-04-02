@@ -10,7 +10,7 @@
       <div class="flex flex-row justify-between items-center py-4">
         <label>Select a track ID</label>
         <select v-model="trackId">
-          <option v-for="id of availableTrackIds" :key="id">{{ id }}</option>
+          <option v-for="track of availableTracks" :key="track.id">{{ track.id }} - {{ track.title }}</option>
         </select>
         <button v-if="player && !player.playing" @click="play" class="border b-white p-2">Play</button>
         <button v-else @click="player.stop" class="border b-white p-2">Stop</button>
@@ -55,7 +55,7 @@ export default {
     countdownTime: -1,
     isRegistered: false,
     trackId: 1,
-    availableTrackIds: [],
+    availableTracks: [],
     deviceRegistrationId: null,
     intervalId: null, // This variable is used for the id of two different intervals. They are never active at the same time, still probably not ideal though.
     hostUrl: 'http://sadiss.test.test',
@@ -65,7 +65,7 @@ export default {
   async mounted () {
     const res = await fetch (this.hostUrl + '/api/track')
     const json = await res.json()
-    this.availableTrackIds = json.map(track => track.id)
+    this.availableTracks = json
 
     // Initialize player
     this.player = new Player()
