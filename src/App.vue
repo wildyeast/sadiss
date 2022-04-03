@@ -81,7 +81,7 @@ export default {
         },
         body: JSON.stringify({performance_id: 1})
       })
-      console.log(response)
+      // console.log(response)
       const data = await response.json()
       this.token = data.token
       this.deviceRegistrationId = data.id
@@ -101,9 +101,9 @@ export default {
         window.clearInterval(this.intervalId)
         this.startTime = clientData.client['start_time']
         this.partials = clientData.client['partials']
-        console.log(this.partials)
+        // console.log(this.partials)
         for (const partial of JSON.parse(this.partials)) {
-          console.log("Partial: " + partial.index)
+          // console.log("Partial: " + partial.index)
         }
         // const oneWayLatency = (dayjs.utc().valueOf() - localNow) / 2
         this.serverTimeOffset = dayjs.utc().valueOf() - clientData.time
@@ -129,7 +129,7 @@ export default {
 
         if (startTime <= localNow - localAheadBy) {
           window.clearInterval(this.intervalId)
-          console.log('Starting. Server time should be: ', localNow - this.serverTimeOffset, "Compare this to the output of other registered devices to judge how accurately synced the starting time is.")
+          // console.log('Starting. Server time should be: ', localNow - this.serverTimeOffset, "Compare this to the output of other registered devices to judge how accurately synced the starting time is.")
           // this.player.partialData = this.partials
           this.player.setup(this.partials)
           this.player.play()
@@ -138,7 +138,7 @@ export default {
           await this.register()
         } else {
           this.countdownTime = Math.floor((startTime - localNow + this.serverTimeOffset) / 1000)
-          console.log(this.countdownTime)
+          // console.log(this.countdownTime)
         }
       }, 5);
     },

@@ -145,10 +145,11 @@ export default class Player {
       .filter(breakpoint => breakpoint.time < this.audioContext.currentTime + timeInSecToScheduleInAdvance)
     */
     // prepared.push(breakpointsToSchedule)
-    console.log(' ')
-    //console.log('index', this.lastScheduledBreakpointIndex)
-    console.log(breakpointsToSchedule)
-    return breakpointsToSchedule
+
+    // console.log(' ')
+    // console.log(breakpointsToSchedule)
+    // return breakpointsToSchedule
+
     /*for (const currentBreakpoint of breakpointsToSchedule) {
       this.lastScheduledBreakpointIndex++
     }*/
@@ -156,11 +157,11 @@ export default class Player {
 
   schedule (timeInSecToScheduleInAdvance) {
       const breakpointsToSchedule = this.prepare(timeInSecToScheduleInAdvance)
-      console.log("Amount of breakpoints to schedule: ", breakpointsToSchedule.length)
-      console.log("Time", parseFloat(this.audioContext.currentTime).toFixed(3), " (+", 
-        parseFloat(this.audioContext.currentTime - lastBreakpointTime).toFixed(3), ")")
-      lastBreakpointTime = this.audioContext.currentTime
-      console.log("")
+      // console.log("Amount of breakpoints to schedule: ", breakpointsToSchedule.length)
+      // console.log("Time", parseFloat(this.audioContext.currentTime).toFixed(3), " (+", 
+      //   parseFloat(this.audioContext.currentTime - lastBreakpointTime).toFixed(3), ")")
+      // lastBreakpointTime = this.audioContext.currentTime
+      // console.log("")
 
       for (const currentBreakpoint of breakpointsToSchedule) {
         const oscIndex = currentBreakpoint.oscIndex
@@ -190,7 +191,7 @@ export default class Player {
     this.endedSrc.push(src)
     if (this.endedSrc.length === this.partialData.length) {
       // this.merger.disconnect(this.audioContext)
-      console.log('prepared', prepared)
+      // console.log('prepared', prepared)
       this.reset()
     }
   }
