@@ -101,8 +101,8 @@ export default {
         window.clearInterval(this.intervalId)
         this.startTime = clientData.client['start_time']
         this.partials = clientData.client['partials']
-        this.serverTimeOffset = dayjs.utc().valueOf() - clientData.time
-        console.log(this.serverTimeOffset, clientData.time - dayjs.utc().valueOf() + this.serverTimeOffset)
+        // this.serverTimeOffset = dayjs.utc().valueOf() - clientData.time
+        // console.log(this.serverTimeOffset, clientData.time - dayjs.utc().valueOf() + this.serverTimeOffset)
         this.waitForStart()
       } else {
         console.log(clientData.client, clientData.time)
@@ -110,16 +110,19 @@ export default {
       return clientData
     },
     now () {
-      return new Date().valueOf() + this.serverTimeOffset
+      return new Date().valueOf()
     },
     async waitForStart () {
       this.player = new Player()
       this.player.mergeBreakpoints(this.partials)
-
       const startTimeUnix = dayjs.utc(this.startTime).valueOf()
+      const serverTime = await this.getTimeFromServer()
+      const offset = serverTime - this.now()
+      console.log('st', serverTime)
+      console.log('local with offset', this.now() + offset)
       let countdown = true
       while (countdown) {
-        if (this.now() >= startTimeUnix) {
+        if (this.now() + offset >= startTimeUnix) {
           countdown = false
         }
         this.countdownTime = Math.floor((startTimeUnix - this.now()) / 1000)
