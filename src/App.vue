@@ -127,7 +127,7 @@ export default {
         // console.log(startTime, nowServer, Date.now())
         const localNow = dayjs.utc().valueOf()
 
-        if (startTime <= localNow - this.serverTimeOffset - localAheadBy) {
+        if (startTime <= localNow - localAheadBy) {
           window.clearInterval(this.intervalId)
           console.log('Starting. Server time should be: ', localNow - this.serverTimeOffset, "Compare this to the output of other registered devices to judge how accurately synced the starting time is.")
           // this.player.partialData = this.partials
