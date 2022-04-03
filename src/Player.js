@@ -1,7 +1,7 @@
 // https://www.html5rocks.com/en/tutorials/audio/scheduling/
 
 const SCHEDULE_TIME = 800
-const OVERLAP = 200
+const OVERLAP = 400
 
 let lastBreakpointTime = 0
 
@@ -19,6 +19,7 @@ export default class Player {
   schedulingInterval = null
   currentTime = 0
   lastScheduledBreakpointIndex = 0
+  oscillatorEndTimes = []
 
   mergeBreakpoints(partialData) {
     // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
@@ -33,6 +34,12 @@ export default class Player {
         breakpoint.oscIndex = partial.index
         this.mergedBreakpoints.push(breakpoint)
       }
+      this.oscillatorEndTimes.push(
+        {
+          oscIndex: partial.index,
+          endTime: Number(partial.endTime)
+        }
+      )
     }
     this.mergedBreakpoints.sort((a, b) => b.time < a.time)
   }
@@ -52,7 +59,7 @@ export default class Player {
       osc,
       gain,
       index: partialIndex,
-      // endTime: Number(partial.endTime),
+      endTime: this.oscillatorEndTimes.find(el => el.oscIndex === partialIndex).endTime,
     }
 
     oscObj.osc.connect(oscObj.gain);
@@ -86,6 +93,7 @@ export default class Player {
 
   schedule (timeInSecToScheduleInAdvance) {
       const breakpointsToSchedule = this.prepare(timeInSecToScheduleInAdvance)
+      console.log("Amount of oscillators currently active: ", this.oscillators.length)
       console.log("Amount of breakpoints to schedule: ", breakpointsToSchedule.length)
       console.log("Time", parseFloat(this.audioContext.currentTime).toFixed(3), " (+", 
         parseFloat(this.audioContext.currentTime - lastBreakpointTime).toFixed(3), ")")
@@ -98,6 +106,8 @@ export default class Player {
         if (!oscObj) {
           oscObj = this.setupOscillator(oscIndex)
           oscObj.osc.start()
+          oscObj.osc.stop(oscObj.endTime)
+          oscObj.osc.onended = (src) => this.ended(src, oscObj.index)
         }
         oscObj.osc.frequency.setValueAtTime(currentBreakpoint.freq, Number(currentBreakpoint.time))
         oscObj.gain.gain.setValueAtTime(currentBreakpoint.amp, Number(currentBreakpoint.time))
@@ -118,8 +128,10 @@ export default class Player {
     this.reset()
   }
 
-  ended (src) {
+  ended (src, idx) {
     this.endedSrc.push(src)
+    const realIdx = this.oscillators.indexOf(this.oscillators.find(el => el.index === idx))
+    this.oscillators.splice(realIdx, 1)
     if (this.endedSrc.length === this.partialData.length) {
       // this.merger.disconnect(this.audioContext)
       // console.log('prepared', prepared)
