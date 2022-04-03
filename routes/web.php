@@ -26,11 +26,6 @@ Route::get('/', function () {
     return redirect()->route('tracks');
 });
 
-Route::get('/trigger/{data}', function ($data) {
-  echo "<p>You have sent $data.</p>";
-});
-
-
 Route::middleware(['auth', 'verified'])->group(function () {
   Route::inertia('dashboard', 'Dashboard')
     ->name('dashboard');

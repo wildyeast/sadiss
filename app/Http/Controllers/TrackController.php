@@ -8,6 +8,8 @@ use App\Models\Track;
 use App\Models\Client;
 use Response;
 
+use App\Providers\TrackStarted;
+use Illuminate\Support\Facades\Event;
 
 class TrackController extends Controller
 {
@@ -94,6 +96,13 @@ class TrackController extends Controller
       $client->save();
     }
     return Response::json(['data' => $chunks]);
+  }
+
+  public function start_track_real (Request $request) {
+    $data = "TestData";
+
+    event(new TrackStarted($data));
+
   }
 
   /**

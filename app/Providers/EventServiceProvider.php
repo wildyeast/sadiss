@@ -18,9 +18,9 @@ class EventServiceProvider extends ServiceProvider
         Registered::class => [
             SendEmailVerificationNotification::class,
         ],
-        // TrackStarted::class => [
-        //     SendTrackStartNotification::class,
-        // ]
+        TrackStarted::class => [
+            SendTrackStartNotification::class,
+        ]
     ];
 
     /**

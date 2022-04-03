@@ -33,6 +33,8 @@ Route::post('/track/edit/{id}', [TrackController::class, 'edit'])
   ->name('track.edit');
 Route::post('/track/{id}/start', [TrackController::class, 'start_track'])
   ->name('track.start');
+Route::post('/track/{id}/start_real', [TrackController::class, 'start_track_real'])
+  ->name('track.startreal');
 Route::get('/track', [TrackController::class, 'get']);
 Route::get('/track/{id}', [TrackController::class, 'get']);
 
