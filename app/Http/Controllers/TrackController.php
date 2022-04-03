@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Track;
 use App\Models\Client;
+use Carbon\Carbon;
 use Response;
 
 
@@ -87,12 +88,15 @@ class TrackController extends Controller
         $counter = 0;
       }
     }
+
+    $startTime = Carbon::now()->addSeconds(8);
     foreach($clients as $i=>$value) {
       $client = Client::where('id', $value->id)->firstOrFail();
       $client->partials = $chunks[$i];
-      $client->start_time = date('Y-m-d H:i:s', strtotime('+ 15 second'));
+      $client->start_time = $startTime;
       $client->save();
     }
+
     return Response::json(['data' => $chunks]);
   }
 
