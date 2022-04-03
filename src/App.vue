@@ -117,6 +117,7 @@ export default {
     async waitForStart () {
       this.player = new Player()
       this.player.mergeBreakpoints(this.partials)
+      
       const serverTime = await this.getTimeFromServer()
       console.log("Servertime: ", serverTime)
       console.log("Local time: ", dayjs.utc().valueOf())
