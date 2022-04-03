@@ -66,7 +66,7 @@ export default class Player {
   play () {
     // console.log("Partial Data: ", this.partialData)
     for (const oscObj of this.oscillators) {
-      oscObj.osc.start(0)
+      // oscObj.osc.start(0)
       oscObj.osc.stop(oscObj.endTime)
       oscObj.osc.onended = (src) => this.ended(src)
     }
@@ -90,7 +90,7 @@ export default class Player {
       console.log("Time", parseFloat(this.audioContext.currentTime).toFixed(3), " (+", 
         parseFloat(this.audioContext.currentTime - lastBreakpointTime).toFixed(3), ")")
       lastBreakpointTime = this.audioContext.currentTime
-      console.log("")
+      console.log(" ")
 
       for (const currentBreakpoint of breakpointsToSchedule) {
         const oscIndex = currentBreakpoint.oscIndex
