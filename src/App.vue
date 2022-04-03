@@ -69,6 +69,9 @@ export default {
     const json = await res.json()
     this.availableTracks = json
 
+    const serverTime = await this.getTimeFromServer()
+    this.serverTimeOffset = serverTime - this.now()
+
     // Initialize player
     this.player = new Player()
 
@@ -118,14 +121,10 @@ export default {
       this.player = new Player()
       this.player.mergeBreakpoints(this.partials)
       const startTimeUnix = dayjs.utc(this.startTime).valueOf()
-      const serverTime = await this.getTimeFromServer()
-      const offset = serverTime - this.now()
-      this.print = 'starttime ' + startTimeUnix + ' serverTime ' + serverTime + ' local with offset ' + (this.now() + offset)
-      console.log('st', serverTime)
-      console.log('local with offset', this.now() + offset)
+      this.print = 'starttime ' + startTimeUnix + ' serverTime ' + serverTime + ' local with offset ' + (this.now() + this.serverTimeOffset)
       let countdown = true
       while (countdown) {
-        if (this.now() + offset >= startTimeUnix) {
+        if (this.now() + this.serverTimeOffset >= startTimeUnix) {
           countdown = false
         }
         this.countdownTime = Math.floor((startTimeUnix - this.now()) / 1000)
