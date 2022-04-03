@@ -29,6 +29,7 @@
         <p v-else-if="player && !player.playing && isRegistered">Device registered with ID {{ deviceRegistrationId }}. Waiting for track start.</p>
         <p v-else-if="player && player.playing">Track currently playing.</p>
         <p v-else>Device not registered.</p>
+        {{ print }}
       </div>
     </div>
   </div>
@@ -60,7 +61,8 @@ export default {
     intervalId: null, // This variable is used for the id of two different intervals. They are never active at the same time, still probably not ideal though.
     // hostUrl: 'http://sadiss.test.test',
     // hostUrl: 'http://8hz.at',
-    hostUrl: 'https://sadiss.net'
+    hostUrl: 'https://sadiss.net',
+    print: ''
   }),
   async mounted () {
     const res = await fetch (this.hostUrl + '/api/track')
@@ -118,6 +120,7 @@ export default {
       const startTimeUnix = dayjs.utc(this.startTime).valueOf()
       const serverTime = await this.getTimeFromServer()
       const offset = serverTime - this.now()
+      this.print = 'starttime ' + startTimeUnix + ' serverTime ' + serverTime + ' local with offset ' + (this.now() + offset)
       console.log('st', serverTime)
       console.log('local with offset', this.now() + offset)
       let countdown = true
