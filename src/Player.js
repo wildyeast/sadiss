@@ -1,7 +1,7 @@
 // https://www.html5rocks.com/en/tutorials/audio/scheduling/
 
-const SCHEDULE_TIME = 800
-const OVERLAP = 200
+const SCHEDULE_TIME = 200
+const OVERLAP = 50
 
 let lastBreakpointTime = 0
 
