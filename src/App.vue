@@ -42,6 +42,9 @@ dayjs.extend(dayjsPluginUTC)
 
 import Player from './Player'
 
+import Echo from 'laravel-echo'
+import Pusher from 'pusher-js'
+
 export default {
   name: 'App',
   components: { },
@@ -63,12 +66,28 @@ export default {
     hostUrl: 'https://sadiss.net'
   }),
   async mounted () {
-    const res = await fetch (this.hostUrl + '/api/track')
-    const json = await res.json()
-    this.availableTracks = json
+    // const res = await fetch (this.hostUrl + '/api/track')
+    // const json = await res.json()
+    // this.availableTracks = json
 
-    // Initialize player
-    this.player = new Player()
+    // // Initialize player
+    // this.player = new Player()
+
+
+    window.Echo = new Echo({
+      broadcaster: 'pusher',
+      key: 'laravel_rdb',
+      cluster: 'mt1',
+      wsHost: window.location.hostname,
+      wsPort: 6001,
+      forceTLS: false,
+      disableStats: true
+    });
+
+    window.Echo.channel('TestChannel')
+            .listen('.TestEvent', (e) => {
+                console.log(e)
+            })
 
   },
   methods: {

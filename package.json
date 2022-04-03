@@ -9,7 +9,10 @@
   "dependencies": {
     "dayjs": "^1.11.0",
     "dayjs-plugin-utc": "^0.1.2",
-    "vue": "^3.2.31"
+    "laravel-echo": "^1.11.4",
+    "pusher-js": "^7.0.6",
+    "vue": "^3.2.31",
+    "vue-echo-laravel": "^0.1.0"
   },
   "devDependencies": {
     "@vitejs/plugin-vue": "^2.2.2",
