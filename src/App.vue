@@ -117,22 +117,23 @@ export default {
     async waitForStart () {
       this.player = new Player()
       this.player.mergeBreakpoints(this.partials)
-      
+
       const serverTime = await this.getTimeFromServer()
       console.log("Servertime: ", serverTime)
       console.log("Local time: ", dayjs.utc().valueOf())
       const localAheadBy = dayjs.utc().valueOf() - serverTime
       console.log("Local ahead of server by: ", localAheadBy)
       this.intervalId = window.setInterval(async () => {
+        const serverTimeActual = await this.getTimeFromServer()
         const startTime = dayjs.utc(this.startTime).valueOf()
         // console.log(startTime, nowServer, Date.now())
         const localNow = dayjs.utc().valueOf()
 
-        if (startTime <= localNow - localAheadBy) {
+        if (startTime <= serverTimeActual) {
           window.clearInterval(this.intervalId)
           // console.log('Starting. Server time should be: ', localNow - this.serverTimeOffset, "Compare this to the output of other registered devices to judge how accurately synced the starting time is.")
           // this.player.partialData = this.partials
-          this.player.setup(this.partials)
+          this.player.setup()
           this.player.play()
           this.isRegistered = false;
           // Reregister when done
