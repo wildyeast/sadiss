@@ -61,18 +61,11 @@ export default {
     availableTracks: [],
     deviceRegistrationId: null,
     intervalId: null, // This variable is used for the id of two different intervals. They are never active at the same time, still probably not ideal though.
-    // hostUrl: 'http://sadiss.test.test',
+    hostUrl: 'http://sadiss.test.test',
     // hostUrl: 'http://8hz.at',
-    hostUrl: 'https://sadiss.net'
+    // hostUrl: 'https://sadiss.net'
   }),
   async mounted () {
-    // const res = await fetch (this.hostUrl + '/api/track')
-    // const json = await res.json()
-    // this.availableTracks = json
-
-    // // Initialize player
-    // this.player = new Player()
-
 
     window.Echo = new Echo({
       broadcaster: 'pusher',
@@ -84,10 +77,17 @@ export default {
       disableStats: true
     });
 
-    window.Echo.channel('TestChannel')
-            .listen('.TestEvent', (e) => {
-                console.log(e)
-            })
+    // window.Echo.channel('EventTriggered')
+    //   .listen('.TrackStarted', (e) => {
+    //       console.log(e)
+    //   })
+
+    const res = await fetch (this.hostUrl + '/api/track')
+    const json = await res.json()
+    this.availableTracks = json
+
+    // Initialize player
+    this.player = new Player()
 
   },
   methods: {
@@ -117,16 +117,18 @@ export default {
       const response = await fetch(`${this.hostUrl}/api/client/${this.token}`)
       const clientData = await response.json()
       if (clientData.client['start_time']) {
-        window.clearInterval(this.intervalId)
-        this.startTime = clientData.client['start_time']
+
+        // window.clearInterval(this.intervalId)
+        // this.startTime = clientData.client['start_time']
+        // // console.log(this.partials)
+        // for (const partial of JSON.parse(this.partials)) {
+          //   // console.log("Partial: " + partial.index)
+        // }
+        // // const oneWayLatency = (dayjs.utc().valueOf() - localNow) / 2
+        // this.serverTimeOffset = dayjs.utc().valueOf() - clientData.time
+        // console.log(this.serverTimeOffset, clientData.time - dayjs.utc().valueOf() + this.serverTimeOffset)
+
         this.partials = clientData.client['partials']
-        // console.log(this.partials)
-        for (const partial of JSON.parse(this.partials)) {
-          // console.log("Partial: " + partial.index)
-        }
-        // const oneWayLatency = (dayjs.utc().valueOf() - localNow) / 2
-        this.serverTimeOffset = dayjs.utc().valueOf() - clientData.time
-        console.log(this.serverTimeOffset, clientData.time - dayjs.utc().valueOf() + this.serverTimeOffset)
         this.waitForStart()
       } else {
         console.log(clientData.client, clientData.time)
@@ -137,45 +139,52 @@ export default {
       this.player = new Player()
       this.player.mergeBreakpoints(this.partials)
 
-      const times = []
-
-      for (let i = 0; i < 10; i++) {
-        const t1 = dayjs.utc().valueOf()
-        let sTime = await this.getTimeFromServer()
-        const t2 = dayjs.utc().valueOf()
-        const halfLatency = (t2 - t1) / 2
-        times.push(dayjs.utc().valueOf() - sTime + halfLatency)
-      }
-
-      const sum = times.reduce((a, b) => a + b, 0);
-      const avgServertimeDifference = (sum / times.length) || 0;
-
-      console.log("Average server time to local time difference: ", avgServertimeDifference)
-
-      // const serverTime = await this.getTimeFromServer()
-      // console.log("Servertime: ", serverTime)
-      console.log("Local time: ", dayjs.utc().valueOf())
-      // const localAheadBy = dayjs.utc().valueOf() - serverTime
-      // console.log("Local ahead of server by: ", localAheadBy)
-      this.intervalId = window.setInterval(async () => {
-        const startTime = dayjs.utc(this.startTime).valueOf()
-        // console.log(startTime, nowServer, Date.now())
-        const localNow = dayjs.utc().valueOf()
-
-        if (startTime <= localNow - avgServertimeDifference) {
-          window.clearInterval(this.intervalId)
-          // console.log('Starting. Server time should be: ', localNow - this.serverTimeOffset, "Compare this to the output of other registered devices to judge how accurately synced the starting time is.")
-          // this.player.partialData = this.partials
+      window.Echo.channel('EventTriggered')
+      .listen('.TrackStarted', (e) => {
+          console.log(e)
           this.player.setup()
           this.player.play()
-          this.isRegistered = false;
-          // Reregister when done
-          await this.register()
-        } else {
-          this.countdownTime = Math.floor((startTime - localNow + this.serverTimeOffset) / 1000)
-          // console.log(this.countdownTime)
-        }
-      }, 5);
+      })
+
+      // const times = []
+
+      // for (let i = 0; i < 10; i++) {
+      //   const t1 = dayjs.utc().valueOf()
+      //   let sTime = await this.getTimeFromServer()
+      //   const t2 = dayjs.utc().valueOf()
+      //   const halfLatency = (t2 - t1) / 2
+      //   times.push(dayjs.utc().valueOf() - sTime + halfLatency)
+      // }
+
+      // const sum = times.reduce((a, b) => a + b, 0);
+      // const avgServertimeDifference = (sum / times.length) || 0;
+
+      // console.log("Average server time to local time difference: ", avgServertimeDifference)
+
+      // // const serverTime = await this.getTimeFromServer()
+      // // console.log("Servertime: ", serverTime)
+      // console.log("Local time: ", dayjs.utc().valueOf())
+      // // const localAheadBy = dayjs.utc().valueOf() - serverTime
+      // // console.log("Local ahead of server by: ", localAheadBy)
+      // this.intervalId = window.setInterval(async () => {
+      //   const startTime = dayjs.utc(this.startTime).valueOf()
+      //   // console.log(startTime, nowServer, Date.now())
+      //   const localNow = dayjs.utc().valueOf()
+
+      //   if (startTime <= localNow - avgServertimeDifference) {
+      //     window.clearInterval(this.intervalId)
+      //     // console.log('Starting. Server time should be: ', localNow - this.serverTimeOffset, "Compare this to the output of other registered devices to judge how accurately synced the starting time is.")
+      //     // this.player.partialData = this.partials
+      //     this.player.setup()
+      //     this.player.play()
+      //     this.isRegistered = false;
+      //     // Reregister when done
+      //     await this.register()
+      //   } else {
+      //     this.countdownTime = Math.floor((startTime - localNow + this.serverTimeOffset) / 1000)
+      //     // console.log(this.countdownTime)
+      //   }
+      // }, 5);
     },
 
     async play () {
