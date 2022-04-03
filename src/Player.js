@@ -1,7 +1,7 @@
 // https://www.html5rocks.com/en/tutorials/audio/scheduling/
 
 const SCHEDULE_TIME = 200
-const OVERLAP = 50
+const OVERLAP = 200
 
 let lastBreakpointTime = 0
 
@@ -148,7 +148,7 @@ export default class Player {
 
     // console.log(' ')
     // console.log(breakpointsToSchedule)
-    // return breakpointsToSchedule
+    return breakpointsToSchedule
 
     /*for (const currentBreakpoint of breakpointsToSchedule) {
       this.lastScheduledBreakpointIndex++
