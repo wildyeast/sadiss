@@ -1,7 +1,7 @@
 // https://www.html5rocks.com/en/tutorials/audio/scheduling/
 
-const SCHEDULE_TIME = 800
-const OVERLAP = 400
+const SCHEDULE_TIME = 200
+const OVERLAP = 100
 
 let lastBreakpointTime = 0
 
@@ -72,11 +72,11 @@ export default class Player {
 
   play () {
     // console.log("Partial Data: ", this.partialData)
-    for (const oscObj of this.oscillators) {
-      // oscObj.osc.start(0)
-      oscObj.osc.stop(oscObj.endTime)
-      oscObj.osc.onended = (src) => this.ended(src)
-    }
+    // for (const oscObj of this.oscillators) {
+    //   // oscObj.osc.start(0)
+    //   oscObj.osc.stop(oscObj.endTime)
+    //   oscObj.osc.onended = (src) => this.ended(src)
+    // }
     this.playing = true
     this.setSchedulingInterval(SCHEDULE_TIME / 1000, SCHEDULE_TIME - OVERLAP)
   }
@@ -93,12 +93,12 @@ export default class Player {
 
   schedule (timeInSecToScheduleInAdvance) {
       const breakpointsToSchedule = this.prepare(timeInSecToScheduleInAdvance)
-      console.log("Amount of oscillators currently active: ", this.oscillators.length)
-      console.log("Amount of breakpoints to schedule: ", breakpointsToSchedule.length)
-      console.log("Time", parseFloat(this.audioContext.currentTime).toFixed(3), " (+", 
-        parseFloat(this.audioContext.currentTime - lastBreakpointTime).toFixed(3), ")")
-      lastBreakpointTime = this.audioContext.currentTime
-      console.log(" ")
+      // console.log("Amount of oscillators currently active: ", this.oscillators.length)
+      // console.log("Amount of breakpoints to schedule: ", breakpointsToSchedule.length)
+      // console.log("Time", parseFloat(this.audioContext.currentTime).toFixed(3), " (+", 
+      //   parseFloat(this.audioContext.currentTime - lastBreakpointTime).toFixed(3), ")")
+      // lastBreakpointTime = this.audioContext.currentTime
+      // console.log(" ")
 
       for (const currentBreakpoint of breakpointsToSchedule) {
         const oscIndex = currentBreakpoint.oscIndex

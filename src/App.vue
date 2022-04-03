@@ -118,17 +118,32 @@ export default {
       this.player = new Player()
       this.player.mergeBreakpoints(this.partials)
 
-      const serverTime = await this.getTimeFromServer()
-      console.log("Servertime: ", serverTime)
+      const times = []
+
+      for (let i = 0; i < 10; i++) {
+        const t1 = dayjs.utc().valueOf()
+        let sTime = await this.getTimeFromServer()
+        const t2 = dayjs.utc().valueOf()
+        const halfLatency = (t2 - t1) / 2
+        times.push(dayjs.utc().valueOf() - sTime + halfLatency)
+      }
+
+      const sum = times.reduce((a, b) => a + b, 0);
+      const avgServertimeDifference = (sum / times.length) || 0;
+
+      console.log("Average server time to local time difference: ", avgServertimeDifference)
+
+      // const serverTime = await this.getTimeFromServer()
+      // console.log("Servertime: ", serverTime)
       console.log("Local time: ", dayjs.utc().valueOf())
-      const localAheadBy = dayjs.utc().valueOf() - serverTime
-      console.log("Local ahead of server by: ", localAheadBy)
+      // const localAheadBy = dayjs.utc().valueOf() - serverTime
+      // console.log("Local ahead of server by: ", localAheadBy)
       this.intervalId = window.setInterval(async () => {
         const startTime = dayjs.utc(this.startTime).valueOf()
         // console.log(startTime, nowServer, Date.now())
         const localNow = dayjs.utc().valueOf()
 
-        if (startTime <= localNow - this.serverTimeOffset - localAheadBy) {
+        if (startTime <= localNow - avgServertimeDifference) {
           window.clearInterval(this.intervalId)
           // console.log('Starting. Server time should be: ', localNow - this.serverTimeOffset, "Compare this to the output of other registered devices to judge how accurately synced the starting time is.")
           // this.player.partialData = this.partials
