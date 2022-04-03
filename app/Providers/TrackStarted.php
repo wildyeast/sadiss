@@ -24,7 +24,7 @@ class TrackStarted implements ShouldBroadcast
     public function __construct()
     {
         $this->message = $data;
-        echo "<p>GetRequestEvent('$data') object has been created.</p>";
+        // echo "<p>GetRequestEvent('$data') object has been created.</p>";
     }
 
     /**
