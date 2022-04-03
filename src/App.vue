@@ -101,11 +101,6 @@ export default {
         window.clearInterval(this.intervalId)
         this.startTime = clientData.client['start_time']
         this.partials = clientData.client['partials']
-        // console.log(this.partials)
-        for (const partial of JSON.parse(this.partials)) {
-          // console.log("Partial: " + partial.index)
-        }
-        // const oneWayLatency = (dayjs.utc().valueOf() - localNow) / 2
         this.serverTimeOffset = dayjs.utc().valueOf() - clientData.time
         console.log(this.serverTimeOffset, clientData.time - dayjs.utc().valueOf() + this.serverTimeOffset)
         this.waitForStart()
@@ -114,12 +109,24 @@ export default {
       }
       return clientData
     },
+    now () {
+      return new Date().valueOf() + this.serverTimeOffset
+    },
     async waitForStart () {
       this.player = new Player()
       this.player.mergeBreakpoints(this.partials)
 
-      const times = []
+      const startTimeUnix = dayjs.utc(this.startTime).valueOf()
+      let countdown = true
+      while (countdown) {
+        if (this.now() >= startTimeUnix) {
+          countdown = false
+        }
+        this.countdownTime = Math.floor((startTimeUnix - this.now()) / 1000)
+        await new Promise(r => setTimeout(r, 100));
+      }
 
+      /*
       for (let i = 0; i < 10; i++) {
         const t1 = dayjs.utc().valueOf()
         let sTime = await this.getTimeFromServer()
@@ -130,14 +137,16 @@ export default {
 
       const sum = times.reduce((a, b) => a + b, 0);
       const avgServertimeDifference = (sum / times.length) || 0;
+      */
 
-      console.log("Average server time to local time difference: ", avgServertimeDifference)
+      // console.log("Average server time to local time difference: ", avgServertimeDifference)
 
       // const serverTime = await this.getTimeFromServer()
       // console.log("Servertime: ", serverTime)
-      console.log("Local time: ", dayjs.utc().valueOf())
+      // console.log("Local time: ", dayjs.utc().valueOf())
       // const localAheadBy = dayjs.utc().valueOf() - serverTime
       // console.log("Local ahead of server by: ", localAheadBy)
+      /*
       this.intervalId = window.setInterval(async () => {
         const startTime = dayjs.utc(this.startTime).valueOf()
         // console.log(startTime, nowServer, Date.now())
@@ -147,16 +156,19 @@ export default {
           window.clearInterval(this.intervalId)
           // console.log('Starting. Server time should be: ', localNow - this.serverTimeOffset, "Compare this to the output of other registered devices to judge how accurately synced the starting time is.")
           // this.player.partialData = this.partials
+          */
           this.player.setup()
           this.player.play()
           this.isRegistered = false;
           // Reregister when done
           await this.register()
+          /*
         } else {
           this.countdownTime = Math.floor((startTime - localNow + this.serverTimeOffset) / 1000)
           // console.log(this.countdownTime)
         }
       }, 5);
+        */
     },
 
     async play () {
