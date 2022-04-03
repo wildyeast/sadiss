@@ -71,6 +71,7 @@ export default {
 
     const serverTime = await this.getTimeFromServer()
     this.serverTimeOffset = serverTime - this.now()
+    this.print += 'servertime ' + serverTime
 
     // Initialize player
     this.player = new Player()
@@ -121,7 +122,7 @@ export default {
       this.player = new Player()
       this.player.mergeBreakpoints(this.partials)
       const startTimeUnix = dayjs.utc(this.startTime).valueOf()
-      this.print = 'starttime ' + startTimeUnix + ' serverTime ' + serverTime + ' local with offset ' + (this.now() + this.serverTimeOffset)
+      this.print += ' local with offset ' + (this.now() + this.serverTimeOffset) + ' starttime ' + startTimeUnix
       let countdown = true
       while (countdown) {
         if (this.now() + this.serverTimeOffset >= startTimeUnix) {
