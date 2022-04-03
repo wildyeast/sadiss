@@ -71,7 +71,7 @@ export default {
 
     const serverTime = await this.getTimeFromServer()
     this.serverTimeOffset = serverTime - this.now()
-    this.print += 'servertime ' + serverTime
+    this.print += 'servertime ' + serverTime + ' offset ' + this.serverTimeOffset
 
     // Initialize player
     this.player = new Player()
@@ -129,7 +129,7 @@ export default {
           countdown = false
         }
         this.countdownTime = Math.floor((startTimeUnix - this.now()) / 1000)
-        await new Promise(r => setTimeout(r, 100));
+        await new Promise(r => setTimeout(r, 20));
       }
 
       /*
