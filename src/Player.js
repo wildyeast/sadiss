@@ -149,7 +149,6 @@ export default class Player {
           oscObj.osc.onended = (src) => this.ended(src, oscObj.index)
         }
         console.log("Time (ms) setup function: ", performance.now() - time1)
-        debugger
         oscObj.osc.frequency.setValueAtTime(currentBreakpoint.freq, Number(currentBreakpoint.time))
         oscObj.gain.gain.setValueAtTime(currentBreakpoint.amp, Number(currentBreakpoint.time))
 
