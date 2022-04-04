@@ -144,6 +144,7 @@ export default {
         this.startTime = clientData.client['start_time']
         this.calculateTimeOffset()
         this.partials = clientData.client['partials']
+        // this.player.setup(this.partials)
         // this.serverTimeOffset = dayjs.utc().valueOf() - clientData.time
         // console.log(this.serverTimeOffset, clientData.time - dayjs.utc().valueOf() + this.serverTimeOffset)
         this.waitForStart()
@@ -157,7 +158,8 @@ export default {
     },
     async waitForStart () {
       this.player = new Player()
-      this.player.mergeBreakpoints(this.partials)
+      this.player.setup(this.partials)
+      // this.player.mergeBreakpoints(this.partials)
       const startTimeUnix = dayjs.utc(this.startTime).valueOf()
       this.print += '<br>local with offset before countdown: ' + this.formatUnixTime(this.nowWithOffset()) + '<br>starttime: ' + this.formatUnixTime(startTimeUnix)
       let countdown = true
@@ -179,7 +181,6 @@ export default {
       }
 
       this.print += '<br> nowWithOffset: ' + this.formatUnixTime(nowWithOffset)
-      this.player.setup()
       this.player.play()
       this.isRegistered = false;
       // Reregister when done

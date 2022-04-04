@@ -24,13 +24,6 @@ export default class Player {
   oscillatorEndTimes = []
 
   mergeBreakpoints(partialData) {
-    // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
-    if (typeof partialData === 'string') {
-      this.partialData = JSON.parse(partialData)
-      this.partialData.reverse()
-    } else {
-      this.partialData = partialData
-    }
     for (const partial of this.partialData) {
       for (const breakpoint of partial.breakpoints) {
         breakpoint.oscIndex = partial.index
@@ -39,20 +32,40 @@ export default class Player {
       this.oscillatorEndTimes.push(
         {
           oscIndex: partial.index,
-          endTime: Number(partial.endTime)
+          endTime: Number(partial.endTime),
         }
       )
     }
-    this.mergedBreakpoints.sort((a, b) => a.time - b.time)
+    // this.mergedBreakpoints.sort((a, b) => a.time - b.time)
   }
 
-  setup () {
-    time1 = performance.now()
+  setup (partialData) {
+    // Start audioContext
     this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
-    
+
+    // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
+    if (typeof partialData === 'string') {
+      this.partialData = JSON.parse(partialData)
+      this.partialData.reverse()
+    } else {
+      this.partialData = partialData
+    }
+
+    // Initialize oscillators, set all values for each oscillator
+    const t1 = performance.now()
+    for (const partial of this.partialData) {
+      const oscObj = this.setupOscillator(partial)
+      for (const breakpoint of partial.breakpoints) {
+        oscObj.osc.frequency.setValueAtTime(breakpoint.freq, Number(breakpoint.time))
+        oscObj.gain.gain.setValueAtTime(breakpoint.amp, Number(breakpoint.time))
+      }
+      this.oscillators.push(oscObj)
+    }
+    const t2 = performance.now()
+    console.log("Finished osc setup and value setting. Duration (ms): ", t2 - t1)
   }
 
-  setupOscillator(partialIndex) {
+  setupOscillator(partial) {
     const osc = this.audioContext.createOscillator()
     const gain = this.audioContext.createGain()
 
@@ -62,15 +75,13 @@ export default class Player {
     const oscObj = {
       osc,
       gain,
-      index: partialIndex,
-      endTime: this.oscillatorEndTimes.find(el => el.oscIndex === partialIndex).endTime,
+      startTime: partial.startTime,
+      endTime: partial.endTime,
     }
 
     oscObj.osc.connect(oscObj.gain);
     oscObj.gain.connect(this.audioContext.destination)
 
-    this.oscillators.push(oscObj)
-  
     return oscObj
   }
 
@@ -82,7 +93,13 @@ export default class Player {
     //   oscObj.osc.onended = (src) => this.ended(src)
     // }
     this.playing = true
-    this.setSchedulingInterval(SCHEDULE_TIME / 1000, SCHEDULE_TIME - OVERLAP)
+    // this.setSchedulingInterval(SCHEDULE_TIME / 1000, SCHEDULE_TIME - OVERLAP)
+    console.log("Starting oscillators")
+    for (const oscObj of this.oscillators) {
+      oscObj.osc.start(oscObj.startTime)
+      oscObj.osc.stop(oscObj.endTime)
+      oscObj.osc.onended = (src) => this.ended(src, oscObj.index)
+    }
   }
 
   startFrom = 0
@@ -146,9 +163,8 @@ export default class Player {
           oscObj = this.setupOscillator(oscIndex)
           oscObj.osc.start()
           oscObj.osc.stop(oscObj.endTime)
-          oscObj.osc.onended = (src) => this.ended(src, oscObj.index)
+          oscObj.osc.onended = (src) => this.ended(src)
         }
-        console.log("Time (ms) setup function: ", performance.now() - time1)
         oscObj.osc.frequency.setValueAtTime(currentBreakpoint.freq, Number(currentBreakpoint.time))
         oscObj.gain.gain.setValueAtTime(currentBreakpoint.amp, Number(currentBreakpoint.time))
 
@@ -168,13 +184,11 @@ export default class Player {
     this.reset()
   }
 
-  ended (src, idx) {
+  ended (src) {
     this.endedSrc.push(src)
-    const realIdx = this.oscillators.indexOf(this.oscillators.find(el => el.index === idx))
-    this.oscillators.splice(realIdx, 1)
+    // const realIdx = this.oscillators.indexOf(this.oscillators.find(el => el.index === idx))
+    // this.oscillators.splice(realIdx, 1)
     if (this.endedSrc.length === this.partialData.length) {
-      // this.merger.disconnect(this.audioContext)
-      // console.log('prepared', prepared)
       this.reset()
     }
   }
