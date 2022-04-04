@@ -125,7 +125,7 @@ export default {
       this.print += ' local with offset ' + (this.now() + this.serverTimeOffset) + ' starttime ' + startTimeUnix
       let countdown = true
       while (countdown) {
-        if (this.now() + this.serverTimeOffset >= startTimeUnix) {
+        if (this.now() - this.serverTimeOffset >= startTimeUnix) {
           countdown = false
         }
         this.countdownTime = Math.floor((startTimeUnix - this.now()) / 1000)
