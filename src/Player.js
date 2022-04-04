@@ -7,6 +7,8 @@ let lastBreakpointTime = 0
 
 const prepared = []
 
+let time1;
+
 export default class Player {
 
   oscillators = []
@@ -45,7 +47,9 @@ export default class Player {
   }
 
   setup () {
+    time1 = performance.now()
     this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
+    
   }
 
   setupOscillator(partialIndex) {
@@ -144,6 +148,8 @@ export default class Player {
           oscObj.osc.stop(oscObj.endTime)
           oscObj.osc.onended = (src) => this.ended(src, oscObj.index)
         }
+        console.log("Time (ms) setup function: ", performance.now() - time1)
+        debugger
         oscObj.osc.frequency.setValueAtTime(currentBreakpoint.freq, Number(currentBreakpoint.time))
         oscObj.gain.gain.setValueAtTime(currentBreakpoint.amp, Number(currentBreakpoint.time))
 

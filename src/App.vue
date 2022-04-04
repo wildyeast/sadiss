@@ -71,35 +71,37 @@ export default {
     const json = await res.json()
     this.availableTracks = json
 
-    // Calculate time offset
-    const now = new Date().valueOf()
-    const serverTime = await this.getTimeFromServer()
-    const nowAfterCall = new Date().valueOf()
-    this.serverTimeOffset = serverTime - now
-    this.callDuration = nowAfterCall - now
+    // this.calculateTimeOffset()
 
-    // Estimate server call duration
-    /*
-    const times = []
-    for (let i = 0; i < 10; i++) {
-      const t1 = dayjs.utc().valueOf()
-      let sTime = await this.getTimeFromServer()
-      const t2 = dayjs.utc().valueOf()
-      const halfLatency = (t2 - t1) / 2
-      times.push(dayjs.utc().valueOf() - sTime + halfLatency)
-    }
-    const sum = times.reduce((a, b) => a + b, 0)
-    const callDuration = (sum / times.length) || 0
-    */
+    // // Calculate time offset
+    // const now = new Date().valueOf()
+    // const serverTime = await this.getTimeFromServer()
+    // const nowAfterCall = new Date().valueOf()
+    // this.serverTimeOffset = serverTime - now
+    // this.callDuration = nowAfterCall - now
 
-      // console.log("Average server time to local time difference: ", avgServertimeDifference)
+    // // Estimate server call duration
+    // /*
+    // const times = []
+    // for (let i = 0; i < 10; i++) {
+    //   const t1 = dayjs.utc().valueOf()
+    //   let sTime = await this.getTimeFromServer()
+    //   const t2 = dayjs.utc().valueOf()
+    //   const halfLatency = (t2 - t1) / 2
+    //   times.push(dayjs.utc().valueOf() - sTime + halfLatency)
+    // }
+    // const sum = times.reduce((a, b) => a + b, 0)
+    // const callDuration = (sum / times.length) || 0
+    // */
 
-    // Print time information to screen
-    this.print += 'localtime: ' + this.formatUnixTime(now) + '<br>servertime: ' + this.formatUnixTime(serverTime) + '<br>offset: ' + this.serverTimeOffset + 'ms'
-    if (this.serverTimeOffset > 0) this.print += ' (server ahead)'
-    else this.print += ' (server behind)'
-    this.print += '<br>call duration: ' + this.formatUnixTime(this.callDuration)
-    this.print += '<br>localtime with offset: ' + this.formatUnixTime(this.nowWithOffset())
+    //   // console.log("Average server time to local time difference: ", avgServertimeDifference)
+
+    // // Print time information to screen
+    // this.print += 'localtime: ' + this.formatUnixTime(now) + '<br>servertime: ' + this.formatUnixTime(serverTime) + '<br>offset: ' + this.serverTimeOffset + 'ms'
+    // if (this.serverTimeOffset > 0) this.print += ' (server ahead)'
+    // else this.print += ' (server behind)'
+    // this.print += '<br>call duration: ' + this.formatUnixTime(this.callDuration)
+    // this.print += '<br>localtime with offset: ' + this.formatUnixTime(this.nowWithOffset())
 
     // Initialize player
     this.player = new Player()
@@ -140,6 +142,7 @@ export default {
       if (clientData.client['start_time']) {
         window.clearInterval(this.intervalId)
         this.startTime = clientData.client['start_time']
+        this.calculateTimeOffset()
         this.partials = clientData.client['partials']
         // this.serverTimeOffset = dayjs.utc().valueOf() - clientData.time
         // console.log(this.serverTimeOffset, clientData.time - dayjs.utc().valueOf() + this.serverTimeOffset)
@@ -175,7 +178,7 @@ export default {
         await new Promise(r => setTimeout(r, 1));
       }
 
-      this.print += '<br> Actual start time: ' + this.formatUnixTime(nowWithOffset)
+      this.print += '<br> nowWithOffset: ' + this.formatUnixTime(nowWithOffset)
       this.player.setup()
       this.player.play()
       this.isRegistered = false;
@@ -188,6 +191,20 @@ export default {
         }
       }, 5);
         */
+    },
+
+    async calculateTimeOffset () {
+      const now = new Date().valueOf()
+      const serverTime = await this.getTimeFromServer()
+      const nowAfterCall = new Date().valueOf()
+      this.serverTimeOffset = serverTime - now
+      this.callDuration = nowAfterCall - now
+
+      this.print += '<br>localtime: ' + this.formatUnixTime(now) + '<br>servertime: ' + this.formatUnixTime(serverTime) + '<br>offset: ' + this.serverTimeOffset + 'ms'
+      if (this.serverTimeOffset > 0) this.print += ' (server ahead)'
+      else this.print += ' (server behind)'
+      this.print += '<br>call duration: ' + this.formatUnixTime(this.callDuration)
+      this.print += '<br>localtime with offset: ' + this.formatUnixTime(this.nowWithOffset())
     },
 
     async play () {
