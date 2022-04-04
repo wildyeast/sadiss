@@ -180,7 +180,7 @@ export default {
       this.player.play()
       this.isRegistered = false;
       // Reregister when done
-      await this.register()
+      // await this.register()
           /*
         } else {
           this.countdownTime = Math.floor((startTime - localNow + this.serverTimeOffset) / 1000)

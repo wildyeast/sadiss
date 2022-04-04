@@ -1,7 +1,7 @@
 // https://www.html5rocks.com/en/tutorials/audio/scheduling/
 
-const SCHEDULE_TIME = 200
-const OVERLAP = 100
+const SCHEDULE_TIME = 400
+const OVERLAP = 200
 
 let lastBreakpointTime = 0
 
@@ -41,7 +41,7 @@ export default class Player {
         }
       )
     }
-    this.mergedBreakpoints.sort((a, b) => b.time < a.time)
+    this.mergedBreakpoints.sort((a, b) => a.time - b.time)
   }
 
   setup () {
@@ -81,14 +81,49 @@ export default class Player {
     this.setSchedulingInterval(SCHEDULE_TIME / 1000, SCHEDULE_TIME - OVERLAP)
   }
 
+  startFrom = 0
+
   prepare (timeInSecToScheduleInAdvance) {
+    // console.log(' ')
+    const t1 = performance.now()
     const breakpointsToSchedule = []
-    for (const bp of this.mergedBreakpoints) {
-      if (bp.time >= this.audioContext.currentTime && bp.time < this.audioContext.currentTime + timeInSecToScheduleInAdvance) {
-        breakpointsToSchedule.push(bp)
+    const now = this.audioContext.currentTime
+    for (let i = this.startFrom; i < this.mergedBreakpoints.length; i++) {
+      const bp = this.mergedBreakpoints[i]
+      if (bp.time >= now) {
+        if (bp.time < now + timeInSecToScheduleInAdvance) {
+          breakpointsToSchedule.push(bp)
+          // console.log("Idx of last scheduled BP: ", this.mergedBreakpoints.indexOf(bp), " of ", this.mergedBreakpoints.length)
+        } else {
+          this.startFrom = i
+          break
+        }
       }
     }
+    const t2 = performance.now()
+    console.log("Time (ms) to prepare next set of breakpoints: ", t2 - t1)
     return breakpointsToSchedule
+    // for (const bp of this.mergedBreakpoints) {
+    //   if (bp.time >= now && bp.time < now + timeInSecToScheduleInAdvance) {
+    //     breakpointsToSchedule.push(bp)
+    //     // if (this.mergedBreakpoints.indexOf(bp) % 100 === 0) {
+    //       // console.log(bp.time, now + timeInSecToScheduleInAdvance)
+    //       // console.log("Idx of last scheduled BP: ", this.mergedBreakpoints.indexOf(bp), " of ", this.mergedBreakpoints.length)
+    //     // }
+    //   }
+    // }
+    // const t2 = performance.now()
+    // console.log("Time (ms) to prepare next set of breakpoints: ", t2 - t1)
+
+    // for (let i = 0; i < this.mergedBreakpoints.length; i++) {
+    //   const bp = this.mergedBreakpoints[i]
+    //   if (bp.time < this.audioContext.currentTime + timeInSecToScheduleInAdvance) {
+    //     if (bp.time >= this.audioContext.currentTime) {
+    //       breakpointsToSchedule.push(bp)
+    //       console.log("Idx of last scheduled BP: ", this.mergedBreakpoints.indexOf(bp), " of ", this.mergedBreakpoints.length)
+    //     }
+    //   }
+    // }
   }
 
   schedule (timeInSecToScheduleInAdvance) {
