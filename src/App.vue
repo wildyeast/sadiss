@@ -29,7 +29,7 @@
         <p v-else-if="player && !player.playing && isRegistered">Device registered with ID {{ deviceRegistrationId }}. Waiting for track start.</p>
         <p v-else-if="player && player.playing">Track currently playing.</p>
         <p v-else>Device not registered.</p>
-        {{ print }}
+        <div v-html="print" style="margin-top: 1rem;" />
       </div>
     </div>
   </div>
@@ -53,6 +53,7 @@ export default {
     partials: null,
     startTime: null,
     serverTimeOffset: null,
+    callDuration: null,
     countdownTime: -1,
     isRegistered: false,
     trackId: 1,
@@ -65,19 +66,52 @@ export default {
     print: ''
   }),
   async mounted () {
+    // Fetch tracks
     const res = await fetch (this.hostUrl + '/api/track')
     const json = await res.json()
     this.availableTracks = json
 
+    // Calculate time offset
+    const now = new Date().valueOf()
     const serverTime = await this.getTimeFromServer()
-    this.serverTimeOffset = serverTime - this.now()
-    this.print += 'servertime ' + serverTime + ' offset ' + this.serverTimeOffset
+    const nowAfterCall = new Date().valueOf()
+    this.serverTimeOffset = serverTime - now
+    this.callDuration = nowAfterCall - now
+
+    // Estimate server call duration
+    /*
+    const times = []
+    for (let i = 0; i < 10; i++) {
+      const t1 = dayjs.utc().valueOf()
+      let sTime = await this.getTimeFromServer()
+      const t2 = dayjs.utc().valueOf()
+      const halfLatency = (t2 - t1) / 2
+      times.push(dayjs.utc().valueOf() - sTime + halfLatency)
+    }
+    const sum = times.reduce((a, b) => a + b, 0)
+    const callDuration = (sum / times.length) || 0
+    */
+
+      // console.log("Average server time to local time difference: ", avgServertimeDifference)
+
+    // Print time information to screen
+    this.print += 'localtime: ' + this.formatUnixTime(now) + '<br>servertime: ' + this.formatUnixTime(serverTime) + '<br>offset: ' + this.serverTimeOffset + 'ms'
+    if (this.serverTimeOffset > 0) this.print += ' (server ahead)'
+    else this.print += ' (server behind)'
+    this.print += '<br>call duration: ' + this.formatUnixTime(this.callDuration)
+    this.print += '<br>localtime with offset: ' + this.formatUnixTime(this.nowWithOffset())
 
     // Initialize player
     this.player = new Player()
 
   },
   methods: {
+    formatUnixTime (t) {
+      return String(t).slice(-5)
+    },
+    nowWithOffset () {
+      return new Date().valueOf() + this.serverTimeOffset - this.callDuration
+    },
     async register () {
       const response = await fetch(this.hostUrl + '/api/client/create', {
         method: 'POST',
