@@ -156,13 +156,13 @@ export default {
       this.player = new Player()
       this.player.mergeBreakpoints(this.partials)
       const startTimeUnix = dayjs.utc(this.startTime).valueOf()
-      this.print += ' local with offset ' + (this.now() + this.serverTimeOffset) + ' starttime ' + startTimeUnix
+      this.print += '<br>local with offset before countdown: ' + this.formatUnixTime(this.nowWithOffset()) + '<br>starttime: ' + this.formatUnixTime(startTimeUnix)
       let countdown = true
       while (countdown) {
-        if (this.now() - this.serverTimeOffset >= startTimeUnix) {
+        if (this.nowWithOffset() >= startTimeUnix) {
           countdown = false
         }
-        this.countdownTime = Math.floor((startTimeUnix - this.now()) / 1000)
+        this.countdownTime = Math.floor((startTimeUnix - this.nowWithOffset()) / 1000)
         await new Promise(r => setTimeout(r, 20));
       }
 
