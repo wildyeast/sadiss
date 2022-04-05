@@ -39,9 +39,12 @@ export default class Player {
     // this.mergedBreakpoints.sort((a, b) => a.time - b.time)
   }
 
-  setup (partialData) {
+  setup (partialData, offsetInSec) {
     // Start audioContext
     this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
+
+    const timeToAddToStart = Number(offsetInSec) + 5
+    console.log("Time (s) to add to BP start: ", timeToAddToStart)
 
     // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
     if (typeof partialData === 'string') {
@@ -54,10 +57,11 @@ export default class Player {
     // Initialize oscillators, set all values for each oscillator
     const t1 = performance.now()
     for (const partial of this.partialData) {
-      const oscObj = this.setupOscillator(partial)
+      const oscObj = this.setupOscillator(partial, timeToAddToStart)
       for (const breakpoint of partial.breakpoints) {
-        oscObj.osc.frequency.setValueAtTime(breakpoint.freq, Number(breakpoint.time))
-        oscObj.gain.gain.setValueAtTime(breakpoint.amp, Number(breakpoint.time))
+        const time = Number(breakpoint.time) + timeToAddToStart
+        oscObj.osc.frequency.setValueAtTime(breakpoint.freq, time)
+        oscObj.gain.gain.setValueAtTime(breakpoint.amp, time)
       }
       this.oscillators.push(oscObj)
     }
@@ -65,7 +69,7 @@ export default class Player {
     console.log("Finished osc setup and value setting. Duration (ms): ", t2 - t1)
   }
 
-  setupOscillator(partial) {
+  setupOscillator(partial, timeToAddToStart) {
     const osc = this.audioContext.createOscillator()
     const gain = this.audioContext.createGain()
 
@@ -75,8 +79,8 @@ export default class Player {
     const oscObj = {
       osc,
       gain,
-      startTime: partial.startTime,
-      endTime: partial.endTime,
+      startTime: Number(partial.startTime) + timeToAddToStart,
+      endTime: Number(partial.endTime) + timeToAddToStart,
     }
 
     oscObj.osc.connect(oscObj.gain);
@@ -165,8 +169,8 @@ export default class Player {
           oscObj.osc.stop(oscObj.endTime)
           oscObj.osc.onended = (src) => this.ended(src)
         }
-        oscObj.osc.frequency.setValueAtTime(currentBreakpoint.freq, Number(currentBreakpoint.time))
-        oscObj.gain.gain.setValueAtTime(currentBreakpoint.amp, Number(currentBreakpoint.time))
+        oscObj.osc.frequency.setValueAtTime(currentBreakpoint.freq, Number(currentBreakpoint.time + 5))
+        oscObj.gain.gain.setValueAtTime(currentBreakpoint.amp, Number(currentBreakpoint.time + 5))
 
       }
   }
