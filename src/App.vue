@@ -1,5 +1,6 @@
 <template>
   <div class="app">
+    <button @click="timingSrcUpdate">timingSrc update</button>
     <div style="display: flex; flex-direction: column; justify-content: center" class="md:w-1/2 w-11/12 border b-white p-4">
       <p>
         Select a track ID from the dropdown below and press Play to play the selected track. All partials will
@@ -40,6 +41,9 @@ import { modules, bps } from './constants'
 import dayjs from 'dayjs'
 import dayjsPluginUTC from 'dayjs/plugin/utc'
 dayjs.extend(dayjsPluginUTC)
+import { TimingProvider } from 'timing-provider';
+import { TimingObject } from 'timing-object';
+import * as TIMINGSRC from 'timingsrc'
 
 import Player from './Player'
 
@@ -63,9 +67,42 @@ export default {
     // hostUrl: 'http://sadiss.test.test',
     // hostUrl: 'http://8hz.at',
     hostUrl: 'https://sadiss.net',
-    print: ''
+    print: '',
+    timingProvider: null,
+    timingObj: null,
+    currentVel: 0,
+    timingSrcPosCurr: null,
+    hasStarted: false
   }),
   async mounted () {
+
+    this.timingProvider = new TimingProvider('ws://192.168.0.87:2276');
+    this.timingObj = new TimingObject(this.timingProvider)
+    // this.timingObj.update({ velocity: 1 })
+
+    // window.setInterval(() => {
+    //   const q = this.timingObj.query()
+    //   console.log(q.position)
+    // }, 100)
+  
+
+    // requestAnimationFrame(function updateUI(_this) {
+    //   if(this.timingObj.query().velocity !== this.currentVel) {
+    //     this.currentVel = this.timingObj.query().velocity
+    //     console.log(this.currentVel)
+    //   }
+    //   requestAnimationFrame(updateUI(this));
+    // });
+
+    // this.timingObj.on('timeupdate', () => {
+    //   if(this.timingObj.query().velocity !== this.currentVel) {
+    //     this.currentVel = this.timingObj.query().velocity
+    //     console.log(this.currentVel)
+    //   }
+    // })
+
+    // console.log(timingProvider, to)
+
     // Fetch tracks
     const res = await fetch (this.hostUrl + '/api/track')
     const json = await res.json()
@@ -108,6 +145,10 @@ export default {
 
   },
   methods: {
+    timingSrcUpdate () {
+      this.timingObj.update({ velocity: 1 })
+    },
+
     formatUnixTime (t) {
       return String(t).slice(-5)
     },
@@ -128,15 +169,20 @@ export default {
       this.token = data.token
       this.deviceRegistrationId = data.id
 
+      // Set timing source velocity to 1
+      this.timingSrcUpdate()
+
       // Check for start immediately, afterwards check in intervals.
       await this.checkForStart();
 
       this.intervalId = window.setInterval(async () => {
         await this.checkForStart();
-      }, 1500);
+      }, 100);
       this.isRegistered = true;
     },
     async checkForStart () {
+
+
       const response = await fetch(`${this.hostUrl}/api/client/${this.token}`)
       const clientData = await response.json()
       if (clientData.client['start_time']) {
@@ -148,9 +194,10 @@ export default {
         // this.serverTimeOffset = dayjs.utc().valueOf() - clientData.time
         // console.log(this.serverTimeOffset, clientData.time - dayjs.utc().valueOf() + this.serverTimeOffset)
         this.waitForStart()
-      } else {
-        console.log(clientData.client, clientData.time)
       }
+      // else {
+      //   console.log(clientData.client, clientData.time)
+      // }
       return clientData
     },
     now () {
@@ -160,34 +207,57 @@ export default {
       this.player = new Player()
       this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
       // const t1 = this.nowWithOffset()
-      this.player.setup(this.partials, (this.serverTimeOffset - this.callDuration) / 1000)
+      this.timingSrcPosCurr = this.timingObj.query().position
+      const startInSec = 10
+      // console.log("timingSrc Position before setup: ", this.timingSrcPosCurr)
+      // console.log("AudioContect.currentTime before setup:", this.player.audioContext.currentTime)
+      this.player.setup(this.partials, startInSec)
+      // console.log("timingSrc Position after setup: ", this.timingObj.query().position)
+      // console.log("AudioContect.currentTime after setup:", this.player.audioContext.currentTime)
+
+      const intervalId = window.setInterval(() => {
+        // console.log(this.timingSrcPosCurr + startInSec - this.timingObj.query().position)
+        const pos = this.timingObj.query().position
+        if (pos >= this.timingSrcPosCurr + startInSec) {
+          if (!this.hasStarted) {
+            console.log("timingSrc Position on start: ", pos)
+            console.log("AudioContect.currentTime on start:", this.player.audioContext.currentTime)
+            this.player.play()
+            window.clearInterval(intervalId)
+            this.hasStarted = true
+          }
+        }
+      }, 50)
+
+
+
       // const t2 = this.nowWithOffset()
       // console.log("Time difference (ms) before and after setup: ", t2 - t1)
-      console.log("AudioContext time after setup: ", this.player.audioContext.currentTime)
+      // console.log("AudioContext time after setup: ", this.player.audioContext.currentTime)
       // this.player.mergeBreakpoints(this.partials)
-      const startTimeUnix = dayjs.utc(this.startTime).valueOf()
-      this.print += '<br>local with offset before countdown: ' + this.formatUnixTime(this.nowWithOffset()) + '<br>starttime: ' + this.formatUnixTime(startTimeUnix)
-      let countdown = true
-      this.print += '<br><br> Scheduled start time: ' + this.formatUnixTime(startTimeUnix)
-      let nowWithOffset = 0
-      while (countdown) {
-        const now = new Date().valueOf()
-        const serverTime = await this.getTimeFromServer()
-        const nowAfterCall = new Date().valueOf()
-        const serverTimeOffset = serverTime - now
-        const callDuration = nowAfterCall - now
-        nowWithOffset = now + serverTimeOffset - callDuration
-        if (nowWithOffset >= startTimeUnix) {
-          countdown = false
-        }
-        // console.log('now with offset', this.formatUnixTime(nowWithOffset))
-        this.countdownTime = Math.floor((startTimeUnix - nowWithOffset) / 1000)
-        await new Promise(r => setTimeout(r, 1));
-      }
+      // const startTimeUnix = dayjs.utc(this.startTime).valueOf()
+      // this.print += '<br>local with offset before countdown: ' + this.formatUnixTime(this.nowWithOffset()) + '<br>starttime: ' + this.formatUnixTime(startTimeUnix)
+      // let countdown = true
+      // this.print += '<br><br> Scheduled start time: ' + this.formatUnixTime(startTimeUnix)
+      // let nowWithOffset = 0
+      // while (countdown) {
+      //   const now = new Date().valueOf()
+      //   const serverTime = await this.getTimeFromServer()
+      //   const nowAfterCall = new Date().valueOf()
+      //   const serverTimeOffset = serverTime - now
+      //   const callDuration = nowAfterCall - now
+      //   nowWithOffset = now + serverTimeOffset - callDuration
+      //   if (nowWithOffset >= startTimeUnix) {
+      //     countdown = false
+      //   }
+      //   // console.log('now with offset', this.formatUnixTime(nowWithOffset))
+      //   this.countdownTime = Math.floor((startTimeUnix - nowWithOffset) / 1000)
+      //   await new Promise(r => setTimeout(r, 1));
+      // }
 
-      this.print += '<br> nowWithOffset: ' + this.formatUnixTime(nowWithOffset)
-      this.player.play()
-      console.log("AudioContext time after pressing play: ", this.player.audioContext.currentTime)
+      // this.print += '<br> nowWithOffset: ' + this.formatUnixTime(nowWithOffset)
+      // this.player.play()
+      // console.log("AudioContext time after pressing play: ", this.player.audioContext.currentTime)
       this.isRegistered = false;
       // Reregister when done
       // await this.register()

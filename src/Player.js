@@ -39,11 +39,12 @@ export default class Player {
     // this.mergedBreakpoints.sort((a, b) => a.time - b.time)
   }
 
-  setup (partialData, offsetInSec) {
+  setup (partialData, startInSec) {
     // Start audioContext
     // this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
 
-    const timeToAddToStart = Number(offsetInSec) + 10
+    // const timeToAddToStart = Number(offsetInSec) + 10
+    const timeToAddToStart = startInSec
 
     // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
     if (typeof partialData === 'string') {
@@ -54,7 +55,7 @@ export default class Player {
     }
 
     // Initialize oscillators, set all values for each oscillator
-    const t1 = performance.now()
+    // const t1 = performance.now()
     for (const partial of this.partialData) {
       const oscObj = this.setupOscillator(partial, timeToAddToStart)
       for (const breakpoint of partial.breakpoints) {
@@ -64,8 +65,8 @@ export default class Player {
       }
       this.oscillators.push(oscObj)
     }
-    const t2 = performance.now()
-    console.log("Finished osc setup and value setting. Duration (ms): ", t2 - t1)
+    // const t2 = performance.now()
+    // console.log("Finished osc setup and value setting. Duration (ms): ", t2 - t1)
   }
 
   setupOscillator(partial, timeToAddToStart) {
