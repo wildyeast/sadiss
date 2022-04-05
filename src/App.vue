@@ -133,7 +133,7 @@ export default {
       this.deviceRegistrationId = data.id // Only used in UI.
 
       // Check for start immediately, afterwards check in intervals of 1.5 seconds.
-      await this.checkForStart();
+      await this.checkForStart(data.token);
       this.intervalId = window.setInterval(async () => {
         await this.checkForStart(data.token);
       }, 1500);
