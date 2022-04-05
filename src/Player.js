@@ -22,6 +22,7 @@ export default class Player {
   currentTime = 0
   lastScheduledBreakpointIndex = 0
   oscillatorEndTimes = []
+  ctxTimeOnSetup = null
 
   mergeBreakpoints(partialData) {
     for (const partial of this.partialData) {
@@ -66,7 +67,7 @@ export default class Player {
       this.oscillators.push(oscObj)
     }
     // const t2 = performance.now()
-    // console.log("Finished osc setup and value setting. Duration (ms): ", t2 - t1)
+    console.log("Finished osc setup and value setting.")
   }
 
   setupOscillator(partial, timeToAddToStart) {
