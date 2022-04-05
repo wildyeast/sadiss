@@ -40,12 +40,14 @@ export default class Player {
     // this.mergedBreakpoints.sort((a, b) => a.time - b.time)
   }
 
-  setup (partialData, startInSec) {
+  setup (partialData, startInSec, offset) {
     // Start audioContext
     // this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
 
+    console.log('Calculated offset: ', offset)
+
     // const timeToAddToStart = Number(offsetInSec) + 10
-    const timeToAddToStart = startInSec
+    const timeToAddToStart = startInSec + offset
 
     // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
     if (typeof partialData === 'string') {

@@ -1,7 +1,7 @@
 <template>
   <div class="app">
     <!-- <button @click="timingSrcUpdate">timingSrc update</button> -->
-    {{ timingSrcPosCurr }}
+    <!-- {{ timingSrcPosCurr }} -->
     <div style="display: flex; flex-direction: column; justify-content: center" class="md:w-1/2 w-11/12 border b-white p-4">
       <p>
         Select a track ID from the dropdown below and press Play to play the selected track. All partials will
@@ -150,23 +150,21 @@ export default {
   methods: {
     timingSrcUpdate () {
       this.timingObj.update({ velocity: 1 })
-      this.player = new Player()
       const startTime = Number(this.timingObj.query().position.toFixed(1)) + 3
       console.log("Start time: ", startTime)
       const id = window.setInterval(() => {
         const q = this.timingObj.query()
-        this.timingSrcPosCurr = q.position.toFixed(1)
+        this.timingSrcPosCurr = q.position
         // console.log(this.timingSrcPosCurr)
-        if (this.timingSrcPosCurr == startTime) {
+        if (this.timingSrcPosCurr >= startTime) {
+          console.log('Starting now. Pos: ', this.timingSrcPosCurr)
           if (!this.ctxCreated) {
-            this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
-            console.log('Ctx created at Pos: ', this.timingSrcPosCurr)
             this.waitForStart()
             this.ctxCreated = true
           }
           window.clearInterval(id)
         }
-      }, 5)
+      }, 2)
     },
 
     formatUnixTime (t) {
@@ -196,6 +194,7 @@ export default {
         await this.checkForStart();
       }, 100);
       this.isRegistered = true;
+      this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
     },
     async checkForStart () {
       const response = await fetch(`${this.hostUrl}/api/client/${this.token}`)
@@ -216,14 +215,8 @@ export default {
     },
     async waitForStart () {
       const startInSec = 2
-      // console.log("timingSrc Position before setup: ", this.timingSrcPosCurr)
-      // console.log("AudioContect.currentTime before setup:", this.player.audioContext.currentTime)
-      this.player.setup(this.partials, startInSec)
-      console.log("timingSrc Position on start: ", this.timingObj.query().position)
-      console.log("AudioCtx time on start: ", this.player.audioContext.currentTime)
+      this.player.setup(this.partials, startInSec, this.player.audioContext.currentTime - this.timingSrcPosCurr / 1000)
       this.player.play()
-      // console.log("timingSrc Position after setup: ", this.timingObj.query().position)
-      // console.log("AudioContect.currentTime after setup:", this.player.audioContext.currentTime)
       this.isRegistered = false;
       // Reregister when done
       // await this.register()
@@ -244,13 +237,13 @@ export default {
     },
 
     async play () {
-      // Fetch breakpoints from server
-      const res = await fetch (this.hostUrl + '/api/track/' + this.trackId)
-      const json = await res.json()
-      const partialData = JSON.parse(json.partials)
-      this.player.mergeBreakpoints(partialData)
-      this.player.setup()
-      this.player.play()
+    //   // Fetch breakpoints from server
+    //   const res = await fetch (this.hostUrl + '/api/track/' + this.trackId)
+    //   const json = await res.json()
+    //   const partialData = JSON.parse(json.partials)
+    //   this.player.mergeBreakpoints(partialData)
+    //   this.player.setup()
+    //   this.player.play()
     },
 
     async getTimeFromServer () {
