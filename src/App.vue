@@ -158,7 +158,12 @@ export default {
     },
     async waitForStart () {
       this.player = new Player()
+      this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
+      // const t1 = this.nowWithOffset()
       this.player.setup(this.partials, (this.serverTimeOffset - this.callDuration) / 1000)
+      // const t2 = this.nowWithOffset()
+      // console.log("Time difference (ms) before and after setup: ", t2 - t1)
+      console.log("AudioContext time after setup: ", this.player.audioContext.currentTime)
       // this.player.mergeBreakpoints(this.partials)
       const startTimeUnix = dayjs.utc(this.startTime).valueOf()
       this.print += '<br>local with offset before countdown: ' + this.formatUnixTime(this.nowWithOffset()) + '<br>starttime: ' + this.formatUnixTime(startTimeUnix)
@@ -182,6 +187,7 @@ export default {
 
       this.print += '<br> nowWithOffset: ' + this.formatUnixTime(nowWithOffset)
       this.player.play()
+      console.log("AudioContext time after pressing play: ", this.player.audioContext.currentTime)
       this.isRegistered = false;
       // Reregister when done
       // await this.register()

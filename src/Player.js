@@ -41,10 +41,9 @@ export default class Player {
 
   setup (partialData, offsetInSec) {
     // Start audioContext
-    this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
+    // this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
 
-    const timeToAddToStart = Number(offsetInSec) + 5
-    console.log("Time (s) to add to BP start: ", timeToAddToStart)
+    const timeToAddToStart = Number(offsetInSec) + 10
 
     // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
     if (typeof partialData === 'string') {
