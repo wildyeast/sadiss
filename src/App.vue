@@ -102,7 +102,7 @@ export default {
     // })
 
     // Fetch tracks
-    const res = await fetch (this.hostUrl + '/api/track')
+    const res = await fetch(this.hostUrl + '/api/track')
     const json = await res.json()
     this.availableTracks = json
 
@@ -133,10 +133,17 @@ export default {
       this.deviceRegistrationId = data.id // Only used in UI.
 
       // Check for start immediately, afterwards check in intervals of 1.5 seconds.
-      await this.checkForStart(data.token);
+      // await this.checkForStart(data.token);
+      // this.intervalId = window.setInterval(async () => {
+      //   await this.checkForStart(data.token);
+      // }, 100);
       this.intervalId = window.setInterval(async () => {
-        await this.checkForStart(data.token);
-      }, 1500);
+        const q = this.timingObj.query().position.toFixed(1)
+        if (q % 1 === 0) {
+          // console.log('Starting now. Position: ', this.timingSrcPosCurr)
+          await this.checkForStart(data.token);
+        }
+      }, 50)
       this.isRegistered = true;
 
       // Start audio context.
@@ -148,19 +155,29 @@ export default {
       const clientData = await response.json()
       if (clientData.client['start_time']) {
         window.clearInterval(this.intervalId)
-        this.startPrepAtPosition = clientData.client['start_time']
+        const startTimeFromServer = Number(this.timingObj.query().position.toFixed(1)) + 3
+        // this.startPrepAtPosition = clientData.client['start_time']
         this.partials = clientData.client['partials']
-        if (!this.timingSetupDone) { // Prevent multiple calls of prepare() if checkForStart() short interval time
-          this.prepare()
-          this.timingSetupDone = true
-        }
+        let prepareStarted = false
+        const intervalId = window.setInterval(() => {
+          const q = this.timingObj.query()
+          this.timingSrcPosCurr = q.position
+          if (this.timingSrcPosCurr >= startTimeFromServer) {
+            console.log('Preparing now. Position: ', this.timingSrcPosCurr)
+            if (!prepareStarted) { // Prevent multiple calls of prepare() if checkForStart() short interval time
+              this.prepare()
+              prepareStarted = true
+            }
+            window.clearInterval(intervalId)
+          }
+        }, 1)
       }
       return clientData
     },
 
     prepare () {
       const startPrepAtPosition = Number(this.timingObj.query().position.toFixed(1)) + 3 // seconds
-      console.log("Starting preparation at position: ", startPrepAtPosition)
+      console.log("Scheduled start time: ", startPrepAtPosition)
       const intervalId = window.setInterval(() => {
         const q = this.timingObj.query()
         this.timingSrcPosCurr = q.position
