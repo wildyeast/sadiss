@@ -63,7 +63,7 @@ export default {
     trackId: 1,
     availableTracks: [],
     deviceRegistrationId: null,
-    intervalId: null, // This variable is used for the id of two different intervals. They are never active at the same time, still probably not ideal though.
+    intervalId: null,
     // hostUrl: 'http://sadiss.test.test',
     // hostUrl: 'http://8hz.at',
     hostUrl: 'https://sadiss.net',
