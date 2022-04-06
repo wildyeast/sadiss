@@ -9737,23 +9737,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                _context2.next = 2;
-                return queryTimingObj();
-
-              case 2:
-                _context2.t0 = _context2.sent;
-
-                if (!(_context2.t0 != 1)) {
-                  _context2.next = 6;
-                  break;
+                if (queryTimingObj() != 1) {
+                  timingObj.update({
+                    velocity: 1
+                  });
+                  console.log("Set TimingObject velocity to 1.");
                 }
 
-                timingObj.update({
-                  velocity: 1
-                });
-                console.log("Set TimingObject velocity to 1.");
-
-              case 6:
                 if (!synchronizing) {
                   synchronizing = true;
                   intervalId = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
@@ -9783,7 +9773,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 console.log("Synchronizing: ", synchronizing);
 
-              case 8:
+              case 3:
               case "end":
                 return _context2.stop();
             }
