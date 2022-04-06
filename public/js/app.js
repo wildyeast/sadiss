@@ -9730,32 +9730,35 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
     function _startTrack() {
       _startTrack = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-        var startTime, response;
+        var calculatedStartingPosition, response;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                if (this.timingObj.query().velocity !== 1) {
-                  this.timingObj.update({
+                console.log("Start track pressed.");
+
+                if (timingObj.query().velocity !== 1) {
+                  timingObj.update({
                     velocity: 1
                   });
                   console.log("Set TimingObject velocity to 1.");
                 }
 
-                startTime = timingObj.query().position + 5;
-                _context.next = 4;
-                return axios.post("/api/track/".concat(props.trackId, "/start/").concat(startTime));
+                calculatedStartingPosition = timingObj.query().position + 5;
+                console.log("Calculated starting position: ", calculatedStartingPosition);
+                _context.next = 6;
+                return axios.post("/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition));
 
-              case 4:
+              case 6:
                 response = _context.sent;
                 console.log(response.data.data);
 
-              case 6:
+              case 8:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, this);
+        }, _callee);
       }));
       return _startTrack.apply(this, arguments);
     }
