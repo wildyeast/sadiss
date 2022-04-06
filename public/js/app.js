@@ -9752,14 +9752,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                       while (1) {
                         switch (_context.prev = _context.next) {
                           case 0:
-                            _context.next = 2;
-                            return queryTimingObj();
-
-                          case 2:
-                            q = _context.sent;
+                            q = queryTimingObj();
                             timingSrcPosition.value = q.position.toFixed(2);
 
-                          case 4:
+                          case 2:
                           case "end":
                             return _context.stop();
                         }
@@ -9784,31 +9780,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function queryTimingObj() {
-      return _queryTimingObj.apply(this, arguments);
-    }
+      // console.log("Quering.")
+      var q = timingObj.query(); // console.log("Queried TimingObj: ", q)
 
-    function _queryTimingObj() {
-      _queryTimingObj = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
-        var q;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
-          while (1) {
-            switch (_context3.prev = _context3.next) {
-              case 0:
-                _context3.next = 2;
-                return timingObj.query();
-
-              case 2:
-                q = _context3.sent;
-                return _context3.abrupt("return", q);
-
-              case 4:
-              case "end":
-                return _context3.stop();
-            }
-          }
-        }, _callee3);
-      }));
-      return _queryTimingObj.apply(this, arguments);
+      return q;
     }
 
     function startTrack() {
@@ -9816,18 +9791,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function _startTrack() {
-      _startTrack = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
+      _startTrack = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
         var q, calculatedStartingPosition, response;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
                 console.log("Start track pressed.");
-                _context4.next = 3;
+                _context3.next = 3;
                 return queryTimingObj();
 
               case 3:
-                q = _context4.sent;
+                q = _context3.sent;
 
                 if (q.velocity !== 1) {
                   timingObj.update({
@@ -9837,33 +9812,33 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 console.log("Queried TimingObject: ", q);
-                _context4.next = 8;
+                _context3.next = 8;
                 return queryTimingObj();
 
               case 8:
-                q = _context4.sent;
+                q = _context3.sent;
                 console.log("Queried TimingObject: ", q);
-                _context4.next = 12;
+                _context3.next = 12;
                 return queryTimingObj();
 
               case 12:
-                q = _context4.sent;
+                q = _context3.sent;
                 console.log("Queried TimingObject: ", q);
                 calculatedStartingPosition = q.position + 5;
                 console.log("Calculated starting position: ", calculatedStartingPosition);
-                _context4.next = 18;
+                _context3.next = 18;
                 return axios.post("/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition));
 
               case 18:
-                response = _context4.sent;
+                response = _context3.sent;
                 console.log(response.data.data);
 
               case 20:
               case "end":
-                return _context4.stop();
+                return _context3.stop();
             }
           }
-        }, _callee4);
+        }, _callee3);
       }));
       return _startTrack.apply(this, arguments);
     }
@@ -9873,18 +9848,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function _getRegisteredClients() {
-      _getRegisteredClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
+      _getRegisteredClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
         var response, _iterator, _step, client;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                _context5.next = 2;
+                _context4.next = 2;
                 return axios.get('/api/client/active');
 
               case 2:
-                response = _context5.sent;
+                response = _context4.sent;
                 registeredClients.splice(0);
                 _iterator = _createForOfIteratorHelper(response.data);
 
@@ -9901,10 +9876,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 6:
               case "end":
-                return _context5.stop();
+                return _context4.stop();
             }
           }
-        }, _callee5);
+        }, _callee4);
       }));
       return _getRegisteredClients.apply(this, arguments);
     }
@@ -9914,36 +9889,36 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function _autoGetRegisteredClients() {
-      _autoGetRegisteredClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
+      _autoGetRegisteredClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
                 if (autoGetRegisteredClientsInterval.value) {
-                  _context7.next = 6;
+                  _context6.next = 6;
                   break;
                 }
 
-                _context7.next = 3;
+                _context6.next = 3;
                 return getRegisteredClients();
 
               case 3:
-                autoGetRegisteredClientsInterval.value = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
-                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
+                autoGetRegisteredClientsInterval.value = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
+                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
                     while (1) {
-                      switch (_context6.prev = _context6.next) {
+                      switch (_context5.prev = _context5.next) {
                         case 0:
-                          _context6.next = 2;
+                          _context5.next = 2;
                           return getRegisteredClients();
 
                         case 2:
                         case "end":
-                          return _context6.stop();
+                          return _context5.stop();
                       }
                     }
-                  }, _callee6);
+                  }, _callee5);
                 })), 2000);
-                _context7.next = 7;
+                _context6.next = 7;
                 break;
 
               case 6:
@@ -9951,10 +9926,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 7:
               case "end":
-                return _context7.stop();
+                return _context6.stop();
             }
           }
-        }, _callee7);
+        }, _callee6);
       }));
       return _autoGetRegisteredClients.apply(this, arguments);
     }
@@ -9964,62 +9939,62 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function _removeClients() {
-      _removeClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee8() {
+      _removeClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7() {
         var _iterator2, _step2, client, response;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee8$(_context8) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
                 _iterator2 = _createForOfIteratorHelper(registeredClients);
-                _context8.prev = 1;
+                _context7.prev = 1;
 
                 _iterator2.s();
 
               case 3:
                 if ((_step2 = _iterator2.n()).done) {
-                  _context8.next = 11;
+                  _context7.next = 11;
                   break;
                 }
 
                 client = _step2.value;
-                _context8.next = 7;
+                _context7.next = 7;
                 return axios.post("/api/client/delete/".concat(client.id));
 
               case 7:
-                response = _context8.sent;
+                response = _context7.sent;
                 console.log("Removed client with id " + client.id);
 
               case 9:
-                _context8.next = 3;
+                _context7.next = 3;
                 break;
 
               case 11:
-                _context8.next = 16;
+                _context7.next = 16;
                 break;
 
               case 13:
-                _context8.prev = 13;
-                _context8.t0 = _context8["catch"](1);
+                _context7.prev = 13;
+                _context7.t0 = _context7["catch"](1);
 
-                _iterator2.e(_context8.t0);
+                _iterator2.e(_context7.t0);
 
               case 16:
-                _context8.prev = 16;
+                _context7.prev = 16;
 
                 _iterator2.f();
 
-                return _context8.finish(16);
+                return _context7.finish(16);
 
               case 19:
                 getRegisteredClients();
 
               case 20:
               case "end":
-                return _context8.stop();
+                return _context7.stop();
             }
           }
-        }, _callee8, null, [[1, 13, 16, 19]]);
+        }, _callee7, null, [[1, 13, 16, 19]]);
       }));
       return _removeClients.apply(this, arguments);
     }
