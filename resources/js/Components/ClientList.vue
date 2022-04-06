@@ -128,6 +128,7 @@ export default {
       startTrack,
       removeClients,
       synchronizing,
+      synchronizeTimingSrcPosition
     }
 
   }
