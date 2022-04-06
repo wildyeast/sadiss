@@ -49,7 +49,7 @@ export default {
       getRegisteredClients()
       autoGetRegisteredClients()
       timingProvider = new TimingProvider('ws://127.0.0.1:2276');
-      timingObj = new TimingObject(timingProvider)
+      // timingObj = new TimingObject(timingProvider)
     })
 
     function registerClient () {
@@ -58,12 +58,13 @@ export default {
     }
 
     async function synchronizeTimingSrcPosition () {
-      if (queryTimingObj().velocity != 1) {
-        timingObj.update({ velocity: 1 })
-        console.log("Set TimingObject velocity to 1.")
-      }
-
       if (!synchronizing) {
+        timingObj = new TimingObject(timingProvider)
+        if (queryTimingObj().velocity != 1) {
+          timingObj.update({ velocity: 1 })
+          console.log("Set TimingObject velocity to 1.")
+        }
+
         synchronizing = true
         intervalId = window.setInterval(async () => {
           const q = queryTimingObj()

@@ -9716,8 +9716,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
       getRegisteredClients();
       autoGetRegisteredClients();
-      timingProvider = new timing_provider__WEBPACK_IMPORTED_MODULE_4__.TimingProvider('ws://127.0.0.1:2276');
-      timingObj = new timing_object__WEBPACK_IMPORTED_MODULE_5__.TimingObject(timingProvider);
+      timingProvider = new timing_provider__WEBPACK_IMPORTED_MODULE_4__.TimingProvider('ws://127.0.0.1:2276'); // timingObj = new TimingObject(timingProvider)
     });
 
     function registerClient() {
@@ -9737,14 +9736,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                if (queryTimingObj().velocity != 1) {
-                  timingObj.update({
-                    velocity: 1
-                  });
-                  console.log("Set TimingObject velocity to 1.");
-                }
-
                 if (!synchronizing) {
+                  timingObj = new timing_object__WEBPACK_IMPORTED_MODULE_5__.TimingObject(timingProvider);
+
+                  if (queryTimingObj().velocity != 1) {
+                    timingObj.update({
+                      velocity: 1
+                    });
+                    console.log("Set TimingObject velocity to 1.");
+                  }
+
                   synchronizing = true;
                   intervalId = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
                     var q;
@@ -9769,7 +9770,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 console.log("Synchronizing: ", synchronizing);
 
-              case 3:
+              case 2:
               case "end":
                 return _context2.stop();
             }
