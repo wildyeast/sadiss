@@ -48,7 +48,7 @@ export default {
     onMounted (() => {
       getRegisteredClients()
       autoGetRegisteredClients()
-      timingProvider = new TimingProvider('ws://sadiss.net:2276');
+      timingProvider = new TimingProvider('ws://116.202.102.79:2276');
       // timingObj = new TimingObject(timingProvider)
     })
 
