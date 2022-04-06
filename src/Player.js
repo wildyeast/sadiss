@@ -24,39 +24,29 @@ export default class Player {
   oscillatorEndTimes = []
   ctxTimeOnSetup = null
 
-  mergeBreakpoints(partialData) {
-    for (const partial of this.partialData) {
-      for (const breakpoint of partial.breakpoints) {
-        breakpoint.oscIndex = partial.index
-        this.mergedBreakpoints.push(breakpoint)
-      }
-      this.oscillatorEndTimes.push(
-        {
-          oscIndex: partial.index,
-          endTime: Number(partial.endTime),
-        }
-      )
-    }
-    // this.mergedBreakpoints.sort((a, b) => a.time - b.time)
-  }
+  // mergeBreakpoints(partialData) {
+  //   for (const partial of this.partialData) {
+  //     for (const breakpoint of partial.breakpoints) {
+  //       breakpoint.oscIndex = partial.index
+  //       this.mergedBreakpoints.push(breakpoint)
+  //     }
+  //     this.oscillatorEndTimes.push(
+  //       {
+  //         oscIndex: partial.index,
+  //         endTime: Number(partial.endTime),
+  //       }
+  //     )
+  //   }
+  //   // this.mergedBreakpoints.sort((a, b) => a.time - b.time)
+  // }
 
   setup (partialData, startInSec, offset) {
-    
-    // console.log('Calculated offset: ', offset)
-    
-    
     const t1 = performance.now()
-    
-    // const timeToAddToStart = Number(offsetInSec) + 10
-    
     this.partialData = partialData
-    
-    // Start audioContext
-    this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
-    // const ctxTime = this.audioContext.currentTime
-    const timeToAddToStart = startInSec
+    const ctxTime = this.audioContext.currentTime
+    const timeToAddToStart = startInSec + ctxTime
     console.log(timeToAddToStart)
-    let time = 0
+    let totalTime = 0
     // Initialize oscillators, set all values for each oscillator
     for (const partial of this.partialData) {
       const t2 = performance.now()
@@ -67,11 +57,10 @@ export default class Player {
         oscObj.gain.gain.setValueAtTime(breakpoint.amp, time)
       }
       this.oscillators.push(oscObj)
-      time += performance.now() - t2
+      totalTime += performance.now() - t2
     }
     console.log("Finished osc setup and value setting. Duration (ms): ", performance.now() - t1)
-    console.log("Average time (ms) to initialize osc and set values for one partial:", time / this.oscillators.length)
-    console.log("audioCtx current time: ", this.audioContext.currentTime)
+    console.log("Average time (ms) to initialize osc and set values for one partial:", totalTime / this.oscillators.length)
   }
 
   setupOscillator(partial, timeToAddToStart) {

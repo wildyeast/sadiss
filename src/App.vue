@@ -100,6 +100,7 @@ export default {
   },
   methods: {
     async register () {
+      this.player.globalTime = this.globalTime()
       
       this.timingObj.onchange =  () => {
         // console.log(this.timingObj.query().position - this.localTimingObj.query().position)
@@ -137,6 +138,7 @@ export default {
       const response = await fetch(`${this.hostUrl}/api/client/${token}`)
       const clientData = await response.json()
       if (clientData.client['start_time']) {
+        console.log("Start time from server: ", clientData.client['start_time'])
         window.clearInterval(this.intervalId)
         // const startTimeFromServer = Number(this.timingObj.query().position.toFixed(1)) + 3
         // this.startPrepAtPosition = clientData.client['start_time']
@@ -155,7 +157,8 @@ export default {
         const intervalId = window.setInterval(() => {
           // console.log(this.localTime(), this.globalTime(), this.globalToLocalTimeOffset())
           if (this.localTimeWithOffset() >= startTimeFromServer) {
-            const startNextStepAtLocalPos = this.localTime() + 3
+            // const startNextStepAtLocalPos = this.localTime() + 3
+            const startNextStepAtLocalPos = 0
             console.log("Start time reached at localTimeWithOffset: ", this.localTimeWithOffset())
             if (!prepareStarted) { // Prevent multiple calls of prepare() if checkForStart() short interval time
               this.prepare(startNextStepAtLocalPos)
@@ -182,8 +185,12 @@ export default {
     },
 
     async start () {
-      const startInSec = 4
+      const startInSec = 10
       console.log("Starting setup. localTimeWithOffset: ", this.localTimeWithOffset() + startInSec)
+      // Start audioContext
+      const t1 = this.globalTime()
+      this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
+      console.log("Time taken for setting up audioCtx: ", this.globalTime() - t1)
       this.player.setup(this.partials, startInSec, 0)
       this.isRegistered = false;
 
@@ -204,7 +211,8 @@ export default {
     },
 
     localTimeWithOffset () {
-      return this.localTime() + this.globalToLocalTimeOffset()
+      // return this.localTime() + this.globalToLocalTimeOffset()
+      return this.globalTime()
     },
 
 
