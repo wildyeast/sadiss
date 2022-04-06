@@ -85,7 +85,6 @@ export default {
     }
 
     async function startTrack () {
-      timingObj.update({position: 0})
       const calculatedStartingPosition = timingSrcPosition.value + 5
       console.log("Calculated starting position: ", calculatedStartingPosition)
       const response = await axios.post(`/api/track/${props.trackId}/start/${calculatedStartingPosition}`)
