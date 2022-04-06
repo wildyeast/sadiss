@@ -48,8 +48,8 @@ export default {
     onMounted (() => {
       getRegisteredClients()
       autoGetRegisteredClients()
-      // timingProvider = new TimingProvider('wss://sadiss.net:2276');
-        timingProvider = new TimingProvider('wss://localhost:2276');
+      // timingProvider = new TimingProvider('ws://sadiss.net:2276');
+        timingProvider = new TimingProvider('ws://localhost:2276');
       // timingObj = new TimingObject(timingProvider)
     })
 
