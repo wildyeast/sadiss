@@ -9735,20 +9735,27 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
+                if (this.timingObj.query().velocity !== 1) {
+                  this.timingObj.update({
+                    velocity: 1
+                  });
+                  console.log("Set TimingObject velocity to 1.");
+                }
+
                 startTime = timingObj.query().position + 5;
-                _context.next = 3;
+                _context.next = 4;
                 return axios.post("/api/track/".concat(props.trackId, "/start/").concat(startTime));
 
-              case 3:
+              case 4:
                 response = _context.sent;
                 console.log(response.data.data);
 
-              case 5:
+              case 6:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee);
+        }, _callee, this);
       }));
       return _startTrack.apply(this, arguments);
     }
