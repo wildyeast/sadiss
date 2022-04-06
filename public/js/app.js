@@ -9765,12 +9765,12 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                _context2.next = 2;
+                console.log("Start track pressed.");
+                _context2.next = 3;
                 return queryTimingObj();
 
-              case 2:
+              case 3:
                 q = _context2.sent;
-                console.log("Start track pressed.");
                 console.log("TimingObj: ", timingObj);
                 console.log("Queried TimingObject: ", q); // if (q.velocity !== 1) {
                 //   timingObj.update({ velocity: 1 })

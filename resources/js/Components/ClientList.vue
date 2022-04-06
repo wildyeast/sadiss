@@ -61,8 +61,8 @@ export default {
     }
 
     async function startTrack () {
-      const q = await queryTimingObj()
       console.log("Start track pressed.")
+      const q = await queryTimingObj()
       console.log("TimingObj: ", timingObj)
       console.log("Queried TimingObject: ", q)
       // if (q.velocity !== 1) {
