@@ -9717,7 +9717,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       getRegisteredClients();
       autoGetRegisteredClients(); // timingProvider = new TimingProvider('ws://sadiss.net:2276');
 
-      timingProvider = new timing_provider__WEBPACK_IMPORTED_MODULE_4__.TimingProvider('ws://localhost:2276'); // timingObj = new TimingObject(timingProvider)
+      timingProvider = new timing_provider__WEBPACK_IMPORTED_MODULE_4__.TimingProvider('ws://sadiss.net/zeitquelle'); // timingObj = new TimingObject(timingProvider)
     });
 
     function registerClient() {
