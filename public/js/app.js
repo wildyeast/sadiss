@@ -9800,7 +9800,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                calculatedStartingPosition = timingSrcPosition.value + 5;
+                calculatedStartingPosition = timingObj.query().position + 5;
                 console.log("Calculated starting position: ", calculatedStartingPosition);
                 _context3.next = 4;
                 return axios.post("/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition));
