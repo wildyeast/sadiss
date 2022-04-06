@@ -76,7 +76,8 @@ export default {
     timingSetupDone: false,
     beep: null,
     offset: null,
-    time: 0
+    time: 0,
+    localTimingObj: null
   }),
   // computed: {
   //   timingSrcPosCurrFormatted: function () {
@@ -87,6 +88,7 @@ export default {
     // this.timingProvider = new TimingProvider('ws://192.168.0.87:2276');
     this.timingProvider = new TimingProvider('wss://sadiss.net/zeitquelle');
     this.timingObj = new TimingObject(this.timingProvider)
+    this.localTimingObj = new TimingObject({ velocity: 1 })
 
     // Fetch tracks
     // const res = await fetch(this.hostUrl + '/api/track')
@@ -97,21 +99,15 @@ export default {
     this.player = new Player()
   },
   methods: {
-    formatUnixTime (t) {
-      return String(t).slice(-5)
-    },
-    nowWithOffset () {
-      return new Date().valueOf() + this.serverTimeOffset - this.callDuration
-    },
     async register () {
-      // Start audio context.
-      this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
-      // if (this.timingObj.query().velocity !== 1) {
-      //   this.timingObj.update({ velocity: 1 })
-      //   console.log("Set TimingObject velocity to 1.")
-      // }
+      
+      this.timingObj.onchange =  () => {
+        // console.log(this.timingObj.query().position - this.localTimingObj.query().position)
+        console.log("Global time object changed.")
+      };
 
-      this.time = this.timingObj.query().position - performance.now()
+      // Start audio context.
+      // this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
 
       const response = await fetch(this.hostUrl + '/api/client/create', {
         method: 'POST',
@@ -123,11 +119,6 @@ export default {
       })
       const data = await response.json()
       this.deviceRegistrationId = data.id // Only used in UI.
-
-      if (this.timingObj.velocity != 1) {
-        this.timingObj.update({ velocity: 1 })
-        // console.log("Set TimingObject velocity to 1.")
-      }
 
       // Check for start immediately, afterwards check in intervals of 1 second.
       await this.checkForStart(data.token);
@@ -154,21 +145,20 @@ export default {
         // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
         if (typeof partialData === 'string') {
           let json = JSON.parse(partialData)
-          this.partialData = json.reverse()
+          this.partials = json.reverse()
+        } else {
+          this.partials = partialData
         }
-        this.partials = partialData
         
         let prepareStarted = false
 
-        const q = this.timingObj.query()
-        this.offset = q.position * -1
-        console.log("Current position: ", q.position, "Current CtxTime: ", this.player.audioContext.currentTime, "Offset: ", this.offset)
-        this.player.printTime("After offset: ", this.offset)
         const intervalId = window.setInterval(() => {
-          if (this.player.audioContext.currentTime >= this.convertPositionToCtxTime(startTimeFromServer)) {
-            this.player.printTime("Preparing now: ", this.offset)
+          // console.log(this.localTime(), this.globalTime(), this.globalToLocalTimeOffset())
+          if (this.localTimeWithOffset() >= startTimeFromServer) {
+            const startNextStepAtLocalPos = this.localTime() + 3
+            console.log("Start time reached at localTimeWithOffset: ", this.localTimeWithOffset())
             if (!prepareStarted) { // Prevent multiple calls of prepare() if checkForStart() short interval time
-              this.prepare()
+              this.prepare(startNextStepAtLocalPos)
               prepareStarted = true
             }
             window.clearInterval(intervalId)
@@ -178,32 +168,49 @@ export default {
       return clientData
     },
 
-    prepare () {
-      // const startPrepAtPosition = Number(this.timingObj.query().position) + 3 // seconds
-      const startPrepAtCtxTime = this.player.audioContext.currentTime + 3
-      // console.log("Scheduled start time: ", startPrepAtCtxTime)
+    prepare (startNextStepAtLocalPos) {
       const intervalId = window.setInterval(() => {
-        if (this.player.audioContext.currentTime >= startPrepAtCtxTime) {
-          // console.log('Starting now. CtxTime: ', this.player.audioContext.currentTime)
+        if (this.localTimeWithOffset() >= startNextStepAtLocalPos) {
+          console.log("Waiting on start. localTimeWithOffset: ", this.localTimeWithOffset())
           if (!this.hasStarted) {
             this.start()
             this.hasStarted = true
           }
           window.clearInterval(intervalId)
         }
-      }, 5)
+      }, 1)
     },
+
     async start () {
       const startInSec = 4
-      this.player.printTime("Start setup: ", this.offset)
-      this.player.setup(this.partials, startInSec, this.offset)
-      // this.player.setup(this.partials, startInSec, 0)
-      // this.player.play()
+      console.log("Starting setup. localTimeWithOffset: ", this.localTimeWithOffset() + startInSec)
+      this.player.setup(this.partials, startInSec, 0)
       this.isRegistered = false;
 
       // Reregister when done
       // await this.register()
     },
+
+    globalTime () {
+      return this.timingObj.query().position
+    },
+
+    localTime () {
+      return this.localTimingObj.query().position
+    },
+
+    globalToLocalTimeOffset () {
+      return this.globalTime() - this.localTime()
+    },
+
+    localTimeWithOffset () {
+      return this.localTime() + this.globalToLocalTimeOffset()
+    },
+
+
+
+
+
 
     convertPositionToCtxTime (pos) {
       return pos - this.offset

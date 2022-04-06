@@ -41,20 +41,21 @@ export default class Player {
   }
 
   setup (partialData, startInSec, offset) {
-    // Start audioContext
-    // this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
-
+    
     // console.log('Calculated offset: ', offset)
-
-    const ctxTime = this.audioContext.currentTime + offset
-
+    
+    
     const t1 = performance.now()
-
+    
     // const timeToAddToStart = Number(offsetInSec) + 10
-    const timeToAddToStart = startInSec + ctxTime
-
-    this.partialData = JSON.parse(partialData)
-
+    
+    this.partialData = partialData
+    
+    // Start audioContext
+    this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
+    // const ctxTime = this.audioContext.currentTime
+    const timeToAddToStart = startInSec
+    console.log(timeToAddToStart)
     let time = 0
     // Initialize oscillators, set all values for each oscillator
     for (const partial of this.partialData) {
@@ -70,8 +71,7 @@ export default class Player {
     }
     console.log("Finished osc setup and value setting. Duration (ms): ", performance.now() - t1)
     console.log("Average time (ms) to initialize osc and set values for one partial:", time / this.oscillators.length)
-    // console.log("Time set for first breakpoints of first partial | audioCtx current time: ",
-    //   Number(this.partialData[0].breakpoints[0].time) + timeToAddToStart, this.audioContext.currentTime)
+    console.log("audioCtx current time: ", this.audioContext.currentTime)
   }
 
   setupOscillator(partial, timeToAddToStart) {
