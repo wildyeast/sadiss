@@ -9710,7 +9710,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var autoGetRegisteredClientsInterval = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(true);
     var timingProvider = null;
     var timingObj = null;
-    var synchronizing = false;
+    var synchronizing = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
     var timingSrcPosition = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(0);
     var intervalId = null;
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
@@ -9737,7 +9737,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                if (!synchronizing) {
+                if (!synchronizing.value) {
                   timingObj = new timing_object__WEBPACK_IMPORTED_MODULE_5__.TimingObject(timingProvider);
 
                   if (queryTimingObj().velocity != 1) {
@@ -9747,7 +9747,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     console.log("Set TimingObject velocity to 1.");
                   }
 
-                  synchronizing = true;
+                  synchronizing.value = true;
                   intervalId = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
                     var q;
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
@@ -9766,13 +9766,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })), 10);
                 } else {
                   window.clearInterval(intervalId);
-                  synchronizing = false;
+                  synchronizing.value = false;
                   timingObj.update({
                     velocity: 0
                   });
                 }
 
-                console.log("Synchronizing: ", synchronizing);
+                console.log("Synchronizing: ", synchronizing.value);
 
               case 2:
               case "end":

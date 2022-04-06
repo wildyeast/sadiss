@@ -41,7 +41,7 @@ export default {
     const autoGetRegisteredClientsInterval = ref(true)
     let timingProvider = null
     let timingObj = null
-    let synchronizing = false
+    let synchronizing = ref(false)
     let timingSrcPosition = ref(0)
     let intervalId = null
 
@@ -59,24 +59,24 @@ export default {
     }
 
     async function synchronizeTimingSrcPosition () {
-      if (!synchronizing) {
+      if (!synchronizing.value) {
         timingObj = new TimingObject(timingProvider)
         if (queryTimingObj().velocity != 1) {
           timingObj.update({ velocity: 1 })
           console.log("Set TimingObject velocity to 1.")
         }
 
-        synchronizing = true
+        synchronizing.value = true
         intervalId = window.setInterval(async () => {
           const q = queryTimingObj()
           timingSrcPosition.value = q.position.toFixed(2)
         }, 10)
       } else {
         window.clearInterval(intervalId)
-        synchronizing = false
+        synchronizing.value = false
         timingObj.update({ velocity: 0 })
       }
-      console.log("Synchronizing: ", synchronizing)
+      console.log("Synchronizing: ", synchronizing.value)
     }
 
     function queryTimingObj () {
