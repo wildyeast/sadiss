@@ -9710,13 +9710,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var autoGetRegisteredClientsInterval = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(true);
     var timingProvider = null;
     var timingObj = null;
-    var synchronizing = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
-    var timingSrcPosition = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(0);
+    var synchronizing = false;
+    var timingSrcPosition = 0;
     var intervalId = null;
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
       getRegisteredClients();
       autoGetRegisteredClients();
-      timingProvider = new timing_provider__WEBPACK_IMPORTED_MODULE_4__.TimingProvider('ws://localhost:2276');
+      timingProvider = new timing_provider__WEBPACK_IMPORTED_MODULE_4__.TimingProvider('ws://127.0.0.1:2276');
       timingObj = new timing_object__WEBPACK_IMPORTED_MODULE_5__.TimingObject(timingProvider);
     });
 

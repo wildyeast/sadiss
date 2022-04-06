@@ -41,14 +41,14 @@ export default {
     const autoGetRegisteredClientsInterval = ref(true)
     let timingProvider = null
     let timingObj = null
-    let synchronizing = ref(false)
-    let timingSrcPosition = ref(0)
+    let synchronizing = false
+    let timingSrcPosition = 0
     let intervalId = null
 
     onMounted (() => {
       getRegisteredClients()
       autoGetRegisteredClients()
-      timingProvider = new TimingProvider('ws://localhost:2276');
+      timingProvider = new TimingProvider('ws://127.0.0.1:2276');
       timingObj = new TimingObject(timingProvider)
     })
 
