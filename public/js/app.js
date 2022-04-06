@@ -9710,6 +9710,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var autoGetRegisteredClientsInterval = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(true);
     var timingProvider = null;
     var timingObj = null;
+    var synchronizing = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
+    var timingSrcPosition = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(0);
+    var intervalId = null;
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
       getRegisteredClients();
       autoGetRegisteredClients();
@@ -9724,33 +9727,94 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       getRegisteredClients();
     }
 
+    function synchronizeTimingSrcPosition() {
+      return _synchronizeTimingSrcPosition.apply(this, arguments);
+    }
+
+    function _synchronizeTimingSrcPosition() {
+      _synchronizeTimingSrcPosition = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                _context2.next = 2;
+                return queryTimingObj();
+
+              case 2:
+                _context2.t0 = _context2.sent;
+
+                if (!(_context2.t0 !== 1)) {
+                  _context2.next = 6;
+                  break;
+                }
+
+                timingObj.update({
+                  velocity: 1
+                });
+                console.log("Set TimingObject velocity to 1.");
+
+              case 6:
+                if (!this.synchronizing) {
+                  intervalId = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+                    var q;
+                    return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+                      while (1) {
+                        switch (_context.prev = _context.next) {
+                          case 0:
+                            _context.next = 2;
+                            return queryTimingObj();
+
+                          case 2:
+                            q = _context.sent;
+                            timingSrcPosition.value = q.position.toFixed(2);
+
+                          case 4:
+                          case "end":
+                            return _context.stop();
+                        }
+                      }
+                    }, _callee);
+                  })), 10);
+                  synchronizing = true;
+                } else {
+                  window.clearInterval(intervalId);
+                  synchronizing = false;
+                }
+
+              case 7:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
+      }));
+      return _synchronizeTimingSrcPosition.apply(this, arguments);
+    }
+
     function queryTimingObj() {
       return _queryTimingObj.apply(this, arguments);
     }
 
     function _queryTimingObj() {
-      _queryTimingObj = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+      _queryTimingObj = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
         var q;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
-                console.log("Quering.");
-                console.log("TimingObj: ", timingObj);
-                _context.next = 4;
+                _context3.next = 2;
                 return timingObj.query();
 
-              case 4:
-                q = _context.sent;
-                console.log("Queried TimingObj: ", q);
-                return _context.abrupt("return", q);
+              case 2:
+                q = _context3.sent;
+                return _context3.abrupt("return", q);
 
-              case 7:
+              case 4:
               case "end":
-                return _context.stop();
+                return _context3.stop();
             }
           }
-        }, _callee);
+        }, _callee3);
       }));
       return _queryTimingObj.apply(this, arguments);
     }
@@ -9760,38 +9824,54 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function _startTrack() {
-      _startTrack = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
+      _startTrack = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
         var q, calculatedStartingPosition, response;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 console.log("Start track pressed.");
-                _context2.next = 3;
+                _context4.next = 3;
                 return queryTimingObj();
 
               case 3:
-                q = _context2.sent;
-                console.log("Queried TimingObject: ", q); // if (q.velocity !== 1) {
-                //   timingObj.update({ velocity: 1 })
-                //   console.log("Set TimingObject velocity to 1.")
-                // }
+                q = _context4.sent;
 
+                if (q.velocity !== 1) {
+                  timingObj.update({
+                    velocity: 1
+                  });
+                  console.log("Set TimingObject velocity to 1.");
+                }
+
+                console.log("Queried TimingObject: ", q);
+                _context4.next = 8;
+                return queryTimingObj();
+
+              case 8:
+                q = _context4.sent;
+                console.log("Queried TimingObject: ", q);
+                _context4.next = 12;
+                return queryTimingObj();
+
+              case 12:
+                q = _context4.sent;
+                console.log("Queried TimingObject: ", q);
                 calculatedStartingPosition = q.position + 5;
                 console.log("Calculated starting position: ", calculatedStartingPosition);
-                _context2.next = 9;
+                _context4.next = 18;
                 return axios.post("/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition));
 
-              case 9:
-                response = _context2.sent;
+              case 18:
+                response = _context4.sent;
                 console.log(response.data.data);
 
-              case 11:
+              case 20:
               case "end":
-                return _context2.stop();
+                return _context4.stop();
             }
           }
-        }, _callee2);
+        }, _callee4);
       }));
       return _startTrack.apply(this, arguments);
     }
@@ -9801,18 +9881,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function _getRegisteredClients() {
-      _getRegisteredClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
+      _getRegisteredClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
         var response, _iterator, _step, client;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
-                _context3.next = 2;
+                _context5.next = 2;
                 return axios.get('/api/client/active');
 
               case 2:
-                response = _context3.sent;
+                response = _context5.sent;
                 registeredClients.splice(0);
                 _iterator = _createForOfIteratorHelper(response.data);
 
@@ -9829,10 +9909,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 6:
               case "end":
-                return _context3.stop();
+                return _context5.stop();
             }
           }
-        }, _callee3);
+        }, _callee5);
       }));
       return _getRegisteredClients.apply(this, arguments);
     }
@@ -9842,36 +9922,36 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function _autoGetRegisteredClients() {
-      _autoGetRegisteredClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
+      _autoGetRegisteredClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
                 if (autoGetRegisteredClientsInterval.value) {
-                  _context5.next = 6;
+                  _context7.next = 6;
                   break;
                 }
 
-                _context5.next = 3;
+                _context7.next = 3;
                 return getRegisteredClients();
 
               case 3:
-                autoGetRegisteredClientsInterval.value = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
-                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
+                autoGetRegisteredClientsInterval.value = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
+                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
                     while (1) {
-                      switch (_context4.prev = _context4.next) {
+                      switch (_context6.prev = _context6.next) {
                         case 0:
-                          _context4.next = 2;
+                          _context6.next = 2;
                           return getRegisteredClients();
 
                         case 2:
                         case "end":
-                          return _context4.stop();
+                          return _context6.stop();
                       }
                     }
-                  }, _callee4);
+                  }, _callee6);
                 })), 2000);
-                _context5.next = 7;
+                _context7.next = 7;
                 break;
 
               case 6:
@@ -9879,10 +9959,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 7:
               case "end":
-                return _context5.stop();
+                return _context7.stop();
             }
           }
-        }, _callee5);
+        }, _callee7);
       }));
       return _autoGetRegisteredClients.apply(this, arguments);
     }
@@ -9892,62 +9972,62 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function _removeClients() {
-      _removeClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
+      _removeClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee8() {
         var _iterator2, _step2, client, response;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee8$(_context8) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context8.prev = _context8.next) {
               case 0:
                 _iterator2 = _createForOfIteratorHelper(registeredClients);
-                _context6.prev = 1;
+                _context8.prev = 1;
 
                 _iterator2.s();
 
               case 3:
                 if ((_step2 = _iterator2.n()).done) {
-                  _context6.next = 11;
+                  _context8.next = 11;
                   break;
                 }
 
                 client = _step2.value;
-                _context6.next = 7;
+                _context8.next = 7;
                 return axios.post("/api/client/delete/".concat(client.id));
 
               case 7:
-                response = _context6.sent;
+                response = _context8.sent;
                 console.log("Removed client with id " + client.id);
 
               case 9:
-                _context6.next = 3;
+                _context8.next = 3;
                 break;
 
               case 11:
-                _context6.next = 16;
+                _context8.next = 16;
                 break;
 
               case 13:
-                _context6.prev = 13;
-                _context6.t0 = _context6["catch"](1);
+                _context8.prev = 13;
+                _context8.t0 = _context8["catch"](1);
 
-                _iterator2.e(_context6.t0);
+                _iterator2.e(_context8.t0);
 
               case 16:
-                _context6.prev = 16;
+                _context8.prev = 16;
 
                 _iterator2.f();
 
-                return _context6.finish(16);
+                return _context8.finish(16);
 
               case 19:
                 getRegisteredClients();
 
               case 20:
               case "end":
-                return _context6.stop();
+                return _context8.stop();
             }
           }
-        }, _callee6, null, [[1, 13, 16, 19]]);
+        }, _callee8, null, [[1, 13, 16, 19]]);
       }));
       return _removeClients.apply(this, arguments);
     }
@@ -9958,7 +10038,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       registeredClients: registeredClients,
       getRegisteredClients: getRegisteredClients,
       startTrack: startTrack,
-      removeClients: removeClients
+      removeClients: removeClients,
+      synchronizeTimingSrcPosition: synchronizeTimingSrcPosition,
+      timingSrcPosition: timingSrcPosition
     };
   }
 });
@@ -11336,18 +11418,25 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "border p-2"
   }, "Start track"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: _cache[1] || (_cache[1] = function () {
+      return $setup.synchronizeTimingSrcPosition && $setup.synchronizeTimingSrcPosition.apply($setup, arguments);
+    }),
+    "class": "border p-2"
+  }, "Sync " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.timingSrcPosition), 1
+  /* TEXT */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    onClick: _cache[2] || (_cache[2] = function () {
       return $setup.removeClients && $setup.removeClients.apply($setup, arguments);
     }),
     "class": "border p-2"
   }, "Remove all registered clients"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[2] || (_cache[2] = function () {
+    onClick: _cache[3] || (_cache[3] = function () {
       return $setup.getRegisteredClients && $setup.getRegisteredClients.apply($setup, arguments);
     }),
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["border p-2", $setup.autoGetRegisteredClientsInterval ? 'border-b-red-400 border-l-red-400 border-t-red-400' : 'border'])
   }, " Refresh list ", 2
   /* CLASS */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[3] || (_cache[3] = function () {
+    onClick: _cache[4] || (_cache[4] = function () {
       return $setup.autoGetRegisteredClients && $setup.autoGetRegisteredClients.apply($setup, arguments);
     }),
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["border-b border-t border-r p-2", $setup.autoGetRegisteredClientsInterval ? 'border-red-400' : 'border-b border-t border-r'])

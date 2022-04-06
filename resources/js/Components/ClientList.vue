@@ -2,6 +2,7 @@
   <div>
     <div class="flex justify-between">
       <button @click="startTrack" class="border p-2">Start track</button>
+      <button @click="synchronizeTimingSrcPosition" class="border p-2">Sync {{ timingSrcPosition }}</button>
       <button @click="removeClients" class="border p-2">Remove all registered clients</button>
       <div>
         <button @click="getRegisteredClients"
@@ -40,6 +41,9 @@ export default {
     const autoGetRegisteredClientsInterval = ref(true)
     let timingProvider = null
     let timingObj = null
+    let synchronizing = ref(false)
+    let timingSrcPosition = ref(0)
+    let intervalId = null
 
     onMounted (() => {
       getRegisteredClients()
@@ -53,22 +57,42 @@ export default {
       getRegisteredClients()
     }
 
+    async function synchronizeTimingSrcPosition () {
+      if (await queryTimingObj() !== 1) {
+        timingObj.update({ velocity: 1 })
+        console.log("Set TimingObject velocity to 1.")
+      }
+      if (!this.synchronizing) {
+        intervalId = window.setInterval(async () => {
+          const q = await queryTimingObj()
+          timingSrcPosition.value = q.position.toFixed(2)
+        }, 10)
+        synchronizing = true
+      } else {
+        window.clearInterval(intervalId)
+        synchronizing = false
+      }
+    }
+
     async function queryTimingObj () {
-      console.log("Quering.")
-      console.log("TimingObj: ", timingObj)
+      // console.log("Quering.")
       const q = await timingObj.query()
-      console.log("Queried TimingObj: ", q)
+      // console.log("Queried TimingObj: ", q)
       return q
     }
 
     async function startTrack () {
       console.log("Start track pressed.")
-      const q = await queryTimingObj()
+      let q = await queryTimingObj()
+      if (q.velocity !== 1) {
+        timingObj.update({ velocity: 1 })
+        console.log("Set TimingObject velocity to 1.")
+      }
       console.log("Queried TimingObject: ", q)
-      // if (q.velocity !== 1) {
-      //   timingObj.update({ velocity: 1 })
-      //   console.log("Set TimingObject velocity to 1.")
-      // }
+      q = await queryTimingObj()
+      console.log("Queried TimingObject: ", q)
+      q = await queryTimingObj()
+      console.log("Queried TimingObject: ", q)
       const calculatedStartingPosition = q.position + 5
       console.log("Calculated starting position: ", calculatedStartingPosition)
       const response = await axios.post(`/api/track/${props.trackId}/start/${calculatedStartingPosition}`)
@@ -110,7 +134,9 @@ export default {
       registeredClients,
       getRegisteredClients,
       startTrack,
-      removeClients
+      removeClients,
+      synchronizeTimingSrcPosition,
+      timingSrcPosition
     }
 
   }
