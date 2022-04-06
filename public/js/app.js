@@ -9740,9 +9740,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 2:
                 q = _context.sent;
+                console.log("Queried TimingObj: ", q);
                 return _context.abrupt("return", q);
 
-              case 4:
+              case 5:
               case "end":
                 return _context.stop();
             }
