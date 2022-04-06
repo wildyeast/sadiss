@@ -63,7 +63,7 @@ class TrackController extends Controller
     return $columns;
   }
 
-  public function start_track (Request $request, $id) {
+  public function start_track (Request $request, $id, $startTime) {
     $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request);
     $partials = json_decode(Track::where('id', $id)->firstOrFail()->partials);
 
