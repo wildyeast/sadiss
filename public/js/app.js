@@ -9706,6 +9706,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var autoGetRegisteredClientsInterval = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(true);
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
       getRegisteredClients();
+      autoGetRegisteredClients();
     });
 
     function registerClient() {
@@ -13540,8 +13541,7 @@ var Player = /*#__PURE__*/function () {
       }
 
       this.merger = new DynamicsCompressorNode(this.audioContext); // Connect merger (which depending on code above can be Merger or Compressor)
-
-      this.merger.connect(this.audioContext.destination);
+      // this.merger.connect(this.audioContext.destination)
 
       var _iterator2 = _createForOfIteratorHelper(this.oscillators.entries()),
           _step2;
@@ -13558,11 +13558,11 @@ var Player = /*#__PURE__*/function () {
           // console.log(outputChannel)
           // oscObj.osc.connect(this.merger, 0, outputChannel)
           // Use next line for DynamicsCompressorNode
+          // oscObj.gain.connect(this.merger, 0, 0)
+          // Use next line for connecting oscillators to destination directly
 
 
-          _oscObj.osc.connect(this.merger, 0, 0); // Use next line for connecting oscillators to destination directly
-          // oscObj.osc.connect(this.audioContext.destination)
-
+          _oscObj.gain.connect(this.audioContext.destination);
 
           _oscObj.osc.start(this.now);
 
