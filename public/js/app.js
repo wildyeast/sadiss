@@ -9735,15 +9735,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _context.next = 2;
+                console.log("Quering.");
+                _context.next = 3;
                 return timingObj.query();
 
-              case 2:
+              case 3:
                 q = _context.sent;
                 console.log("Queried TimingObj: ", q);
                 return _context.abrupt("return", q);
 
-              case 5:
+              case 6:
               case "end":
                 return _context.stop();
             }
