@@ -45,9 +45,7 @@ export default {
       getRegisteredClients()
       autoGetRegisteredClients()
       timingProvider = new TimingProvider('ws://sadiss.net:2276');
-      console.log("TimingProvider after creation: ", timingProvider)
       timingObj = new TimingObject(timingProvider)
-      console.log("TimingObject after creation: ", timingObj)
     })
 
     function registerClient () {
@@ -58,12 +56,12 @@ export default {
     async function startTrack () {
       console.log("Start track pressed.")
       console.log("TimingObj: ", timingObj)
-      console.log("Queried TimingObj: ", timingObj.query())
-      if (timingObj.query().velocity !== 1) {
+      const q = timingObj.query()
+      if (q.velocity !== 1) {
         timingObj.update({ velocity: 1 })
         console.log("Set TimingObject velocity to 1.")
       }
-      const calculatedStartingPosition = timingObj.query().position + 5
+      const calculatedStartingPosition = q.position + 5
       console.log("Calculated starting position: ", calculatedStartingPosition)
       const response = await axios.post(`/api/track/${props.trackId}/start/${calculatedStartingPosition}`)
       console.log(response.data.data)

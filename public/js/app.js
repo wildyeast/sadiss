@@ -9714,9 +9714,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       getRegisteredClients();
       autoGetRegisteredClients();
       timingProvider = new timing_provider__WEBPACK_IMPORTED_MODULE_4__.TimingProvider('ws://sadiss.net:2276');
-      console.log("TimingProvider after creation: ", timingProvider);
       timingObj = new timing_object__WEBPACK_IMPORTED_MODULE_5__.TimingObject(timingProvider);
-      console.log("TimingObject after creation: ", timingObj);
     });
 
     function registerClient() {
@@ -9732,23 +9730,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
     function _startTrack() {
       _startTrack = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-        var calculatedStartingPosition, response;
+        var q, calculatedStartingPosition, response;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 console.log("Start track pressed.");
                 console.log("TimingObj: ", timingObj);
-                console.log("Queried TimingObj: ", timingObj.query());
+                q = timingObj.query();
 
-                if (timingObj.query().velocity !== 1) {
+                if (q.velocity !== 1) {
                   timingObj.update({
                     velocity: 1
                   });
                   console.log("Set TimingObject velocity to 1.");
                 }
 
-                calculatedStartingPosition = timingObj.query().position + 5;
+                calculatedStartingPosition = q.position + 5;
                 console.log("Calculated starting position: ", calculatedStartingPosition);
                 _context.next = 8;
                 return axios.post("/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition));
