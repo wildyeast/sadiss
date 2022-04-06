@@ -42,7 +42,7 @@ export default {
     let timingProvider = null
     let timingObj = null
     let synchronizing = false
-    let timingSrcPosition = 0
+    let timingSrcPosition = ref(0)
     let intervalId = null
 
     onMounted (() => {

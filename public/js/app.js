@@ -9711,7 +9711,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var timingProvider = null;
     var timingObj = null;
     var synchronizing = false;
-    var timingSrcPosition = 0;
+    var timingSrcPosition = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(0);
     var intervalId = null;
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
       getRegisteredClients();
