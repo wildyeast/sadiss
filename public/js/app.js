@@ -9754,7 +9754,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 console.log("Set TimingObject velocity to 1.");
 
               case 6:
-                if (!this.synchronizing) {
+                if (!synchronizing) {
                   synchronizing = true;
                   intervalId = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
                     var q;
@@ -9788,7 +9788,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return _context2.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee2);
       }));
       return _synchronizeTimingSrcPosition.apply(this, arguments);
     }
