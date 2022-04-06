@@ -55,6 +55,7 @@ export default {
 
     async function queryTimingObj () {
       console.log("Quering.")
+      console.log("TimingObj: ", timingObj)
       const q = await timingObj.query()
       console.log("Queried TimingObj: ", q)
       return q
@@ -63,7 +64,6 @@ export default {
     async function startTrack () {
       console.log("Start track pressed.")
       const q = await queryTimingObj()
-      console.log("TimingObj: ", timingObj)
       console.log("Queried TimingObject: ", q)
       // if (q.velocity !== 1) {
       //   timingObj.update({ velocity: 1 })
