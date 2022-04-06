@@ -70,6 +70,7 @@ export default {
         intervalId = window.setInterval(async () => {
           const q = queryTimingObj()
           timingSrcPosition.value = q.position.toFixed(2)
+          console.log(timingSrcPosition.value)
         }, 10)
       } else {
         window.clearInterval(intervalId)

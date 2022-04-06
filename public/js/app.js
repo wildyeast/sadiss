@@ -9756,8 +9756,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                           case 0:
                             q = queryTimingObj();
                             timingSrcPosition.value = q.position.toFixed(2);
+                            console.log(timingSrcPosition.value);
 
-                          case 2:
+                          case 3:
                           case "end":
                             return _context.stop();
                         }
