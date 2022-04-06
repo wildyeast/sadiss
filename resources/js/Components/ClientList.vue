@@ -55,6 +55,7 @@ export default {
 
     async function startTrack () {
       console.log("Start track pressed.")
+      console.log("TimingObj: ", timingObj)
       console.log("Queried TimingObj: ", timingObj.query())
       if (timingObj.query().velocity !== 1) {
         timingObj.update({ velocity: 1 })
