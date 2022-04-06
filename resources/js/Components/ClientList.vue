@@ -54,6 +54,7 @@ export default {
     }
 
     async function queryTimingObj () {
+      console.log("Quering.")
       const q = await timingObj.query()
       console.log("Queried TimingObj: ", q)
       return q
