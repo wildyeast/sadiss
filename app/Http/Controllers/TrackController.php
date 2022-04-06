@@ -89,7 +89,6 @@ class TrackController extends Controller
       }
     }
 
-    $startTime = Carbon::now()->addSeconds(8);
     foreach($clients as $i=>$value) {
       $client = Client::where('id', $value->id)->firstOrFail();
       $client->partials = $chunks[$i];
