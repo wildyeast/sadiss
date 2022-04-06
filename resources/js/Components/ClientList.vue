@@ -27,6 +27,8 @@
 import { useForm } from '@inertiajs/inertia-vue3'
 import { onMounted, reactive, ref } from 'vue'
 import Button from './Button.vue'
+import { TimingProvider } from 'timing-provider';
+import { TimingObject } from 'timing-object';
 export default {
   components: { Button },
   props: {
@@ -36,10 +38,14 @@ export default {
 
     const registeredClients = reactive([])
     const autoGetRegisteredClientsInterval = ref(true)
+    let timingProvider = null
+    let timingObj = null
 
     onMounted (() => {
       getRegisteredClients()
       autoGetRegisteredClients()
+      timingProvider = new TimingProvider('ws://sadiss.net:2276');
+      timingObj = new TimingObject(timingProvider)
     })
 
     function registerClient () {
@@ -48,7 +54,8 @@ export default {
     }
 
     async function startTrack () {
-      const response = await axios.post(`/api/track/${props.trackId}/start`)
+      const startTime = timingObj.query().position + 5
+      const response = await axios.post(`/api/track/${props.trackId}/start/${startTime}`)
       console.log(response.data.data)
     }
 
