@@ -100,8 +100,6 @@ export default {
   },
   methods: {
     async register () {
-      this.player.globalTime = this.globalTime()
-      
       this.timingObj.onchange =  () => {
         // console.log(this.timingObj.query().position - this.localTimingObj.query().position)
         console.log("App: Global time object changed.")
@@ -151,6 +149,8 @@ export default {
         } else {
           this.partials = partialData
         }
+        this.player.partialData = this.partials
+        this.player.mergeBreakpoints(this.partials)
         
         let prepareStarted = false
 
@@ -176,7 +176,8 @@ export default {
         if (this.localTimeWithOffset() >= startNextStepAtLocalPos) {
           console.log("Waiting on start. localTimeWithOffset: ", this.localTimeWithOffset())
           if (!this.hasStarted) {
-            this.start()
+            this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
+            this.player.play()
             this.hasStarted = true
           }
           window.clearInterval(intervalId)
@@ -187,7 +188,6 @@ export default {
     async start () {
       const startInSec = 4
       console.log("Starting setup. localTimeWithOffset: ", this.localTimeWithOffset() + startInSec)
-      // Start audioContext
       const t1 = this.globalTime()
       this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
       console.log("Time taken for setting up audioCtx: ", this.globalTime())

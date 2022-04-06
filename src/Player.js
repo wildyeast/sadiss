@@ -36,21 +36,22 @@ export default class Player {
     };
   }
 
-  // mergeBreakpoints(partialData) {
-  //   for (const partial of this.partialData) {
-  //     for (const breakpoint of partial.breakpoints) {
-  //       breakpoint.oscIndex = partial.index
-  //       this.mergedBreakpoints.push(breakpoint)
-  //     }
-  //     this.oscillatorEndTimes.push(
-  //       {
-  //         oscIndex: partial.index,
-  //         endTime: Number(partial.endTime),
-  //       }
-  //     )
-  //   }
-  //   // this.mergedBreakpoints.sort((a, b) => a.time - b.time)
-  // }
+  mergeBreakpoints() {
+    console.log(this.partialData)
+    for (const partial of this.partialData) {
+      for (const breakpoint of partial.breakpoints) {
+        breakpoint.oscIndex = partial.index
+        this.mergedBreakpoints.push(breakpoint)
+      }
+      this.oscillatorEndTimes.push(
+        {
+          oscIndex: partial.index,
+          endTime: Number(partial.endTime),
+        }
+      )
+    }
+    this.mergedBreakpoints.sort((a, b) => a.time - b.time)
+  }
 
   setup (partialData, startInSec, offset) {
     const t1 = performance.now()
@@ -75,7 +76,7 @@ export default class Player {
     console.log("Global time after finishing setup: ", this.timingObj.query().position)
   }
 
-  setupOscillator(partial, timeToAddToStart) {
+  setupOscillator(partialIndex) {
     const osc = this.audioContext.createOscillator()
     const gain = this.audioContext.createGain()
 
@@ -85,42 +86,55 @@ export default class Player {
     const oscObj = {
       osc,
       gain,
-      startTime: Number(partial.startTime) + timeToAddToStart,
-      endTime: Number(partial.endTime) + timeToAddToStart,
+      endTime: this.oscillatorEndTimes.find(el => el.oscIndex === partialIndex).endTime,
     }
 
     oscObj.osc.connect(oscObj.gain);
     oscObj.gain.connect(this.audioContext.destination)
 
-    oscObj.osc.start(oscObj.startTime)
-    oscObj.osc.stop(oscObj.endTime)
-    oscObj.osc.onended = (src) => this.ended(src, oscObj.index)
+    this.oscillators.push(oscObj)
 
     return oscObj
   }
 
+  // setupOscillator(partial, timeToAddToStart) {
+  //   const osc = this.audioContext.createOscillator()
+  //   const gain = this.audioContext.createGain()
+
+  //   osc.frequency.value = 0
+  //   gain.gain.value = 0
+
+  //   const oscObj = {
+  //     osc,
+  //     gain,
+  //     startTime: Number(partial.startTime) + timeToAddToStart,
+  //     endTime: Number(partial.endTime) + timeToAddToStart,
+  //   }
+
+  //   oscObj.osc.connect(oscObj.gain);
+  //   oscObj.gain.connect(this.audioContext.destination)
+
+  //   oscObj.osc.start(oscObj.startTime)
+  //   oscObj.osc.stop(oscObj.endTime)
+  //   oscObj.osc.onended = (src) => this.ended(src, oscObj.index)
+
+  //   return oscObj
+  // }
+
   play () {
-    // console.log("Partial Data: ", this.partialData)
-    // for (const oscObj of this.oscillators) {
-    //   // oscObj.osc.start(0)
-    //   oscObj.osc.stop(oscObj.endTime)
-    //   oscObj.osc.onended = (src) => this.ended(src)
-    // }
     this.playing = true
-    // this.setSchedulingInterval(SCHEDULE_TIME / 1000, SCHEDULE_TIME - OVERLAP)
-    console.log("Starting oscillators")
-    for (const oscObj of this.oscillators) {
-      oscObj.osc.start(oscObj.startTime)
-      oscObj.osc.stop(oscObj.endTime)
-      oscObj.osc.onended = (src) => this.ended(src, oscObj.index)
-    }
+    this.setSchedulingInterval(SCHEDULE_TIME / 1000, SCHEDULE_TIME - OVERLAP)
+    // console.log("Starting oscillators")
+    // for (const oscObj of this.oscillators) {
+    //   oscObj.osc.start(oscObj.startTime)
+    //   oscObj.osc.stop(oscObj.endTime)
+    //   oscObj.osc.onended = (src) => this.ended(src, oscObj.index)
+    // }
   }
 
   startFrom = 0
 
   prepare (timeInSecToScheduleInAdvance) {
-    // console.log(' ')
-    const t1 = performance.now()
     const breakpointsToSchedule = []
     const now = this.audioContext.currentTime
     for (let i = this.startFrom; i < this.mergedBreakpoints.length; i++) {
@@ -128,37 +142,13 @@ export default class Player {
       if (bp.time >= now) {
         if (bp.time < now + timeInSecToScheduleInAdvance) {
           breakpointsToSchedule.push(bp)
-          // console.log("Idx of last scheduled BP: ", this.mergedBreakpoints.indexOf(bp), " of ", this.mergedBreakpoints.length)
         } else {
           this.startFrom = i
           break
         }
       }
     }
-    const t2 = performance.now()
-    console.log("Time (ms) to prepare next set of breakpoints: ", t2 - t1)
     return breakpointsToSchedule
-    // for (const bp of this.mergedBreakpoints) {
-    //   if (bp.time >= now && bp.time < now + timeInSecToScheduleInAdvance) {
-    //     breakpointsToSchedule.push(bp)
-    //     // if (this.mergedBreakpoints.indexOf(bp) % 100 === 0) {
-    //       // console.log(bp.time, now + timeInSecToScheduleInAdvance)
-    //       // console.log("Idx of last scheduled BP: ", this.mergedBreakpoints.indexOf(bp), " of ", this.mergedBreakpoints.length)
-    //     // }
-    //   }
-    // }
-    // const t2 = performance.now()
-    // console.log("Time (ms) to prepare next set of breakpoints: ", t2 - t1)
-
-    // for (let i = 0; i < this.mergedBreakpoints.length; i++) {
-    //   const bp = this.mergedBreakpoints[i]
-    //   if (bp.time < this.audioContext.currentTime + timeInSecToScheduleInAdvance) {
-    //     if (bp.time >= this.audioContext.currentTime) {
-    //       breakpointsToSchedule.push(bp)
-    //       console.log("Idx of last scheduled BP: ", this.mergedBreakpoints.indexOf(bp), " of ", this.mergedBreakpoints.length)
-    //     }
-    //   }
-    // }
   }
 
   schedule (timeInSecToScheduleInAdvance) {
@@ -175,6 +165,7 @@ export default class Player {
         let oscObj = this.oscillators.find(osc => osc.index === oscIndex)
         if (!oscObj) {
           oscObj = this.setupOscillator(oscIndex)
+          console.log(oscObj)
           oscObj.osc.start()
           oscObj.osc.stop(oscObj.endTime)
           oscObj.osc.onended = (src) => this.ended(src)
@@ -200,6 +191,8 @@ export default class Player {
 
   ended (src) {
     this.endedSrc.push(src)
+    const realIdx = this.oscillators.indexOf(this.oscillators.find(el => el.index === idx))
+    this.oscillators.splice(realIdx, 1)
     // const realIdx = this.oscillators.indexOf(this.oscillators.find(el => el.index === idx))
     // this.oscillators.splice(realIdx, 1)
     if (this.endedSrc.length === this.partialData.length) {
