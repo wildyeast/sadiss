@@ -9736,6 +9736,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 console.log("Start track pressed.");
+                console.log("TimingObj: ", timingObj);
                 console.log("Queried TimingObj: ", timingObj.query());
 
                 if (timingObj.query().velocity !== 1) {
@@ -9747,14 +9748,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 calculatedStartingPosition = timingObj.query().position + 5;
                 console.log("Calculated starting position: ", calculatedStartingPosition);
-                _context.next = 7;
+                _context.next = 8;
                 return axios.post("/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition));
 
-              case 7:
+              case 8:
                 response = _context.sent;
                 console.log(response.data.data);
 
-              case 9:
+              case 10:
               case "end":
                 return _context.stop();
             }
