@@ -58,7 +58,7 @@ export default {
     }
 
     async function synchronizeTimingSrcPosition () {
-      if (queryTimingObj() != 1) {
+      if (queryTimingObj().velocity != 1) {
         timingObj.update({ velocity: 1 })
         console.log("Set TimingObject velocity to 1.")
       }

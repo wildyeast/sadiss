@@ -9737,7 +9737,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                if (queryTimingObj() != 1) {
+                if (queryTimingObj().velocity != 1) {
                   timingObj.update({
                     velocity: 1
                   });
