@@ -57,6 +57,7 @@ export default {
       console.log("Start track pressed.")
       console.log("TimingObj: ", timingObj)
       const q = timingObj.query()
+      console.log("Queried TimingObject: ", q)
       if (q.velocity !== 1) {
         timingObj.update({ velocity: 1 })
         console.log("Set TimingObject velocity to 1.")
