@@ -53,15 +53,29 @@ export default {
       getRegisteredClients()
     }
 
+    async function queryTimingObj () {
+      const q = await timingObj.query()
+      return q
+      // let counter = 0
+      // const intervalId = window.setInterval(() => {
+      //   const q = timingObj.query()
+      //   console.log("Queried TimingObj: ", q)
+      //   counter++
+      //   if (counter > 5) {
+      //     window.clearInterval(intervalId)
+      //   }
+      // }, 5)
+    }
+
     async function startTrack () {
+      const q = await queryTimingObj()
       console.log("Start track pressed.")
       console.log("TimingObj: ", timingObj)
-      const q = timingObj.query()
       console.log("Queried TimingObject: ", q)
-      if (q.velocity !== 1) {
-        timingObj.update({ velocity: 1 })
-        console.log("Set TimingObject velocity to 1.")
-      }
+      // if (q.velocity !== 1) {
+      //   timingObj.update({ velocity: 1 })
+      //   console.log("Set TimingObject velocity to 1.")
+      // }
       const calculatedStartingPosition = q.position + 5
       console.log("Calculated starting position: ", calculatedStartingPosition)
       const response = await axios.post(`/api/track/${props.trackId}/start/${calculatedStartingPosition}`)
