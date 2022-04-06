@@ -9982,8 +9982,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       getRegisteredClients: getRegisteredClients,
       startTrack: startTrack,
       removeClients: removeClients,
-      synchronizeTimingSrcPosition: synchronizeTimingSrcPosition,
-      timingSrcPosition: timingSrcPosition
+      synchronizing: synchronizing
     };
   }
 });
@@ -11361,10 +11360,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "border p-2"
   }, "Start track"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: _cache[1] || (_cache[1] = function () {
-      return $setup.synchronizeTimingSrcPosition && $setup.synchronizeTimingSrcPosition.apply($setup, arguments);
+      return _ctx.synchronizeTimingSrcPosition && _ctx.synchronizeTimingSrcPosition.apply(_ctx, arguments);
     }),
     "class": "border p-2"
-  }, "Sync " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.timingSrcPosition), 1
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.synchronizing ? 'Sync running' : 'Sync'), 1
   /* TEXT */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: _cache[2] || (_cache[2] = function () {

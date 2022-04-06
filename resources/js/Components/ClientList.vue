@@ -2,7 +2,7 @@
   <div>
     <div class="flex justify-between">
       <button @click="startTrack" class="border p-2">Start track</button>
-      <button @click="synchronizeTimingSrcPosition" class="border p-2">Sync {{ timingSrcPosition }}</button>
+      <button @click="synchronizeTimingSrcPosition" class="border p-2">{{ synchronizing ? 'Sync running' : 'Sync' }}</button>
       <button @click="removeClients" class="border p-2">Remove all registered clients</button>
       <div>
         <button @click="getRegisteredClients"
@@ -127,8 +127,7 @@ export default {
       getRegisteredClients,
       startTrack,
       removeClients,
-      synchronizeTimingSrcPosition,
-      timingSrcPosition
+      synchronizing,
     }
 
   }
