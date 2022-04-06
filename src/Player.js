@@ -49,14 +49,11 @@ export default class Player {
   }
 
   setup (partialData, startInSec, offset) {
-    const t1 = performance.now()
     this.partialData = partialData
     const ctxTime = this.audioContext.currentTime
     const timeToAddToStart = startInSec + ctxTime
-    let totalTime = 0
     // Initialize oscillators, set all values for each oscillator
     for (const partial of this.partialData) {
-      const t2 = performance.now()
       const oscObj = this.setupOscillator(partial, timeToAddToStart)
       for (const breakpoint of partial.breakpoints) {
         const time = Number(breakpoint.time) + timeToAddToStart
@@ -64,10 +61,7 @@ export default class Player {
         oscObj.gain.gain.setValueAtTime(breakpoint.amp, time)
       }
       this.oscillators.push(oscObj)
-      totalTime += performance.now() - t2
     }
-    // console.log("Finished osc setup and value setting. Duration (ms): ", performance.now() - t1)
-    // console.log("Average time (ms) to initialize osc and set values for one partial:", totalTime / this.oscillators.length)
     console.log("Global time after finishing setup: ", this.timingObj.query().position)
   }
 
@@ -130,6 +124,14 @@ export default class Player {
   prepare (timeInSecToScheduleInAdvance) {
     const breakpointsToSchedule = []
     const now = this.audioContext.currentTime
+    // console.log(now)
+    // let bp
+    // while (bp = this.mergedBreakpoints.pop()) {
+    //   if (bp.time > now + timeInSecToScheduleInAdvance ) {
+    //     break
+    //   }
+    //   breakpointsToSchedule.push(bp)
+    // }
     for (let i = this.startFrom; i < this.mergedBreakpoints.length; i++) {
       const bp = this.mergedBreakpoints[i]
       if (bp.time >= now) {
@@ -141,33 +143,41 @@ export default class Player {
         }
       }
     }
-    // console.log("Finished prepare: ", this.audioContext.currentTime) // TOO MANY FOR PHONE
-    console.log(breakpointsToSchedule.length)
+    // console.log("Finished prepare: ", this.audioContext.currentTime) // Too many for phone
     return breakpointsToSchedule
   }
 
   schedule (timeInSecToScheduleInAdvance) {
-    const breakpointsToSchedule = this.prepare(timeInSecToScheduleInAdvance)
-    // console.log("Amount of oscillators currently active: ", this.oscillators.length)
-    // console.log("Amount of breakpoints to schedule: ", breakpointsToSchedule.length)
-    // console.log("Time", parseFloat(this.audioContext.currentTime).toFixed(3), " (+", 
-    //   parseFloat(this.audioContext.currentTime - lastBreakpointTime).toFixed(3), ")")
-    // lastBreakpointTime = this.audioContext.currentTime
-    // console.log(" ")
-
-    for (const currentBreakpoint of breakpointsToSchedule) {
-      const oscIndex = currentBreakpoint.oscIndex
-      let oscObj = this.oscillators.find(osc => osc.index === oscIndex)
-      if (!oscObj) {
-        oscObj = this.setupOscillator(oscIndex)
-        oscObj.osc.start()
-        oscObj.osc.stop(oscObj.endTime)
-        oscObj.osc.onended = (src) => this.ended(src, oscObj.index)
+    const now = performance.now()
+    if (this.mergedBreakpoints[0].time < now + timeInSecToScheduleInAdvance) { // TODO: This doesn't seem to do anything.
+      const breakpointsToSchedule = this.prepare(timeInSecToScheduleInAdvance)
+      // console.log("Amount of oscillators currently active: ", this.oscillators.length)
+      // console.log("Amount of breakpoints to schedule: ", breakpointsToSchedule.length)
+      // console.log("Time", parseFloat(this.audioContext.currentTime).toFixed(3), " (+", 
+      //   parseFloat(this.audioContext.currentTime - lastBreakpointTime).toFixed(3), ")")
+      // lastBreakpointTime = this.audioContext.currentTime
+      // console.log(" ")
+      
+      // const t1 = performance.now()
+      for (const currentBreakpoint of breakpointsToSchedule) {
+        const oscIndex = currentBreakpoint.oscIndex
+        let oscObj = this.oscillators.find(osc => osc.index === oscIndex)
+        // time += performance.now() - t1
+        if (!oscObj) {
+          oscObj = this.setupOscillator(oscIndex)
+          oscObj.osc.start()
+          oscObj.osc.stop(oscObj.endTime)
+          oscObj.osc.onended = (src) => this.ended(src, oscObj.index)
+        }
+        oscObj.osc.frequency.setValueAtTime(currentBreakpoint.freq, Number(currentBreakpoint.time ))
+        oscObj.gain.gain.setValueAtTime(currentBreakpoint.amp, Number(currentBreakpoint.time))
+        // console.log("Total time for finding oscs for all breakpoints: ", time / this.oscillators.length)
       }
-      oscObj.osc.frequency.setValueAtTime(currentBreakpoint.freq, Number(currentBreakpoint.time ))
-      oscObj.gain.gain.setValueAtTime(currentBreakpoint.amp, Number(currentBreakpoint.time))
-
+      // console.log("Total amount of time for scheduling all breakpoints this round: ", performance.now() - t1)
+      // console.log(`Scheduled ${breakpointsToSchedule.length} BPs at ${this.audioContext.currentTime} this round.`,)
     }
+    const t2 = performance.now()
+    console.log("Current time: ", t2, "Time taken for scheduling: ", t2 - now)
   }
 
   setSchedulingInterval (timeInSecToScheduleInAdvance, intervalTimeInMs) {

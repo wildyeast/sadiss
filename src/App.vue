@@ -151,6 +151,7 @@ export default {
         }
         this.player.partialData = this.partials
         this.player.mergeBreakpoints(this.partials)
+        console.log("Total amount of breakpoints: ", this.player.mergedBreakpoints.length)
         
         let prepareStarted = false
 
@@ -166,7 +167,7 @@ export default {
             }
             window.clearInterval(intervalId)
           }
-        }, 1)
+        }, 5)
       }
       return clientData
     },
@@ -185,13 +186,13 @@ export default {
             // console.log("BPs scheduled in initial scheduling round.", bpCountAfterScheduling)
             console.log("audioCtx time when calling setSchedulingInterval: ", this.player.audioContext.currentTime)
             console.log("Global time when calling setSchedulingInterval: ", this.timingObj.query().position)
-            this.player.setSchedulingInterval(100, 100)
+            this.player.setSchedulingInterval(1, 100)
             // this.player.play()
             this.hasStarted = true
           }
           window.clearInterval(intervalId)
         }
-      }, 1)
+      }, 5)
     },
 
     async start () {
