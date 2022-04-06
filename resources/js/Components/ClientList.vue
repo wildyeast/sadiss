@@ -49,7 +49,7 @@ export default {
       getRegisteredClients()
       autoGetRegisteredClients()
       // timingProvider = new TimingProvider('ws://sadiss.net:2276');
-        timingProvider = new TimingProvider('ws://sadiss.net/zeitquelle');
+        timingProvider = new TimingProvider('wss://sadiss.net/zeitquelle');
       // timingObj = new TimingObject(timingProvider)
     })
 
