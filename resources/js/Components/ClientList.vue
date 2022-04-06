@@ -55,16 +55,8 @@ export default {
 
     async function queryTimingObj () {
       const q = await timingObj.query()
+      console.log("Queried TimingObj: ", q)
       return q
-      // let counter = 0
-      // const intervalId = window.setInterval(() => {
-      //   const q = timingObj.query()
-      //   console.log("Queried TimingObj: ", q)
-      //   counter++
-      //   if (counter > 5) {
-      //     window.clearInterval(intervalId)
-      //   }
-      // }, 5)
     }
 
     async function startTrack () {
