@@ -9716,7 +9716,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
       getRegisteredClients();
       autoGetRegisteredClients();
-      timingProvider = new timing_provider__WEBPACK_IMPORTED_MODULE_4__.TimingProvider('ws://sadiss.net:2276'); // timingObj = new TimingObject(timingProvider)
+      timingProvider = new timing_provider__WEBPACK_IMPORTED_MODULE_4__.TimingProvider('ws://localhost:2276'); // timingObj = new TimingObject(timingProvider)
     });
 
     function registerClient() {
