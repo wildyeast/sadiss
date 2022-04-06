@@ -62,7 +62,7 @@ class TrackController extends Controller
     return $columns;
   }
 
-  public function start_track (Request $request, $id) {
+  public function start_track (Request $request, $id, $startTime) {
     $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request);
     $partials = json_decode(Track::where('id', $id)->firstOrFail()->partials);
 
@@ -90,7 +90,7 @@ class TrackController extends Controller
     foreach($clients as $i=>$value) {
       $client = Client::where('id', $value->id)->firstOrFail();
       $client->partials = $chunks[$i];
-      $client->start_time = date('Y-m-d H:i:s', strtotime('+ 15 second'));
+      $client->start_time = $startTime;
       $client->save();
     }
     return Response::json(['data' => $chunks]);

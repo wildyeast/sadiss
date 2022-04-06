@@ -9679,6 +9679,8 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 /* harmony import */ var _Button_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Button.vue */ "./resources/js/Components/Button.vue");
+/* harmony import */ var timing_provider__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! timing-provider */ "./node_modules/timing-provider/build/es2019/module.js");
+/* harmony import */ var timing_object__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! timing-object */ "./node_modules/timing-object/build/es2019/module.js");
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -9694,6 +9696,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
 
 
+
+
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = ({
   components: {
     Button: _Button_vue__WEBPACK_IMPORTED_MODULE_3__["default"]
@@ -9704,8 +9708,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   setup: function setup(props) {
     var registeredClients = (0,vue__WEBPACK_IMPORTED_MODULE_2__.reactive)([]);
     var autoGetRegisteredClientsInterval = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(true);
+    var timingProvider = null;
+    var timingObj = null;
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
       getRegisteredClients();
+      autoGetRegisteredClients();
+      timingProvider = new timing_provider__WEBPACK_IMPORTED_MODULE_4__.TimingProvider('ws://sadiss.net:2276');
+      timingObj = new timing_object__WEBPACK_IMPORTED_MODULE_5__.TimingObject(timingProvider);
     });
 
     function registerClient() {
@@ -9721,19 +9730,20 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
     function _startTrack() {
       _startTrack = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-        var response;
+        var startTime, response;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                _context.next = 2;
-                return axios.post("/api/track/".concat(props.trackId, "/start"));
+                startTime = timingObj.query().position + 5;
+                _context.next = 3;
+                return axios.post("/api/track/".concat(props.trackId, "/start/").concat(startTime));
 
-              case 2:
+              case 3:
                 response = _context.sent;
                 console.log(response.data.data);
 
-              case 4:
+              case 5:
               case "end":
                 return _context.stop();
             }
@@ -13540,8 +13550,7 @@ var Player = /*#__PURE__*/function () {
       }
 
       this.merger = new DynamicsCompressorNode(this.audioContext); // Connect merger (which depending on code above can be Merger or Compressor)
-
-      this.merger.connect(this.audioContext.destination);
+      // this.merger.connect(this.audioContext.destination)
 
       var _iterator2 = _createForOfIteratorHelper(this.oscillators.entries()),
           _step2;
@@ -13558,11 +13567,11 @@ var Player = /*#__PURE__*/function () {
           // console.log(outputChannel)
           // oscObj.osc.connect(this.merger, 0, outputChannel)
           // Use next line for DynamicsCompressorNode
+          // oscObj.gain.connect(this.merger, 0, 0)
+          // Use next line for connecting oscillators to destination directly
 
 
-          _oscObj.osc.connect(this.merger, 0, 0); // Use next line for connecting oscillators to destination directly
-          // oscObj.osc.connect(this.audioContext.destination)
-
+          _oscObj.gain.connect(this.audioContext.destination);
 
           _oscObj.osc.start(this.now);
 
@@ -13727,6 +13736,125 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 //     cluster: process.env.MIX_PUSHER_APP_CLUSTER,
 //     forceTLS: true
 // });
+
+/***/ }),
+
+/***/ "./node_modules/backoff-rxjs/esm5/index.js":
+/*!*************************************************!*\
+  !*** ./node_modules/backoff-rxjs/esm5/index.js ***!
+  \*************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "retryBackoff": () => (/* reexport safe */ _operators_retryBackoff__WEBPACK_IMPORTED_MODULE_0__.retryBackoff),
+/* harmony export */   "intervalBackoff": () => (/* reexport safe */ _observable_intervalBackoff__WEBPACK_IMPORTED_MODULE_1__.intervalBackoff)
+/* harmony export */ });
+/* harmony import */ var _operators_retryBackoff__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./operators/retryBackoff */ "./node_modules/backoff-rxjs/esm5/operators/retryBackoff.js");
+/* harmony import */ var _observable_intervalBackoff__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./observable/intervalBackoff */ "./node_modules/backoff-rxjs/esm5/observable/intervalBackoff.js");
+
+
+
+
+/***/ }),
+
+/***/ "./node_modules/backoff-rxjs/esm5/observable/intervalBackoff.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/backoff-rxjs/esm5/observable/intervalBackoff.js ***!
+  \**********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "intervalBackoff": () => (/* binding */ intervalBackoff)
+/* harmony export */ });
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/scheduler/async.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/observable/of.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/observable/timer.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/expand.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/mapTo.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./node_modules/backoff-rxjs/esm5/utils.js");
+
+
+
+function intervalBackoff(config, scheduler) {
+    if (scheduler === void 0) { scheduler = rxjs__WEBPACK_IMPORTED_MODULE_1__.asyncScheduler; }
+    var _a = typeof config === 'number' ? { initialInterval: config } : config, initialInterval = _a.initialInterval, _b = _a.maxInterval, maxInterval = _b === void 0 ? Infinity : _b, _c = _a.backoffDelay, backoffDelay = _c === void 0 ? _utils__WEBPACK_IMPORTED_MODULE_0__.exponentialBackoffDelay : _c;
+    initialInterval = initialInterval < 0 ? 0 : initialInterval;
+    return (0,rxjs__WEBPACK_IMPORTED_MODULE_2__.of)(0, scheduler).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_3__.expand)(function (iteration) {
+        return (0,rxjs__WEBPACK_IMPORTED_MODULE_4__.timer)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.getDelay)(backoffDelay(iteration, initialInterval), maxInterval))
+            .pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_5__.mapTo)(iteration + 1));
+    }));
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/backoff-rxjs/esm5/operators/retryBackoff.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/backoff-rxjs/esm5/operators/retryBackoff.js ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "retryBackoff": () => (/* binding */ retryBackoff)
+/* harmony export */ });
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/observable/defer.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/observable/iif.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/observable/timer.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/observable/throwError.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/retryWhen.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/concatMap.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/tap.js");
+/* harmony import */ var _utils__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../utils */ "./node_modules/backoff-rxjs/esm5/utils.js");
+
+
+
+function retryBackoff(config) {
+    var _a = typeof config === 'number' ? { initialInterval: config } : config, initialInterval = _a.initialInterval, _b = _a.maxRetries, maxRetries = _b === void 0 ? Infinity : _b, _c = _a.maxInterval, maxInterval = _c === void 0 ? Infinity : _c, _d = _a.shouldRetry, shouldRetry = _d === void 0 ? function () { return true; } : _d, _e = _a.resetOnSuccess, resetOnSuccess = _e === void 0 ? false : _e, _f = _a.backoffDelay, backoffDelay = _f === void 0 ? _utils__WEBPACK_IMPORTED_MODULE_0__.exponentialBackoffDelay : _f;
+    return function (source) {
+        return (0,rxjs__WEBPACK_IMPORTED_MODULE_1__.defer)(function () {
+            var index = 0;
+            return source.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_2__.retryWhen)(function (errors) {
+                return errors.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_3__.concatMap)(function (error) {
+                    var attempt = index++;
+                    return (0,rxjs__WEBPACK_IMPORTED_MODULE_4__.iif)(function () { return attempt < maxRetries && shouldRetry(error); }, (0,rxjs__WEBPACK_IMPORTED_MODULE_5__.timer)((0,_utils__WEBPACK_IMPORTED_MODULE_0__.getDelay)(backoffDelay(attempt, initialInterval), maxInterval)), (0,rxjs__WEBPACK_IMPORTED_MODULE_6__.throwError)(error));
+                }));
+            }), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_7__.tap)(function () {
+                if (resetOnSuccess) {
+                    index = 0;
+                }
+            }));
+        });
+    };
+}
+
+
+/***/ }),
+
+/***/ "./node_modules/backoff-rxjs/esm5/utils.js":
+/*!*************************************************!*\
+  !*** ./node_modules/backoff-rxjs/esm5/utils.js ***!
+  \*************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "getDelay": () => (/* binding */ getDelay),
+/* harmony export */   "exponentialBackoffDelay": () => (/* binding */ exponentialBackoffDelay)
+/* harmony export */ });
+function getDelay(backoffDelay, maxInterval) {
+    return Math.min(backoffDelay, maxInterval);
+}
+function exponentialBackoffDelay(iteration, initialInterval) {
+    return Math.pow(2, iteration) * initialInterval;
+}
+
 
 /***/ }),
 
@@ -37994,6 +38122,5048 @@ module.exports = function getSideChannel() {
 
 /***/ }),
 
+/***/ "./node_modules/rxjs-broker/build/es2019/classes/data-channel-observer.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/classes/data-channel-observer.js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DataChannelObserver": () => (/* binding */ DataChannelObserver)
+/* harmony export */ });
+const BUFFERED_AMOUNT_LOW_THRESHOLD = 2048;
+class DataChannelObserver {
+    constructor(dataChannel) {
+        this._dataChannel = dataChannel;
+        if (typeof dataChannel.bufferedAmountLowThreshold === 'number') {
+            this._isSupportingBufferedAmountLowThreshold = true;
+            if (dataChannel.bufferedAmountLowThreshold === 0) {
+                dataChannel.bufferedAmountLowThreshold = BUFFERED_AMOUNT_LOW_THRESHOLD;
+            }
+        }
+        else {
+            this._isSupportingBufferedAmountLowThreshold = false;
+        }
+    }
+    complete() {
+        // This method does nothing because the DataChannel can be closed separately.
+    }
+    error(err) {
+        throw err;
+    }
+    next(value) {
+        this.send(value);
+    }
+    send(message) {
+        if (this._dataChannel.readyState === 'open') {
+            if (this._isSupportingBufferedAmountLowThreshold &&
+                this._dataChannel.bufferedAmount > this._dataChannel.bufferedAmountLowThreshold) {
+                return new Promise((resolve, reject) => {
+                    const handleBufferedAmountLowEvent = () => {
+                        this._dataChannel.removeEventListener('bufferedamountlow', handleBufferedAmountLowEvent);
+                        this._dataChannel.removeEventListener('error', handleErrorEvent); // tslint:disable-line:no-use-before-declare
+                        this.send(message);
+                        resolve();
+                    };
+                    const handleErrorEvent = (({ error }) => {
+                        this._dataChannel.removeEventListener('bufferedamountlow', handleBufferedAmountLowEvent);
+                        this._dataChannel.removeEventListener('error', handleErrorEvent);
+                        reject(error);
+                    });
+                    this._dataChannel.addEventListener('bufferedamountlow', handleBufferedAmountLowEvent);
+                    this._dataChannel.addEventListener('error', handleErrorEvent);
+                });
+            }
+            return Promise.resolve(this._dataChannel.send(JSON.stringify(message)));
+        }
+        return new Promise((resolve, reject) => {
+            const handleErrorEvent = (({ error }) => {
+                this._dataChannel.removeEventListener('error', handleErrorEvent);
+                this._dataChannel.removeEventListener('open', handleOpenEvent); // tslint:disable-line:no-use-before-declare
+                reject(error);
+            });
+            const handleOpenEvent = () => {
+                this._dataChannel.removeEventListener('error', handleErrorEvent);
+                this._dataChannel.removeEventListener('open', handleOpenEvent);
+                resolve(this.send(message));
+            };
+            this._dataChannel.addEventListener('error', handleErrorEvent);
+            this._dataChannel.addEventListener('open', handleOpenEvent);
+        });
+    }
+}
+//# sourceMappingURL=data-channel-observer.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/classes/data-channel-subject.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/classes/data-channel-subject.js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "DataChannelSubject": () => (/* binding */ DataChannelSubject)
+/* harmony export */ });
+/* harmony import */ var rxjs_internal_Subject__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! rxjs/internal/Subject */ "./node_modules/rxjs/dist/esm5/internal/Subject.js");
+ // tslint:disable-line rxjs-no-compat no-submodule-imports rxjs-no-internal
+class DataChannelSubject extends rxjs_internal_Subject__WEBPACK_IMPORTED_MODULE_0__.AnonymousSubject {
+    constructor(createDataChannelObserver, createTransportObservable, dataChannel, subjectConfig) {
+        const observable = createTransportObservable(dataChannel, subjectConfig);
+        const observer = createDataChannelObserver(dataChannel);
+        super(observer, observable);
+        this._dataChannel = dataChannel;
+    }
+    close() {
+        this._dataChannel.close();
+    }
+    send(message) {
+        const { destination } = this;
+        if (!this.isStopped) {
+            return destination.send(message);
+        }
+        return Promise.resolve();
+    }
+}
+//# sourceMappingURL=data-channel-subject.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/classes/masked-subject.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/classes/masked-subject.js ***!
+  \*************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "MaskedSubject": () => (/* binding */ MaskedSubject)
+/* harmony export */ });
+/* harmony import */ var rxjs_internal_Subject__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! rxjs/internal/Subject */ "./node_modules/rxjs/dist/esm5/internal/Subject.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/filter.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/map.js");
+ // tslint:disable-line rxjs-no-compat no-submodule-imports rxjs-no-internal
+
+class MaskedSubject extends rxjs_internal_Subject__WEBPACK_IMPORTED_MODULE_0__.AnonymousSubject {
+    // tslint:disable-next-line max-line-length rxjs-no-exposed-subjects
+    constructor(getTypedKeys, mask, maskableSubject) {
+        const destination = {
+            complete: maskableSubject.complete,
+            error: maskableSubject.error,
+            next: (value) => this.send(value)
+        };
+        const stringifiedValues = getTypedKeys(mask).map((key) => [key, JSON.stringify(mask[key])]);
+        const source = maskableSubject.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_1__.filter)((message) => stringifiedValues.every(([key, value]) => value === JSON.stringify(message[key]))), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_2__.map)(({ message }) => message));
+        super(destination, source);
+        this._mask = mask;
+        this._maskableSubject = maskableSubject;
+    }
+    close() {
+        this._maskableSubject.close();
+    }
+    send(value) {
+        return this._maskableSubject.send({ ...this._mask, message: value });
+    }
+}
+//# sourceMappingURL=masked-subject.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/classes/transport-observable.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/classes/transport-observable.js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "TransportObservable": () => (/* binding */ TransportObservable)
+/* harmony export */ });
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/Observable.js");
+
+const defaultDeserializer = ({ data }) => {
+    try {
+        return JSON.parse(data);
+    }
+    catch {
+        return data;
+    }
+};
+// tslint:disable-next-line rxjs-no-subclass
+class TransportObservable extends rxjs__WEBPACK_IMPORTED_MODULE_0__.Observable {
+    constructor(transport, { deserializer = defaultDeserializer, openObserver }) {
+        super((observer) => {
+            const handleCloseEvent = () => observer.complete();
+            const handleErrorEvent = ((({ error }) => (error === undefined ? observer.error(new Error('Unknown Error')) : observer.error(error))));
+            const handleMessageEvent = ((event) => observer.next(deserializer(event)));
+            const handleOpenEvent = () => {
+                if (openObserver !== undefined) {
+                    openObserver.next();
+                }
+            };
+            transport.addEventListener('close', handleCloseEvent);
+            transport.addEventListener('error', handleErrorEvent);
+            transport.addEventListener('message', handleMessageEvent);
+            transport.addEventListener('open', handleOpenEvent);
+            return () => {
+                transport.removeEventListener('close', handleCloseEvent);
+                transport.removeEventListener('error', handleErrorEvent);
+                transport.removeEventListener('message', handleMessageEvent);
+                transport.removeEventListener('open', handleOpenEvent);
+            };
+        });
+    }
+}
+//# sourceMappingURL=transport-observable.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/classes/web-socket-observer.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/classes/web-socket-observer.js ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "WebSocketObserver": () => (/* binding */ WebSocketObserver)
+/* harmony export */ });
+class WebSocketObserver {
+    constructor(webSocket) {
+        this._webSocket = webSocket;
+    }
+    complete() {
+        // This method does nothing because the DataChannel can be closed separately.
+    }
+    error(err) {
+        throw err;
+    }
+    next(value) {
+        this.send(value);
+    }
+    send(message) {
+        const stringifiedMessage = JSON.stringify(message);
+        if (this._webSocket.readyState === WebSocket.OPEN) {
+            this._webSocket.send(stringifiedMessage);
+            return Promise.resolve();
+        }
+        if (this._webSocket.readyState === WebSocket.CLOSING) {
+            return Promise.reject(new Error('The WebSocket is already closing.'));
+        }
+        if (this._webSocket.readyState === WebSocket.CLOSED) {
+            return Promise.reject(new Error('The WebSocket is already closed.'));
+        }
+        return new Promise((resolve, reject) => {
+            const handleErrorEvent = () => {
+                this._webSocket.removeEventListener('error', handleErrorEvent);
+                this._webSocket.removeEventListener('open', handleOpenEvent); // tslint:disable-line:no-use-before-declare
+                reject(new Error('Unknown WebSocket Error'));
+            };
+            const handleOpenEvent = () => {
+                this._webSocket.removeEventListener('error', handleErrorEvent);
+                this._webSocket.removeEventListener('open', handleOpenEvent);
+                this._webSocket.send(stringifiedMessage);
+                resolve();
+            };
+            this._webSocket.addEventListener('error', handleErrorEvent);
+            this._webSocket.addEventListener('open', handleOpenEvent);
+        });
+    }
+}
+//# sourceMappingURL=web-socket-observer.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/classes/web-socket-subject.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/classes/web-socket-subject.js ***!
+  \*****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "WebSocketSubject": () => (/* binding */ WebSocketSubject)
+/* harmony export */ });
+/* harmony import */ var rxjs_internal_Subject__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! rxjs/internal/Subject */ "./node_modules/rxjs/dist/esm5/internal/Subject.js");
+ // tslint:disable-line rxjs-no-compat no-submodule-imports rxjs-no-internal
+class WebSocketSubject extends rxjs_internal_Subject__WEBPACK_IMPORTED_MODULE_0__.AnonymousSubject {
+    constructor(createTransportObservable, createWebSocketObserver, webSocket, subjectConfig) {
+        const observable = createTransportObservable(webSocket, subjectConfig);
+        const observer = createWebSocketObserver(webSocket);
+        super(observer, observable);
+        this._webSocket = webSocket;
+    }
+    close() {
+        this._webSocket.close();
+    }
+    send(message) {
+        const { destination } = this;
+        if (!this.isStopped) {
+            return destination.send(message);
+        }
+        return Promise.resolve();
+    }
+}
+//# sourceMappingURL=web-socket-subject.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/factories/data-channel-observer.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/factories/data-channel-observer.js ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createDataChannelObserver": () => (/* binding */ createDataChannelObserver)
+/* harmony export */ });
+/* harmony import */ var _classes_data_channel_observer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../classes/data-channel-observer */ "./node_modules/rxjs-broker/build/es2019/classes/data-channel-observer.js");
+
+const createDataChannelObserver = (dataChannel) => {
+    return new _classes_data_channel_observer__WEBPACK_IMPORTED_MODULE_0__.DataChannelObserver(dataChannel);
+};
+//# sourceMappingURL=data-channel-observer.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/factories/data-channel-subject-factory.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/factories/data-channel-subject-factory.js ***!
+  \*****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createDataChannelSubjectFactory": () => (/* binding */ createDataChannelSubjectFactory)
+/* harmony export */ });
+/* harmony import */ var _classes_data_channel_subject__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../classes/data-channel-subject */ "./node_modules/rxjs-broker/build/es2019/classes/data-channel-subject.js");
+
+const createDataChannelSubjectFactory = (createDataChannelObserver, createTransportObservable) => {
+    return (dataChannel, subjectConfig) => {
+        return new _classes_data_channel_subject__WEBPACK_IMPORTED_MODULE_0__.DataChannelSubject(createDataChannelObserver, createTransportObservable, dataChannel, subjectConfig);
+    };
+};
+//# sourceMappingURL=data-channel-subject-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/factories/masked-subject-factory.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/factories/masked-subject-factory.js ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createMaskedSubjectFactory": () => (/* binding */ createMaskedSubjectFactory)
+/* harmony export */ });
+/* harmony import */ var _classes_masked_subject__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../classes/masked-subject */ "./node_modules/rxjs-broker/build/es2019/classes/masked-subject.js");
+
+const createMaskedSubjectFactory = (getTypedKeys) => {
+    return (// tslint:disable-line max-line-length
+    mask, maskableSubject) => {
+        return new _classes_masked_subject__WEBPACK_IMPORTED_MODULE_0__.MaskedSubject(getTypedKeys, mask, maskableSubject);
+    };
+};
+//# sourceMappingURL=masked-subject-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/factories/transport-observable.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/factories/transport-observable.js ***!
+  \*********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createTransportObservable": () => (/* binding */ createTransportObservable)
+/* harmony export */ });
+/* harmony import */ var _classes_transport_observable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../classes/transport-observable */ "./node_modules/rxjs-broker/build/es2019/classes/transport-observable.js");
+
+const createTransportObservable = (transport, subjectConfig) => {
+    return new _classes_transport_observable__WEBPACK_IMPORTED_MODULE_0__.TransportObservable(transport, subjectConfig);
+};
+//# sourceMappingURL=transport-observable.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/factories/web-socket-observer.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/factories/web-socket-observer.js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createWebSocketObserver": () => (/* binding */ createWebSocketObserver)
+/* harmony export */ });
+/* harmony import */ var _classes_web_socket_observer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../classes/web-socket-observer */ "./node_modules/rxjs-broker/build/es2019/classes/web-socket-observer.js");
+
+const createWebSocketObserver = (webSocket) => {
+    return new _classes_web_socket_observer__WEBPACK_IMPORTED_MODULE_0__.WebSocketObserver(webSocket);
+};
+//# sourceMappingURL=web-socket-observer.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/factories/web-socket-subject-factory.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/factories/web-socket-subject-factory.js ***!
+  \***************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createWebSocketSubjectFactory": () => (/* binding */ createWebSocketSubjectFactory)
+/* harmony export */ });
+/* harmony import */ var _classes_web_socket_subject__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../classes/web-socket-subject */ "./node_modules/rxjs-broker/build/es2019/classes/web-socket-subject.js");
+
+const createWebSocketSubjectFactory = (createTransportObservable, createWebSocketObserver) => {
+    return (webSocket, subjectConfig) => {
+        return new _classes_web_socket_subject__WEBPACK_IMPORTED_MODULE_0__.WebSocketSubject(createTransportObservable, createWebSocketObserver, webSocket, subjectConfig);
+    };
+};
+//# sourceMappingURL=web-socket-subject-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/functions/get-typed-keys.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/functions/get-typed-keys.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "getTypedKeys": () => (/* binding */ getTypedKeys)
+/* harmony export */ });
+const getTypedKeys = (object) => Object.keys(object);
+//# sourceMappingURL=get-typed-keys.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/interfaces/index.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/interfaces/index.js ***!
+  \*******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _remote_subject__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./remote-subject */ "./node_modules/rxjs-broker/build/es2019/interfaces/remote-subject.js");
+/* harmony import */ var _stringifyable_json_object__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./stringifyable-json-object */ "./node_modules/rxjs-broker/build/es2019/interfaces/stringifyable-json-object.js");
+/* harmony import */ var _stringifyable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./stringifyable */ "./node_modules/rxjs-broker/build/es2019/interfaces/stringifyable.js");
+/* harmony import */ var _subject_config__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./subject-config */ "./node_modules/rxjs-broker/build/es2019/interfaces/subject-config.js");
+
+
+
+
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/interfaces/remote-subject.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/interfaces/remote-subject.js ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=remote-subject.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/interfaces/stringifyable-json-object.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/interfaces/stringifyable-json-object.js ***!
+  \***************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=stringifyable-json-object.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/interfaces/stringifyable.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/interfaces/stringifyable.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=stringifyable.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/interfaces/subject-config.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/interfaces/subject-config.js ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=subject-config.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/module.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/module.js ***!
+  \*********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "connect": () => (/* binding */ connect),
+/* harmony export */   "isSupported": () => (/* binding */ isSupported),
+/* harmony export */   "mask": () => (/* binding */ mask),
+/* harmony export */   "wrap": () => (/* binding */ wrap)
+/* harmony export */ });
+/* harmony import */ var _factories_data_channel_observer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./factories/data-channel-observer */ "./node_modules/rxjs-broker/build/es2019/factories/data-channel-observer.js");
+/* harmony import */ var _factories_data_channel_subject_factory__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./factories/data-channel-subject-factory */ "./node_modules/rxjs-broker/build/es2019/factories/data-channel-subject-factory.js");
+/* harmony import */ var _factories_masked_subject_factory__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./factories/masked-subject-factory */ "./node_modules/rxjs-broker/build/es2019/factories/masked-subject-factory.js");
+/* harmony import */ var _factories_transport_observable__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./factories/transport-observable */ "./node_modules/rxjs-broker/build/es2019/factories/transport-observable.js");
+/* harmony import */ var _factories_web_socket_observer__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./factories/web-socket-observer */ "./node_modules/rxjs-broker/build/es2019/factories/web-socket-observer.js");
+/* harmony import */ var _factories_web_socket_subject_factory__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./factories/web-socket-subject-factory */ "./node_modules/rxjs-broker/build/es2019/factories/web-socket-subject-factory.js");
+/* harmony import */ var _functions_get_typed_keys__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./functions/get-typed-keys */ "./node_modules/rxjs-broker/build/es2019/functions/get-typed-keys.js");
+/* harmony import */ var _interfaces_index__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./interfaces/index */ "./node_modules/rxjs-broker/build/es2019/interfaces/index.js");
+/* harmony import */ var _types_index__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./types/index */ "./node_modules/rxjs-broker/build/es2019/types/index.js");
+
+
+
+
+
+
+
+/*
+ * @todo Explicitly referencing the barrel file seems to be necessary when enabling the
+ * isolatedModules compiler option.
+ */
+
+
+const createDataChannelSubject = (0,_factories_data_channel_subject_factory__WEBPACK_IMPORTED_MODULE_1__.createDataChannelSubjectFactory)(_factories_data_channel_observer__WEBPACK_IMPORTED_MODULE_0__.createDataChannelObserver, _factories_transport_observable__WEBPACK_IMPORTED_MODULE_3__.createTransportObservable);
+const createWebSocketSubject = (0,_factories_web_socket_subject_factory__WEBPACK_IMPORTED_MODULE_5__.createWebSocketSubjectFactory)(_factories_transport_observable__WEBPACK_IMPORTED_MODULE_3__.createTransportObservable, _factories_web_socket_observer__WEBPACK_IMPORTED_MODULE_4__.createWebSocketObserver);
+const connect = (url, subjectConfig = {}) => {
+    return createWebSocketSubject(new WebSocket(url), subjectConfig);
+};
+/**
+ * This property is true if the browser supports WebSockets.
+ */
+const isSupported = typeof window !== 'undefined' && 'WebSocket' in window;
+const mask = (0,_factories_masked_subject_factory__WEBPACK_IMPORTED_MODULE_2__.createMaskedSubjectFactory)(_functions_get_typed_keys__WEBPACK_IMPORTED_MODULE_6__.getTypedKeys);
+const wrap = (dataChannel, subjectConfig = {}) => {
+    return createDataChannelSubject(dataChannel, subjectConfig);
+};
+//# sourceMappingURL=module.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/types/binary-type.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/types/binary-type.js ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// @todo This is an extract of @types/webrtc because it can't be used anymore since it causes a conflict with the built-in types.
+
+//# sourceMappingURL=binary-type.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/types/data-channel-observer-factory.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/types/data-channel-observer-factory.js ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=data-channel-observer-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/types/data-channel-subject-factory-factory.js":
+/*!*********************************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/types/data-channel-subject-factory-factory.js ***!
+  \*********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=data-channel-subject-factory-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/types/data-channel-subject-factory.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/types/data-channel-subject-factory.js ***!
+  \*************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=data-channel-subject-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/types/event-handler.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/types/event-handler.js ***!
+  \**********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+// @todo This is an extract of @types/webrtc because it can't be used anymore since it causes a conflict with the built-in types.
+
+//# sourceMappingURL=event-handler.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/types/get-typed-keys-function.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/types/get-typed-keys-function.js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=get-typed-keys-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/types/index.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/types/index.js ***!
+  \**************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _binary_type__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./binary-type */ "./node_modules/rxjs-broker/build/es2019/types/binary-type.js");
+/* harmony import */ var _data_channel_observer_factory__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./data-channel-observer-factory */ "./node_modules/rxjs-broker/build/es2019/types/data-channel-observer-factory.js");
+/* harmony import */ var _data_channel_subject_factory__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./data-channel-subject-factory */ "./node_modules/rxjs-broker/build/es2019/types/data-channel-subject-factory.js");
+/* harmony import */ var _data_channel_subject_factory_factory__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./data-channel-subject-factory-factory */ "./node_modules/rxjs-broker/build/es2019/types/data-channel-subject-factory-factory.js");
+/* harmony import */ var _event_handler__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./event-handler */ "./node_modules/rxjs-broker/build/es2019/types/event-handler.js");
+/* harmony import */ var _get_typed_keys_function__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./get-typed-keys-function */ "./node_modules/rxjs-broker/build/es2019/types/get-typed-keys-function.js");
+/* harmony import */ var _masked_subject_factory__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./masked-subject-factory */ "./node_modules/rxjs-broker/build/es2019/types/masked-subject-factory.js");
+/* harmony import */ var _masked_subject_factory_factory__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./masked-subject-factory-factory */ "./node_modules/rxjs-broker/build/es2019/types/masked-subject-factory-factory.js");
+/* harmony import */ var _stringifyable_json_object__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./stringifyable-json-object */ "./node_modules/rxjs-broker/build/es2019/types/stringifyable-json-object.js");
+/* harmony import */ var _stringifyable_json_value__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./stringifyable-json-value */ "./node_modules/rxjs-broker/build/es2019/types/stringifyable-json-value.js");
+/* harmony import */ var _transport_observable_factory__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./transport-observable-factory */ "./node_modules/rxjs-broker/build/es2019/types/transport-observable-factory.js");
+/* harmony import */ var _web_socket_observer_factory__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./web-socket-observer-factory */ "./node_modules/rxjs-broker/build/es2019/types/web-socket-observer-factory.js");
+/* harmony import */ var _web_socket_subject_factory__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./web-socket-subject-factory */ "./node_modules/rxjs-broker/build/es2019/types/web-socket-subject-factory.js");
+/* harmony import */ var _web_socket_subject_factory_factory__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./web-socket-subject-factory-factory */ "./node_modules/rxjs-broker/build/es2019/types/web-socket-subject-factory-factory.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/types/masked-subject-factory-factory.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/types/masked-subject-factory-factory.js ***!
+  \***************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=masked-subject-factory-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/types/masked-subject-factory.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/types/masked-subject-factory.js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=masked-subject-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/types/stringifyable-json-object.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/types/stringifyable-json-object.js ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=stringifyable-json-object.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/types/stringifyable-json-value.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/types/stringifyable-json-value.js ***!
+  \*********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=stringifyable-json-value.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/types/transport-observable-factory.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/types/transport-observable-factory.js ***!
+  \*************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=transport-observable-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/types/web-socket-observer-factory.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/types/web-socket-observer-factory.js ***!
+  \************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=web-socket-observer-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/types/web-socket-subject-factory-factory.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/types/web-socket-subject-factory-factory.js ***!
+  \*******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=web-socket-subject-factory-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-broker/build/es2019/types/web-socket-subject-factory.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/rxjs-broker/build/es2019/types/web-socket-subject-factory.js ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=web-socket-subject-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/factories/data-channel-accepting-observable-factory.js":
+/*!*********************************************************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/factories/data-channel-accepting-observable-factory.js ***!
+  \*********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createDataChannelAcceptingObservableFactory": () => (/* binding */ createDataChannelAcceptingObservableFactory)
+/* harmony export */ });
+const createDataChannelAcceptingObservableFactory = (createDataChannelAwaitingObservable, createDataChannelCreatingObservable, iceServers) => {
+    return (isActive, label, webSocketSubject) => {
+        if (isActive) {
+            return createDataChannelCreatingObservable(iceServers, label, webSocketSubject);
+        }
+        return createDataChannelAwaitingObservable(iceServers, webSocketSubject);
+    };
+};
+//# sourceMappingURL=data-channel-accepting-observable-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/factories/data-channel-awaitting-observable-factory.js":
+/*!*********************************************************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/factories/data-channel-awaitting-observable-factory.js ***!
+  \*********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createDataChannelAwaitingObservableFactory": () => (/* binding */ createDataChannelAwaitingObservableFactory)
+/* harmony export */ });
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/Observable.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/operators/filter.js");
+/* harmony import */ var rxjs_broker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! rxjs-broker */ "./node_modules/rxjs-broker/build/es2019/module.js");
+
+
+const createDataChannelAwaitingObservableFactory = (emitChannel) => {
+    return (iceServers, webSocketSubject) => {
+        return new rxjs__WEBPACK_IMPORTED_MODULE_1__.Observable((observer) => {
+            const peerConnection = new RTCPeerConnection({ iceServers });
+            const candidateChannelSubject = (0,rxjs_broker__WEBPACK_IMPORTED_MODULE_0__.mask)({ type: 'candidate' }, webSocketSubject);
+            const descriptionChannelSubject = (0,rxjs_broker__WEBPACK_IMPORTED_MODULE_0__.mask)({ type: 'description' }, webSocketSubject);
+            const termination$ = webSocketSubject.pipe((0,rxjs__WEBPACK_IMPORTED_MODULE_2__.filter)((event) => event.type === 'termination'));
+            const candidateChannelSubscription = candidateChannelSubject.subscribe(({ candidate }) => peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {
+                // Errors can be ignored.
+            }));
+            const descriptionChannelSubscription = descriptionChannelSubject.subscribe(({ description }) => {
+                peerConnection.setRemoteDescription(new RTCSessionDescription(description)).catch(() => {
+                    // @todo Handle this error and maybe request another description.
+                });
+                peerConnection
+                    .createAnswer()
+                    .then((answer) => {
+                    peerConnection.setLocalDescription(answer).catch(() => {
+                        // @todo Handle this error and maybe create another description.
+                    });
+                    // @todo Remove casting again when possible.
+                    descriptionChannelSubject.send({ description: answer });
+                })
+                    .catch(() => {
+                    // @todo Handle this error and maybe create another answer.
+                });
+            });
+            const terminationSubscription = termination$.subscribe(() => {
+                unsubscribe();
+                observer.complete();
+                peerConnection.close();
+            });
+            const unsubscribe = () => {
+                candidateChannelSubscription.unsubscribe();
+                descriptionChannelSubscription.unsubscribe();
+                terminationSubscription.unsubscribe();
+            };
+            peerConnection.addEventListener('datachannel', ({ channel }) => {
+                unsubscribe();
+                // @todo In Firefox the channel might have a readyState of 'connecting'. That needs to be covered by a test.
+                if (channel.readyState === 'connecting') {
+                    const emitChannelWhenOpen = () => {
+                        channel.removeEventListener('open', emitChannelWhenOpen);
+                        emitChannel(channel, observer);
+                    };
+                    // @todo What happens if there is no 'open' event and the channel gets closed before.
+                    channel.addEventListener('open', emitChannelWhenOpen);
+                }
+                else {
+                    emitChannel(channel, observer);
+                }
+            });
+            peerConnection.addEventListener('icecandidate', ({ candidate }) => {
+                if (candidate !== null) {
+                    // @todo Remove casting again when possible.
+                    candidateChannelSubject.send({ candidate });
+                }
+            });
+            return () => {
+                unsubscribe();
+                // @todo Close the PeerConnection.
+            };
+        });
+    };
+};
+//# sourceMappingURL=data-channel-awaitting-observable-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/factories/data-channels-accepting-observable-factory.js":
+/*!**********************************************************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/factories/data-channels-accepting-observable-factory.js ***!
+  \**********************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createDataChannelsAcceptingObservableFactory": () => (/* binding */ createDataChannelsAcceptingObservableFactory)
+/* harmony export */ });
+/* harmony import */ var rxjs_broker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! rxjs-broker */ "./node_modules/rxjs-broker/build/es2019/module.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/mergeMap.js");
+
+
+const createDataChannelsAcceptingObservableFactory = (createDataChannelAcceptingObservable) => {
+    return (webSocketSubject) => (0,rxjs_broker__WEBPACK_IMPORTED_MODULE_0__.mask)({ type: 'request' }, webSocketSubject).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_1__.mergeMap)(({ isActive = true, label = null, mask: msk }) => {
+        return createDataChannelAcceptingObservable(isActive, label, (0,rxjs_broker__WEBPACK_IMPORTED_MODULE_0__.mask)(msk, webSocketSubject));
+    }));
+};
+//# sourceMappingURL=data-channels-accepting-observable-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/functions/create-data-channel-creating-observable.js":
+/*!*******************************************************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/functions/create-data-channel-creating-observable.js ***!
+  \*******************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createDataChannelCreatingObservable": () => (/* binding */ createDataChannelCreatingObservable)
+/* harmony export */ });
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/Observable.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/operators/filter.js");
+/* harmony import */ var rxjs_broker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! rxjs-broker */ "./node_modules/rxjs-broker/build/es2019/module.js");
+
+
+const createDataChannelCreatingObservable = (iceServers, label, webSocketSubject) => {
+    return new rxjs__WEBPACK_IMPORTED_MODULE_1__.Observable((observer) => {
+        const peerConnection = new RTCPeerConnection({ iceServers });
+        const dataChannel = peerConnection.createDataChannel(label === null ? '' : label, { ordered: true });
+        const candidateSubject = (0,rxjs_broker__WEBPACK_IMPORTED_MODULE_0__.mask)({ type: 'candidate' }, webSocketSubject);
+        const descriptionSubject = (0,rxjs_broker__WEBPACK_IMPORTED_MODULE_0__.mask)({ type: 'description' }, webSocketSubject);
+        const termination$ = webSocketSubject.pipe((0,rxjs__WEBPACK_IMPORTED_MODULE_2__.filter)((event) => event.type === 'termination'));
+        const candidateSubjectSubscription = candidateSubject.subscribe(({ candidate }) => peerConnection.addIceCandidate(new RTCIceCandidate(candidate)).catch(() => {
+            // Errors can be ignored.
+        }));
+        const descriptionSubjectSubscription = descriptionSubject.subscribe(({ description }) => peerConnection.setRemoteDescription(new RTCSessionDescription(description)).catch(() => {
+            // @todo Handle this error and maybe request another description.
+        }));
+        const terminationSubscription = termination$.subscribe(() => {
+            unsubscribe();
+            observer.complete();
+            peerConnection.close();
+        });
+        const unsubscribe = () => {
+            candidateSubjectSubscription.unsubscribe();
+            descriptionSubjectSubscription.unsubscribe();
+            terminationSubscription.unsubscribe();
+        };
+        dataChannel.addEventListener('open', () => {
+            unsubscribe();
+            // Make sure to close the peerConnection when the DataChannel gets closed.
+            dataChannel.addEventListener('close', () => peerConnection.close());
+            observer.next(dataChannel);
+            observer.complete();
+        });
+        peerConnection.addEventListener('icecandidate', ({ candidate }) => {
+            if (candidate !== null) {
+                // @todo Remove casting again when possible.
+                candidateSubject.send({ candidate });
+            }
+        });
+        peerConnection.addEventListener('negotiationneeded', () => {
+            peerConnection
+                .createOffer()
+                .then((description) => {
+                peerConnection.setLocalDescription(description).catch(() => {
+                    // @todo Handle this error and maybe create another offer.
+                });
+                // @todo Remove casting again when possible.
+                descriptionSubject.send({ description });
+            })
+                .catch(() => {
+                // @todo Handle this error and maybe create another offer.
+            });
+        });
+        return () => {
+            unsubscribe();
+            if (dataChannel.readyState === 'connecting') {
+                peerConnection.close();
+            }
+        };
+    });
+};
+//# sourceMappingURL=create-data-channel-creating-observable.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/functions/emit-channel.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/functions/emit-channel.js ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "emitChannel": () => (/* binding */ emitChannel)
+/* harmony export */ });
+const emitChannel = (channel, observer) => {
+    observer.next(channel);
+    observer.complete();
+};
+//# sourceMappingURL=emit-channel.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/interfaces/data-channel-event.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/interfaces/data-channel-event.js ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=data-channel-event.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/interfaces/index.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/interfaces/index.js ***!
+  \**********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _data_channel_event__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./data-channel-event */ "./node_modules/rxjs-connector/build/es2019/interfaces/data-channel-event.js");
+
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/module.js":
+/*!************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/module.js ***!
+  \************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "accept": () => (/* binding */ accept),
+/* harmony export */   "isSupported": () => (/* reexport safe */ rxjs_broker__WEBPACK_IMPORTED_MODULE_0__.isSupported)
+/* harmony export */ });
+/* harmony import */ var rxjs_broker__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! rxjs-broker */ "./node_modules/rxjs-broker/build/es2019/module.js");
+/* harmony import */ var _factories_data_channel_accepting_observable_factory__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./factories/data-channel-accepting-observable-factory */ "./node_modules/rxjs-connector/build/es2019/factories/data-channel-accepting-observable-factory.js");
+/* harmony import */ var _factories_data_channel_awaitting_observable_factory__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./factories/data-channel-awaitting-observable-factory */ "./node_modules/rxjs-connector/build/es2019/factories/data-channel-awaitting-observable-factory.js");
+/* harmony import */ var _factories_data_channels_accepting_observable_factory__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./factories/data-channels-accepting-observable-factory */ "./node_modules/rxjs-connector/build/es2019/factories/data-channels-accepting-observable-factory.js");
+/* harmony import */ var _functions_create_data_channel_creating_observable__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./functions/create-data-channel-creating-observable */ "./node_modules/rxjs-connector/build/es2019/functions/create-data-channel-creating-observable.js");
+/* harmony import */ var _functions_emit_channel__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./functions/emit-channel */ "./node_modules/rxjs-connector/build/es2019/functions/emit-channel.js");
+/* harmony import */ var _interfaces_index__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./interfaces/index */ "./node_modules/rxjs-connector/build/es2019/interfaces/index.js");
+/* harmony import */ var _types_index__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./types/index */ "./node_modules/rxjs-connector/build/es2019/types/index.js");
+
+
+
+
+
+
+/*
+ * @todo Explicitly referencing the barrel file seems to be necessary when enabling the
+ * isolatedModules compiler option.
+ */
+
+
+const ICE_SERVERS = [
+    {
+        urls: ['stun:stun.l.google.com:19302', 'stun:stun1.l.google.com:19302']
+    }
+];
+const createDataChannelsAcceptingObservable = (0,_factories_data_channels_accepting_observable_factory__WEBPACK_IMPORTED_MODULE_3__.createDataChannelsAcceptingObservableFactory)((0,_factories_data_channel_accepting_observable_factory__WEBPACK_IMPORTED_MODULE_1__.createDataChannelAcceptingObservableFactory)((0,_factories_data_channel_awaitting_observable_factory__WEBPACK_IMPORTED_MODULE_2__.createDataChannelAwaitingObservableFactory)(_functions_emit_channel__WEBPACK_IMPORTED_MODULE_5__.emitChannel), _functions_create_data_channel_creating_observable__WEBPACK_IMPORTED_MODULE_4__.createDataChannelCreatingObservable, ICE_SERVERS));
+const accept = (url, subjectConfig = {}) => {
+    return createDataChannelsAcceptingObservable((0,rxjs_broker__WEBPACK_IMPORTED_MODULE_0__.connect)(url, subjectConfig));
+};
+/**
+ * This property is true if the browser supports WebSockets.
+ */
+// @todo Do also check of RTCPeerConnection and DataChannel support.
+
+//# sourceMappingURL=module.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/types/candidate-event.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/types/candidate-event.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=candidate-event.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/types/candidate-message.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/types/candidate-message.js ***!
+  \*****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=candidate-message.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/types/client-event.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/types/client-event.js ***!
+  \************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=client-event.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/types/description-event.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/types/description-event.js ***!
+  \*****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=description-event.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/types/description-message.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/types/description-message.js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=description-message.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/types/index.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/types/index.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _candidate_event__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./candidate-event */ "./node_modules/rxjs-connector/build/es2019/types/candidate-event.js");
+/* harmony import */ var _candidate_message__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./candidate-message */ "./node_modules/rxjs-connector/build/es2019/types/candidate-message.js");
+/* harmony import */ var _client_event__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./client-event */ "./node_modules/rxjs-connector/build/es2019/types/client-event.js");
+/* harmony import */ var _description_event__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./description-event */ "./node_modules/rxjs-connector/build/es2019/types/description-event.js");
+/* harmony import */ var _description_message__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./description-message */ "./node_modules/rxjs-connector/build/es2019/types/description-message.js");
+/* harmony import */ var _request_event__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./request-event */ "./node_modules/rxjs-connector/build/es2019/types/request-event.js");
+/* harmony import */ var _request_message__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./request-message */ "./node_modules/rxjs-connector/build/es2019/types/request-message.js");
+/* harmony import */ var _termination_event__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./termination-event */ "./node_modules/rxjs-connector/build/es2019/types/termination-event.js");
+/* harmony import */ var _web_socket_event__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./web-socket-event */ "./node_modules/rxjs-connector/build/es2019/types/web-socket-event.js");
+
+
+
+
+
+
+
+
+
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/types/request-event.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/types/request-event.js ***!
+  \*************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=request-event.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/types/request-message.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/types/request-message.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=request-message.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/types/termination-event.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/types/termination-event.js ***!
+  \*****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=termination-event.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-connector/build/es2019/types/web-socket-event.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/rxjs-connector/build/es2019/types/web-socket-event.js ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=web-socket-event.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-etc/dist/esm/operators/equals.js":
+/*!************************************************************!*\
+  !*** ./node_modules/rxjs-etc/dist/esm/operators/equals.js ***!
+  \************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "equals": () => (/* binding */ equals)
+/* harmony export */ });
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/filter.js");
+
+function equals(predicate) {
+    return (source) => source.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_0__.filter)((value) => predicate === value));
+}
+//# sourceMappingURL=equals.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-interop/dist/esm/patch.js":
+/*!*****************************************************!*\
+  !*** ./node_modules/rxjs-interop/dist/esm/patch.js ***!
+  \*****************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "patch": () => (/* binding */ patch)
+/* harmony export */ });
+/* harmony import */ var _symbols__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./symbols */ "./node_modules/rxjs-interop/dist/esm/symbols.js");
+
+function patch(arg) {
+    if (!Symbol.observable) {
+        if (typeof arg === "function" &&
+            arg.prototype &&
+            arg.prototype[Symbol.observable]) {
+            arg.prototype[_symbols__WEBPACK_IMPORTED_MODULE_0__.observable] = arg.prototype[Symbol.observable];
+            delete arg.prototype[Symbol.observable];
+        }
+        else {
+            arg[_symbols__WEBPACK_IMPORTED_MODULE_0__.observable] = arg[Symbol.observable];
+            delete arg[Symbol.observable];
+        }
+    }
+    return arg;
+}
+//# sourceMappingURL=patch.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-interop/dist/esm/symbols.js":
+/*!*******************************************************!*\
+  !*** ./node_modules/rxjs-interop/dist/esm/symbols.js ***!
+  \*******************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "observable": () => (/* binding */ observable)
+/* harmony export */ });
+const observable = Symbol.observable || "@@observable";
+//# sourceMappingURL=symbols.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs-interop/dist/esm/to-observer.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/rxjs-interop/dist/esm/to-observer.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "toObserver": () => (/* binding */ toObserver)
+/* harmony export */ });
+const noop = () => { };
+const rethrow = (error) => {
+    throw error;
+};
+function toObserver(observer) {
+    if (observer) {
+        if (observer.next && observer.error && observer.complete) {
+            return observer;
+        }
+        return {
+            complete: (observer.complete ?? noop).bind(observer),
+            error: (observer.error ?? rethrow).bind(observer),
+            next: (observer.next ?? noop).bind(observer),
+        };
+    }
+    return {
+        complete: noop,
+        error: rethrow,
+        next: noop,
+    };
+}
+//# sourceMappingURL=to-observer.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/NotificationFactories.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/NotificationFactories.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "COMPLETE_NOTIFICATION": () => (/* binding */ COMPLETE_NOTIFICATION),
+/* harmony export */   "errorNotification": () => (/* binding */ errorNotification),
+/* harmony export */   "nextNotification": () => (/* binding */ nextNotification),
+/* harmony export */   "createNotification": () => (/* binding */ createNotification)
+/* harmony export */ });
+var COMPLETE_NOTIFICATION = (function () { return createNotification('C', undefined, undefined); })();
+function errorNotification(error) {
+    return createNotification('E', undefined, error);
+}
+function nextNotification(value) {
+    return createNotification('N', value, undefined);
+}
+function createNotification(kind, value, error) {
+    return {
+        kind: kind,
+        value: value,
+        error: error,
+    };
+}
+//# sourceMappingURL=NotificationFactories.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/Observable.js":
+/*!************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/Observable.js ***!
+  \************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Observable": () => (/* binding */ Observable)
+/* harmony export */ });
+/* harmony import */ var _Subscriber__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./Subscriber */ "./node_modules/rxjs/dist/esm5/internal/Subscriber.js");
+/* harmony import */ var _Subscription__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./Subscription */ "./node_modules/rxjs/dist/esm5/internal/Subscription.js");
+/* harmony import */ var _symbol_observable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./symbol/observable */ "./node_modules/rxjs/dist/esm5/internal/symbol/observable.js");
+/* harmony import */ var _util_pipe__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./util/pipe */ "./node_modules/rxjs/dist/esm5/internal/util/pipe.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./config */ "./node_modules/rxjs/dist/esm5/internal/config.js");
+/* harmony import */ var _util_isFunction__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./util/isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+/* harmony import */ var _util_errorContext__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./util/errorContext */ "./node_modules/rxjs/dist/esm5/internal/util/errorContext.js");
+
+
+
+
+
+
+
+var Observable = (function () {
+    function Observable(subscribe) {
+        if (subscribe) {
+            this._subscribe = subscribe;
+        }
+    }
+    Observable.prototype.lift = function (operator) {
+        var observable = new Observable();
+        observable.source = this;
+        observable.operator = operator;
+        return observable;
+    };
+    Observable.prototype.subscribe = function (observerOrNext, error, complete) {
+        var _this = this;
+        var subscriber = isSubscriber(observerOrNext) ? observerOrNext : new _Subscriber__WEBPACK_IMPORTED_MODULE_0__.SafeSubscriber(observerOrNext, error, complete);
+        (0,_util_errorContext__WEBPACK_IMPORTED_MODULE_1__.errorContext)(function () {
+            var _a = _this, operator = _a.operator, source = _a.source;
+            subscriber.add(operator
+                ?
+                    operator.call(subscriber, source)
+                : source
+                    ?
+                        _this._subscribe(subscriber)
+                    :
+                        _this._trySubscribe(subscriber));
+        });
+        return subscriber;
+    };
+    Observable.prototype._trySubscribe = function (sink) {
+        try {
+            return this._subscribe(sink);
+        }
+        catch (err) {
+            sink.error(err);
+        }
+    };
+    Observable.prototype.forEach = function (next, promiseCtor) {
+        var _this = this;
+        promiseCtor = getPromiseCtor(promiseCtor);
+        return new promiseCtor(function (resolve, reject) {
+            var subscriber = new _Subscriber__WEBPACK_IMPORTED_MODULE_0__.SafeSubscriber({
+                next: function (value) {
+                    try {
+                        next(value);
+                    }
+                    catch (err) {
+                        reject(err);
+                        subscriber.unsubscribe();
+                    }
+                },
+                error: reject,
+                complete: resolve,
+            });
+            _this.subscribe(subscriber);
+        });
+    };
+    Observable.prototype._subscribe = function (subscriber) {
+        var _a;
+        return (_a = this.source) === null || _a === void 0 ? void 0 : _a.subscribe(subscriber);
+    };
+    Observable.prototype[_symbol_observable__WEBPACK_IMPORTED_MODULE_2__.observable] = function () {
+        return this;
+    };
+    Observable.prototype.pipe = function () {
+        var operations = [];
+        for (var _i = 0; _i < arguments.length; _i++) {
+            operations[_i] = arguments[_i];
+        }
+        return (0,_util_pipe__WEBPACK_IMPORTED_MODULE_3__.pipeFromArray)(operations)(this);
+    };
+    Observable.prototype.toPromise = function (promiseCtor) {
+        var _this = this;
+        promiseCtor = getPromiseCtor(promiseCtor);
+        return new promiseCtor(function (resolve, reject) {
+            var value;
+            _this.subscribe(function (x) { return (value = x); }, function (err) { return reject(err); }, function () { return resolve(value); });
+        });
+    };
+    Observable.create = function (subscribe) {
+        return new Observable(subscribe);
+    };
+    return Observable;
+}());
+
+function getPromiseCtor(promiseCtor) {
+    var _a;
+    return (_a = promiseCtor !== null && promiseCtor !== void 0 ? promiseCtor : _config__WEBPACK_IMPORTED_MODULE_4__.config.Promise) !== null && _a !== void 0 ? _a : Promise;
+}
+function isObserver(value) {
+    return value && (0,_util_isFunction__WEBPACK_IMPORTED_MODULE_5__.isFunction)(value.next) && (0,_util_isFunction__WEBPACK_IMPORTED_MODULE_5__.isFunction)(value.error) && (0,_util_isFunction__WEBPACK_IMPORTED_MODULE_5__.isFunction)(value.complete);
+}
+function isSubscriber(value) {
+    return (value && value instanceof _Subscriber__WEBPACK_IMPORTED_MODULE_0__.Subscriber) || (isObserver(value) && (0,_Subscription__WEBPACK_IMPORTED_MODULE_6__.isSubscription)(value));
+}
+//# sourceMappingURL=Observable.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/Scheduler.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/Scheduler.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Scheduler": () => (/* binding */ Scheduler)
+/* harmony export */ });
+/* harmony import */ var _scheduler_dateTimestampProvider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./scheduler/dateTimestampProvider */ "./node_modules/rxjs/dist/esm5/internal/scheduler/dateTimestampProvider.js");
+
+var Scheduler = (function () {
+    function Scheduler(schedulerActionCtor, now) {
+        if (now === void 0) { now = Scheduler.now; }
+        this.schedulerActionCtor = schedulerActionCtor;
+        this.now = now;
+    }
+    Scheduler.prototype.schedule = function (work, delay, state) {
+        if (delay === void 0) { delay = 0; }
+        return new this.schedulerActionCtor(this, work).schedule(state, delay);
+    };
+    Scheduler.now = _scheduler_dateTimestampProvider__WEBPACK_IMPORTED_MODULE_0__.dateTimestampProvider.now;
+    return Scheduler;
+}());
+
+//# sourceMappingURL=Scheduler.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/Subject.js":
+/*!*********************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/Subject.js ***!
+  \*********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Subject": () => (/* binding */ Subject),
+/* harmony export */   "AnonymousSubject": () => (/* binding */ AnonymousSubject)
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./Observable */ "./node_modules/rxjs/dist/esm5/internal/Observable.js");
+/* harmony import */ var _Subscription__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Subscription */ "./node_modules/rxjs/dist/esm5/internal/Subscription.js");
+/* harmony import */ var _util_ObjectUnsubscribedError__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./util/ObjectUnsubscribedError */ "./node_modules/rxjs/dist/esm5/internal/util/ObjectUnsubscribedError.js");
+/* harmony import */ var _util_arrRemove__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./util/arrRemove */ "./node_modules/rxjs/dist/esm5/internal/util/arrRemove.js");
+/* harmony import */ var _util_errorContext__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./util/errorContext */ "./node_modules/rxjs/dist/esm5/internal/util/errorContext.js");
+
+
+
+
+
+
+var Subject = (function (_super) {
+    (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__extends)(Subject, _super);
+    function Subject() {
+        var _this = _super.call(this) || this;
+        _this.closed = false;
+        _this.currentObservers = null;
+        _this.observers = [];
+        _this.isStopped = false;
+        _this.hasError = false;
+        _this.thrownError = null;
+        return _this;
+    }
+    Subject.prototype.lift = function (operator) {
+        var subject = new AnonymousSubject(this, this);
+        subject.operator = operator;
+        return subject;
+    };
+    Subject.prototype._throwIfClosed = function () {
+        if (this.closed) {
+            throw new _util_ObjectUnsubscribedError__WEBPACK_IMPORTED_MODULE_1__.ObjectUnsubscribedError();
+        }
+    };
+    Subject.prototype.next = function (value) {
+        var _this = this;
+        (0,_util_errorContext__WEBPACK_IMPORTED_MODULE_2__.errorContext)(function () {
+            var e_1, _a;
+            _this._throwIfClosed();
+            if (!_this.isStopped) {
+                if (!_this.currentObservers) {
+                    _this.currentObservers = Array.from(_this.observers);
+                }
+                try {
+                    for (var _b = (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__values)(_this.currentObservers), _c = _b.next(); !_c.done; _c = _b.next()) {
+                        var observer = _c.value;
+                        observer.next(value);
+                    }
+                }
+                catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                finally {
+                    try {
+                        if (_c && !_c.done && (_a = _b.return)) _a.call(_b);
+                    }
+                    finally { if (e_1) throw e_1.error; }
+                }
+            }
+        });
+    };
+    Subject.prototype.error = function (err) {
+        var _this = this;
+        (0,_util_errorContext__WEBPACK_IMPORTED_MODULE_2__.errorContext)(function () {
+            _this._throwIfClosed();
+            if (!_this.isStopped) {
+                _this.hasError = _this.isStopped = true;
+                _this.thrownError = err;
+                var observers = _this.observers;
+                while (observers.length) {
+                    observers.shift().error(err);
+                }
+            }
+        });
+    };
+    Subject.prototype.complete = function () {
+        var _this = this;
+        (0,_util_errorContext__WEBPACK_IMPORTED_MODULE_2__.errorContext)(function () {
+            _this._throwIfClosed();
+            if (!_this.isStopped) {
+                _this.isStopped = true;
+                var observers = _this.observers;
+                while (observers.length) {
+                    observers.shift().complete();
+                }
+            }
+        });
+    };
+    Subject.prototype.unsubscribe = function () {
+        this.isStopped = this.closed = true;
+        this.observers = this.currentObservers = null;
+    };
+    Object.defineProperty(Subject.prototype, "observed", {
+        get: function () {
+            var _a;
+            return ((_a = this.observers) === null || _a === void 0 ? void 0 : _a.length) > 0;
+        },
+        enumerable: false,
+        configurable: true
+    });
+    Subject.prototype._trySubscribe = function (subscriber) {
+        this._throwIfClosed();
+        return _super.prototype._trySubscribe.call(this, subscriber);
+    };
+    Subject.prototype._subscribe = function (subscriber) {
+        this._throwIfClosed();
+        this._checkFinalizedStatuses(subscriber);
+        return this._innerSubscribe(subscriber);
+    };
+    Subject.prototype._innerSubscribe = function (subscriber) {
+        var _this = this;
+        var _a = this, hasError = _a.hasError, isStopped = _a.isStopped, observers = _a.observers;
+        if (hasError || isStopped) {
+            return _Subscription__WEBPACK_IMPORTED_MODULE_3__.EMPTY_SUBSCRIPTION;
+        }
+        this.currentObservers = null;
+        observers.push(subscriber);
+        return new _Subscription__WEBPACK_IMPORTED_MODULE_3__.Subscription(function () {
+            _this.currentObservers = null;
+            (0,_util_arrRemove__WEBPACK_IMPORTED_MODULE_4__.arrRemove)(observers, subscriber);
+        });
+    };
+    Subject.prototype._checkFinalizedStatuses = function (subscriber) {
+        var _a = this, hasError = _a.hasError, thrownError = _a.thrownError, isStopped = _a.isStopped;
+        if (hasError) {
+            subscriber.error(thrownError);
+        }
+        else if (isStopped) {
+            subscriber.complete();
+        }
+    };
+    Subject.prototype.asObservable = function () {
+        var observable = new _Observable__WEBPACK_IMPORTED_MODULE_5__.Observable();
+        observable.source = this;
+        return observable;
+    };
+    Subject.create = function (destination, source) {
+        return new AnonymousSubject(destination, source);
+    };
+    return Subject;
+}(_Observable__WEBPACK_IMPORTED_MODULE_5__.Observable));
+
+var AnonymousSubject = (function (_super) {
+    (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__extends)(AnonymousSubject, _super);
+    function AnonymousSubject(destination, source) {
+        var _this = _super.call(this) || this;
+        _this.destination = destination;
+        _this.source = source;
+        return _this;
+    }
+    AnonymousSubject.prototype.next = function (value) {
+        var _a, _b;
+        (_b = (_a = this.destination) === null || _a === void 0 ? void 0 : _a.next) === null || _b === void 0 ? void 0 : _b.call(_a, value);
+    };
+    AnonymousSubject.prototype.error = function (err) {
+        var _a, _b;
+        (_b = (_a = this.destination) === null || _a === void 0 ? void 0 : _a.error) === null || _b === void 0 ? void 0 : _b.call(_a, err);
+    };
+    AnonymousSubject.prototype.complete = function () {
+        var _a, _b;
+        (_b = (_a = this.destination) === null || _a === void 0 ? void 0 : _a.complete) === null || _b === void 0 ? void 0 : _b.call(_a);
+    };
+    AnonymousSubject.prototype._subscribe = function (subscriber) {
+        var _a, _b;
+        return (_b = (_a = this.source) === null || _a === void 0 ? void 0 : _a.subscribe(subscriber)) !== null && _b !== void 0 ? _b : _Subscription__WEBPACK_IMPORTED_MODULE_3__.EMPTY_SUBSCRIPTION;
+    };
+    return AnonymousSubject;
+}(Subject));
+
+//# sourceMappingURL=Subject.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/Subscriber.js":
+/*!************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/Subscriber.js ***!
+  \************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Subscriber": () => (/* binding */ Subscriber),
+/* harmony export */   "SafeSubscriber": () => (/* binding */ SafeSubscriber),
+/* harmony export */   "EMPTY_OBSERVER": () => (/* binding */ EMPTY_OBSERVER)
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _util_isFunction__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./util/isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+/* harmony import */ var _Subscription__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./Subscription */ "./node_modules/rxjs/dist/esm5/internal/Subscription.js");
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./config */ "./node_modules/rxjs/dist/esm5/internal/config.js");
+/* harmony import */ var _util_reportUnhandledError__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./util/reportUnhandledError */ "./node_modules/rxjs/dist/esm5/internal/util/reportUnhandledError.js");
+/* harmony import */ var _util_noop__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./util/noop */ "./node_modules/rxjs/dist/esm5/internal/util/noop.js");
+/* harmony import */ var _NotificationFactories__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./NotificationFactories */ "./node_modules/rxjs/dist/esm5/internal/NotificationFactories.js");
+/* harmony import */ var _scheduler_timeoutProvider__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./scheduler/timeoutProvider */ "./node_modules/rxjs/dist/esm5/internal/scheduler/timeoutProvider.js");
+/* harmony import */ var _util_errorContext__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./util/errorContext */ "./node_modules/rxjs/dist/esm5/internal/util/errorContext.js");
+
+
+
+
+
+
+
+
+
+var Subscriber = (function (_super) {
+    (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__extends)(Subscriber, _super);
+    function Subscriber(destination) {
+        var _this = _super.call(this) || this;
+        _this.isStopped = false;
+        if (destination) {
+            _this.destination = destination;
+            if ((0,_Subscription__WEBPACK_IMPORTED_MODULE_1__.isSubscription)(destination)) {
+                destination.add(_this);
+            }
+        }
+        else {
+            _this.destination = EMPTY_OBSERVER;
+        }
+        return _this;
+    }
+    Subscriber.create = function (next, error, complete) {
+        return new SafeSubscriber(next, error, complete);
+    };
+    Subscriber.prototype.next = function (value) {
+        if (this.isStopped) {
+            handleStoppedNotification((0,_NotificationFactories__WEBPACK_IMPORTED_MODULE_2__.nextNotification)(value), this);
+        }
+        else {
+            this._next(value);
+        }
+    };
+    Subscriber.prototype.error = function (err) {
+        if (this.isStopped) {
+            handleStoppedNotification((0,_NotificationFactories__WEBPACK_IMPORTED_MODULE_2__.errorNotification)(err), this);
+        }
+        else {
+            this.isStopped = true;
+            this._error(err);
+        }
+    };
+    Subscriber.prototype.complete = function () {
+        if (this.isStopped) {
+            handleStoppedNotification(_NotificationFactories__WEBPACK_IMPORTED_MODULE_2__.COMPLETE_NOTIFICATION, this);
+        }
+        else {
+            this.isStopped = true;
+            this._complete();
+        }
+    };
+    Subscriber.prototype.unsubscribe = function () {
+        if (!this.closed) {
+            this.isStopped = true;
+            _super.prototype.unsubscribe.call(this);
+            this.destination = null;
+        }
+    };
+    Subscriber.prototype._next = function (value) {
+        this.destination.next(value);
+    };
+    Subscriber.prototype._error = function (err) {
+        try {
+            this.destination.error(err);
+        }
+        finally {
+            this.unsubscribe();
+        }
+    };
+    Subscriber.prototype._complete = function () {
+        try {
+            this.destination.complete();
+        }
+        finally {
+            this.unsubscribe();
+        }
+    };
+    return Subscriber;
+}(_Subscription__WEBPACK_IMPORTED_MODULE_1__.Subscription));
+
+var _bind = Function.prototype.bind;
+function bind(fn, thisArg) {
+    return _bind.call(fn, thisArg);
+}
+var ConsumerObserver = (function () {
+    function ConsumerObserver(partialObserver) {
+        this.partialObserver = partialObserver;
+    }
+    ConsumerObserver.prototype.next = function (value) {
+        var partialObserver = this.partialObserver;
+        if (partialObserver.next) {
+            try {
+                partialObserver.next(value);
+            }
+            catch (error) {
+                handleUnhandledError(error);
+            }
+        }
+    };
+    ConsumerObserver.prototype.error = function (err) {
+        var partialObserver = this.partialObserver;
+        if (partialObserver.error) {
+            try {
+                partialObserver.error(err);
+            }
+            catch (error) {
+                handleUnhandledError(error);
+            }
+        }
+        else {
+            handleUnhandledError(err);
+        }
+    };
+    ConsumerObserver.prototype.complete = function () {
+        var partialObserver = this.partialObserver;
+        if (partialObserver.complete) {
+            try {
+                partialObserver.complete();
+            }
+            catch (error) {
+                handleUnhandledError(error);
+            }
+        }
+    };
+    return ConsumerObserver;
+}());
+var SafeSubscriber = (function (_super) {
+    (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__extends)(SafeSubscriber, _super);
+    function SafeSubscriber(observerOrNext, error, complete) {
+        var _this = _super.call(this) || this;
+        var partialObserver;
+        if ((0,_util_isFunction__WEBPACK_IMPORTED_MODULE_3__.isFunction)(observerOrNext) || !observerOrNext) {
+            partialObserver = {
+                next: observerOrNext !== null && observerOrNext !== void 0 ? observerOrNext : undefined,
+                error: error !== null && error !== void 0 ? error : undefined,
+                complete: complete !== null && complete !== void 0 ? complete : undefined,
+            };
+        }
+        else {
+            var context_1;
+            if (_this && _config__WEBPACK_IMPORTED_MODULE_4__.config.useDeprecatedNextContext) {
+                context_1 = Object.create(observerOrNext);
+                context_1.unsubscribe = function () { return _this.unsubscribe(); };
+                partialObserver = {
+                    next: observerOrNext.next && bind(observerOrNext.next, context_1),
+                    error: observerOrNext.error && bind(observerOrNext.error, context_1),
+                    complete: observerOrNext.complete && bind(observerOrNext.complete, context_1),
+                };
+            }
+            else {
+                partialObserver = observerOrNext;
+            }
+        }
+        _this.destination = new ConsumerObserver(partialObserver);
+        return _this;
+    }
+    return SafeSubscriber;
+}(Subscriber));
+
+function handleUnhandledError(error) {
+    if (_config__WEBPACK_IMPORTED_MODULE_4__.config.useDeprecatedSynchronousErrorHandling) {
+        (0,_util_errorContext__WEBPACK_IMPORTED_MODULE_5__.captureError)(error);
+    }
+    else {
+        (0,_util_reportUnhandledError__WEBPACK_IMPORTED_MODULE_6__.reportUnhandledError)(error);
+    }
+}
+function defaultErrorHandler(err) {
+    throw err;
+}
+function handleStoppedNotification(notification, subscriber) {
+    var onStoppedNotification = _config__WEBPACK_IMPORTED_MODULE_4__.config.onStoppedNotification;
+    onStoppedNotification && _scheduler_timeoutProvider__WEBPACK_IMPORTED_MODULE_7__.timeoutProvider.setTimeout(function () { return onStoppedNotification(notification, subscriber); });
+}
+var EMPTY_OBSERVER = {
+    closed: true,
+    next: _util_noop__WEBPACK_IMPORTED_MODULE_8__.noop,
+    error: defaultErrorHandler,
+    complete: _util_noop__WEBPACK_IMPORTED_MODULE_8__.noop,
+};
+//# sourceMappingURL=Subscriber.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/Subscription.js":
+/*!**************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/Subscription.js ***!
+  \**************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Subscription": () => (/* binding */ Subscription),
+/* harmony export */   "EMPTY_SUBSCRIPTION": () => (/* binding */ EMPTY_SUBSCRIPTION),
+/* harmony export */   "isSubscription": () => (/* binding */ isSubscription)
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _util_isFunction__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./util/isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+/* harmony import */ var _util_UnsubscriptionError__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./util/UnsubscriptionError */ "./node_modules/rxjs/dist/esm5/internal/util/UnsubscriptionError.js");
+/* harmony import */ var _util_arrRemove__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./util/arrRemove */ "./node_modules/rxjs/dist/esm5/internal/util/arrRemove.js");
+
+
+
+
+var Subscription = (function () {
+    function Subscription(initialTeardown) {
+        this.initialTeardown = initialTeardown;
+        this.closed = false;
+        this._parentage = null;
+        this._finalizers = null;
+    }
+    Subscription.prototype.unsubscribe = function () {
+        var e_1, _a, e_2, _b;
+        var errors;
+        if (!this.closed) {
+            this.closed = true;
+            var _parentage = this._parentage;
+            if (_parentage) {
+                this._parentage = null;
+                if (Array.isArray(_parentage)) {
+                    try {
+                        for (var _parentage_1 = (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__values)(_parentage), _parentage_1_1 = _parentage_1.next(); !_parentage_1_1.done; _parentage_1_1 = _parentage_1.next()) {
+                            var parent_1 = _parentage_1_1.value;
+                            parent_1.remove(this);
+                        }
+                    }
+                    catch (e_1_1) { e_1 = { error: e_1_1 }; }
+                    finally {
+                        try {
+                            if (_parentage_1_1 && !_parentage_1_1.done && (_a = _parentage_1.return)) _a.call(_parentage_1);
+                        }
+                        finally { if (e_1) throw e_1.error; }
+                    }
+                }
+                else {
+                    _parentage.remove(this);
+                }
+            }
+            var initialFinalizer = this.initialTeardown;
+            if ((0,_util_isFunction__WEBPACK_IMPORTED_MODULE_1__.isFunction)(initialFinalizer)) {
+                try {
+                    initialFinalizer();
+                }
+                catch (e) {
+                    errors = e instanceof _util_UnsubscriptionError__WEBPACK_IMPORTED_MODULE_2__.UnsubscriptionError ? e.errors : [e];
+                }
+            }
+            var _finalizers = this._finalizers;
+            if (_finalizers) {
+                this._finalizers = null;
+                try {
+                    for (var _finalizers_1 = (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__values)(_finalizers), _finalizers_1_1 = _finalizers_1.next(); !_finalizers_1_1.done; _finalizers_1_1 = _finalizers_1.next()) {
+                        var finalizer = _finalizers_1_1.value;
+                        try {
+                            execFinalizer(finalizer);
+                        }
+                        catch (err) {
+                            errors = errors !== null && errors !== void 0 ? errors : [];
+                            if (err instanceof _util_UnsubscriptionError__WEBPACK_IMPORTED_MODULE_2__.UnsubscriptionError) {
+                                errors = (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__spreadArray)((0,tslib__WEBPACK_IMPORTED_MODULE_0__.__spreadArray)([], (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__read)(errors)), (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__read)(err.errors));
+                            }
+                            else {
+                                errors.push(err);
+                            }
+                        }
+                    }
+                }
+                catch (e_2_1) { e_2 = { error: e_2_1 }; }
+                finally {
+                    try {
+                        if (_finalizers_1_1 && !_finalizers_1_1.done && (_b = _finalizers_1.return)) _b.call(_finalizers_1);
+                    }
+                    finally { if (e_2) throw e_2.error; }
+                }
+            }
+            if (errors) {
+                throw new _util_UnsubscriptionError__WEBPACK_IMPORTED_MODULE_2__.UnsubscriptionError(errors);
+            }
+        }
+    };
+    Subscription.prototype.add = function (teardown) {
+        var _a;
+        if (teardown && teardown !== this) {
+            if (this.closed) {
+                execFinalizer(teardown);
+            }
+            else {
+                if (teardown instanceof Subscription) {
+                    if (teardown.closed || teardown._hasParent(this)) {
+                        return;
+                    }
+                    teardown._addParent(this);
+                }
+                (this._finalizers = (_a = this._finalizers) !== null && _a !== void 0 ? _a : []).push(teardown);
+            }
+        }
+    };
+    Subscription.prototype._hasParent = function (parent) {
+        var _parentage = this._parentage;
+        return _parentage === parent || (Array.isArray(_parentage) && _parentage.includes(parent));
+    };
+    Subscription.prototype._addParent = function (parent) {
+        var _parentage = this._parentage;
+        this._parentage = Array.isArray(_parentage) ? (_parentage.push(parent), _parentage) : _parentage ? [_parentage, parent] : parent;
+    };
+    Subscription.prototype._removeParent = function (parent) {
+        var _parentage = this._parentage;
+        if (_parentage === parent) {
+            this._parentage = null;
+        }
+        else if (Array.isArray(_parentage)) {
+            (0,_util_arrRemove__WEBPACK_IMPORTED_MODULE_3__.arrRemove)(_parentage, parent);
+        }
+    };
+    Subscription.prototype.remove = function (teardown) {
+        var _finalizers = this._finalizers;
+        _finalizers && (0,_util_arrRemove__WEBPACK_IMPORTED_MODULE_3__.arrRemove)(_finalizers, teardown);
+        if (teardown instanceof Subscription) {
+            teardown._removeParent(this);
+        }
+    };
+    Subscription.EMPTY = (function () {
+        var empty = new Subscription();
+        empty.closed = true;
+        return empty;
+    })();
+    return Subscription;
+}());
+
+var EMPTY_SUBSCRIPTION = Subscription.EMPTY;
+function isSubscription(value) {
+    return (value instanceof Subscription ||
+        (value && 'closed' in value && (0,_util_isFunction__WEBPACK_IMPORTED_MODULE_1__.isFunction)(value.remove) && (0,_util_isFunction__WEBPACK_IMPORTED_MODULE_1__.isFunction)(value.add) && (0,_util_isFunction__WEBPACK_IMPORTED_MODULE_1__.isFunction)(value.unsubscribe)));
+}
+function execFinalizer(finalizer) {
+    if ((0,_util_isFunction__WEBPACK_IMPORTED_MODULE_1__.isFunction)(finalizer)) {
+        finalizer();
+    }
+    else {
+        finalizer.unsubscribe();
+    }
+}
+//# sourceMappingURL=Subscription.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/config.js":
+/*!********************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/config.js ***!
+  \********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "config": () => (/* binding */ config)
+/* harmony export */ });
+var config = {
+    onUnhandledError: null,
+    onStoppedNotification: null,
+    Promise: undefined,
+    useDeprecatedSynchronousErrorHandling: false,
+    useDeprecatedNextContext: false,
+};
+//# sourceMappingURL=config.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/observable/combineLatest.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/observable/combineLatest.js ***!
+  \**************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "combineLatest": () => (/* binding */ combineLatest),
+/* harmony export */   "combineLatestInit": () => (/* binding */ combineLatestInit)
+/* harmony export */ });
+/* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../Observable */ "./node_modules/rxjs/dist/esm5/internal/Observable.js");
+/* harmony import */ var _util_argsArgArrayOrObject__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/argsArgArrayOrObject */ "./node_modules/rxjs/dist/esm5/internal/util/argsArgArrayOrObject.js");
+/* harmony import */ var _from__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./from */ "./node_modules/rxjs/dist/esm5/internal/observable/from.js");
+/* harmony import */ var _util_identity__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../util/identity */ "./node_modules/rxjs/dist/esm5/internal/util/identity.js");
+/* harmony import */ var _util_mapOneOrManyArgs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../util/mapOneOrManyArgs */ "./node_modules/rxjs/dist/esm5/internal/util/mapOneOrManyArgs.js");
+/* harmony import */ var _util_args__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/args */ "./node_modules/rxjs/dist/esm5/internal/util/args.js");
+/* harmony import */ var _util_createObject__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../util/createObject */ "./node_modules/rxjs/dist/esm5/internal/util/createObject.js");
+/* harmony import */ var _operators_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../operators/OperatorSubscriber */ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js");
+/* harmony import */ var _util_executeSchedule__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../util/executeSchedule */ "./node_modules/rxjs/dist/esm5/internal/util/executeSchedule.js");
+
+
+
+
+
+
+
+
+
+function combineLatest() {
+    var args = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i] = arguments[_i];
+    }
+    var scheduler = (0,_util_args__WEBPACK_IMPORTED_MODULE_0__.popScheduler)(args);
+    var resultSelector = (0,_util_args__WEBPACK_IMPORTED_MODULE_0__.popResultSelector)(args);
+    var _a = (0,_util_argsArgArrayOrObject__WEBPACK_IMPORTED_MODULE_1__.argsArgArrayOrObject)(args), observables = _a.args, keys = _a.keys;
+    if (observables.length === 0) {
+        return (0,_from__WEBPACK_IMPORTED_MODULE_2__.from)([], scheduler);
+    }
+    var result = new _Observable__WEBPACK_IMPORTED_MODULE_3__.Observable(combineLatestInit(observables, scheduler, keys
+        ?
+            function (values) { return (0,_util_createObject__WEBPACK_IMPORTED_MODULE_4__.createObject)(keys, values); }
+        :
+            _util_identity__WEBPACK_IMPORTED_MODULE_5__.identity));
+    return resultSelector ? result.pipe((0,_util_mapOneOrManyArgs__WEBPACK_IMPORTED_MODULE_6__.mapOneOrManyArgs)(resultSelector)) : result;
+}
+function combineLatestInit(observables, scheduler, valueTransform) {
+    if (valueTransform === void 0) { valueTransform = _util_identity__WEBPACK_IMPORTED_MODULE_5__.identity; }
+    return function (subscriber) {
+        maybeSchedule(scheduler, function () {
+            var length = observables.length;
+            var values = new Array(length);
+            var active = length;
+            var remainingFirstValues = length;
+            var _loop_1 = function (i) {
+                maybeSchedule(scheduler, function () {
+                    var source = (0,_from__WEBPACK_IMPORTED_MODULE_2__.from)(observables[i], scheduler);
+                    var hasFirstValue = false;
+                    source.subscribe((0,_operators_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_7__.createOperatorSubscriber)(subscriber, function (value) {
+                        values[i] = value;
+                        if (!hasFirstValue) {
+                            hasFirstValue = true;
+                            remainingFirstValues--;
+                        }
+                        if (!remainingFirstValues) {
+                            subscriber.next(valueTransform(values.slice()));
+                        }
+                    }, function () {
+                        if (!--active) {
+                            subscriber.complete();
+                        }
+                    }));
+                }, subscriber);
+            };
+            for (var i = 0; i < length; i++) {
+                _loop_1(i);
+            }
+        }, subscriber);
+    };
+}
+function maybeSchedule(scheduler, execute, subscription) {
+    if (scheduler) {
+        (0,_util_executeSchedule__WEBPACK_IMPORTED_MODULE_8__.executeSchedule)(subscription, scheduler, execute);
+    }
+    else {
+        execute();
+    }
+}
+//# sourceMappingURL=combineLatest.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/observable/concat.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/observable/concat.js ***!
+  \*******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "concat": () => (/* binding */ concat)
+/* harmony export */ });
+/* harmony import */ var _operators_concatAll__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../operators/concatAll */ "./node_modules/rxjs/dist/esm5/internal/operators/concatAll.js");
+/* harmony import */ var _util_args__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/args */ "./node_modules/rxjs/dist/esm5/internal/util/args.js");
+/* harmony import */ var _from__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./from */ "./node_modules/rxjs/dist/esm5/internal/observable/from.js");
+
+
+
+function concat() {
+    var args = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i] = arguments[_i];
+    }
+    return (0,_operators_concatAll__WEBPACK_IMPORTED_MODULE_0__.concatAll)()((0,_from__WEBPACK_IMPORTED_MODULE_1__.from)(args, (0,_util_args__WEBPACK_IMPORTED_MODULE_2__.popScheduler)(args)));
+}
+//# sourceMappingURL=concat.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/observable/defer.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/observable/defer.js ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "defer": () => (/* binding */ defer)
+/* harmony export */ });
+/* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Observable */ "./node_modules/rxjs/dist/esm5/internal/Observable.js");
+/* harmony import */ var _innerFrom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./innerFrom */ "./node_modules/rxjs/dist/esm5/internal/observable/innerFrom.js");
+
+
+function defer(observableFactory) {
+    return new _Observable__WEBPACK_IMPORTED_MODULE_0__.Observable(function (subscriber) {
+        (0,_innerFrom__WEBPACK_IMPORTED_MODULE_1__.innerFrom)(observableFactory()).subscribe(subscriber);
+    });
+}
+//# sourceMappingURL=defer.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/observable/empty.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/observable/empty.js ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "EMPTY": () => (/* binding */ EMPTY),
+/* harmony export */   "empty": () => (/* binding */ empty)
+/* harmony export */ });
+/* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Observable */ "./node_modules/rxjs/dist/esm5/internal/Observable.js");
+
+var EMPTY = new _Observable__WEBPACK_IMPORTED_MODULE_0__.Observable(function (subscriber) { return subscriber.complete(); });
+function empty(scheduler) {
+    return scheduler ? emptyScheduled(scheduler) : EMPTY;
+}
+function emptyScheduled(scheduler) {
+    return new _Observable__WEBPACK_IMPORTED_MODULE_0__.Observable(function (subscriber) { return scheduler.schedule(function () { return subscriber.complete(); }); });
+}
+//# sourceMappingURL=empty.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/observable/from.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/observable/from.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "from": () => (/* binding */ from)
+/* harmony export */ });
+/* harmony import */ var _scheduled_scheduled__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../scheduled/scheduled */ "./node_modules/rxjs/dist/esm5/internal/scheduled/scheduled.js");
+/* harmony import */ var _innerFrom__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./innerFrom */ "./node_modules/rxjs/dist/esm5/internal/observable/innerFrom.js");
+
+
+function from(input, scheduler) {
+    return scheduler ? (0,_scheduled_scheduled__WEBPACK_IMPORTED_MODULE_0__.scheduled)(input, scheduler) : (0,_innerFrom__WEBPACK_IMPORTED_MODULE_1__.innerFrom)(input);
+}
+//# sourceMappingURL=from.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/observable/fromSubscribable.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/observable/fromSubscribable.js ***!
+  \*****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "fromSubscribable": () => (/* binding */ fromSubscribable)
+/* harmony export */ });
+/* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Observable */ "./node_modules/rxjs/dist/esm5/internal/Observable.js");
+
+function fromSubscribable(subscribable) {
+    return new _Observable__WEBPACK_IMPORTED_MODULE_0__.Observable(function (subscriber) { return subscribable.subscribe(subscriber); });
+}
+//# sourceMappingURL=fromSubscribable.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/observable/iif.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/observable/iif.js ***!
+  \****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "iif": () => (/* binding */ iif)
+/* harmony export */ });
+/* harmony import */ var _defer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./defer */ "./node_modules/rxjs/dist/esm5/internal/observable/defer.js");
+
+function iif(condition, trueResult, falseResult) {
+    return (0,_defer__WEBPACK_IMPORTED_MODULE_0__.defer)(function () { return (condition() ? trueResult : falseResult); });
+}
+//# sourceMappingURL=iif.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/observable/innerFrom.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/observable/innerFrom.js ***!
+  \**********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "innerFrom": () => (/* binding */ innerFrom),
+/* harmony export */   "fromInteropObservable": () => (/* binding */ fromInteropObservable),
+/* harmony export */   "fromArrayLike": () => (/* binding */ fromArrayLike),
+/* harmony export */   "fromPromise": () => (/* binding */ fromPromise),
+/* harmony export */   "fromIterable": () => (/* binding */ fromIterable),
+/* harmony export */   "fromAsyncIterable": () => (/* binding */ fromAsyncIterable),
+/* harmony export */   "fromReadableStreamLike": () => (/* binding */ fromReadableStreamLike)
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _util_isArrayLike__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/isArrayLike */ "./node_modules/rxjs/dist/esm5/internal/util/isArrayLike.js");
+/* harmony import */ var _util_isPromise__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../util/isPromise */ "./node_modules/rxjs/dist/esm5/internal/util/isPromise.js");
+/* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Observable */ "./node_modules/rxjs/dist/esm5/internal/Observable.js");
+/* harmony import */ var _util_isInteropObservable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/isInteropObservable */ "./node_modules/rxjs/dist/esm5/internal/util/isInteropObservable.js");
+/* harmony import */ var _util_isAsyncIterable__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../util/isAsyncIterable */ "./node_modules/rxjs/dist/esm5/internal/util/isAsyncIterable.js");
+/* harmony import */ var _util_throwUnobservableError__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ../util/throwUnobservableError */ "./node_modules/rxjs/dist/esm5/internal/util/throwUnobservableError.js");
+/* harmony import */ var _util_isIterable__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../util/isIterable */ "./node_modules/rxjs/dist/esm5/internal/util/isIterable.js");
+/* harmony import */ var _util_isReadableStreamLike__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../util/isReadableStreamLike */ "./node_modules/rxjs/dist/esm5/internal/util/isReadableStreamLike.js");
+/* harmony import */ var _util_isFunction__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ../util/isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+/* harmony import */ var _util_reportUnhandledError__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../util/reportUnhandledError */ "./node_modules/rxjs/dist/esm5/internal/util/reportUnhandledError.js");
+/* harmony import */ var _symbol_observable__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../symbol/observable */ "./node_modules/rxjs/dist/esm5/internal/symbol/observable.js");
+
+
+
+
+
+
+
+
+
+
+
+
+function innerFrom(input) {
+    if (input instanceof _Observable__WEBPACK_IMPORTED_MODULE_0__.Observable) {
+        return input;
+    }
+    if (input != null) {
+        if ((0,_util_isInteropObservable__WEBPACK_IMPORTED_MODULE_1__.isInteropObservable)(input)) {
+            return fromInteropObservable(input);
+        }
+        if ((0,_util_isArrayLike__WEBPACK_IMPORTED_MODULE_2__.isArrayLike)(input)) {
+            return fromArrayLike(input);
+        }
+        if ((0,_util_isPromise__WEBPACK_IMPORTED_MODULE_3__.isPromise)(input)) {
+            return fromPromise(input);
+        }
+        if ((0,_util_isAsyncIterable__WEBPACK_IMPORTED_MODULE_4__.isAsyncIterable)(input)) {
+            return fromAsyncIterable(input);
+        }
+        if ((0,_util_isIterable__WEBPACK_IMPORTED_MODULE_5__.isIterable)(input)) {
+            return fromIterable(input);
+        }
+        if ((0,_util_isReadableStreamLike__WEBPACK_IMPORTED_MODULE_6__.isReadableStreamLike)(input)) {
+            return fromReadableStreamLike(input);
+        }
+    }
+    throw (0,_util_throwUnobservableError__WEBPACK_IMPORTED_MODULE_7__.createInvalidObservableTypeError)(input);
+}
+function fromInteropObservable(obj) {
+    return new _Observable__WEBPACK_IMPORTED_MODULE_0__.Observable(function (subscriber) {
+        var obs = obj[_symbol_observable__WEBPACK_IMPORTED_MODULE_8__.observable]();
+        if ((0,_util_isFunction__WEBPACK_IMPORTED_MODULE_9__.isFunction)(obs.subscribe)) {
+            return obs.subscribe(subscriber);
+        }
+        throw new TypeError('Provided object does not correctly implement Symbol.observable');
+    });
+}
+function fromArrayLike(array) {
+    return new _Observable__WEBPACK_IMPORTED_MODULE_0__.Observable(function (subscriber) {
+        for (var i = 0; i < array.length && !subscriber.closed; i++) {
+            subscriber.next(array[i]);
+        }
+        subscriber.complete();
+    });
+}
+function fromPromise(promise) {
+    return new _Observable__WEBPACK_IMPORTED_MODULE_0__.Observable(function (subscriber) {
+        promise
+            .then(function (value) {
+            if (!subscriber.closed) {
+                subscriber.next(value);
+                subscriber.complete();
+            }
+        }, function (err) { return subscriber.error(err); })
+            .then(null, _util_reportUnhandledError__WEBPACK_IMPORTED_MODULE_10__.reportUnhandledError);
+    });
+}
+function fromIterable(iterable) {
+    return new _Observable__WEBPACK_IMPORTED_MODULE_0__.Observable(function (subscriber) {
+        var e_1, _a;
+        try {
+            for (var iterable_1 = (0,tslib__WEBPACK_IMPORTED_MODULE_11__.__values)(iterable), iterable_1_1 = iterable_1.next(); !iterable_1_1.done; iterable_1_1 = iterable_1.next()) {
+                var value = iterable_1_1.value;
+                subscriber.next(value);
+                if (subscriber.closed) {
+                    return;
+                }
+            }
+        }
+        catch (e_1_1) { e_1 = { error: e_1_1 }; }
+        finally {
+            try {
+                if (iterable_1_1 && !iterable_1_1.done && (_a = iterable_1.return)) _a.call(iterable_1);
+            }
+            finally { if (e_1) throw e_1.error; }
+        }
+        subscriber.complete();
+    });
+}
+function fromAsyncIterable(asyncIterable) {
+    return new _Observable__WEBPACK_IMPORTED_MODULE_0__.Observable(function (subscriber) {
+        process(asyncIterable, subscriber).catch(function (err) { return subscriber.error(err); });
+    });
+}
+function fromReadableStreamLike(readableStream) {
+    return fromAsyncIterable((0,_util_isReadableStreamLike__WEBPACK_IMPORTED_MODULE_6__.readableStreamLikeToAsyncGenerator)(readableStream));
+}
+function process(asyncIterable, subscriber) {
+    var asyncIterable_1, asyncIterable_1_1;
+    var e_2, _a;
+    return (0,tslib__WEBPACK_IMPORTED_MODULE_11__.__awaiter)(this, void 0, void 0, function () {
+        var value, e_2_1;
+        return (0,tslib__WEBPACK_IMPORTED_MODULE_11__.__generator)(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    _b.trys.push([0, 5, 6, 11]);
+                    asyncIterable_1 = (0,tslib__WEBPACK_IMPORTED_MODULE_11__.__asyncValues)(asyncIterable);
+                    _b.label = 1;
+                case 1: return [4, asyncIterable_1.next()];
+                case 2:
+                    if (!(asyncIterable_1_1 = _b.sent(), !asyncIterable_1_1.done)) return [3, 4];
+                    value = asyncIterable_1_1.value;
+                    subscriber.next(value);
+                    if (subscriber.closed) {
+                        return [2];
+                    }
+                    _b.label = 3;
+                case 3: return [3, 1];
+                case 4: return [3, 11];
+                case 5:
+                    e_2_1 = _b.sent();
+                    e_2 = { error: e_2_1 };
+                    return [3, 11];
+                case 6:
+                    _b.trys.push([6, , 9, 10]);
+                    if (!(asyncIterable_1_1 && !asyncIterable_1_1.done && (_a = asyncIterable_1.return))) return [3, 8];
+                    return [4, _a.call(asyncIterable_1)];
+                case 7:
+                    _b.sent();
+                    _b.label = 8;
+                case 8: return [3, 10];
+                case 9:
+                    if (e_2) throw e_2.error;
+                    return [7];
+                case 10: return [7];
+                case 11:
+                    subscriber.complete();
+                    return [2];
+            }
+        });
+    });
+}
+//# sourceMappingURL=innerFrom.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/observable/interval.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/observable/interval.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "interval": () => (/* binding */ interval)
+/* harmony export */ });
+/* harmony import */ var _scheduler_async__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../scheduler/async */ "./node_modules/rxjs/dist/esm5/internal/scheduler/async.js");
+/* harmony import */ var _timer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./timer */ "./node_modules/rxjs/dist/esm5/internal/observable/timer.js");
+
+
+function interval(period, scheduler) {
+    if (period === void 0) { period = 0; }
+    if (scheduler === void 0) { scheduler = _scheduler_async__WEBPACK_IMPORTED_MODULE_0__.asyncScheduler; }
+    if (period < 0) {
+        period = 0;
+    }
+    return (0,_timer__WEBPACK_IMPORTED_MODULE_1__.timer)(period, period, scheduler);
+}
+//# sourceMappingURL=interval.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/observable/merge.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/observable/merge.js ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "merge": () => (/* binding */ merge)
+/* harmony export */ });
+/* harmony import */ var _operators_mergeAll__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../operators/mergeAll */ "./node_modules/rxjs/dist/esm5/internal/operators/mergeAll.js");
+/* harmony import */ var _innerFrom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./innerFrom */ "./node_modules/rxjs/dist/esm5/internal/observable/innerFrom.js");
+/* harmony import */ var _empty__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./empty */ "./node_modules/rxjs/dist/esm5/internal/observable/empty.js");
+/* harmony import */ var _util_args__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/args */ "./node_modules/rxjs/dist/esm5/internal/util/args.js");
+/* harmony import */ var _from__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./from */ "./node_modules/rxjs/dist/esm5/internal/observable/from.js");
+
+
+
+
+
+function merge() {
+    var args = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i] = arguments[_i];
+    }
+    var scheduler = (0,_util_args__WEBPACK_IMPORTED_MODULE_0__.popScheduler)(args);
+    var concurrent = (0,_util_args__WEBPACK_IMPORTED_MODULE_0__.popNumber)(args, Infinity);
+    var sources = args;
+    return !sources.length
+        ?
+            _empty__WEBPACK_IMPORTED_MODULE_1__.EMPTY
+        : sources.length === 1
+            ?
+                (0,_innerFrom__WEBPACK_IMPORTED_MODULE_2__.innerFrom)(sources[0])
+            :
+                (0,_operators_mergeAll__WEBPACK_IMPORTED_MODULE_3__.mergeAll)(concurrent)((0,_from__WEBPACK_IMPORTED_MODULE_4__.from)(sources, scheduler));
+}
+//# sourceMappingURL=merge.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/observable/of.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/observable/of.js ***!
+  \***************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "of": () => (/* binding */ of)
+/* harmony export */ });
+/* harmony import */ var _util_args__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/args */ "./node_modules/rxjs/dist/esm5/internal/util/args.js");
+/* harmony import */ var _from__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./from */ "./node_modules/rxjs/dist/esm5/internal/observable/from.js");
+
+
+function of() {
+    var args = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i] = arguments[_i];
+    }
+    var scheduler = (0,_util_args__WEBPACK_IMPORTED_MODULE_0__.popScheduler)(args);
+    return (0,_from__WEBPACK_IMPORTED_MODULE_1__.from)(args, scheduler);
+}
+//# sourceMappingURL=of.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/observable/throwError.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/observable/throwError.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "throwError": () => (/* binding */ throwError)
+/* harmony export */ });
+/* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Observable */ "./node_modules/rxjs/dist/esm5/internal/Observable.js");
+/* harmony import */ var _util_isFunction__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+
+
+function throwError(errorOrErrorFactory, scheduler) {
+    var errorFactory = (0,_util_isFunction__WEBPACK_IMPORTED_MODULE_0__.isFunction)(errorOrErrorFactory) ? errorOrErrorFactory : function () { return errorOrErrorFactory; };
+    var init = function (subscriber) { return subscriber.error(errorFactory()); };
+    return new _Observable__WEBPACK_IMPORTED_MODULE_1__.Observable(scheduler ? function (subscriber) { return scheduler.schedule(init, 0, subscriber); } : init);
+}
+//# sourceMappingURL=throwError.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/observable/timer.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/observable/timer.js ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "timer": () => (/* binding */ timer)
+/* harmony export */ });
+/* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Observable */ "./node_modules/rxjs/dist/esm5/internal/Observable.js");
+/* harmony import */ var _scheduler_async__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../scheduler/async */ "./node_modules/rxjs/dist/esm5/internal/scheduler/async.js");
+/* harmony import */ var _util_isScheduler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/isScheduler */ "./node_modules/rxjs/dist/esm5/internal/util/isScheduler.js");
+/* harmony import */ var _util_isDate__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../util/isDate */ "./node_modules/rxjs/dist/esm5/internal/util/isDate.js");
+
+
+
+
+function timer(dueTime, intervalOrScheduler, scheduler) {
+    if (dueTime === void 0) { dueTime = 0; }
+    if (scheduler === void 0) { scheduler = _scheduler_async__WEBPACK_IMPORTED_MODULE_0__.async; }
+    var intervalDuration = -1;
+    if (intervalOrScheduler != null) {
+        if ((0,_util_isScheduler__WEBPACK_IMPORTED_MODULE_1__.isScheduler)(intervalOrScheduler)) {
+            scheduler = intervalOrScheduler;
+        }
+        else {
+            intervalDuration = intervalOrScheduler;
+        }
+    }
+    return new _Observable__WEBPACK_IMPORTED_MODULE_2__.Observable(function (subscriber) {
+        var due = (0,_util_isDate__WEBPACK_IMPORTED_MODULE_3__.isValidDate)(dueTime) ? +dueTime - scheduler.now() : dueTime;
+        if (due < 0) {
+            due = 0;
+        }
+        var n = 0;
+        return scheduler.schedule(function () {
+            if (!subscriber.closed) {
+                subscriber.next(n++);
+                if (0 <= intervalDuration) {
+                    this.schedule(undefined, intervalDuration);
+                }
+                else {
+                    subscriber.complete();
+                }
+            }
+        }, due);
+    });
+}
+//# sourceMappingURL=timer.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/observable/zip.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/observable/zip.js ***!
+  \****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "zip": () => (/* binding */ zip)
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Observable */ "./node_modules/rxjs/dist/esm5/internal/Observable.js");
+/* harmony import */ var _innerFrom__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./innerFrom */ "./node_modules/rxjs/dist/esm5/internal/observable/innerFrom.js");
+/* harmony import */ var _util_argsOrArgArray__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/argsOrArgArray */ "./node_modules/rxjs/dist/esm5/internal/util/argsOrArgArray.js");
+/* harmony import */ var _empty__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./empty */ "./node_modules/rxjs/dist/esm5/internal/observable/empty.js");
+/* harmony import */ var _operators_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../operators/OperatorSubscriber */ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js");
+/* harmony import */ var _util_args__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/args */ "./node_modules/rxjs/dist/esm5/internal/util/args.js");
+
+
+
+
+
+
+
+function zip() {
+    var args = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        args[_i] = arguments[_i];
+    }
+    var resultSelector = (0,_util_args__WEBPACK_IMPORTED_MODULE_0__.popResultSelector)(args);
+    var sources = (0,_util_argsOrArgArray__WEBPACK_IMPORTED_MODULE_1__.argsOrArgArray)(args);
+    return sources.length
+        ? new _Observable__WEBPACK_IMPORTED_MODULE_2__.Observable(function (subscriber) {
+            var buffers = sources.map(function () { return []; });
+            var completed = sources.map(function () { return false; });
+            subscriber.add(function () {
+                buffers = completed = null;
+            });
+            var _loop_1 = function (sourceIndex) {
+                (0,_innerFrom__WEBPACK_IMPORTED_MODULE_3__.innerFrom)(sources[sourceIndex]).subscribe((0,_operators_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_4__.createOperatorSubscriber)(subscriber, function (value) {
+                    buffers[sourceIndex].push(value);
+                    if (buffers.every(function (buffer) { return buffer.length; })) {
+                        var result = buffers.map(function (buffer) { return buffer.shift(); });
+                        subscriber.next(resultSelector ? resultSelector.apply(void 0, (0,tslib__WEBPACK_IMPORTED_MODULE_5__.__spreadArray)([], (0,tslib__WEBPACK_IMPORTED_MODULE_5__.__read)(result))) : result);
+                        if (buffers.some(function (buffer, i) { return !buffer.length && completed[i]; })) {
+                            subscriber.complete();
+                        }
+                    }
+                }, function () {
+                    completed[sourceIndex] = true;
+                    !buffers[sourceIndex].length && subscriber.complete();
+                }));
+            };
+            for (var sourceIndex = 0; !subscriber.closed && sourceIndex < sources.length; sourceIndex++) {
+                _loop_1(sourceIndex);
+            }
+            return function () {
+                buffers = completed = null;
+            };
+        })
+        : _empty__WEBPACK_IMPORTED_MODULE_6__.EMPTY;
+}
+//# sourceMappingURL=zip.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createOperatorSubscriber": () => (/* binding */ createOperatorSubscriber),
+/* harmony export */   "OperatorSubscriber": () => (/* binding */ OperatorSubscriber)
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _Subscriber__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Subscriber */ "./node_modules/rxjs/dist/esm5/internal/Subscriber.js");
+
+
+function createOperatorSubscriber(destination, onNext, onComplete, onError, onFinalize) {
+    return new OperatorSubscriber(destination, onNext, onComplete, onError, onFinalize);
+}
+var OperatorSubscriber = (function (_super) {
+    (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__extends)(OperatorSubscriber, _super);
+    function OperatorSubscriber(destination, onNext, onComplete, onError, onFinalize, shouldUnsubscribe) {
+        var _this = _super.call(this, destination) || this;
+        _this.onFinalize = onFinalize;
+        _this.shouldUnsubscribe = shouldUnsubscribe;
+        _this._next = onNext
+            ? function (value) {
+                try {
+                    onNext(value);
+                }
+                catch (err) {
+                    destination.error(err);
+                }
+            }
+            : _super.prototype._next;
+        _this._error = onError
+            ? function (err) {
+                try {
+                    onError(err);
+                }
+                catch (err) {
+                    destination.error(err);
+                }
+                finally {
+                    this.unsubscribe();
+                }
+            }
+            : _super.prototype._error;
+        _this._complete = onComplete
+            ? function () {
+                try {
+                    onComplete();
+                }
+                catch (err) {
+                    destination.error(err);
+                }
+                finally {
+                    this.unsubscribe();
+                }
+            }
+            : _super.prototype._complete;
+        return _this;
+    }
+    OperatorSubscriber.prototype.unsubscribe = function () {
+        var _a;
+        if (!this.shouldUnsubscribe || this.shouldUnsubscribe()) {
+            var closed_1 = this.closed;
+            _super.prototype.unsubscribe.call(this);
+            !closed_1 && ((_a = this.onFinalize) === null || _a === void 0 ? void 0 : _a.call(this));
+        }
+    };
+    return OperatorSubscriber;
+}(_Subscriber__WEBPACK_IMPORTED_MODULE_1__.Subscriber));
+
+//# sourceMappingURL=OperatorSubscriber.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/catchError.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/catchError.js ***!
+  \**********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "catchError": () => (/* binding */ catchError)
+/* harmony export */ });
+/* harmony import */ var _observable_innerFrom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../observable/innerFrom */ "./node_modules/rxjs/dist/esm5/internal/observable/innerFrom.js");
+/* harmony import */ var _OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./OperatorSubscriber */ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js");
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+
+
+
+function catchError(selector) {
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_0__.operate)(function (source, subscriber) {
+        var innerSub = null;
+        var syncUnsub = false;
+        var handledResult;
+        innerSub = source.subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__.createOperatorSubscriber)(subscriber, undefined, undefined, function (err) {
+            handledResult = (0,_observable_innerFrom__WEBPACK_IMPORTED_MODULE_2__.innerFrom)(selector(err, catchError(selector)(source)));
+            if (innerSub) {
+                innerSub.unsubscribe();
+                innerSub = null;
+                handledResult.subscribe(subscriber);
+            }
+            else {
+                syncUnsub = true;
+            }
+        }));
+        if (syncUnsub) {
+            innerSub.unsubscribe();
+            innerSub = null;
+            handledResult.subscribe(subscriber);
+        }
+    });
+}
+//# sourceMappingURL=catchError.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/concatAll.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/concatAll.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "concatAll": () => (/* binding */ concatAll)
+/* harmony export */ });
+/* harmony import */ var _mergeAll__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./mergeAll */ "./node_modules/rxjs/dist/esm5/internal/operators/mergeAll.js");
+
+function concatAll() {
+    return (0,_mergeAll__WEBPACK_IMPORTED_MODULE_0__.mergeAll)(1);
+}
+//# sourceMappingURL=concatAll.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/concatMap.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/concatMap.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "concatMap": () => (/* binding */ concatMap)
+/* harmony export */ });
+/* harmony import */ var _mergeMap__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./mergeMap */ "./node_modules/rxjs/dist/esm5/internal/operators/mergeMap.js");
+/* harmony import */ var _util_isFunction__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+
+
+function concatMap(project, resultSelector) {
+    return (0,_util_isFunction__WEBPACK_IMPORTED_MODULE_0__.isFunction)(resultSelector) ? (0,_mergeMap__WEBPACK_IMPORTED_MODULE_1__.mergeMap)(project, resultSelector, 1) : (0,_mergeMap__WEBPACK_IMPORTED_MODULE_1__.mergeMap)(project, 1);
+}
+//# sourceMappingURL=concatMap.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/connect.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/connect.js ***!
+  \*******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "connect": () => (/* binding */ connect)
+/* harmony export */ });
+/* harmony import */ var _Subject__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Subject */ "./node_modules/rxjs/dist/esm5/internal/Subject.js");
+/* harmony import */ var _observable_from__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../observable/from */ "./node_modules/rxjs/dist/esm5/internal/observable/from.js");
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+/* harmony import */ var _observable_fromSubscribable__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../observable/fromSubscribable */ "./node_modules/rxjs/dist/esm5/internal/observable/fromSubscribable.js");
+
+
+
+
+var DEFAULT_CONFIG = {
+    connector: function () { return new _Subject__WEBPACK_IMPORTED_MODULE_0__.Subject(); },
+};
+function connect(selector, config) {
+    if (config === void 0) { config = DEFAULT_CONFIG; }
+    var connector = config.connector;
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_1__.operate)(function (source, subscriber) {
+        var subject = connector();
+        (0,_observable_from__WEBPACK_IMPORTED_MODULE_2__.from)(selector((0,_observable_fromSubscribable__WEBPACK_IMPORTED_MODULE_3__.fromSubscribable)(subject))).subscribe(subscriber);
+        subscriber.add(source.subscribe(subject));
+    });
+}
+//# sourceMappingURL=connect.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/defaultIfEmpty.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/defaultIfEmpty.js ***!
+  \**************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "defaultIfEmpty": () => (/* binding */ defaultIfEmpty)
+/* harmony export */ });
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+/* harmony import */ var _OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./OperatorSubscriber */ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js");
+
+
+function defaultIfEmpty(defaultValue) {
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_0__.operate)(function (source, subscriber) {
+        var hasValue = false;
+        source.subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__.createOperatorSubscriber)(subscriber, function (value) {
+            hasValue = true;
+            subscriber.next(value);
+        }, function () {
+            if (!hasValue) {
+                subscriber.next(defaultValue);
+            }
+            subscriber.complete();
+        }));
+    });
+}
+//# sourceMappingURL=defaultIfEmpty.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/distinctUntilChanged.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/distinctUntilChanged.js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "distinctUntilChanged": () => (/* binding */ distinctUntilChanged)
+/* harmony export */ });
+/* harmony import */ var _util_identity__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/identity */ "./node_modules/rxjs/dist/esm5/internal/util/identity.js");
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+/* harmony import */ var _OperatorSubscriber__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./OperatorSubscriber */ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js");
+
+
+
+function distinctUntilChanged(comparator, keySelector) {
+    if (keySelector === void 0) { keySelector = _util_identity__WEBPACK_IMPORTED_MODULE_0__.identity; }
+    comparator = comparator !== null && comparator !== void 0 ? comparator : defaultCompare;
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_1__.operate)(function (source, subscriber) {
+        var previousKey;
+        var first = true;
+        source.subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_2__.createOperatorSubscriber)(subscriber, function (value) {
+            var currentKey = keySelector(value);
+            if (first || !comparator(previousKey, currentKey)) {
+                first = false;
+                previousKey = currentKey;
+                subscriber.next(value);
+            }
+        }));
+    });
+}
+function defaultCompare(a, b) {
+    return a === b;
+}
+//# sourceMappingURL=distinctUntilChanged.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/endWith.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/endWith.js ***!
+  \*******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "endWith": () => (/* binding */ endWith)
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _observable_concat__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../observable/concat */ "./node_modules/rxjs/dist/esm5/internal/observable/concat.js");
+/* harmony import */ var _observable_of__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../observable/of */ "./node_modules/rxjs/dist/esm5/internal/observable/of.js");
+
+
+
+function endWith() {
+    var values = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        values[_i] = arguments[_i];
+    }
+    return function (source) { return (0,_observable_concat__WEBPACK_IMPORTED_MODULE_0__.concat)(source, _observable_of__WEBPACK_IMPORTED_MODULE_1__.of.apply(void 0, (0,tslib__WEBPACK_IMPORTED_MODULE_2__.__spreadArray)([], (0,tslib__WEBPACK_IMPORTED_MODULE_2__.__read)(values)))); };
+}
+//# sourceMappingURL=endWith.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/expand.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/expand.js ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "expand": () => (/* binding */ expand)
+/* harmony export */ });
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+/* harmony import */ var _mergeInternals__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./mergeInternals */ "./node_modules/rxjs/dist/esm5/internal/operators/mergeInternals.js");
+
+
+function expand(project, concurrent, scheduler) {
+    if (concurrent === void 0) { concurrent = Infinity; }
+    concurrent = (concurrent || 0) < 1 ? Infinity : concurrent;
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_0__.operate)(function (source, subscriber) {
+        return (0,_mergeInternals__WEBPACK_IMPORTED_MODULE_1__.mergeInternals)(source, subscriber, project, concurrent, undefined, true, scheduler);
+    });
+}
+//# sourceMappingURL=expand.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/filter.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/filter.js ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "filter": () => (/* binding */ filter)
+/* harmony export */ });
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+/* harmony import */ var _OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./OperatorSubscriber */ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js");
+
+
+function filter(predicate, thisArg) {
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_0__.operate)(function (source, subscriber) {
+        var index = 0;
+        source.subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__.createOperatorSubscriber)(subscriber, function (value) { return predicate.call(thisArg, value, index++) && subscriber.next(value); }));
+    });
+}
+//# sourceMappingURL=filter.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/finalize.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/finalize.js ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "finalize": () => (/* binding */ finalize)
+/* harmony export */ });
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+
+function finalize(callback) {
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_0__.operate)(function (source, subscriber) {
+        try {
+            source.subscribe(subscriber);
+        }
+        finally {
+            subscriber.add(callback);
+        }
+    });
+}
+//# sourceMappingURL=finalize.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/first.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/first.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "first": () => (/* binding */ first)
+/* harmony export */ });
+/* harmony import */ var _util_EmptyError__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../util/EmptyError */ "./node_modules/rxjs/dist/esm5/internal/util/EmptyError.js");
+/* harmony import */ var _filter__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./filter */ "./node_modules/rxjs/dist/esm5/internal/operators/filter.js");
+/* harmony import */ var _take__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./take */ "./node_modules/rxjs/dist/esm5/internal/operators/take.js");
+/* harmony import */ var _defaultIfEmpty__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./defaultIfEmpty */ "./node_modules/rxjs/dist/esm5/internal/operators/defaultIfEmpty.js");
+/* harmony import */ var _throwIfEmpty__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./throwIfEmpty */ "./node_modules/rxjs/dist/esm5/internal/operators/throwIfEmpty.js");
+/* harmony import */ var _util_identity__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/identity */ "./node_modules/rxjs/dist/esm5/internal/util/identity.js");
+
+
+
+
+
+
+function first(predicate, defaultValue) {
+    var hasDefaultValue = arguments.length >= 2;
+    return function (source) {
+        return source.pipe(predicate ? (0,_filter__WEBPACK_IMPORTED_MODULE_0__.filter)(function (v, i) { return predicate(v, i, source); }) : _util_identity__WEBPACK_IMPORTED_MODULE_1__.identity, (0,_take__WEBPACK_IMPORTED_MODULE_2__.take)(1), hasDefaultValue ? (0,_defaultIfEmpty__WEBPACK_IMPORTED_MODULE_3__.defaultIfEmpty)(defaultValue) : (0,_throwIfEmpty__WEBPACK_IMPORTED_MODULE_4__.throwIfEmpty)(function () { return new _util_EmptyError__WEBPACK_IMPORTED_MODULE_5__.EmptyError(); }));
+    };
+}
+//# sourceMappingURL=first.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/ignoreElements.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/ignoreElements.js ***!
+  \**************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ignoreElements": () => (/* binding */ ignoreElements)
+/* harmony export */ });
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+/* harmony import */ var _OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./OperatorSubscriber */ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js");
+/* harmony import */ var _util_noop__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/noop */ "./node_modules/rxjs/dist/esm5/internal/util/noop.js");
+
+
+
+function ignoreElements() {
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_0__.operate)(function (source, subscriber) {
+        source.subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__.createOperatorSubscriber)(subscriber, _util_noop__WEBPACK_IMPORTED_MODULE_2__.noop));
+    });
+}
+//# sourceMappingURL=ignoreElements.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/map.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/map.js ***!
+  \***************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "map": () => (/* binding */ map)
+/* harmony export */ });
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+/* harmony import */ var _OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./OperatorSubscriber */ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js");
+
+
+function map(project, thisArg) {
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_0__.operate)(function (source, subscriber) {
+        var index = 0;
+        source.subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__.createOperatorSubscriber)(subscriber, function (value) {
+            subscriber.next(project.call(thisArg, value, index++));
+        }));
+    });
+}
+//# sourceMappingURL=map.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/mapTo.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/mapTo.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "mapTo": () => (/* binding */ mapTo)
+/* harmony export */ });
+/* harmony import */ var _map__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./map */ "./node_modules/rxjs/dist/esm5/internal/operators/map.js");
+
+function mapTo(value) {
+    return (0,_map__WEBPACK_IMPORTED_MODULE_0__.map)(function () { return value; });
+}
+//# sourceMappingURL=mapTo.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/mergeAll.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/mergeAll.js ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "mergeAll": () => (/* binding */ mergeAll)
+/* harmony export */ });
+/* harmony import */ var _mergeMap__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./mergeMap */ "./node_modules/rxjs/dist/esm5/internal/operators/mergeMap.js");
+/* harmony import */ var _util_identity__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/identity */ "./node_modules/rxjs/dist/esm5/internal/util/identity.js");
+
+
+function mergeAll(concurrent) {
+    if (concurrent === void 0) { concurrent = Infinity; }
+    return (0,_mergeMap__WEBPACK_IMPORTED_MODULE_0__.mergeMap)(_util_identity__WEBPACK_IMPORTED_MODULE_1__.identity, concurrent);
+}
+//# sourceMappingURL=mergeAll.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/mergeInternals.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/mergeInternals.js ***!
+  \**************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "mergeInternals": () => (/* binding */ mergeInternals)
+/* harmony export */ });
+/* harmony import */ var _observable_innerFrom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../observable/innerFrom */ "./node_modules/rxjs/dist/esm5/internal/observable/innerFrom.js");
+/* harmony import */ var _util_executeSchedule__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/executeSchedule */ "./node_modules/rxjs/dist/esm5/internal/util/executeSchedule.js");
+/* harmony import */ var _OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./OperatorSubscriber */ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js");
+
+
+
+function mergeInternals(source, subscriber, project, concurrent, onBeforeNext, expand, innerSubScheduler, additionalFinalizer) {
+    var buffer = [];
+    var active = 0;
+    var index = 0;
+    var isComplete = false;
+    var checkComplete = function () {
+        if (isComplete && !buffer.length && !active) {
+            subscriber.complete();
+        }
+    };
+    var outerNext = function (value) { return (active < concurrent ? doInnerSub(value) : buffer.push(value)); };
+    var doInnerSub = function (value) {
+        expand && subscriber.next(value);
+        active++;
+        var innerComplete = false;
+        (0,_observable_innerFrom__WEBPACK_IMPORTED_MODULE_0__.innerFrom)(project(value, index++)).subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__.createOperatorSubscriber)(subscriber, function (innerValue) {
+            onBeforeNext === null || onBeforeNext === void 0 ? void 0 : onBeforeNext(innerValue);
+            if (expand) {
+                outerNext(innerValue);
+            }
+            else {
+                subscriber.next(innerValue);
+            }
+        }, function () {
+            innerComplete = true;
+        }, undefined, function () {
+            if (innerComplete) {
+                try {
+                    active--;
+                    var _loop_1 = function () {
+                        var bufferedValue = buffer.shift();
+                        if (innerSubScheduler) {
+                            (0,_util_executeSchedule__WEBPACK_IMPORTED_MODULE_2__.executeSchedule)(subscriber, innerSubScheduler, function () { return doInnerSub(bufferedValue); });
+                        }
+                        else {
+                            doInnerSub(bufferedValue);
+                        }
+                    };
+                    while (buffer.length && active < concurrent) {
+                        _loop_1();
+                    }
+                    checkComplete();
+                }
+                catch (err) {
+                    subscriber.error(err);
+                }
+            }
+        }));
+    };
+    source.subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__.createOperatorSubscriber)(subscriber, outerNext, function () {
+        isComplete = true;
+        checkComplete();
+    }));
+    return function () {
+        additionalFinalizer === null || additionalFinalizer === void 0 ? void 0 : additionalFinalizer();
+    };
+}
+//# sourceMappingURL=mergeInternals.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/mergeMap.js":
+/*!********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/mergeMap.js ***!
+  \********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "mergeMap": () => (/* binding */ mergeMap)
+/* harmony export */ });
+/* harmony import */ var _map__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./map */ "./node_modules/rxjs/dist/esm5/internal/operators/map.js");
+/* harmony import */ var _observable_innerFrom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../observable/innerFrom */ "./node_modules/rxjs/dist/esm5/internal/observable/innerFrom.js");
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+/* harmony import */ var _mergeInternals__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./mergeInternals */ "./node_modules/rxjs/dist/esm5/internal/operators/mergeInternals.js");
+/* harmony import */ var _util_isFunction__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+
+
+
+
+
+function mergeMap(project, resultSelector, concurrent) {
+    if (concurrent === void 0) { concurrent = Infinity; }
+    if ((0,_util_isFunction__WEBPACK_IMPORTED_MODULE_0__.isFunction)(resultSelector)) {
+        return mergeMap(function (a, i) { return (0,_map__WEBPACK_IMPORTED_MODULE_1__.map)(function (b, ii) { return resultSelector(a, b, i, ii); })((0,_observable_innerFrom__WEBPACK_IMPORTED_MODULE_2__.innerFrom)(project(a, i))); }, concurrent);
+    }
+    else if (typeof resultSelector === 'number') {
+        concurrent = resultSelector;
+    }
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_3__.operate)(function (source, subscriber) { return (0,_mergeInternals__WEBPACK_IMPORTED_MODULE_4__.mergeInternals)(source, subscriber, project, concurrent); });
+}
+//# sourceMappingURL=mergeMap.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/observeOn.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/observeOn.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "observeOn": () => (/* binding */ observeOn)
+/* harmony export */ });
+/* harmony import */ var _util_executeSchedule__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/executeSchedule */ "./node_modules/rxjs/dist/esm5/internal/util/executeSchedule.js");
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+/* harmony import */ var _OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./OperatorSubscriber */ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js");
+
+
+
+function observeOn(scheduler, delay) {
+    if (delay === void 0) { delay = 0; }
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_0__.operate)(function (source, subscriber) {
+        source.subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__.createOperatorSubscriber)(subscriber, function (value) { return (0,_util_executeSchedule__WEBPACK_IMPORTED_MODULE_2__.executeSchedule)(subscriber, scheduler, function () { return subscriber.next(value); }, delay); }, function () { return (0,_util_executeSchedule__WEBPACK_IMPORTED_MODULE_2__.executeSchedule)(subscriber, scheduler, function () { return subscriber.complete(); }, delay); }, function (err) { return (0,_util_executeSchedule__WEBPACK_IMPORTED_MODULE_2__.executeSchedule)(subscriber, scheduler, function () { return subscriber.error(err); }, delay); }));
+    });
+}
+//# sourceMappingURL=observeOn.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/retryWhen.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/retryWhen.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "retryWhen": () => (/* binding */ retryWhen)
+/* harmony export */ });
+/* harmony import */ var _Subject__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../Subject */ "./node_modules/rxjs/dist/esm5/internal/Subject.js");
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+/* harmony import */ var _OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./OperatorSubscriber */ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js");
+
+
+
+function retryWhen(notifier) {
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_0__.operate)(function (source, subscriber) {
+        var innerSub;
+        var syncResub = false;
+        var errors$;
+        var subscribeForRetryWhen = function () {
+            innerSub = source.subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__.createOperatorSubscriber)(subscriber, undefined, undefined, function (err) {
+                if (!errors$) {
+                    errors$ = new _Subject__WEBPACK_IMPORTED_MODULE_2__.Subject();
+                    notifier(errors$).subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__.createOperatorSubscriber)(subscriber, function () {
+                        return innerSub ? subscribeForRetryWhen() : (syncResub = true);
+                    }));
+                }
+                if (errors$) {
+                    errors$.next(err);
+                }
+            }));
+            if (syncResub) {
+                innerSub.unsubscribe();
+                innerSub = null;
+                syncResub = false;
+                subscribeForRetryWhen();
+            }
+        };
+        subscribeForRetryWhen();
+    });
+}
+//# sourceMappingURL=retryWhen.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/scan.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/scan.js ***!
+  \****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "scan": () => (/* binding */ scan)
+/* harmony export */ });
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+/* harmony import */ var _scanInternals__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./scanInternals */ "./node_modules/rxjs/dist/esm5/internal/operators/scanInternals.js");
+
+
+function scan(accumulator, seed) {
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_0__.operate)((0,_scanInternals__WEBPACK_IMPORTED_MODULE_1__.scanInternals)(accumulator, seed, arguments.length >= 2, true));
+}
+//# sourceMappingURL=scan.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/scanInternals.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/scanInternals.js ***!
+  \*************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "scanInternals": () => (/* binding */ scanInternals)
+/* harmony export */ });
+/* harmony import */ var _OperatorSubscriber__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./OperatorSubscriber */ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js");
+
+function scanInternals(accumulator, seed, hasSeed, emitOnNext, emitBeforeComplete) {
+    return function (source, subscriber) {
+        var hasState = hasSeed;
+        var state = seed;
+        var index = 0;
+        source.subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_0__.createOperatorSubscriber)(subscriber, function (value) {
+            var i = index++;
+            state = hasState
+                ?
+                    accumulator(state, value, i)
+                :
+                    ((hasState = true), value);
+            emitOnNext && subscriber.next(state);
+        }, emitBeforeComplete &&
+            (function () {
+                hasState && subscriber.next(state);
+                subscriber.complete();
+            })));
+    };
+}
+//# sourceMappingURL=scanInternals.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/startWith.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/startWith.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "startWith": () => (/* binding */ startWith)
+/* harmony export */ });
+/* harmony import */ var _observable_concat__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../observable/concat */ "./node_modules/rxjs/dist/esm5/internal/observable/concat.js");
+/* harmony import */ var _util_args__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/args */ "./node_modules/rxjs/dist/esm5/internal/util/args.js");
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+
+
+
+function startWith() {
+    var values = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        values[_i] = arguments[_i];
+    }
+    var scheduler = (0,_util_args__WEBPACK_IMPORTED_MODULE_0__.popScheduler)(values);
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_1__.operate)(function (source, subscriber) {
+        (scheduler ? (0,_observable_concat__WEBPACK_IMPORTED_MODULE_2__.concat)(values, source, scheduler) : (0,_observable_concat__WEBPACK_IMPORTED_MODULE_2__.concat)(values, source)).subscribe(subscriber);
+    });
+}
+//# sourceMappingURL=startWith.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/subscribeOn.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/subscribeOn.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "subscribeOn": () => (/* binding */ subscribeOn)
+/* harmony export */ });
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+
+function subscribeOn(scheduler, delay) {
+    if (delay === void 0) { delay = 0; }
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_0__.operate)(function (source, subscriber) {
+        subscriber.add(scheduler.schedule(function () { return source.subscribe(subscriber); }, delay));
+    });
+}
+//# sourceMappingURL=subscribeOn.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/take.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/take.js ***!
+  \****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "take": () => (/* binding */ take)
+/* harmony export */ });
+/* harmony import */ var _observable_empty__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../observable/empty */ "./node_modules/rxjs/dist/esm5/internal/observable/empty.js");
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+/* harmony import */ var _OperatorSubscriber__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./OperatorSubscriber */ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js");
+
+
+
+function take(count) {
+    return count <= 0
+        ?
+            function () { return _observable_empty__WEBPACK_IMPORTED_MODULE_0__.EMPTY; }
+        : (0,_util_lift__WEBPACK_IMPORTED_MODULE_1__.operate)(function (source, subscriber) {
+            var seen = 0;
+            source.subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_2__.createOperatorSubscriber)(subscriber, function (value) {
+                if (++seen <= count) {
+                    subscriber.next(value);
+                    if (count <= seen) {
+                        subscriber.complete();
+                    }
+                }
+            }));
+        });
+}
+//# sourceMappingURL=take.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/tap.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/tap.js ***!
+  \***************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "tap": () => (/* binding */ tap)
+/* harmony export */ });
+/* harmony import */ var _util_isFunction__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+/* harmony import */ var _OperatorSubscriber__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./OperatorSubscriber */ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js");
+/* harmony import */ var _util_identity__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../util/identity */ "./node_modules/rxjs/dist/esm5/internal/util/identity.js");
+
+
+
+
+function tap(observerOrNext, error, complete) {
+    var tapObserver = (0,_util_isFunction__WEBPACK_IMPORTED_MODULE_0__.isFunction)(observerOrNext) || error || complete
+        ?
+            { next: observerOrNext, error: error, complete: complete }
+        : observerOrNext;
+    return tapObserver
+        ? (0,_util_lift__WEBPACK_IMPORTED_MODULE_1__.operate)(function (source, subscriber) {
+            var _a;
+            (_a = tapObserver.subscribe) === null || _a === void 0 ? void 0 : _a.call(tapObserver);
+            var isUnsub = true;
+            source.subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_2__.createOperatorSubscriber)(subscriber, function (value) {
+                var _a;
+                (_a = tapObserver.next) === null || _a === void 0 ? void 0 : _a.call(tapObserver, value);
+                subscriber.next(value);
+            }, function () {
+                var _a;
+                isUnsub = false;
+                (_a = tapObserver.complete) === null || _a === void 0 ? void 0 : _a.call(tapObserver);
+                subscriber.complete();
+            }, function (err) {
+                var _a;
+                isUnsub = false;
+                (_a = tapObserver.error) === null || _a === void 0 ? void 0 : _a.call(tapObserver, err);
+                subscriber.error(err);
+            }, function () {
+                var _a, _b;
+                if (isUnsub) {
+                    (_a = tapObserver.unsubscribe) === null || _a === void 0 ? void 0 : _a.call(tapObserver);
+                }
+                (_b = tapObserver.finalize) === null || _b === void 0 ? void 0 : _b.call(tapObserver);
+            }));
+        })
+        :
+            _util_identity__WEBPACK_IMPORTED_MODULE_3__.identity;
+}
+//# sourceMappingURL=tap.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/throwIfEmpty.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/throwIfEmpty.js ***!
+  \************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "throwIfEmpty": () => (/* binding */ throwIfEmpty)
+/* harmony export */ });
+/* harmony import */ var _util_EmptyError__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/EmptyError */ "./node_modules/rxjs/dist/esm5/internal/util/EmptyError.js");
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+/* harmony import */ var _OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./OperatorSubscriber */ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js");
+
+
+
+function throwIfEmpty(errorFactory) {
+    if (errorFactory === void 0) { errorFactory = defaultErrorFactory; }
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_0__.operate)(function (source, subscriber) {
+        var hasValue = false;
+        source.subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_1__.createOperatorSubscriber)(subscriber, function (value) {
+            hasValue = true;
+            subscriber.next(value);
+        }, function () { return (hasValue ? subscriber.complete() : subscriber.error(errorFactory())); }));
+    });
+}
+function defaultErrorFactory() {
+    return new _util_EmptyError__WEBPACK_IMPORTED_MODULE_2__.EmptyError();
+}
+//# sourceMappingURL=throwIfEmpty.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/operators/withLatestFrom.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/operators/withLatestFrom.js ***!
+  \**************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "withLatestFrom": () => (/* binding */ withLatestFrom)
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _util_lift__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/lift */ "./node_modules/rxjs/dist/esm5/internal/util/lift.js");
+/* harmony import */ var _OperatorSubscriber__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./OperatorSubscriber */ "./node_modules/rxjs/dist/esm5/internal/operators/OperatorSubscriber.js");
+/* harmony import */ var _observable_innerFrom__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../observable/innerFrom */ "./node_modules/rxjs/dist/esm5/internal/observable/innerFrom.js");
+/* harmony import */ var _util_identity__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../util/identity */ "./node_modules/rxjs/dist/esm5/internal/util/identity.js");
+/* harmony import */ var _util_noop__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ../util/noop */ "./node_modules/rxjs/dist/esm5/internal/util/noop.js");
+/* harmony import */ var _util_args__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/args */ "./node_modules/rxjs/dist/esm5/internal/util/args.js");
+
+
+
+
+
+
+
+function withLatestFrom() {
+    var inputs = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        inputs[_i] = arguments[_i];
+    }
+    var project = (0,_util_args__WEBPACK_IMPORTED_MODULE_0__.popResultSelector)(inputs);
+    return (0,_util_lift__WEBPACK_IMPORTED_MODULE_1__.operate)(function (source, subscriber) {
+        var len = inputs.length;
+        var otherValues = new Array(len);
+        var hasValue = inputs.map(function () { return false; });
+        var ready = false;
+        var _loop_1 = function (i) {
+            (0,_observable_innerFrom__WEBPACK_IMPORTED_MODULE_2__.innerFrom)(inputs[i]).subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_3__.createOperatorSubscriber)(subscriber, function (value) {
+                otherValues[i] = value;
+                if (!ready && !hasValue[i]) {
+                    hasValue[i] = true;
+                    (ready = hasValue.every(_util_identity__WEBPACK_IMPORTED_MODULE_4__.identity)) && (hasValue = null);
+                }
+            }, _util_noop__WEBPACK_IMPORTED_MODULE_5__.noop));
+        };
+        for (var i = 0; i < len; i++) {
+            _loop_1(i);
+        }
+        source.subscribe((0,_OperatorSubscriber__WEBPACK_IMPORTED_MODULE_3__.createOperatorSubscriber)(subscriber, function (value) {
+            if (ready) {
+                var values = (0,tslib__WEBPACK_IMPORTED_MODULE_6__.__spreadArray)([value], (0,tslib__WEBPACK_IMPORTED_MODULE_6__.__read)(otherValues));
+                subscriber.next(project ? project.apply(void 0, (0,tslib__WEBPACK_IMPORTED_MODULE_6__.__spreadArray)([], (0,tslib__WEBPACK_IMPORTED_MODULE_6__.__read)(values))) : values);
+            }
+        }));
+    });
+}
+//# sourceMappingURL=withLatestFrom.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/scheduled/scheduleArray.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/scheduled/scheduleArray.js ***!
+  \*************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "scheduleArray": () => (/* binding */ scheduleArray)
+/* harmony export */ });
+/* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Observable */ "./node_modules/rxjs/dist/esm5/internal/Observable.js");
+
+function scheduleArray(input, scheduler) {
+    return new _Observable__WEBPACK_IMPORTED_MODULE_0__.Observable(function (subscriber) {
+        var i = 0;
+        return scheduler.schedule(function () {
+            if (i === input.length) {
+                subscriber.complete();
+            }
+            else {
+                subscriber.next(input[i++]);
+                if (!subscriber.closed) {
+                    this.schedule();
+                }
+            }
+        });
+    });
+}
+//# sourceMappingURL=scheduleArray.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/scheduled/scheduleAsyncIterable.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/scheduled/scheduleAsyncIterable.js ***!
+  \*********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "scheduleAsyncIterable": () => (/* binding */ scheduleAsyncIterable)
+/* harmony export */ });
+/* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Observable */ "./node_modules/rxjs/dist/esm5/internal/Observable.js");
+/* harmony import */ var _util_executeSchedule__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/executeSchedule */ "./node_modules/rxjs/dist/esm5/internal/util/executeSchedule.js");
+
+
+function scheduleAsyncIterable(input, scheduler) {
+    if (!input) {
+        throw new Error('Iterable cannot be null');
+    }
+    return new _Observable__WEBPACK_IMPORTED_MODULE_0__.Observable(function (subscriber) {
+        (0,_util_executeSchedule__WEBPACK_IMPORTED_MODULE_1__.executeSchedule)(subscriber, scheduler, function () {
+            var iterator = input[Symbol.asyncIterator]();
+            (0,_util_executeSchedule__WEBPACK_IMPORTED_MODULE_1__.executeSchedule)(subscriber, scheduler, function () {
+                iterator.next().then(function (result) {
+                    if (result.done) {
+                        subscriber.complete();
+                    }
+                    else {
+                        subscriber.next(result.value);
+                    }
+                });
+            }, 0, true);
+        });
+    });
+}
+//# sourceMappingURL=scheduleAsyncIterable.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/scheduled/scheduleIterable.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/scheduled/scheduleIterable.js ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "scheduleIterable": () => (/* binding */ scheduleIterable)
+/* harmony export */ });
+/* harmony import */ var _Observable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../Observable */ "./node_modules/rxjs/dist/esm5/internal/Observable.js");
+/* harmony import */ var _symbol_iterator__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../symbol/iterator */ "./node_modules/rxjs/dist/esm5/internal/symbol/iterator.js");
+/* harmony import */ var _util_isFunction__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ../util/isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+/* harmony import */ var _util_executeSchedule__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/executeSchedule */ "./node_modules/rxjs/dist/esm5/internal/util/executeSchedule.js");
+
+
+
+
+function scheduleIterable(input, scheduler) {
+    return new _Observable__WEBPACK_IMPORTED_MODULE_0__.Observable(function (subscriber) {
+        var iterator;
+        (0,_util_executeSchedule__WEBPACK_IMPORTED_MODULE_1__.executeSchedule)(subscriber, scheduler, function () {
+            iterator = input[_symbol_iterator__WEBPACK_IMPORTED_MODULE_2__.iterator]();
+            (0,_util_executeSchedule__WEBPACK_IMPORTED_MODULE_1__.executeSchedule)(subscriber, scheduler, function () {
+                var _a;
+                var value;
+                var done;
+                try {
+                    (_a = iterator.next(), value = _a.value, done = _a.done);
+                }
+                catch (err) {
+                    subscriber.error(err);
+                    return;
+                }
+                if (done) {
+                    subscriber.complete();
+                }
+                else {
+                    subscriber.next(value);
+                }
+            }, 0, true);
+        });
+        return function () { return (0,_util_isFunction__WEBPACK_IMPORTED_MODULE_3__.isFunction)(iterator === null || iterator === void 0 ? void 0 : iterator.return) && iterator.return(); };
+    });
+}
+//# sourceMappingURL=scheduleIterable.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/scheduled/scheduleObservable.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/scheduled/scheduleObservable.js ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "scheduleObservable": () => (/* binding */ scheduleObservable)
+/* harmony export */ });
+/* harmony import */ var _observable_innerFrom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../observable/innerFrom */ "./node_modules/rxjs/dist/esm5/internal/observable/innerFrom.js");
+/* harmony import */ var _operators_observeOn__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../operators/observeOn */ "./node_modules/rxjs/dist/esm5/internal/operators/observeOn.js");
+/* harmony import */ var _operators_subscribeOn__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../operators/subscribeOn */ "./node_modules/rxjs/dist/esm5/internal/operators/subscribeOn.js");
+
+
+
+function scheduleObservable(input, scheduler) {
+    return (0,_observable_innerFrom__WEBPACK_IMPORTED_MODULE_0__.innerFrom)(input).pipe((0,_operators_subscribeOn__WEBPACK_IMPORTED_MODULE_1__.subscribeOn)(scheduler), (0,_operators_observeOn__WEBPACK_IMPORTED_MODULE_2__.observeOn)(scheduler));
+}
+//# sourceMappingURL=scheduleObservable.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/scheduled/schedulePromise.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/scheduled/schedulePromise.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "schedulePromise": () => (/* binding */ schedulePromise)
+/* harmony export */ });
+/* harmony import */ var _observable_innerFrom__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../observable/innerFrom */ "./node_modules/rxjs/dist/esm5/internal/observable/innerFrom.js");
+/* harmony import */ var _operators_observeOn__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../operators/observeOn */ "./node_modules/rxjs/dist/esm5/internal/operators/observeOn.js");
+/* harmony import */ var _operators_subscribeOn__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../operators/subscribeOn */ "./node_modules/rxjs/dist/esm5/internal/operators/subscribeOn.js");
+
+
+
+function schedulePromise(input, scheduler) {
+    return (0,_observable_innerFrom__WEBPACK_IMPORTED_MODULE_0__.innerFrom)(input).pipe((0,_operators_subscribeOn__WEBPACK_IMPORTED_MODULE_1__.subscribeOn)(scheduler), (0,_operators_observeOn__WEBPACK_IMPORTED_MODULE_2__.observeOn)(scheduler));
+}
+//# sourceMappingURL=schedulePromise.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/scheduled/scheduleReadableStreamLike.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/scheduled/scheduleReadableStreamLike.js ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "scheduleReadableStreamLike": () => (/* binding */ scheduleReadableStreamLike)
+/* harmony export */ });
+/* harmony import */ var _scheduleAsyncIterable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./scheduleAsyncIterable */ "./node_modules/rxjs/dist/esm5/internal/scheduled/scheduleAsyncIterable.js");
+/* harmony import */ var _util_isReadableStreamLike__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../util/isReadableStreamLike */ "./node_modules/rxjs/dist/esm5/internal/util/isReadableStreamLike.js");
+
+
+function scheduleReadableStreamLike(input, scheduler) {
+    return (0,_scheduleAsyncIterable__WEBPACK_IMPORTED_MODULE_0__.scheduleAsyncIterable)((0,_util_isReadableStreamLike__WEBPACK_IMPORTED_MODULE_1__.readableStreamLikeToAsyncGenerator)(input), scheduler);
+}
+//# sourceMappingURL=scheduleReadableStreamLike.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/scheduled/scheduled.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/scheduled/scheduled.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "scheduled": () => (/* binding */ scheduled)
+/* harmony export */ });
+/* harmony import */ var _scheduleObservable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./scheduleObservable */ "./node_modules/rxjs/dist/esm5/internal/scheduled/scheduleObservable.js");
+/* harmony import */ var _schedulePromise__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./schedulePromise */ "./node_modules/rxjs/dist/esm5/internal/scheduled/schedulePromise.js");
+/* harmony import */ var _scheduleArray__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./scheduleArray */ "./node_modules/rxjs/dist/esm5/internal/scheduled/scheduleArray.js");
+/* harmony import */ var _scheduleIterable__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./scheduleIterable */ "./node_modules/rxjs/dist/esm5/internal/scheduled/scheduleIterable.js");
+/* harmony import */ var _scheduleAsyncIterable__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./scheduleAsyncIterable */ "./node_modules/rxjs/dist/esm5/internal/scheduled/scheduleAsyncIterable.js");
+/* harmony import */ var _util_isInteropObservable__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../util/isInteropObservable */ "./node_modules/rxjs/dist/esm5/internal/util/isInteropObservable.js");
+/* harmony import */ var _util_isPromise__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../util/isPromise */ "./node_modules/rxjs/dist/esm5/internal/util/isPromise.js");
+/* harmony import */ var _util_isArrayLike__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/isArrayLike */ "./node_modules/rxjs/dist/esm5/internal/util/isArrayLike.js");
+/* harmony import */ var _util_isIterable__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ../util/isIterable */ "./node_modules/rxjs/dist/esm5/internal/util/isIterable.js");
+/* harmony import */ var _util_isAsyncIterable__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ../util/isAsyncIterable */ "./node_modules/rxjs/dist/esm5/internal/util/isAsyncIterable.js");
+/* harmony import */ var _util_throwUnobservableError__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ../util/throwUnobservableError */ "./node_modules/rxjs/dist/esm5/internal/util/throwUnobservableError.js");
+/* harmony import */ var _util_isReadableStreamLike__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ../util/isReadableStreamLike */ "./node_modules/rxjs/dist/esm5/internal/util/isReadableStreamLike.js");
+/* harmony import */ var _scheduleReadableStreamLike__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./scheduleReadableStreamLike */ "./node_modules/rxjs/dist/esm5/internal/scheduled/scheduleReadableStreamLike.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+function scheduled(input, scheduler) {
+    if (input != null) {
+        if ((0,_util_isInteropObservable__WEBPACK_IMPORTED_MODULE_0__.isInteropObservable)(input)) {
+            return (0,_scheduleObservable__WEBPACK_IMPORTED_MODULE_1__.scheduleObservable)(input, scheduler);
+        }
+        if ((0,_util_isArrayLike__WEBPACK_IMPORTED_MODULE_2__.isArrayLike)(input)) {
+            return (0,_scheduleArray__WEBPACK_IMPORTED_MODULE_3__.scheduleArray)(input, scheduler);
+        }
+        if ((0,_util_isPromise__WEBPACK_IMPORTED_MODULE_4__.isPromise)(input)) {
+            return (0,_schedulePromise__WEBPACK_IMPORTED_MODULE_5__.schedulePromise)(input, scheduler);
+        }
+        if ((0,_util_isAsyncIterable__WEBPACK_IMPORTED_MODULE_6__.isAsyncIterable)(input)) {
+            return (0,_scheduleAsyncIterable__WEBPACK_IMPORTED_MODULE_7__.scheduleAsyncIterable)(input, scheduler);
+        }
+        if ((0,_util_isIterable__WEBPACK_IMPORTED_MODULE_8__.isIterable)(input)) {
+            return (0,_scheduleIterable__WEBPACK_IMPORTED_MODULE_9__.scheduleIterable)(input, scheduler);
+        }
+        if ((0,_util_isReadableStreamLike__WEBPACK_IMPORTED_MODULE_10__.isReadableStreamLike)(input)) {
+            return (0,_scheduleReadableStreamLike__WEBPACK_IMPORTED_MODULE_11__.scheduleReadableStreamLike)(input, scheduler);
+        }
+    }
+    throw (0,_util_throwUnobservableError__WEBPACK_IMPORTED_MODULE_12__.createInvalidObservableTypeError)(input);
+}
+//# sourceMappingURL=scheduled.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/scheduler/Action.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/scheduler/Action.js ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "Action": () => (/* binding */ Action)
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _Subscription__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Subscription */ "./node_modules/rxjs/dist/esm5/internal/Subscription.js");
+
+
+var Action = (function (_super) {
+    (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__extends)(Action, _super);
+    function Action(scheduler, work) {
+        return _super.call(this) || this;
+    }
+    Action.prototype.schedule = function (state, delay) {
+        if (delay === void 0) { delay = 0; }
+        return this;
+    };
+    return Action;
+}(_Subscription__WEBPACK_IMPORTED_MODULE_1__.Subscription));
+
+//# sourceMappingURL=Action.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/scheduler/AsyncAction.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/scheduler/AsyncAction.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "AsyncAction": () => (/* binding */ AsyncAction)
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _Action__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Action */ "./node_modules/rxjs/dist/esm5/internal/scheduler/Action.js");
+/* harmony import */ var _intervalProvider__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./intervalProvider */ "./node_modules/rxjs/dist/esm5/internal/scheduler/intervalProvider.js");
+/* harmony import */ var _util_arrRemove__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ../util/arrRemove */ "./node_modules/rxjs/dist/esm5/internal/util/arrRemove.js");
+
+
+
+
+var AsyncAction = (function (_super) {
+    (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__extends)(AsyncAction, _super);
+    function AsyncAction(scheduler, work) {
+        var _this = _super.call(this, scheduler, work) || this;
+        _this.scheduler = scheduler;
+        _this.work = work;
+        _this.pending = false;
+        return _this;
+    }
+    AsyncAction.prototype.schedule = function (state, delay) {
+        if (delay === void 0) { delay = 0; }
+        if (this.closed) {
+            return this;
+        }
+        this.state = state;
+        var id = this.id;
+        var scheduler = this.scheduler;
+        if (id != null) {
+            this.id = this.recycleAsyncId(scheduler, id, delay);
+        }
+        this.pending = true;
+        this.delay = delay;
+        this.id = this.id || this.requestAsyncId(scheduler, this.id, delay);
+        return this;
+    };
+    AsyncAction.prototype.requestAsyncId = function (scheduler, _id, delay) {
+        if (delay === void 0) { delay = 0; }
+        return _intervalProvider__WEBPACK_IMPORTED_MODULE_1__.intervalProvider.setInterval(scheduler.flush.bind(scheduler, this), delay);
+    };
+    AsyncAction.prototype.recycleAsyncId = function (_scheduler, id, delay) {
+        if (delay === void 0) { delay = 0; }
+        if (delay != null && this.delay === delay && this.pending === false) {
+            return id;
+        }
+        _intervalProvider__WEBPACK_IMPORTED_MODULE_1__.intervalProvider.clearInterval(id);
+        return undefined;
+    };
+    AsyncAction.prototype.execute = function (state, delay) {
+        if (this.closed) {
+            return new Error('executing a cancelled action');
+        }
+        this.pending = false;
+        var error = this._execute(state, delay);
+        if (error) {
+            return error;
+        }
+        else if (this.pending === false && this.id != null) {
+            this.id = this.recycleAsyncId(this.scheduler, this.id, null);
+        }
+    };
+    AsyncAction.prototype._execute = function (state, _delay) {
+        var errored = false;
+        var errorValue;
+        try {
+            this.work(state);
+        }
+        catch (e) {
+            errored = true;
+            errorValue = e ? e : new Error('Scheduled action threw falsy error');
+        }
+        if (errored) {
+            this.unsubscribe();
+            return errorValue;
+        }
+    };
+    AsyncAction.prototype.unsubscribe = function () {
+        if (!this.closed) {
+            var _a = this, id = _a.id, scheduler = _a.scheduler;
+            var actions = scheduler.actions;
+            this.work = this.state = this.scheduler = null;
+            this.pending = false;
+            (0,_util_arrRemove__WEBPACK_IMPORTED_MODULE_2__.arrRemove)(actions, this);
+            if (id != null) {
+                this.id = this.recycleAsyncId(scheduler, id, null);
+            }
+            this.delay = null;
+            _super.prototype.unsubscribe.call(this);
+        }
+    };
+    return AsyncAction;
+}(_Action__WEBPACK_IMPORTED_MODULE_3__.Action));
+
+//# sourceMappingURL=AsyncAction.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/scheduler/AsyncScheduler.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/scheduler/AsyncScheduler.js ***!
+  \**************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "AsyncScheduler": () => (/* binding */ AsyncScheduler)
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _Scheduler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../Scheduler */ "./node_modules/rxjs/dist/esm5/internal/Scheduler.js");
+
+
+var AsyncScheduler = (function (_super) {
+    (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__extends)(AsyncScheduler, _super);
+    function AsyncScheduler(SchedulerAction, now) {
+        if (now === void 0) { now = _Scheduler__WEBPACK_IMPORTED_MODULE_1__.Scheduler.now; }
+        var _this = _super.call(this, SchedulerAction, now) || this;
+        _this.actions = [];
+        _this._active = false;
+        _this._scheduled = undefined;
+        return _this;
+    }
+    AsyncScheduler.prototype.flush = function (action) {
+        var actions = this.actions;
+        if (this._active) {
+            actions.push(action);
+            return;
+        }
+        var error;
+        this._active = true;
+        do {
+            if ((error = action.execute(action.state, action.delay))) {
+                break;
+            }
+        } while ((action = actions.shift()));
+        this._active = false;
+        if (error) {
+            while ((action = actions.shift())) {
+                action.unsubscribe();
+            }
+            throw error;
+        }
+    };
+    return AsyncScheduler;
+}(_Scheduler__WEBPACK_IMPORTED_MODULE_1__.Scheduler));
+
+//# sourceMappingURL=AsyncScheduler.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/scheduler/async.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/scheduler/async.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "asyncScheduler": () => (/* binding */ asyncScheduler),
+/* harmony export */   "async": () => (/* binding */ async)
+/* harmony export */ });
+/* harmony import */ var _AsyncAction__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./AsyncAction */ "./node_modules/rxjs/dist/esm5/internal/scheduler/AsyncAction.js");
+/* harmony import */ var _AsyncScheduler__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./AsyncScheduler */ "./node_modules/rxjs/dist/esm5/internal/scheduler/AsyncScheduler.js");
+
+
+var asyncScheduler = new _AsyncScheduler__WEBPACK_IMPORTED_MODULE_0__.AsyncScheduler(_AsyncAction__WEBPACK_IMPORTED_MODULE_1__.AsyncAction);
+var async = asyncScheduler;
+//# sourceMappingURL=async.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/scheduler/dateTimestampProvider.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/scheduler/dateTimestampProvider.js ***!
+  \*********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "dateTimestampProvider": () => (/* binding */ dateTimestampProvider)
+/* harmony export */ });
+var dateTimestampProvider = {
+    now: function () {
+        return (dateTimestampProvider.delegate || Date).now();
+    },
+    delegate: undefined,
+};
+//# sourceMappingURL=dateTimestampProvider.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/scheduler/intervalProvider.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/scheduler/intervalProvider.js ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "intervalProvider": () => (/* binding */ intervalProvider)
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+
+var intervalProvider = {
+    setInterval: function (handler, timeout) {
+        var args = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
+        }
+        var delegate = intervalProvider.delegate;
+        if (delegate === null || delegate === void 0 ? void 0 : delegate.setInterval) {
+            return delegate.setInterval.apply(delegate, (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__spreadArray)([handler, timeout], (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__read)(args)));
+        }
+        return setInterval.apply(void 0, (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__spreadArray)([handler, timeout], (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__read)(args)));
+    },
+    clearInterval: function (handle) {
+        var delegate = intervalProvider.delegate;
+        return ((delegate === null || delegate === void 0 ? void 0 : delegate.clearInterval) || clearInterval)(handle);
+    },
+    delegate: undefined,
+};
+//# sourceMappingURL=intervalProvider.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/scheduler/timeoutProvider.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/scheduler/timeoutProvider.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "timeoutProvider": () => (/* binding */ timeoutProvider)
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+
+var timeoutProvider = {
+    setTimeout: function (handler, timeout) {
+        var args = [];
+        for (var _i = 2; _i < arguments.length; _i++) {
+            args[_i - 2] = arguments[_i];
+        }
+        var delegate = timeoutProvider.delegate;
+        if (delegate === null || delegate === void 0 ? void 0 : delegate.setTimeout) {
+            return delegate.setTimeout.apply(delegate, (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__spreadArray)([handler, timeout], (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__read)(args)));
+        }
+        return setTimeout.apply(void 0, (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__spreadArray)([handler, timeout], (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__read)(args)));
+    },
+    clearTimeout: function (handle) {
+        var delegate = timeoutProvider.delegate;
+        return ((delegate === null || delegate === void 0 ? void 0 : delegate.clearTimeout) || clearTimeout)(handle);
+    },
+    delegate: undefined,
+};
+//# sourceMappingURL=timeoutProvider.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/symbol/iterator.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/symbol/iterator.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "getSymbolIterator": () => (/* binding */ getSymbolIterator),
+/* harmony export */   "iterator": () => (/* binding */ iterator)
+/* harmony export */ });
+function getSymbolIterator() {
+    if (typeof Symbol !== 'function' || !Symbol.iterator) {
+        return '@@iterator';
+    }
+    return Symbol.iterator;
+}
+var iterator = getSymbolIterator();
+//# sourceMappingURL=iterator.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/symbol/observable.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/symbol/observable.js ***!
+  \*******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "observable": () => (/* binding */ observable)
+/* harmony export */ });
+var observable = (function () { return (typeof Symbol === 'function' && Symbol.observable) || '@@observable'; })();
+//# sourceMappingURL=observable.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/EmptyError.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/EmptyError.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "EmptyError": () => (/* binding */ EmptyError)
+/* harmony export */ });
+/* harmony import */ var _createErrorClass__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./createErrorClass */ "./node_modules/rxjs/dist/esm5/internal/util/createErrorClass.js");
+
+var EmptyError = (0,_createErrorClass__WEBPACK_IMPORTED_MODULE_0__.createErrorClass)(function (_super) { return function EmptyErrorImpl() {
+    _super(this);
+    this.name = 'EmptyError';
+    this.message = 'no elements in sequence';
+}; });
+//# sourceMappingURL=EmptyError.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/ObjectUnsubscribedError.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/ObjectUnsubscribedError.js ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "ObjectUnsubscribedError": () => (/* binding */ ObjectUnsubscribedError)
+/* harmony export */ });
+/* harmony import */ var _createErrorClass__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./createErrorClass */ "./node_modules/rxjs/dist/esm5/internal/util/createErrorClass.js");
+
+var ObjectUnsubscribedError = (0,_createErrorClass__WEBPACK_IMPORTED_MODULE_0__.createErrorClass)(function (_super) {
+    return function ObjectUnsubscribedErrorImpl() {
+        _super(this);
+        this.name = 'ObjectUnsubscribedError';
+        this.message = 'object unsubscribed';
+    };
+});
+//# sourceMappingURL=ObjectUnsubscribedError.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/UnsubscriptionError.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/UnsubscriptionError.js ***!
+  \**************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "UnsubscriptionError": () => (/* binding */ UnsubscriptionError)
+/* harmony export */ });
+/* harmony import */ var _createErrorClass__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./createErrorClass */ "./node_modules/rxjs/dist/esm5/internal/util/createErrorClass.js");
+
+var UnsubscriptionError = (0,_createErrorClass__WEBPACK_IMPORTED_MODULE_0__.createErrorClass)(function (_super) {
+    return function UnsubscriptionErrorImpl(errors) {
+        _super(this);
+        this.message = errors
+            ? errors.length + " errors occurred during unsubscription:\n" + errors.map(function (err, i) { return i + 1 + ") " + err.toString(); }).join('\n  ')
+            : '';
+        this.name = 'UnsubscriptionError';
+        this.errors = errors;
+    };
+});
+//# sourceMappingURL=UnsubscriptionError.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/args.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/args.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "popResultSelector": () => (/* binding */ popResultSelector),
+/* harmony export */   "popScheduler": () => (/* binding */ popScheduler),
+/* harmony export */   "popNumber": () => (/* binding */ popNumber)
+/* harmony export */ });
+/* harmony import */ var _isFunction__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+/* harmony import */ var _isScheduler__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./isScheduler */ "./node_modules/rxjs/dist/esm5/internal/util/isScheduler.js");
+
+
+function last(arr) {
+    return arr[arr.length - 1];
+}
+function popResultSelector(args) {
+    return (0,_isFunction__WEBPACK_IMPORTED_MODULE_0__.isFunction)(last(args)) ? args.pop() : undefined;
+}
+function popScheduler(args) {
+    return (0,_isScheduler__WEBPACK_IMPORTED_MODULE_1__.isScheduler)(last(args)) ? args.pop() : undefined;
+}
+function popNumber(args, defaultValue) {
+    return typeof last(args) === 'number' ? args.pop() : defaultValue;
+}
+//# sourceMappingURL=args.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/argsArgArrayOrObject.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/argsArgArrayOrObject.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "argsArgArrayOrObject": () => (/* binding */ argsArgArrayOrObject)
+/* harmony export */ });
+var isArray = Array.isArray;
+var getPrototypeOf = Object.getPrototypeOf, objectProto = Object.prototype, getKeys = Object.keys;
+function argsArgArrayOrObject(args) {
+    if (args.length === 1) {
+        var first_1 = args[0];
+        if (isArray(first_1)) {
+            return { args: first_1, keys: null };
+        }
+        if (isPOJO(first_1)) {
+            var keys = getKeys(first_1);
+            return {
+                args: keys.map(function (key) { return first_1[key]; }),
+                keys: keys,
+            };
+        }
+    }
+    return { args: args, keys: null };
+}
+function isPOJO(obj) {
+    return obj && typeof obj === 'object' && getPrototypeOf(obj) === objectProto;
+}
+//# sourceMappingURL=argsArgArrayOrObject.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/argsOrArgArray.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/argsOrArgArray.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "argsOrArgArray": () => (/* binding */ argsOrArgArray)
+/* harmony export */ });
+var isArray = Array.isArray;
+function argsOrArgArray(args) {
+    return args.length === 1 && isArray(args[0]) ? args[0] : args;
+}
+//# sourceMappingURL=argsOrArgArray.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/arrRemove.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/arrRemove.js ***!
+  \****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "arrRemove": () => (/* binding */ arrRemove)
+/* harmony export */ });
+function arrRemove(arr, item) {
+    if (arr) {
+        var index = arr.indexOf(item);
+        0 <= index && arr.splice(index, 1);
+    }
+}
+//# sourceMappingURL=arrRemove.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/createErrorClass.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/createErrorClass.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createErrorClass": () => (/* binding */ createErrorClass)
+/* harmony export */ });
+function createErrorClass(createImpl) {
+    var _super = function (instance) {
+        Error.call(instance);
+        instance.stack = new Error().stack;
+    };
+    var ctorFunc = createImpl(_super);
+    ctorFunc.prototype = Object.create(Error.prototype);
+    ctorFunc.prototype.constructor = ctorFunc;
+    return ctorFunc;
+}
+//# sourceMappingURL=createErrorClass.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/createObject.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/createObject.js ***!
+  \*******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createObject": () => (/* binding */ createObject)
+/* harmony export */ });
+function createObject(keys, values) {
+    return keys.reduce(function (result, key, i) { return ((result[key] = values[i]), result); }, {});
+}
+//# sourceMappingURL=createObject.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/errorContext.js":
+/*!*******************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/errorContext.js ***!
+  \*******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "errorContext": () => (/* binding */ errorContext),
+/* harmony export */   "captureError": () => (/* binding */ captureError)
+/* harmony export */ });
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../config */ "./node_modules/rxjs/dist/esm5/internal/config.js");
+
+var context = null;
+function errorContext(cb) {
+    if (_config__WEBPACK_IMPORTED_MODULE_0__.config.useDeprecatedSynchronousErrorHandling) {
+        var isRoot = !context;
+        if (isRoot) {
+            context = { errorThrown: false, error: null };
+        }
+        cb();
+        if (isRoot) {
+            var _a = context, errorThrown = _a.errorThrown, error = _a.error;
+            context = null;
+            if (errorThrown) {
+                throw error;
+            }
+        }
+    }
+    else {
+        cb();
+    }
+}
+function captureError(err) {
+    if (_config__WEBPACK_IMPORTED_MODULE_0__.config.useDeprecatedSynchronousErrorHandling && context) {
+        context.errorThrown = true;
+        context.error = err;
+    }
+}
+//# sourceMappingURL=errorContext.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/executeSchedule.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/executeSchedule.js ***!
+  \**********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "executeSchedule": () => (/* binding */ executeSchedule)
+/* harmony export */ });
+function executeSchedule(parentSubscription, scheduler, work, delay, repeat) {
+    if (delay === void 0) { delay = 0; }
+    if (repeat === void 0) { repeat = false; }
+    var scheduleSubscription = scheduler.schedule(function () {
+        work();
+        if (repeat) {
+            parentSubscription.add(this.schedule(null, delay));
+        }
+        else {
+            this.unsubscribe();
+        }
+    }, delay);
+    parentSubscription.add(scheduleSubscription);
+    if (!repeat) {
+        return scheduleSubscription;
+    }
+}
+//# sourceMappingURL=executeSchedule.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/identity.js":
+/*!***************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/identity.js ***!
+  \***************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "identity": () => (/* binding */ identity)
+/* harmony export */ });
+function identity(x) {
+    return x;
+}
+//# sourceMappingURL=identity.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/isArrayLike.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/isArrayLike.js ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "isArrayLike": () => (/* binding */ isArrayLike)
+/* harmony export */ });
+var isArrayLike = (function (x) { return x && typeof x.length === 'number' && typeof x !== 'function'; });
+//# sourceMappingURL=isArrayLike.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/isAsyncIterable.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/isAsyncIterable.js ***!
+  \**********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "isAsyncIterable": () => (/* binding */ isAsyncIterable)
+/* harmony export */ });
+/* harmony import */ var _isFunction__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+
+function isAsyncIterable(obj) {
+    return Symbol.asyncIterator && (0,_isFunction__WEBPACK_IMPORTED_MODULE_0__.isFunction)(obj === null || obj === void 0 ? void 0 : obj[Symbol.asyncIterator]);
+}
+//# sourceMappingURL=isAsyncIterable.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/isDate.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/isDate.js ***!
+  \*************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "isValidDate": () => (/* binding */ isValidDate)
+/* harmony export */ });
+function isValidDate(value) {
+    return value instanceof Date && !isNaN(value);
+}
+//# sourceMappingURL=isDate.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/isFunction.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "isFunction": () => (/* binding */ isFunction)
+/* harmony export */ });
+function isFunction(value) {
+    return typeof value === 'function';
+}
+//# sourceMappingURL=isFunction.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/isInteropObservable.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/isInteropObservable.js ***!
+  \**************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "isInteropObservable": () => (/* binding */ isInteropObservable)
+/* harmony export */ });
+/* harmony import */ var _symbol_observable__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../symbol/observable */ "./node_modules/rxjs/dist/esm5/internal/symbol/observable.js");
+/* harmony import */ var _isFunction__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+
+
+function isInteropObservable(input) {
+    return (0,_isFunction__WEBPACK_IMPORTED_MODULE_0__.isFunction)(input[_symbol_observable__WEBPACK_IMPORTED_MODULE_1__.observable]);
+}
+//# sourceMappingURL=isInteropObservable.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/isIterable.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/isIterable.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "isIterable": () => (/* binding */ isIterable)
+/* harmony export */ });
+/* harmony import */ var _symbol_iterator__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../symbol/iterator */ "./node_modules/rxjs/dist/esm5/internal/symbol/iterator.js");
+/* harmony import */ var _isFunction__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+
+
+function isIterable(input) {
+    return (0,_isFunction__WEBPACK_IMPORTED_MODULE_0__.isFunction)(input === null || input === void 0 ? void 0 : input[_symbol_iterator__WEBPACK_IMPORTED_MODULE_1__.iterator]);
+}
+//# sourceMappingURL=isIterable.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/isPromise.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/isPromise.js ***!
+  \****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "isPromise": () => (/* binding */ isPromise)
+/* harmony export */ });
+/* harmony import */ var _isFunction__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+
+function isPromise(value) {
+    return (0,_isFunction__WEBPACK_IMPORTED_MODULE_0__.isFunction)(value === null || value === void 0 ? void 0 : value.then);
+}
+//# sourceMappingURL=isPromise.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/isReadableStreamLike.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/isReadableStreamLike.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "readableStreamLikeToAsyncGenerator": () => (/* binding */ readableStreamLikeToAsyncGenerator),
+/* harmony export */   "isReadableStreamLike": () => (/* binding */ isReadableStreamLike)
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _isFunction__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+
+
+function readableStreamLikeToAsyncGenerator(readableStream) {
+    return (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__asyncGenerator)(this, arguments, function readableStreamLikeToAsyncGenerator_1() {
+        var reader, _a, value, done;
+        return (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__generator)(this, function (_b) {
+            switch (_b.label) {
+                case 0:
+                    reader = readableStream.getReader();
+                    _b.label = 1;
+                case 1:
+                    _b.trys.push([1, , 9, 10]);
+                    _b.label = 2;
+                case 2:
+                    if (false) {}
+                    return [4, (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__await)(reader.read())];
+                case 3:
+                    _a = _b.sent(), value = _a.value, done = _a.done;
+                    if (!done) return [3, 5];
+                    return [4, (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__await)(void 0)];
+                case 4: return [2, _b.sent()];
+                case 5: return [4, (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__await)(value)];
+                case 6: return [4, _b.sent()];
+                case 7:
+                    _b.sent();
+                    return [3, 2];
+                case 8: return [3, 10];
+                case 9:
+                    reader.releaseLock();
+                    return [7];
+                case 10: return [2];
+            }
+        });
+    });
+}
+function isReadableStreamLike(obj) {
+    return (0,_isFunction__WEBPACK_IMPORTED_MODULE_1__.isFunction)(obj === null || obj === void 0 ? void 0 : obj.getReader);
+}
+//# sourceMappingURL=isReadableStreamLike.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/isScheduler.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/isScheduler.js ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "isScheduler": () => (/* binding */ isScheduler)
+/* harmony export */ });
+/* harmony import */ var _isFunction__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+
+function isScheduler(value) {
+    return value && (0,_isFunction__WEBPACK_IMPORTED_MODULE_0__.isFunction)(value.schedule);
+}
+//# sourceMappingURL=isScheduler.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/lift.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/lift.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "hasLift": () => (/* binding */ hasLift),
+/* harmony export */   "operate": () => (/* binding */ operate)
+/* harmony export */ });
+/* harmony import */ var _isFunction__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./isFunction */ "./node_modules/rxjs/dist/esm5/internal/util/isFunction.js");
+
+function hasLift(source) {
+    return (0,_isFunction__WEBPACK_IMPORTED_MODULE_0__.isFunction)(source === null || source === void 0 ? void 0 : source.lift);
+}
+function operate(init) {
+    return function (source) {
+        if (hasLift(source)) {
+            return source.lift(function (liftedSource) {
+                try {
+                    return init(liftedSource, this);
+                }
+                catch (err) {
+                    this.error(err);
+                }
+            });
+        }
+        throw new TypeError('Unable to lift unknown Observable type');
+    };
+}
+//# sourceMappingURL=lift.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/mapOneOrManyArgs.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/mapOneOrManyArgs.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "mapOneOrManyArgs": () => (/* binding */ mapOneOrManyArgs)
+/* harmony export */ });
+/* harmony import */ var tslib__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! tslib */ "./node_modules/tslib/tslib.es6.js");
+/* harmony import */ var _operators_map__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../operators/map */ "./node_modules/rxjs/dist/esm5/internal/operators/map.js");
+
+
+var isArray = Array.isArray;
+function callOrApply(fn, args) {
+    return isArray(args) ? fn.apply(void 0, (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__spreadArray)([], (0,tslib__WEBPACK_IMPORTED_MODULE_0__.__read)(args))) : fn(args);
+}
+function mapOneOrManyArgs(fn) {
+    return (0,_operators_map__WEBPACK_IMPORTED_MODULE_1__.map)(function (args) { return callOrApply(fn, args); });
+}
+//# sourceMappingURL=mapOneOrManyArgs.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/noop.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/noop.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "noop": () => (/* binding */ noop)
+/* harmony export */ });
+function noop() { }
+//# sourceMappingURL=noop.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/pipe.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/pipe.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "pipe": () => (/* binding */ pipe),
+/* harmony export */   "pipeFromArray": () => (/* binding */ pipeFromArray)
+/* harmony export */ });
+/* harmony import */ var _identity__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./identity */ "./node_modules/rxjs/dist/esm5/internal/util/identity.js");
+
+function pipe() {
+    var fns = [];
+    for (var _i = 0; _i < arguments.length; _i++) {
+        fns[_i] = arguments[_i];
+    }
+    return pipeFromArray(fns);
+}
+function pipeFromArray(fns) {
+    if (fns.length === 0) {
+        return _identity__WEBPACK_IMPORTED_MODULE_0__.identity;
+    }
+    if (fns.length === 1) {
+        return fns[0];
+    }
+    return function piped(input) {
+        return fns.reduce(function (prev, fn) { return fn(prev); }, input);
+    };
+}
+//# sourceMappingURL=pipe.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/reportUnhandledError.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/reportUnhandledError.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "reportUnhandledError": () => (/* binding */ reportUnhandledError)
+/* harmony export */ });
+/* harmony import */ var _config__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ../config */ "./node_modules/rxjs/dist/esm5/internal/config.js");
+/* harmony import */ var _scheduler_timeoutProvider__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ../scheduler/timeoutProvider */ "./node_modules/rxjs/dist/esm5/internal/scheduler/timeoutProvider.js");
+
+
+function reportUnhandledError(err) {
+    _scheduler_timeoutProvider__WEBPACK_IMPORTED_MODULE_0__.timeoutProvider.setTimeout(function () {
+        var onUnhandledError = _config__WEBPACK_IMPORTED_MODULE_1__.config.onUnhandledError;
+        if (onUnhandledError) {
+            onUnhandledError(err);
+        }
+        else {
+            throw err;
+        }
+    });
+}
+//# sourceMappingURL=reportUnhandledError.js.map
+
+/***/ }),
+
+/***/ "./node_modules/rxjs/dist/esm5/internal/util/throwUnobservableError.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/rxjs/dist/esm5/internal/util/throwUnobservableError.js ***!
+  \*****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createInvalidObservableTypeError": () => (/* binding */ createInvalidObservableTypeError)
+/* harmony export */ });
+function createInvalidObservableTypeError(input) {
+    return new TypeError("You provided " + (input !== null && typeof input === 'object' ? 'an invalid object' : "'" + input + "'") + " where a stream was expected. You can provide an Observable, Promise, ReadableStream, Array, AsyncIterable, or Iterable.");
+}
+//# sourceMappingURL=throwUnobservableError.js.map
+
+/***/ }),
+
 /***/ "./node_modules/@oruga-ui/theme-bulma/dist/bulma.css":
 /*!***********************************************************!*\
   !*** ./node_modules/@oruga-ui/theme-bulma/dist/bulma.css ***!
@@ -38420,6 +43590,4034 @@ module.exports = function (list, options) {
     lastIdentifiers = newLastIdentifiers;
   };
 };
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/animation-frame.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/animation-frame.js ***!
+  \************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createAnimationFrame": () => (/* binding */ createAnimationFrame)
+/* harmony export */ });
+const createAnimationFrame = (emitNotSupportedError, window, wrapSubscribeFunction) => {
+    return () => wrapSubscribeFunction((observer) => {
+        if (window === null || window.cancelAnimationFrame === undefined || window.requestAnimationFrame === undefined) {
+            return emitNotSupportedError(observer);
+        }
+        let animationFrameHandle = window.requestAnimationFrame(function animationFrameCallback(timestamp) {
+            animationFrameHandle = window.requestAnimationFrame(animationFrameCallback);
+            observer.next(timestamp);
+        });
+        return () => window.cancelAnimationFrame(animationFrameHandle);
+    });
+};
+//# sourceMappingURL=animation-frame.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/attribute.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/attribute.js ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createAttribute": () => (/* binding */ createAttribute)
+/* harmony export */ });
+const createAttribute = (mapSubscribableThing, mutations, prependSubscribableThing) => {
+    return (htmlElement, name) => {
+        const getAttribute = () => htmlElement.getAttribute(name);
+        return prependSubscribableThing(mapSubscribableThing(mutations(htmlElement, {
+            attributeFilter: [name],
+            childList: false,
+            subtree: false
+        }), () => getAttribute()), getAttribute());
+    };
+};
+//# sourceMappingURL=attribute.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/geolocation.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/geolocation.js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createGeolocation": () => (/* binding */ createGeolocation)
+/* harmony export */ });
+const createGeolocation = (emitNotSupportedError, window, wrapSubscribeFunction) => {
+    return (options) => wrapSubscribeFunction((observer) => {
+        if (window === null ||
+            window.navigator === undefined ||
+            window.navigator.geolocation === undefined ||
+            window.navigator.geolocation.clearWatch === undefined ||
+            window.navigator.geolocation.watchPosition === undefined) {
+            return emitNotSupportedError(observer);
+        }
+        const watchId = window.navigator.geolocation.watchPosition((position) => observer.next(position), (err) => observer.error(err), options);
+        return () => window.navigator.geolocation.clearWatch(watchId);
+    });
+};
+//# sourceMappingURL=geolocation.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/intersections.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/intersections.js ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createIntersections": () => (/* binding */ createIntersections)
+/* harmony export */ });
+const createIntersections = (emitNotSupportedError, window, wrapSubscribeFunction) => {
+    return (htmlElement, options) => wrapSubscribeFunction((observer) => {
+        if (window === null || window.IntersectionObserver === undefined) {
+            return emitNotSupportedError(observer);
+        }
+        const intersectionObserverObserver = new window.IntersectionObserver((entries) => observer.next(entries), options);
+        try {
+            intersectionObserverObserver.observe(htmlElement);
+        }
+        catch (err) {
+            observer.error(err);
+        }
+        return () => intersectionObserverObserver.disconnect();
+    });
+};
+//# sourceMappingURL=intersections.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/map-subscribable-thing.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/map-subscribable-thing.js ***!
+  \*******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createMapSubscribableThing": () => (/* binding */ createMapSubscribableThing)
+/* harmony export */ });
+const createMapSubscribableThing = (wrapSubscribeFunction) => (subscribableThing, map) => wrapSubscribeFunction((observer) => subscribableThing({ ...observer, next: (value) => observer.next(map(value)) }));
+//# sourceMappingURL=map-subscribable-thing.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/media-devices.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/media-devices.js ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createMediaDevices": () => (/* binding */ createMediaDevices)
+/* harmony export */ });
+const createMediaDevices = (emitNotSupportedError, window, wrapSubscribeFunction) => {
+    return () => wrapSubscribeFunction((observer) => {
+        if (window === null ||
+            window.navigator === undefined ||
+            window.navigator.mediaDevices === undefined ||
+            window.navigator.mediaDevices.enumerateDevices === undefined) {
+            return emitNotSupportedError(observer);
+        }
+        let isActive = true;
+        const enumerateDevices = () => {
+            window.navigator.mediaDevices.enumerateDevices().then((mediaDevices) => {
+                if (isActive) {
+                    observer.next(mediaDevices);
+                }
+            }, (err) => {
+                if (isActive) {
+                    unsubscribe();
+                    observer.error(err);
+                }
+            });
+        };
+        const unsubscribe = () => {
+            isActive = false;
+            window.navigator.mediaDevices.removeEventListener('devicechange', enumerateDevices);
+        };
+        enumerateDevices();
+        window.navigator.mediaDevices.addEventListener('devicechange', enumerateDevices);
+        return unsubscribe;
+    });
+};
+//# sourceMappingURL=media-devices.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/media-query-match.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/media-query-match.js ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createMediaQueryMatch": () => (/* binding */ createMediaQueryMatch)
+/* harmony export */ });
+const createMediaQueryMatch = (emitNotSupportedError, window, wrapSubscribeFunction) => {
+    return (mediaQueryString) => wrapSubscribeFunction((observer) => {
+        if (window === null || window.matchMedia === undefined) {
+            return emitNotSupportedError(observer);
+        }
+        const mediaQueryList = window.matchMedia(mediaQueryString);
+        observer.next(mediaQueryList.matches);
+        mediaQueryList.onchange = () => observer.next(mediaQueryList.matches);
+        return () => {
+            mediaQueryList.onchange = null;
+        };
+    });
+};
+//# sourceMappingURL=media-query-match.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/metrics.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/metrics.js ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createMetrics": () => (/* binding */ createMetrics)
+/* harmony export */ });
+const createMetrics = (emitNotSupportedError, window, wrapSubscribeFunction) => {
+    return (options) => wrapSubscribeFunction((observer) => {
+        if (window === null || window.PerformanceObserver === undefined) {
+            return emitNotSupportedError(observer);
+        }
+        const performanceObserver = new window.PerformanceObserver((entryList) => observer.next(entryList.getEntries()));
+        try {
+            performanceObserver.observe(options);
+        }
+        catch (err) {
+            observer.error(err);
+        }
+        return () => performanceObserver.disconnect();
+    });
+};
+//# sourceMappingURL=metrics.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/midi-inputs.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/midi-inputs.js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createMidiInputs": () => (/* binding */ createMidiInputs)
+/* harmony export */ });
+const createMidiInputs = (wrapSubscribeFunction) => {
+    return (midiAccess) => wrapSubscribeFunction((observer) => {
+        let midiInputs = Array.from(midiAccess.inputs.values());
+        const emitMidiInputs = () => {
+            const midiAccessInputs = midiAccess.inputs;
+            if (midiInputs.length !== midiAccessInputs.size || midiInputs.some(({ id }) => !midiAccessInputs.has(id))) {
+                midiInputs = Array.from(midiAccessInputs.values());
+                observer.next(midiInputs);
+            }
+        };
+        observer.next(midiInputs);
+        midiAccess.addEventListener('statechange', emitMidiInputs);
+        return () => midiAccess.removeEventListener('statechange', emitMidiInputs);
+    });
+};
+//# sourceMappingURL=midi-inputs.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/midi-outputs.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/midi-outputs.js ***!
+  \*********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createMidiOutputs": () => (/* binding */ createMidiOutputs)
+/* harmony export */ });
+const createMidiOutputs = (wrapSubscribeFunction) => {
+    return (midiAccess) => wrapSubscribeFunction((observer) => {
+        let midiOutputs = Array.from(midiAccess.outputs.values());
+        const emitMidiOutputs = () => {
+            const midiAccessOutputs = midiAccess.outputs;
+            if (midiOutputs.length !== midiAccessOutputs.size || midiOutputs.some(({ id }) => !midiAccessOutputs.has(id))) {
+                midiOutputs = Array.from(midiAccessOutputs.values());
+                observer.next(midiOutputs);
+            }
+        };
+        observer.next(midiOutputs);
+        midiAccess.addEventListener('statechange', emitMidiOutputs);
+        return () => midiAccess.removeEventListener('statechange', emitMidiOutputs);
+    });
+};
+//# sourceMappingURL=midi-outputs.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/mutations.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/mutations.js ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createMutations": () => (/* binding */ createMutations)
+/* harmony export */ });
+const createMutations = (emitNotSupportedError, window, wrapSubscribeFunction) => {
+    return (htmlElement, options) => wrapSubscribeFunction((observer) => {
+        if (window === null || window.MutationObserver === undefined) {
+            return emitNotSupportedError(observer);
+        }
+        const mutationObserver = new window.MutationObserver((records) => observer.next(records));
+        try {
+            mutationObserver.observe(htmlElement, options);
+        }
+        catch (err) {
+            observer.error(err);
+        }
+        return () => mutationObserver.disconnect();
+    });
+};
+//# sourceMappingURL=mutations.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/on.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/on.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createOn": () => (/* binding */ createOn)
+/* harmony export */ });
+const createOn = (wrapSubscribeFunction) => {
+    return (target, type, options) => wrapSubscribeFunction((observer) => {
+        const listener = (event) => observer.next(event);
+        target.addEventListener(type, listener, options);
+        return () => target.removeEventListener(type, listener, options);
+    });
+};
+//# sourceMappingURL=on.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/online.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/online.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createOnline": () => (/* binding */ createOnline)
+/* harmony export */ });
+const createOnline = (emitNotSupportedError, window, wrapSubscribeFunction) => {
+    return () => wrapSubscribeFunction((observer) => {
+        if (window === null || window.navigator === undefined || window.navigator.onLine === undefined) {
+            return emitNotSupportedError(observer);
+        }
+        const emitFalse = () => observer.next(false);
+        const emitTrue = () => observer.next(true);
+        window.addEventListener('offline', emitFalse);
+        window.addEventListener('online', emitTrue);
+        observer.next(window.navigator.onLine);
+        return () => {
+            window.removeEventListener('offline', emitFalse);
+            window.removeEventListener('online', emitTrue);
+        };
+    });
+};
+//# sourceMappingURL=online.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/permission-state.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/permission-state.js ***!
+  \*************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createPermissionState": () => (/* binding */ createPermissionState)
+/* harmony export */ });
+const createPermissionState = (emitNotSupportedError, window, wrapSubscribeFunction) => {
+    return (permissionDescriptor) => wrapSubscribeFunction((observer) => {
+        if (window === null ||
+            window.navigator === undefined ||
+            window.navigator.permissions === undefined ||
+            window.navigator.permissions.query === undefined) {
+            return emitNotSupportedError(observer);
+        }
+        let isActive = true;
+        let unsubscribe = () => {
+            isActive = false;
+        };
+        window.navigator.permissions.query(permissionDescriptor).then((permissionStatus) => {
+            if (isActive) {
+                observer.next(permissionStatus.state);
+            }
+            if (isActive) {
+                permissionStatus.onchange = () => observer.next(permissionStatus.state);
+                unsubscribe = () => {
+                    permissionStatus.onchange = null;
+                };
+            }
+        }, (err) => {
+            if (isActive) {
+                observer.error(err);
+            }
+        });
+        return () => unsubscribe();
+    });
+};
+//# sourceMappingURL=permission-state.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/prepend-subscribable-thing.js":
+/*!***********************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/prepend-subscribable-thing.js ***!
+  \***********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createPrependSubscribableThing": () => (/* binding */ createPrependSubscribableThing)
+/* harmony export */ });
+const createPrependSubscribableThing = (wrapSubscribeFunction) => (subscribableThing, prependedValue) => wrapSubscribeFunction((observer) => {
+    observer.next(prependedValue);
+    return subscribableThing(observer);
+});
+//# sourceMappingURL=prepend-subscribable-thing.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/reports.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/reports.js ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createReports": () => (/* binding */ createReports)
+/* harmony export */ });
+const createReports = (emitNotSupportedError, window, wrapSubscribeFunction) => {
+    return (options) => wrapSubscribeFunction((observer) => {
+        if (window === null || window.ReportingObserver === undefined) {
+            return emitNotSupportedError(observer);
+        }
+        const reportingObserver = new window.ReportingObserver((reportList) => observer.next(reportList), options);
+        reportingObserver.observe();
+        return () => reportingObserver.disconnect();
+    });
+};
+//# sourceMappingURL=reports.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/resizes.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/resizes.js ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createResizes": () => (/* binding */ createResizes)
+/* harmony export */ });
+const createResizes = (emitNotSupportedError, window, wrapSubscribeFunction) => {
+    return (htmlElement, options) => wrapSubscribeFunction((observer) => {
+        if (window === null || window.ResizeObserver === undefined) {
+            return emitNotSupportedError(observer);
+        }
+        const resizeObserver = new window.ResizeObserver((entries) => observer.next(entries));
+        try {
+            resizeObserver.observe(htmlElement, options);
+        }
+        catch (err) {
+            observer.error(err);
+        }
+        return () => resizeObserver.disconnect();
+    });
+};
+//# sourceMappingURL=resizes.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/unhandled-rejection.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/unhandled-rejection.js ***!
+  \****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createUnhandledRejection": () => (/* binding */ createUnhandledRejection)
+/* harmony export */ });
+const createUnhandledRejection = (emitNotSupportedError, window, wrapSubscribeFunction) => {
+    return (coolingOffPeriod) => wrapSubscribeFunction((observer) => {
+        if (window === null || window.clearInterval === undefined || window.setInterval === undefined) {
+            return emitNotSupportedError(observer);
+        }
+        const possiblyUnhandledRejections = new Map();
+        let intervalId = null;
+        const deletePossiblyUnhandledRejection = ({ promise }) => possiblyUnhandledRejections.delete(promise);
+        const emitUnhandledRejection = () => {
+            const latestTimestampToEmit = Date.now() - coolingOffPeriod;
+            possiblyUnhandledRejections.forEach(({ reason, timestamp }, promise) => {
+                if (timestamp > latestTimestampToEmit) {
+                    return;
+                }
+                possiblyUnhandledRejections.delete(promise);
+                observer.next(reason);
+            });
+            if (intervalId !== null && possiblyUnhandledRejections.size === 0) {
+                window.clearInterval(intervalId);
+                intervalId = null;
+            }
+        };
+        const registerPossiblyUnhandledRejection = (event) => {
+            event.preventDefault();
+            possiblyUnhandledRejections.set(event.promise, {
+                reason: event.reason,
+                timestamp: Date.now()
+            });
+            if (intervalId === null) {
+                intervalId = window.setInterval(emitUnhandledRejection, coolingOffPeriod / 2);
+            }
+        };
+        window.addEventListener('rejectionhandled', deletePossiblyUnhandledRejection);
+        window.addEventListener('unhandledrejection', registerPossiblyUnhandledRejection);
+        return () => {
+            if (intervalId !== null) {
+                window.clearInterval(intervalId);
+            }
+            window.removeEventListener('rejectionhandled', deletePossiblyUnhandledRejection);
+            window.removeEventListener('unhandledrejection', registerPossiblyUnhandledRejection);
+        };
+    });
+};
+//# sourceMappingURL=unhandled-rejection.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/video-frame.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/video-frame.js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createVideoFrame": () => (/* binding */ createVideoFrame)
+/* harmony export */ });
+const createVideoFrame = (emitNotSupportedError, wrapSubscribeFunction) => {
+    return (videoElement) => wrapSubscribeFunction((observer) => {
+        if (videoElement.cancelVideoFrameCallback === undefined || videoElement.requestVideoFrameCallback === undefined) {
+            return emitNotSupportedError(observer);
+        }
+        let videoFrameHandle = videoElement.requestVideoFrameCallback(function videoFrameCallback(now, metadata) {
+            videoFrameHandle = videoElement.requestVideoFrameCallback(videoFrameCallback);
+            observer.next({ ...metadata, now });
+        });
+        return () => videoElement.cancelVideoFrameCallback(videoFrameHandle);
+    });
+};
+//# sourceMappingURL=video-frame.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/wake-lock.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/wake-lock.js ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createWakeLock": () => (/* binding */ createWakeLock)
+/* harmony export */ });
+const createWakeLock = (emitNotSupportedError, window, wrapSubscribeFunction) => {
+    return (type) => wrapSubscribeFunction((observer) => {
+        if (window === null || window.navigator === undefined || window.navigator.wakeLock === undefined) {
+            return emitNotSupportedError(observer);
+        }
+        const releaseWakeLock = (wakeLockSentinel) => wakeLockSentinel.release().catch(() => {
+            // Ignore errors.
+        });
+        const removeReleaseEventListener = (wakeLockSentinel) => {
+            wakeLockSentinel.onrelease = null;
+        };
+        let isActive = true;
+        const unsubscribeWhileRequesting = () => {
+            isActive = false;
+        };
+        let unsubscribe = unsubscribeWhileRequesting;
+        const requestWakeLock = () => window.navigator.wakeLock.request(type).then((wakeLockSentinel) => {
+            if (isActive) {
+                observer.next(true);
+            }
+            if (isActive) {
+                wakeLockSentinel.onrelease = () => {
+                    observer.next(false);
+                    unsubscribe = unsubscribeWhileRequesting;
+                    removeReleaseEventListener(wakeLockSentinel);
+                    requestWakeLock();
+                };
+                unsubscribe = () => {
+                    removeReleaseEventListener(wakeLockSentinel);
+                    releaseWakeLock(wakeLockSentinel);
+                };
+            }
+            else {
+                releaseWakeLock(wakeLockSentinel);
+            }
+        }, (err) => {
+            if (isActive) {
+                observer.error(err);
+            }
+        });
+        requestWakeLock();
+        return () => unsubscribe();
+    });
+};
+//# sourceMappingURL=wake-lock.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/window.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/window.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createWindow": () => (/* binding */ createWindow)
+/* harmony export */ });
+// @todo TypeScript does not include type definitions for the Reporting API yet.
+const createWindow = () => (typeof window === 'undefined' ? null : window);
+//# sourceMappingURL=window.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/factories/wrap-subscribe-function.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/factories/wrap-subscribe-function.js ***!
+  \********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createWrapSubscribeFunction": () => (/* binding */ createWrapSubscribeFunction)
+/* harmony export */ });
+const createWrapSubscribeFunction = (patch, toObserver) => {
+    const emptyFunction = () => { }; // tslint:disable-line:no-empty
+    const isNextFunction = (args) => typeof args[0] === 'function';
+    return (innerSubscribe) => {
+        const subscribe = ((...args) => {
+            const unsubscribe = innerSubscribe(isNextFunction(args) ? toObserver({ next: args[0] }) : toObserver(...args));
+            if (unsubscribe !== undefined) {
+                return unsubscribe;
+            }
+            return emptyFunction;
+        });
+        subscribe[Symbol.observable] = () => ({
+            subscribe: (...args) => ({ unsubscribe: subscribe(...args) })
+        });
+        return patch(subscribe);
+    };
+};
+//# sourceMappingURL=wrap-subscribe-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/functions/emit-not-supported-error.js":
+/*!*********************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/functions/emit-not-supported-error.js ***!
+  \*********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "emitNotSupportedError": () => (/* binding */ emitNotSupportedError)
+/* harmony export */ });
+const emitNotSupportedError = (observer) => {
+    observer.error(new Error('The required browser API seems to be not supported.'));
+    return () => { }; // tslint:disable-line:no-empty
+};
+//# sourceMappingURL=emit-not-supported-error.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/html-video-element.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/html-video-element.js ***!
+  \****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=html-video-element.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/index.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/index.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _html_video_element__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./html-video-element */ "./node_modules/subscribable-things/build/es2019/interfaces/html-video-element.js");
+/* harmony import */ var _midi_access__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./midi-access */ "./node_modules/subscribable-things/build/es2019/interfaces/midi-access.js");
+/* harmony import */ var _midi_connection_event__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./midi-connection-event */ "./node_modules/subscribable-things/build/es2019/interfaces/midi-connection-event.js");
+/* harmony import */ var _midi_input__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./midi-input */ "./node_modules/subscribable-things/build/es2019/interfaces/midi-input.js");
+/* harmony import */ var _midi_input_event_map__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./midi-input-event-map */ "./node_modules/subscribable-things/build/es2019/interfaces/midi-input-event-map.js");
+/* harmony import */ var _midi_message_event__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./midi-message-event */ "./node_modules/subscribable-things/build/es2019/interfaces/midi-message-event.js");
+/* harmony import */ var _midi_output__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./midi-output */ "./node_modules/subscribable-things/build/es2019/interfaces/midi-output.js");
+/* harmony import */ var _midi_output_event_map__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./midi-output-event-map */ "./node_modules/subscribable-things/build/es2019/interfaces/midi-output-event-map.js");
+/* harmony import */ var _midi_port__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./midi-port */ "./node_modules/subscribable-things/build/es2019/interfaces/midi-port.js");
+/* harmony import */ var _report__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./report */ "./node_modules/subscribable-things/build/es2019/interfaces/report.js");
+/* harmony import */ var _report_body__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./report-body */ "./node_modules/subscribable-things/build/es2019/interfaces/report-body.js");
+/* harmony import */ var _reporting_observer__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./reporting-observer */ "./node_modules/subscribable-things/build/es2019/interfaces/reporting-observer.js");
+/* harmony import */ var _reporting_observer_options__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./reporting-observer-options */ "./node_modules/subscribable-things/build/es2019/interfaces/reporting-observer-options.js");
+/* harmony import */ var _resize_observer__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./resize-observer */ "./node_modules/subscribable-things/build/es2019/interfaces/resize-observer.js");
+/* harmony import */ var _resize_observer_entry__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./resize-observer-entry */ "./node_modules/subscribable-things/build/es2019/interfaces/resize-observer-entry.js");
+/* harmony import */ var _resize_observer_options__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./resize-observer-options */ "./node_modules/subscribable-things/build/es2019/interfaces/resize-observer-options.js");
+/* harmony import */ var _resize_observer_size__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./resize-observer-size */ "./node_modules/subscribable-things/build/es2019/interfaces/resize-observer-size.js");
+/* harmony import */ var _video_frame_metadata__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./video-frame-metadata */ "./node_modules/subscribable-things/build/es2019/interfaces/video-frame-metadata.js");
+/* harmony import */ var _wake_lock__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./wake-lock */ "./node_modules/subscribable-things/build/es2019/interfaces/wake-lock.js");
+/* harmony import */ var _wake_lock_sentinel__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./wake-lock-sentinel */ "./node_modules/subscribable-things/build/es2019/interfaces/wake-lock-sentinel.js");
+/* harmony import */ var _wake_lock_sentinel_event_map__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./wake-lock-sentinel-event-map */ "./node_modules/subscribable-things/build/es2019/interfaces/wake-lock-sentinel-event-map.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/midi-access.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/midi-access.js ***!
+  \*********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-access.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/midi-connection-event.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/midi-connection-event.js ***!
+  \*******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-connection-event.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/midi-input-event-map.js":
+/*!******************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/midi-input-event-map.js ***!
+  \******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-input-event-map.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/midi-input.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/midi-input.js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-input.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/midi-message-event.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/midi-message-event.js ***!
+  \****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-message-event.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/midi-output-event-map.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/midi-output-event-map.js ***!
+  \*******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-output-event-map.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/midi-output.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/midi-output.js ***!
+  \*********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-output.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/midi-port.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/midi-port.js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-port.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/report-body.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/report-body.js ***!
+  \*********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=report-body.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/report.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/report.js ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=report.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/reporting-observer-options.js":
+/*!************************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/reporting-observer-options.js ***!
+  \************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=reporting-observer-options.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/reporting-observer.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/reporting-observer.js ***!
+  \****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=reporting-observer.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/resize-observer-entry.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/resize-observer-entry.js ***!
+  \*******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=resize-observer-entry.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/resize-observer-options.js":
+/*!*********************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/resize-observer-options.js ***!
+  \*********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=resize-observer-options.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/resize-observer-size.js":
+/*!******************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/resize-observer-size.js ***!
+  \******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=resize-observer-size.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/resize-observer.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/resize-observer.js ***!
+  \*************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=resize-observer.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/video-frame-metadata.js":
+/*!******************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/video-frame-metadata.js ***!
+  \******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=video-frame-metadata.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/wake-lock-sentinel-event-map.js":
+/*!**************************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/wake-lock-sentinel-event-map.js ***!
+  \**************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=wake-lock-sentinel-event-map.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/wake-lock-sentinel.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/wake-lock-sentinel.js ***!
+  \****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=wake-lock-sentinel.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/interfaces/wake-lock.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/interfaces/wake-lock.js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=wake-lock.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/module.js":
+/*!*****************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/module.js ***!
+  \*****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "animationFrame": () => (/* binding */ animationFrame),
+/* harmony export */   "mutations": () => (/* binding */ mutations),
+/* harmony export */   "attribute": () => (/* binding */ attribute),
+/* harmony export */   "geolocation": () => (/* binding */ geolocation),
+/* harmony export */   "intersections": () => (/* binding */ intersections),
+/* harmony export */   "mediaDevices": () => (/* binding */ mediaDevices),
+/* harmony export */   "mediaQueryMatch": () => (/* binding */ mediaQueryMatch),
+/* harmony export */   "metrics": () => (/* binding */ metrics),
+/* harmony export */   "midiInputs": () => (/* binding */ midiInputs),
+/* harmony export */   "midiOutputs": () => (/* binding */ midiOutputs),
+/* harmony export */   "on": () => (/* binding */ on),
+/* harmony export */   "online": () => (/* binding */ online),
+/* harmony export */   "permissionState": () => (/* binding */ permissionState),
+/* harmony export */   "reports": () => (/* binding */ reports),
+/* harmony export */   "resizes": () => (/* binding */ resizes),
+/* harmony export */   "unhandledRejection": () => (/* binding */ unhandledRejection),
+/* harmony export */   "videoFrame": () => (/* binding */ videoFrame),
+/* harmony export */   "wakeLock": () => (/* binding */ wakeLock)
+/* harmony export */ });
+/* harmony import */ var rxjs_interop__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! rxjs-interop */ "./node_modules/rxjs-interop/dist/esm/patch.js");
+/* harmony import */ var rxjs_interop__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! rxjs-interop */ "./node_modules/rxjs-interop/dist/esm/to-observer.js");
+/* harmony import */ var _factories_animation_frame__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./factories/animation-frame */ "./node_modules/subscribable-things/build/es2019/factories/animation-frame.js");
+/* harmony import */ var _factories_attribute__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./factories/attribute */ "./node_modules/subscribable-things/build/es2019/factories/attribute.js");
+/* harmony import */ var _factories_geolocation__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./factories/geolocation */ "./node_modules/subscribable-things/build/es2019/factories/geolocation.js");
+/* harmony import */ var _factories_intersections__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./factories/intersections */ "./node_modules/subscribable-things/build/es2019/factories/intersections.js");
+/* harmony import */ var _factories_map_subscribable_thing__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./factories/map-subscribable-thing */ "./node_modules/subscribable-things/build/es2019/factories/map-subscribable-thing.js");
+/* harmony import */ var _factories_media_devices__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./factories/media-devices */ "./node_modules/subscribable-things/build/es2019/factories/media-devices.js");
+/* harmony import */ var _factories_media_query_match__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./factories/media-query-match */ "./node_modules/subscribable-things/build/es2019/factories/media-query-match.js");
+/* harmony import */ var _factories_metrics__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./factories/metrics */ "./node_modules/subscribable-things/build/es2019/factories/metrics.js");
+/* harmony import */ var _factories_midi_inputs__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./factories/midi-inputs */ "./node_modules/subscribable-things/build/es2019/factories/midi-inputs.js");
+/* harmony import */ var _factories_midi_outputs__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./factories/midi-outputs */ "./node_modules/subscribable-things/build/es2019/factories/midi-outputs.js");
+/* harmony import */ var _factories_mutations__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./factories/mutations */ "./node_modules/subscribable-things/build/es2019/factories/mutations.js");
+/* harmony import */ var _factories_on__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./factories/on */ "./node_modules/subscribable-things/build/es2019/factories/on.js");
+/* harmony import */ var _factories_online__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./factories/online */ "./node_modules/subscribable-things/build/es2019/factories/online.js");
+/* harmony import */ var _factories_permission_state__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./factories/permission-state */ "./node_modules/subscribable-things/build/es2019/factories/permission-state.js");
+/* harmony import */ var _factories_prepend_subscribable_thing__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./factories/prepend-subscribable-thing */ "./node_modules/subscribable-things/build/es2019/factories/prepend-subscribable-thing.js");
+/* harmony import */ var _factories_reports__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./factories/reports */ "./node_modules/subscribable-things/build/es2019/factories/reports.js");
+/* harmony import */ var _factories_resizes__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./factories/resizes */ "./node_modules/subscribable-things/build/es2019/factories/resizes.js");
+/* harmony import */ var _factories_unhandled_rejection__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./factories/unhandled-rejection */ "./node_modules/subscribable-things/build/es2019/factories/unhandled-rejection.js");
+/* harmony import */ var _factories_video_frame__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./factories/video-frame */ "./node_modules/subscribable-things/build/es2019/factories/video-frame.js");
+/* harmony import */ var _factories_wake_lock__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./factories/wake-lock */ "./node_modules/subscribable-things/build/es2019/factories/wake-lock.js");
+/* harmony import */ var _factories_window__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./factories/window */ "./node_modules/subscribable-things/build/es2019/factories/window.js");
+/* harmony import */ var _factories_wrap_subscribe_function__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./factories/wrap-subscribe-function */ "./node_modules/subscribable-things/build/es2019/factories/wrap-subscribe-function.js");
+/* harmony import */ var _functions_emit_not_supported_error__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./functions/emit-not-supported-error */ "./node_modules/subscribable-things/build/es2019/functions/emit-not-supported-error.js");
+/* harmony import */ var _interfaces_index__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./interfaces/index */ "./node_modules/subscribable-things/build/es2019/interfaces/index.js");
+/* harmony import */ var _types_index__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./types/index */ "./node_modules/subscribable-things/build/es2019/types/index.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * @todo Explicitly referencing the barrel file seems to be necessary when enabling the
+ * isolatedModules compiler option.
+ */
+
+
+const window = (0,_factories_window__WEBPACK_IMPORTED_MODULE_20__.createWindow)();
+const wrapSubscribeFunction = (0,_factories_wrap_subscribe_function__WEBPACK_IMPORTED_MODULE_21__.createWrapSubscribeFunction)(rxjs_interop__WEBPACK_IMPORTED_MODULE_25__.patch, rxjs_interop__WEBPACK_IMPORTED_MODULE_26__.toObserver);
+const animationFrame = (0,_factories_animation_frame__WEBPACK_IMPORTED_MODULE_0__.createAnimationFrame)(_functions_emit_not_supported_error__WEBPACK_IMPORTED_MODULE_22__.emitNotSupportedError, window, wrapSubscribeFunction);
+const mutations = (0,_factories_mutations__WEBPACK_IMPORTED_MODULE_10__.createMutations)(_functions_emit_not_supported_error__WEBPACK_IMPORTED_MODULE_22__.emitNotSupportedError, window, wrapSubscribeFunction);
+const mapSubscribableThing = (0,_factories_map_subscribable_thing__WEBPACK_IMPORTED_MODULE_4__.createMapSubscribableThing)(wrapSubscribeFunction);
+const prependSubscribableThing = (0,_factories_prepend_subscribable_thing__WEBPACK_IMPORTED_MODULE_14__.createPrependSubscribableThing)(wrapSubscribeFunction);
+const attribute = (0,_factories_attribute__WEBPACK_IMPORTED_MODULE_1__.createAttribute)(mapSubscribableThing, mutations, prependSubscribableThing);
+const geolocation = (0,_factories_geolocation__WEBPACK_IMPORTED_MODULE_2__.createGeolocation)(_functions_emit_not_supported_error__WEBPACK_IMPORTED_MODULE_22__.emitNotSupportedError, window, wrapSubscribeFunction);
+const intersections = (0,_factories_intersections__WEBPACK_IMPORTED_MODULE_3__.createIntersections)(_functions_emit_not_supported_error__WEBPACK_IMPORTED_MODULE_22__.emitNotSupportedError, window, wrapSubscribeFunction);
+const mediaDevices = (0,_factories_media_devices__WEBPACK_IMPORTED_MODULE_5__.createMediaDevices)(_functions_emit_not_supported_error__WEBPACK_IMPORTED_MODULE_22__.emitNotSupportedError, window, wrapSubscribeFunction);
+const mediaQueryMatch = (0,_factories_media_query_match__WEBPACK_IMPORTED_MODULE_6__.createMediaQueryMatch)(_functions_emit_not_supported_error__WEBPACK_IMPORTED_MODULE_22__.emitNotSupportedError, window, wrapSubscribeFunction);
+const metrics = (0,_factories_metrics__WEBPACK_IMPORTED_MODULE_7__.createMetrics)(_functions_emit_not_supported_error__WEBPACK_IMPORTED_MODULE_22__.emitNotSupportedError, window, wrapSubscribeFunction);
+const midiInputs = (0,_factories_midi_inputs__WEBPACK_IMPORTED_MODULE_8__.createMidiInputs)(wrapSubscribeFunction);
+const midiOutputs = (0,_factories_midi_outputs__WEBPACK_IMPORTED_MODULE_9__.createMidiOutputs)(wrapSubscribeFunction);
+const on = (0,_factories_on__WEBPACK_IMPORTED_MODULE_11__.createOn)(wrapSubscribeFunction);
+const online = (0,_factories_online__WEBPACK_IMPORTED_MODULE_12__.createOnline)(_functions_emit_not_supported_error__WEBPACK_IMPORTED_MODULE_22__.emitNotSupportedError, window, wrapSubscribeFunction);
+const permissionState = (0,_factories_permission_state__WEBPACK_IMPORTED_MODULE_13__.createPermissionState)(_functions_emit_not_supported_error__WEBPACK_IMPORTED_MODULE_22__.emitNotSupportedError, window, wrapSubscribeFunction);
+const reports = (0,_factories_reports__WEBPACK_IMPORTED_MODULE_15__.createReports)(_functions_emit_not_supported_error__WEBPACK_IMPORTED_MODULE_22__.emitNotSupportedError, window, wrapSubscribeFunction);
+const resizes = (0,_factories_resizes__WEBPACK_IMPORTED_MODULE_16__.createResizes)(_functions_emit_not_supported_error__WEBPACK_IMPORTED_MODULE_22__.emitNotSupportedError, window, wrapSubscribeFunction);
+const unhandledRejection = (0,_factories_unhandled_rejection__WEBPACK_IMPORTED_MODULE_17__.createUnhandledRejection)(_functions_emit_not_supported_error__WEBPACK_IMPORTED_MODULE_22__.emitNotSupportedError, window, wrapSubscribeFunction);
+const videoFrame = (0,_factories_video_frame__WEBPACK_IMPORTED_MODULE_18__.createVideoFrame)(_functions_emit_not_supported_error__WEBPACK_IMPORTED_MODULE_22__.emitNotSupportedError, wrapSubscribeFunction);
+const wakeLock = (0,_factories_wake_lock__WEBPACK_IMPORTED_MODULE_19__.createWakeLock)(_functions_emit_not_supported_error__WEBPACK_IMPORTED_MODULE_22__.emitNotSupportedError, window, wrapSubscribeFunction);
+//# sourceMappingURL=module.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/animation-frame-factory.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/animation-frame-factory.js ***!
+  \****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=animation-frame-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/animation-frame-function.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/animation-frame-function.js ***!
+  \*****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=animation-frame-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/emit-not-supported-error-function.js":
+/*!**************************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/emit-not-supported-error-function.js ***!
+  \**************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=emit-not-supported-error-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/event-handler.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/event-handler.js ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=event-handler.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/event-target-with-property-handler.js":
+/*!***************************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/event-target-with-property-handler.js ***!
+  \***************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=event-target-with-property-handler.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/event-type.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/event-type.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=event-type.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/flexible-subscribe-function.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/flexible-subscribe-function.js ***!
+  \********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=flexible-subscribe-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/index.js":
+/*!**********************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/index.js ***!
+  \**********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _animation_frame_factory__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./animation-frame-factory */ "./node_modules/subscribable-things/build/es2019/types/animation-frame-factory.js");
+/* harmony import */ var _animation_frame_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./animation-frame-function */ "./node_modules/subscribable-things/build/es2019/types/animation-frame-function.js");
+/* harmony import */ var _emit_not_supported_error_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./emit-not-supported-error-function */ "./node_modules/subscribable-things/build/es2019/types/emit-not-supported-error-function.js");
+/* harmony import */ var _event_handler__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./event-handler */ "./node_modules/subscribable-things/build/es2019/types/event-handler.js");
+/* harmony import */ var _event_target_with_property_handler__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./event-target-with-property-handler */ "./node_modules/subscribable-things/build/es2019/types/event-target-with-property-handler.js");
+/* harmony import */ var _event_type__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./event-type */ "./node_modules/subscribable-things/build/es2019/types/event-type.js");
+/* harmony import */ var _flexible_subscribe_function__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./flexible-subscribe-function */ "./node_modules/subscribable-things/build/es2019/types/flexible-subscribe-function.js");
+/* harmony import */ var _intersections_factory__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./intersections-factory */ "./node_modules/subscribable-things/build/es2019/types/intersections-factory.js");
+/* harmony import */ var _intersections_function__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./intersections-function */ "./node_modules/subscribable-things/build/es2019/types/intersections-function.js");
+/* harmony import */ var _media_devices_factory__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./media-devices-factory */ "./node_modules/subscribable-things/build/es2019/types/media-devices-factory.js");
+/* harmony import */ var _media_devices_function__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./media-devices-function */ "./node_modules/subscribable-things/build/es2019/types/media-devices-function.js");
+/* harmony import */ var _media_query_match_factory__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./media-query-match-factory */ "./node_modules/subscribable-things/build/es2019/types/media-query-match-factory.js");
+/* harmony import */ var _media_query_match_function__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./media-query-match-function */ "./node_modules/subscribable-things/build/es2019/types/media-query-match-function.js");
+/* harmony import */ var _metrics_factory__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./metrics-factory */ "./node_modules/subscribable-things/build/es2019/types/metrics-factory.js");
+/* harmony import */ var _metrics_function__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./metrics-function */ "./node_modules/subscribable-things/build/es2019/types/metrics-function.js");
+/* harmony import */ var _midi_connection_event_handler__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./midi-connection-event-handler */ "./node_modules/subscribable-things/build/es2019/types/midi-connection-event-handler.js");
+/* harmony import */ var _midi_inputs_factory__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./midi-inputs-factory */ "./node_modules/subscribable-things/build/es2019/types/midi-inputs-factory.js");
+/* harmony import */ var _midi_inputs_function__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./midi-inputs-function */ "./node_modules/subscribable-things/build/es2019/types/midi-inputs-function.js");
+/* harmony import */ var _midi_message_event_handler__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./midi-message-event-handler */ "./node_modules/subscribable-things/build/es2019/types/midi-message-event-handler.js");
+/* harmony import */ var _midi_outputs_factory__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./midi-outputs-factory */ "./node_modules/subscribable-things/build/es2019/types/midi-outputs-factory.js");
+/* harmony import */ var _midi_outputs_function__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./midi-outputs-function */ "./node_modules/subscribable-things/build/es2019/types/midi-outputs-function.js");
+/* harmony import */ var _midi_port_connection_state__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./midi-port-connection-state */ "./node_modules/subscribable-things/build/es2019/types/midi-port-connection-state.js");
+/* harmony import */ var _midi_port_device_state__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./midi-port-device-state */ "./node_modules/subscribable-things/build/es2019/types/midi-port-device-state.js");
+/* harmony import */ var _midi_port_type__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! ./midi-port-type */ "./node_modules/subscribable-things/build/es2019/types/midi-port-type.js");
+/* harmony import */ var _mutations_factory__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! ./mutations-factory */ "./node_modules/subscribable-things/build/es2019/types/mutations-factory.js");
+/* harmony import */ var _mutations_function__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! ./mutations-function */ "./node_modules/subscribable-things/build/es2019/types/mutations-function.js");
+/* harmony import */ var _observer_parameters__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! ./observer-parameters */ "./node_modules/subscribable-things/build/es2019/types/observer-parameters.js");
+/* harmony import */ var _online_factory__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! ./online-factory */ "./node_modules/subscribable-things/build/es2019/types/online-factory.js");
+/* harmony import */ var _online_function__WEBPACK_IMPORTED_MODULE_28__ = __webpack_require__(/*! ./online-function */ "./node_modules/subscribable-things/build/es2019/types/online-function.js");
+/* harmony import */ var _on_factory__WEBPACK_IMPORTED_MODULE_29__ = __webpack_require__(/*! ./on-factory */ "./node_modules/subscribable-things/build/es2019/types/on-factory.js");
+/* harmony import */ var _on_function__WEBPACK_IMPORTED_MODULE_30__ = __webpack_require__(/*! ./on-function */ "./node_modules/subscribable-things/build/es2019/types/on-function.js");
+/* harmony import */ var _optional_unsubscribe_function__WEBPACK_IMPORTED_MODULE_31__ = __webpack_require__(/*! ./optional-unsubscribe-function */ "./node_modules/subscribable-things/build/es2019/types/optional-unsubscribe-function.js");
+/* harmony import */ var _permission_state_factory__WEBPACK_IMPORTED_MODULE_32__ = __webpack_require__(/*! ./permission-state-factory */ "./node_modules/subscribable-things/build/es2019/types/permission-state-factory.js");
+/* harmony import */ var _permission_state_function__WEBPACK_IMPORTED_MODULE_33__ = __webpack_require__(/*! ./permission-state-function */ "./node_modules/subscribable-things/build/es2019/types/permission-state-function.js");
+/* harmony import */ var _release_event_handler__WEBPACK_IMPORTED_MODULE_34__ = __webpack_require__(/*! ./release-event-handler */ "./node_modules/subscribable-things/build/es2019/types/release-event-handler.js");
+/* harmony import */ var _reports_factory__WEBPACK_IMPORTED_MODULE_35__ = __webpack_require__(/*! ./reports-factory */ "./node_modules/subscribable-things/build/es2019/types/reports-factory.js");
+/* harmony import */ var _reports_function__WEBPACK_IMPORTED_MODULE_36__ = __webpack_require__(/*! ./reports-function */ "./node_modules/subscribable-things/build/es2019/types/reports-function.js");
+/* harmony import */ var _resize_observer_box_options__WEBPACK_IMPORTED_MODULE_37__ = __webpack_require__(/*! ./resize-observer-box-options */ "./node_modules/subscribable-things/build/es2019/types/resize-observer-box-options.js");
+/* harmony import */ var _resizes_factory__WEBPACK_IMPORTED_MODULE_38__ = __webpack_require__(/*! ./resizes-factory */ "./node_modules/subscribable-things/build/es2019/types/resizes-factory.js");
+/* harmony import */ var _resizes_function__WEBPACK_IMPORTED_MODULE_39__ = __webpack_require__(/*! ./resizes-function */ "./node_modules/subscribable-things/build/es2019/types/resizes-function.js");
+/* harmony import */ var _subscribable_thing__WEBPACK_IMPORTED_MODULE_40__ = __webpack_require__(/*! ./subscribable-thing */ "./node_modules/subscribable-things/build/es2019/types/subscribable-thing.js");
+/* harmony import */ var _subscribe_function__WEBPACK_IMPORTED_MODULE_41__ = __webpack_require__(/*! ./subscribe-function */ "./node_modules/subscribable-things/build/es2019/types/subscribe-function.js");
+/* harmony import */ var _unhandled_rejection_factory__WEBPACK_IMPORTED_MODULE_42__ = __webpack_require__(/*! ./unhandled-rejection-factory */ "./node_modules/subscribable-things/build/es2019/types/unhandled-rejection-factory.js");
+/* harmony import */ var _unhandled_rejection_function__WEBPACK_IMPORTED_MODULE_43__ = __webpack_require__(/*! ./unhandled-rejection-function */ "./node_modules/subscribable-things/build/es2019/types/unhandled-rejection-function.js");
+/* harmony import */ var _unsubscribe_function__WEBPACK_IMPORTED_MODULE_44__ = __webpack_require__(/*! ./unsubscribe-function */ "./node_modules/subscribable-things/build/es2019/types/unsubscribe-function.js");
+/* harmony import */ var _video_frame_factory__WEBPACK_IMPORTED_MODULE_45__ = __webpack_require__(/*! ./video-frame-factory */ "./node_modules/subscribable-things/build/es2019/types/video-frame-factory.js");
+/* harmony import */ var _video_frame_function__WEBPACK_IMPORTED_MODULE_46__ = __webpack_require__(/*! ./video-frame-function */ "./node_modules/subscribable-things/build/es2019/types/video-frame-function.js");
+/* harmony import */ var _video_frame_request_callback__WEBPACK_IMPORTED_MODULE_47__ = __webpack_require__(/*! ./video-frame-request-callback */ "./node_modules/subscribable-things/build/es2019/types/video-frame-request-callback.js");
+/* harmony import */ var _wake_lock_factory__WEBPACK_IMPORTED_MODULE_48__ = __webpack_require__(/*! ./wake-lock-factory */ "./node_modules/subscribable-things/build/es2019/types/wake-lock-factory.js");
+/* harmony import */ var _wake_lock_function__WEBPACK_IMPORTED_MODULE_49__ = __webpack_require__(/*! ./wake-lock-function */ "./node_modules/subscribable-things/build/es2019/types/wake-lock-function.js");
+/* harmony import */ var _wake_lock_type__WEBPACK_IMPORTED_MODULE_50__ = __webpack_require__(/*! ./wake-lock-type */ "./node_modules/subscribable-things/build/es2019/types/wake-lock-type.js");
+/* harmony import */ var _window__WEBPACK_IMPORTED_MODULE_51__ = __webpack_require__(/*! ./window */ "./node_modules/subscribable-things/build/es2019/types/window.js");
+/* harmony import */ var _window_factory__WEBPACK_IMPORTED_MODULE_52__ = __webpack_require__(/*! ./window-factory */ "./node_modules/subscribable-things/build/es2019/types/window-factory.js");
+/* harmony import */ var _wrap_subscribe_function_factory__WEBPACK_IMPORTED_MODULE_53__ = __webpack_require__(/*! ./wrap-subscribe-function-factory */ "./node_modules/subscribable-things/build/es2019/types/wrap-subscribe-function-factory.js");
+/* harmony import */ var _wrap_subscribe_function_function__WEBPACK_IMPORTED_MODULE_54__ = __webpack_require__(/*! ./wrap-subscribe-function-function */ "./node_modules/subscribable-things/build/es2019/types/wrap-subscribe-function-function.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/intersections-factory.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/intersections-factory.js ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=intersections-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/intersections-function.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/intersections-function.js ***!
+  \***************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=intersections-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/media-devices-factory.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/media-devices-factory.js ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=media-devices-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/media-devices-function.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/media-devices-function.js ***!
+  \***************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=media-devices-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/media-query-match-factory.js":
+/*!******************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/media-query-match-factory.js ***!
+  \******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=media-query-match-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/media-query-match-function.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/media-query-match-function.js ***!
+  \*******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=media-query-match-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/metrics-factory.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/metrics-factory.js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=metrics-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/metrics-function.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/metrics-function.js ***!
+  \*********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=metrics-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/midi-connection-event-handler.js":
+/*!**********************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/midi-connection-event-handler.js ***!
+  \**********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-connection-event-handler.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/midi-inputs-factory.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/midi-inputs-factory.js ***!
+  \************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-inputs-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/midi-inputs-function.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/midi-inputs-function.js ***!
+  \*************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-inputs-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/midi-message-event-handler.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/midi-message-event-handler.js ***!
+  \*******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-message-event-handler.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/midi-outputs-factory.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/midi-outputs-factory.js ***!
+  \*************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-outputs-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/midi-outputs-function.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/midi-outputs-function.js ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-outputs-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/midi-port-connection-state.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/midi-port-connection-state.js ***!
+  \*******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-port-connection-state.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/midi-port-device-state.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/midi-port-device-state.js ***!
+  \***************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-port-device-state.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/midi-port-type.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/midi-port-type.js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=midi-port-type.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/mutations-factory.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/mutations-factory.js ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=mutations-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/mutations-function.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/mutations-function.js ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=mutations-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/observer-parameters.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/observer-parameters.js ***!
+  \************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=observer-parameters.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/on-factory.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/on-factory.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=on-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/on-function.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/on-function.js ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=on-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/online-factory.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/online-factory.js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=online-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/online-function.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/online-function.js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=online-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/optional-unsubscribe-function.js":
+/*!**********************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/optional-unsubscribe-function.js ***!
+  \**********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=optional-unsubscribe-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/permission-state-factory.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/permission-state-factory.js ***!
+  \*****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=permission-state-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/permission-state-function.js":
+/*!******************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/permission-state-function.js ***!
+  \******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=permission-state-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/release-event-handler.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/release-event-handler.js ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=release-event-handler.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/reports-factory.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/reports-factory.js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=reports-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/reports-function.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/reports-function.js ***!
+  \*********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=reports-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/resize-observer-box-options.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/resize-observer-box-options.js ***!
+  \********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=resize-observer-box-options.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/resizes-factory.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/resizes-factory.js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=resizes-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/resizes-function.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/resizes-function.js ***!
+  \*********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=resizes-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/subscribable-thing.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/subscribable-thing.js ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=subscribable-thing.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/subscribe-function.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/subscribe-function.js ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=subscribe-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/unhandled-rejection-factory.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/unhandled-rejection-factory.js ***!
+  \********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=unhandled-rejection-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/unhandled-rejection-function.js":
+/*!*********************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/unhandled-rejection-function.js ***!
+  \*********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=unhandled-rejection-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/unsubscribe-function.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/unsubscribe-function.js ***!
+  \*************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=unsubscribe-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/video-frame-factory.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/video-frame-factory.js ***!
+  \************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=video-frame-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/video-frame-function.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/video-frame-function.js ***!
+  \*************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=video-frame-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/video-frame-request-callback.js":
+/*!*********************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/video-frame-request-callback.js ***!
+  \*********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=video-frame-request-callback.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/wake-lock-factory.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/wake-lock-factory.js ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=wake-lock-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/wake-lock-function.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/wake-lock-function.js ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=wake-lock-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/wake-lock-type.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/wake-lock-type.js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=wake-lock-type.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/window-factory.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/window-factory.js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=window-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/window.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/window.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=window.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/wrap-subscribe-function-factory.js":
+/*!************************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/wrap-subscribe-function-factory.js ***!
+  \************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=wrap-subscribe-function-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/subscribable-things/build/es2019/types/wrap-subscribe-function-function.js":
+/*!*************************************************************************************************!*\
+  !*** ./node_modules/subscribable-things/build/es2019/types/wrap-subscribe-function-function.js ***!
+  \*************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=wrap-subscribe-function-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/factories/calculate-delta.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/factories/calculate-delta.js ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createCalculateDelta": () => (/* binding */ createCalculateDelta)
+/* harmony export */ });
+const createCalculateDelta = (calculatePositiveRealSolution) => {
+    return (vector, startPosition, endPosition) => {
+        const deltaToStartPosition = calculatePositiveRealSolution(vector, startPosition);
+        const deltaToEndPosition = calculatePositiveRealSolution(vector, endPosition);
+        // @todo Is it theoretically possible to have both deltas?
+        if (deltaToStartPosition !== null && deltaToEndPosition !== null) {
+            if (deltaToStartPosition < deltaToEndPosition) {
+                return deltaToStartPosition;
+            }
+            return deltaToEndPosition;
+        }
+        if (deltaToStartPosition !== null) {
+            return deltaToStartPosition;
+        }
+        if (deltaToEndPosition !== null) {
+            return deltaToEndPosition;
+        }
+        return null;
+    };
+};
+//# sourceMappingURL=calculate-delta.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/factories/calculate-positive-real-solution.js":
+/*!***********************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/factories/calculate-positive-real-solution.js ***!
+  \***********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createCalculatePositiveRealSolution": () => (/* binding */ createCalculatePositiveRealSolution)
+/* harmony export */ });
+const createCalculatePositiveRealSolution = (calculateRealSolutions) => {
+    return ({ acceleration, position, velocity }, x) => {
+        const results = calculateRealSolutions(position, velocity, acceleration, x);
+        if (results.length === 0) {
+            return null;
+        }
+        if (results.length === 1) {
+            if (results[0] > 0) {
+                return results[0];
+            }
+            return null;
+        }
+        if (results.length === 2) {
+            if (results[1] < 0) {
+                return null;
+            }
+            if (results[0] > 0) {
+                return results[0];
+            }
+            if (results[1] > 0) {
+                return results[1];
+            }
+        }
+        return null;
+    };
+};
+//# sourceMappingURL=calculate-positive-real-solution.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/factories/calculate-timeout-delay.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/factories/calculate-timeout-delay.js ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createCalculateTimeoutDelay": () => (/* binding */ createCalculateTimeoutDelay)
+/* harmony export */ });
+const createCalculateTimeoutDelay = (calculateDelta) => {
+    return (vector, startPosition, endPosition) => {
+        const delta = calculateDelta(vector, startPosition, endPosition);
+        if (delta === null || delta === Number.POSITIVE_INFINITY) {
+            return null;
+        }
+        return delta;
+    };
+};
+//# sourceMappingURL=calculate-timeout-delay.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/factories/event-target-constructor.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/factories/event-target-constructor.js ***!
+  \***************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createEventTargetConstructor": () => (/* binding */ createEventTargetConstructor)
+/* harmony export */ });
+const createEventTargetConstructor = (createEventTarget, wrapEventListener) => {
+    return class EventTarget {
+        constructor() {
+            this._listeners = new WeakMap();
+            this._nativeEventTarget = createEventTarget();
+        }
+        addEventListener(type, listener, options) {
+            if (listener !== null) {
+                let wrappedEventListener = this._listeners.get(listener);
+                if (wrappedEventListener === undefined) {
+                    wrappedEventListener = wrapEventListener(this, listener);
+                    if (typeof listener === 'function') {
+                        this._listeners.set(listener, wrappedEventListener);
+                    }
+                }
+                this._nativeEventTarget.addEventListener(type, wrappedEventListener, options);
+            }
+        }
+        dispatchEvent(event) {
+            return this._nativeEventTarget.dispatchEvent(event);
+        }
+        removeEventListener(type, listener, options) {
+            const wrappedEventListener = listener === null ? undefined : this._listeners.get(listener);
+            this._nativeEventTarget.removeEventListener(type, wrappedEventListener === undefined ? null : wrappedEventListener, options);
+        }
+    };
+};
+//# sourceMappingURL=event-target-constructor.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/factories/event-target-factory.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/factories/event-target-factory.js ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createEventTargetFactory": () => (/* binding */ createEventTargetFactory)
+/* harmony export */ });
+const createEventTargetFactory = (window) => {
+    return () => {
+        if (window === null) {
+            throw new Error('A native EventTarget could not be created.');
+        }
+        return window.document.createElement('p');
+    };
+};
+//# sourceMappingURL=event-target-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/factories/illegal-value-error.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/factories/illegal-value-error.js ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createIllegalValueError": () => (/* binding */ createIllegalValueError)
+/* harmony export */ });
+const createIllegalValueError = () => {
+    try {
+        return new DOMException('', 'IllegalValueError');
+    }
+    catch (err) {
+        // @todo err.code;
+        err.name = 'IllegalValueError';
+        return err;
+    }
+};
+//# sourceMappingURL=illegal-value-error.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/factories/invalid-state-error.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/factories/invalid-state-error.js ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createInvalidStateError": () => (/* binding */ createInvalidStateError)
+/* harmony export */ });
+const createInvalidStateError = () => {
+    try {
+        return new DOMException('', 'InvalidStateError');
+    }
+    catch (err) {
+        err.code = 11;
+        err.name = 'InvalidStateError';
+        return err;
+    }
+};
+//# sourceMappingURL=invalid-state-error.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/factories/timing-object-constructor.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/factories/timing-object-constructor.js ***!
+  \****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createTimingObjectConstructor": () => (/* binding */ createTimingObjectConstructor)
+/* harmony export */ });
+const createTimingObjectConstructor = (calculateTimeoutDelay, createIllegalValueError, createInvalidStateError, eventTargetConstructor, filterTimingStateVectorUpdate, performance, setTimeout, translateTimingStateVector) => {
+    return class extends eventTargetConstructor {
+        constructor(timingProviderSourceOrVector = {}, startPosition = Number.NEGATIVE_INFINITY, endPosition = Number.POSITIVE_INFINITY) {
+            super();
+            const { timingProviderSource, vector } = timingProviderSourceOrVector.update === undefined
+                ? { timingProviderSource: null, vector: timingProviderSourceOrVector }
+                : { timingProviderSource: timingProviderSourceOrVector, vector: {} };
+            this._endPosition = timingProviderSource === null ? endPosition : timingProviderSource.endPosition;
+            this._onchange = null;
+            this._onerror = null;
+            this._onreadystatechange = null;
+            this._readyState = timingProviderSource === null ? 'open' : timingProviderSource.readyState;
+            this._skew = timingProviderSource === null ? 0 : timingProviderSource.skew;
+            this._startPosition = timingProviderSource === null ? startPosition : timingProviderSource.startPosition;
+            this._timingProviderSource = timingProviderSource;
+            this._timeoutId = null;
+            this._vector =
+                timingProviderSource === null
+                    ? {
+                        acceleration: 0,
+                        position: 0,
+                        velocity: 0,
+                        ...filterTimingStateVectorUpdate(vector),
+                        timestamp: performance.now() / 1000
+                    }
+                    : timingProviderSource.vector;
+            // @todo The spec doesn't require to check if the endPosition is actually greater than the startPosition.
+            if (endPosition < this._vector.position) {
+                this._vector = { ...this._vector, acceleration: 0, position: endPosition, velocity: 0 };
+            }
+            if (startPosition > this._vector.position) {
+                this._vector = { ...this._vector, acceleration: 0, position: startPosition, velocity: 0 };
+            }
+            /*
+             * @todo Check if the vector would leave the range immediately.
+             * @todo The specification requires to run this._setInternalTimeout() only if the vector had to be modified above but it
+             * probably should run in either case.
+             * https://webtiming.github.io/timingobject/#x5-1-create-a-new-timing-object
+             */
+            this._setInternalTimeout();
+            if (timingProviderSource === null) {
+                setTimeout(() => this.dispatchEvent(new Event('readystatechange')));
+            }
+            else {
+                const onAdjust = () => {
+                    this._skew = timingProviderSource.skew;
+                    /*
+                     * @todo Process skew change with newSkew as parameter.
+                     * https://webtiming.github.io/timingobject/#x5-7-process-skew-change
+                     * https://webtiming.github.io/timingobject/#x5-10-calculate-skew-adjustment
+                     */
+                };
+                const onChange = () => this._setInternalVector(timingProviderSource.vector);
+                const onReadyStateChange = () => {
+                    if (this._isAllowedTransition(timingProviderSource.readyState)) {
+                        this._readyState = timingProviderSource.readyState;
+                    }
+                    else {
+                        this._readyState = 'closed';
+                        timingProviderSource.removeEventListener('adjust', onAdjust);
+                        timingProviderSource.removeEventListener('change', onChange);
+                        timingProviderSource.removeEventListener('readystatechange', onReadyStateChange);
+                    }
+                    if (timingProviderSource.error !== null) {
+                        setTimeout(() => this.dispatchEvent(new Event('error')));
+                    }
+                    setTimeout(() => this.dispatchEvent(new Event('readystatechange')));
+                };
+                timingProviderSource.addEventListener('adjust', onAdjust);
+                timingProviderSource.addEventListener('change', onChange);
+                timingProviderSource.addEventListener('readystatechange', onReadyStateChange);
+            }
+        }
+        get endPosition() {
+            return this._endPosition;
+        }
+        get onchange() {
+            return this._onchange === null ? this._onchange : this._onchange[0];
+        }
+        set onchange(value) {
+            if (this._onchange !== null) {
+                this.removeEventListener('change', this._onchange[1]);
+            }
+            if (typeof value === 'function') {
+                const boundListener = value.bind(this);
+                this.addEventListener('change', boundListener);
+                this._onchange = [value, boundListener];
+            }
+            else {
+                this._onchange = null;
+            }
+        }
+        get onerror() {
+            return this._onerror === null ? this._onerror : this._onerror[0];
+        }
+        set onerror(value) {
+            if (this._onerror !== null) {
+                this.removeEventListener('error', this._onerror[1]);
+            }
+            if (typeof value === 'function') {
+                const boundListener = value.bind(this);
+                this.addEventListener('error', boundListener);
+                this._onerror = [value, boundListener];
+            }
+            else {
+                this._onerror = null;
+            }
+        }
+        get onreadystatechange() {
+            return this._onreadystatechange === null ? this._onreadystatechange : this._onreadystatechange[0];
+        }
+        set onreadystatechange(value) {
+            if (this._onreadystatechange !== null) {
+                this.removeEventListener('readystatechange', this._onreadystatechange[1]);
+            }
+            if (typeof value === 'function') {
+                const boundListener = value.bind(this);
+                this.addEventListener('readystatechange', boundListener);
+                this._onreadystatechange = [value, boundListener];
+            }
+            else {
+                this._onreadystatechange = null;
+            }
+        }
+        get readyState() {
+            return this._readyState;
+        }
+        get startPosition() {
+            return this._startPosition;
+        }
+        get timingProviderSource() {
+            return this._timingProviderSource;
+        }
+        query() {
+            if (this._readyState !== 'open') {
+                throw createInvalidStateError();
+            }
+            const timestamp = performance.now() / 1000;
+            // @todo Compute the delta by gradually applying the skew.
+            const delta = this._timingProviderSource === null ? timestamp - this._vector.timestamp : timestamp + this._skew - this._vector.timestamp;
+            const vector = translateTimingStateVector(this._vector, delta);
+            if (this._endPosition < vector.position || this._startPosition > vector.position) {
+                this._setInternalVector({
+                    ...vector,
+                    acceleration: 0,
+                    position: this._endPosition < vector.position ? this._endPosition : this._startPosition,
+                    velocity: 0
+                });
+                return this.query();
+            }
+            return vector;
+        }
+        update(newVector) {
+            if (this._readyState !== 'open') {
+                return Promise.reject(createInvalidStateError());
+            }
+            if (this._timingProviderSource !== null) {
+                const promise = this._timingProviderSource.update(newVector);
+                if (promise instanceof Promise) {
+                    return promise;
+                }
+                return Promise.reject(new TypeError('The timingProviderSource failed to return a promise.'));
+            }
+            const filteredVector = filterTimingStateVectorUpdate(newVector);
+            // Return immediately if there is nothing to update.
+            if (Object.keys(filteredVector).length === 0) {
+                return Promise.resolve();
+            }
+            const normalizedNewVector = { ...this.query(), ...filteredVector };
+            const { position, velocity, acceleration } = normalizedNewVector;
+            if (position < this._startPosition ||
+                position > this._endPosition ||
+                (position === this._startPosition && (velocity < 0 || (velocity === 0 && acceleration < 0))) ||
+                (position === this._endPosition && (velocity > 0 || (velocity === 0 && acceleration > 0)))) {
+                return Promise.reject(createIllegalValueError());
+            }
+            this._setInternalVector(normalizedNewVector);
+            return Promise.resolve();
+        }
+        _isAllowedTransition(readyState) {
+            return ((this._readyState === 'closing' && readyState === 'closed') ||
+                this._readyState === 'connecting' ||
+                (this._readyState === 'open' && (readyState === 'closed' || readyState === 'closing')));
+        }
+        _setInternalTimeout() {
+            if (this._timeoutId !== null) {
+                clearTimeout(this._timeoutId);
+                this._timeoutId = null;
+            }
+            if ((this._endPosition === Number.POSITIVE_INFINITY && this._startPosition === Number.NEGATIVE_INFINITY) ||
+                (this._vector.acceleration === 0 && this._vector.velocity === 0)) {
+                return;
+            }
+            const delay = calculateTimeoutDelay(this._vector, this._startPosition, this._endPosition);
+            if (delay === null) {
+                return;
+            }
+            this._timeoutId = setTimeout(() => this.query(), delay);
+        }
+        _setInternalVector(vector) {
+            this._vector = vector;
+            this._setInternalTimeout();
+            setTimeout(() => this.dispatchEvent(new Event('change')));
+        }
+    };
+};
+//# sourceMappingURL=timing-object-constructor.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/functions/calculate-real-solutions.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/functions/calculate-real-solutions.js ***!
+  \***************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "calculateRealSolutions": () => (/* binding */ calculateRealSolutions)
+/* harmony export */ });
+const calculateRealSolutions = (position, velocity, acceleration, x) => {
+    // The position is constant.
+    if (acceleration === 0 && velocity === 0) {
+        if (position !== x) {
+            return [];
+        }
+        return [0];
+    }
+    // The velocity is constant and not equal to zero.
+    if (acceleration === 0) {
+        return [(x - position) / velocity];
+    }
+    // The velocity is accelerated.
+    // This equals p/2 of the pq-formula.
+    const firstSummand = velocity / acceleration;
+    // This equals sqrt((p/2 ** 2) - q) of the pq-formula.
+    const secondSummand = Math.sqrt(firstSummand ** 2 - (2 / acceleration) * (position - x));
+    return [secondSummand - firstSummand, -(secondSummand + firstSummand)].filter((solution) => !isNaN(solution)).sort();
+};
+//# sourceMappingURL=calculate-real-solutions.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/functions/filter-timing-state-vector-update.js":
+/*!************************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/functions/filter-timing-state-vector-update.js ***!
+  \************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "filterTimingStateVectorUpdate": () => (/* binding */ filterTimingStateVectorUpdate)
+/* harmony export */ });
+const filterTimingStateVectorUpdate = (vector) => {
+    if (vector === undefined) {
+        return {};
+    }
+    let filteredVector = vector.acceleration !== null && vector.acceleration !== undefined ? { acceleration: vector.acceleration } : {};
+    if (vector.position !== null && vector.position !== undefined) {
+        filteredVector = { ...filteredVector, position: vector.position };
+    }
+    if (vector.velocity !== null && vector.velocity !== undefined) {
+        return { ...filteredVector, velocity: vector.velocity };
+    }
+    return filteredVector;
+};
+//# sourceMappingURL=filter-timing-state-vector-update.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/functions/translate-timing-state-vector.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/functions/translate-timing-state-vector.js ***!
+  \********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "translateTimingStateVector": () => (/* binding */ translateTimingStateVector)
+/* harmony export */ });
+const translateTimingStateVector = (vector, delta) => {
+    const { acceleration, position, timestamp, velocity } = vector;
+    return {
+        acceleration,
+        position: position + velocity * delta + 0.5 * acceleration * delta ** 2,
+        timestamp: timestamp + delta,
+        velocity: velocity + acceleration * delta
+    };
+};
+//# sourceMappingURL=translate-timing-state-vector.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/functions/wrap-event-listener.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/functions/wrap-event-listener.js ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "wrapEventListener": () => (/* binding */ wrapEventListener)
+/* harmony export */ });
+const wrapEventListener = (target, eventListener) => {
+    return (event) => {
+        const descriptor = { value: target };
+        Object.defineProperties(event, {
+            currentTarget: descriptor,
+            target: descriptor
+        });
+        if (typeof eventListener === 'function') {
+            return eventListener.call(target, event);
+        }
+        return eventListener.handleEvent.call(target, event);
+    };
+};
+//# sourceMappingURL=wrap-event-listener.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/interfaces/event-target.js":
+/*!****************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/interfaces/event-target.js ***!
+  \****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=event-target.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/interfaces/index.js":
+/*!*********************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/interfaces/index.js ***!
+  \*********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _event_target__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./event-target */ "./node_modules/timing-object/build/es2019/interfaces/event-target.js");
+/* harmony import */ var _timing_object__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./timing-object */ "./node_modules/timing-object/build/es2019/interfaces/timing-object.js");
+/* harmony import */ var _timing_object_constructor__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./timing-object-constructor */ "./node_modules/timing-object/build/es2019/interfaces/timing-object-constructor.js");
+/* harmony import */ var _timing_object_event_map__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./timing-object-event-map */ "./node_modules/timing-object/build/es2019/interfaces/timing-object-event-map.js");
+/* harmony import */ var _timing_provider__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./timing-provider */ "./node_modules/timing-object/build/es2019/interfaces/timing-provider.js");
+/* harmony import */ var _timing_provider_event_map__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./timing-provider-event-map */ "./node_modules/timing-object/build/es2019/interfaces/timing-provider-event-map.js");
+/* harmony import */ var _timing_state_vector__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./timing-state-vector */ "./node_modules/timing-object/build/es2019/interfaces/timing-state-vector.js");
+
+
+
+
+
+
+
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/interfaces/timing-object-constructor.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/interfaces/timing-object-constructor.js ***!
+  \*****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=timing-object-constructor.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/interfaces/timing-object-event-map.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/interfaces/timing-object-event-map.js ***!
+  \***************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=timing-object-event-map.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/interfaces/timing-object.js":
+/*!*****************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/interfaces/timing-object.js ***!
+  \*****************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=timing-object.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/interfaces/timing-provider-event-map.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/interfaces/timing-provider-event-map.js ***!
+  \*****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=timing-provider-event-map.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/interfaces/timing-provider.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/interfaces/timing-provider.js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=timing-provider.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/interfaces/timing-state-vector.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/interfaces/timing-state-vector.js ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=timing-state-vector.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/module.js":
+/*!***********************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/module.js ***!
+  \***********************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "filterTimingStateVectorUpdate": () => (/* reexport safe */ _functions_filter_timing_state_vector_update__WEBPACK_IMPORTED_MODULE_9__.filterTimingStateVectorUpdate),
+/* harmony export */   "TimingObject": () => (/* binding */ timingObjectConstructor),
+/* harmony export */   "translateTimingStateVector": () => (/* reexport safe */ _functions_translate_timing_state_vector__WEBPACK_IMPORTED_MODULE_10__.translateTimingStateVector)
+/* harmony export */ });
+/* harmony import */ var _factories_calculate_delta__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./factories/calculate-delta */ "./node_modules/timing-object/build/es2019/factories/calculate-delta.js");
+/* harmony import */ var _factories_calculate_positive_real_solution__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./factories/calculate-positive-real-solution */ "./node_modules/timing-object/build/es2019/factories/calculate-positive-real-solution.js");
+/* harmony import */ var _factories_calculate_timeout_delay__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./factories/calculate-timeout-delay */ "./node_modules/timing-object/build/es2019/factories/calculate-timeout-delay.js");
+/* harmony import */ var _factories_event_target_constructor__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./factories/event-target-constructor */ "./node_modules/timing-object/build/es2019/factories/event-target-constructor.js");
+/* harmony import */ var _factories_event_target_factory__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./factories/event-target-factory */ "./node_modules/timing-object/build/es2019/factories/event-target-factory.js");
+/* harmony import */ var _factories_illegal_value_error__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./factories/illegal-value-error */ "./node_modules/timing-object/build/es2019/factories/illegal-value-error.js");
+/* harmony import */ var _factories_invalid_state_error__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./factories/invalid-state-error */ "./node_modules/timing-object/build/es2019/factories/invalid-state-error.js");
+/* harmony import */ var _factories_timing_object_constructor__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./factories/timing-object-constructor */ "./node_modules/timing-object/build/es2019/factories/timing-object-constructor.js");
+/* harmony import */ var _functions_calculate_real_solutions__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./functions/calculate-real-solutions */ "./node_modules/timing-object/build/es2019/functions/calculate-real-solutions.js");
+/* harmony import */ var _functions_filter_timing_state_vector_update__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./functions/filter-timing-state-vector-update */ "./node_modules/timing-object/build/es2019/functions/filter-timing-state-vector-update.js");
+/* harmony import */ var _functions_translate_timing_state_vector__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./functions/translate-timing-state-vector */ "./node_modules/timing-object/build/es2019/functions/translate-timing-state-vector.js");
+/* harmony import */ var _functions_wrap_event_listener__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./functions/wrap-event-listener */ "./node_modules/timing-object/build/es2019/functions/wrap-event-listener.js");
+/* harmony import */ var _interfaces_index__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./interfaces/index */ "./node_modules/timing-object/build/es2019/interfaces/index.js");
+/* harmony import */ var _types_index__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./types/index */ "./node_modules/timing-object/build/es2019/types/index.js");
+
+
+
+
+
+
+
+
+
+
+
+
+/*
+ * @todo Explicitly referencing the barrel file seems to be necessary when enabling the
+ * isolatedModules compiler option.
+ */
+
+
+
+const timingObjectConstructor = (0,_factories_timing_object_constructor__WEBPACK_IMPORTED_MODULE_7__.createTimingObjectConstructor)((0,_factories_calculate_timeout_delay__WEBPACK_IMPORTED_MODULE_2__.createCalculateTimeoutDelay)((0,_factories_calculate_delta__WEBPACK_IMPORTED_MODULE_0__.createCalculateDelta)((0,_factories_calculate_positive_real_solution__WEBPACK_IMPORTED_MODULE_1__.createCalculatePositiveRealSolution)(_functions_calculate_real_solutions__WEBPACK_IMPORTED_MODULE_8__.calculateRealSolutions))), _factories_illegal_value_error__WEBPACK_IMPORTED_MODULE_5__.createIllegalValueError, _factories_invalid_state_error__WEBPACK_IMPORTED_MODULE_6__.createInvalidStateError, (0,_factories_event_target_constructor__WEBPACK_IMPORTED_MODULE_3__.createEventTargetConstructor)((0,_factories_event_target_factory__WEBPACK_IMPORTED_MODULE_4__.createEventTargetFactory)(window), _functions_wrap_event_listener__WEBPACK_IMPORTED_MODULE_11__.wrapEventListener), _functions_filter_timing_state_vector_update__WEBPACK_IMPORTED_MODULE_9__.filterTimingStateVectorUpdate, performance, setTimeout, _functions_translate_timing_state_vector__WEBPACK_IMPORTED_MODULE_10__.translateTimingStateVector);
+
+
+// @todo Expose an isSupported flag which checks for performance.now() support.
+//# sourceMappingURL=module.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/calculate-delta-factory.js":
+/*!**********************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/calculate-delta-factory.js ***!
+  \**********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=calculate-delta-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/calculate-delta-function.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/calculate-delta-function.js ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=calculate-delta-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/calculate-positive-real-solution-factory.js":
+/*!***************************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/calculate-positive-real-solution-factory.js ***!
+  \***************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=calculate-positive-real-solution-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/calculate-positive-real-solution-function.js":
+/*!****************************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/calculate-positive-real-solution-function.js ***!
+  \****************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=calculate-positive-real-solution-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/calculate-real-solutions-function.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/calculate-real-solutions-function.js ***!
+  \********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=calculate-real-solutions-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/calculate-timeout-delay-factory.js":
+/*!******************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/calculate-timeout-delay-factory.js ***!
+  \******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=calculate-timeout-delay-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/calculate-timeout-delay-function.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/calculate-timeout-delay-function.js ***!
+  \*******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=calculate-timeout-delay-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/connection-state.js":
+/*!***************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/connection-state.js ***!
+  \***************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=connection-state.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/error-event-handler.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/error-event-handler.js ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=error-event-handler.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/event-handler.js":
+/*!************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/event-handler.js ***!
+  \************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=event-handler.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/event-target-constructor-factory.js":
+/*!*******************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/event-target-constructor-factory.js ***!
+  \*******************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=event-target-constructor-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/event-target-constructor.js":
+/*!***********************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/event-target-constructor.js ***!
+  \***********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=event-target-constructor.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/event-target-factory-factory.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/event-target-factory-factory.js ***!
+  \***************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=event-target-factory-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/event-target-factory.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/event-target-factory.js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=event-target-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/filter-timing-state-vector-update-function.js":
+/*!*****************************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/filter-timing-state-vector-update-function.js ***!
+  \*****************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=filter-timing-state-vector-update-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/filtered-timing-state-vector-update.js":
+/*!**********************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/filtered-timing-state-vector-update.js ***!
+  \**********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=filtered-timing-state-vector-update.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/illegal-value-error-factory.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/illegal-value-error-factory.js ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=illegal-value-error-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/index.js":
+/*!****************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/index.js ***!
+  \****************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _calculate_delta_factory__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./calculate-delta-factory */ "./node_modules/timing-object/build/es2019/types/calculate-delta-factory.js");
+/* harmony import */ var _calculate_delta_function__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./calculate-delta-function */ "./node_modules/timing-object/build/es2019/types/calculate-delta-function.js");
+/* harmony import */ var _calculate_positive_real_solution_factory__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./calculate-positive-real-solution-factory */ "./node_modules/timing-object/build/es2019/types/calculate-positive-real-solution-factory.js");
+/* harmony import */ var _calculate_positive_real_solution_function__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./calculate-positive-real-solution-function */ "./node_modules/timing-object/build/es2019/types/calculate-positive-real-solution-function.js");
+/* harmony import */ var _calculate_real_solutions_function__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./calculate-real-solutions-function */ "./node_modules/timing-object/build/es2019/types/calculate-real-solutions-function.js");
+/* harmony import */ var _calculate_timeout_delay_factory__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./calculate-timeout-delay-factory */ "./node_modules/timing-object/build/es2019/types/calculate-timeout-delay-factory.js");
+/* harmony import */ var _calculate_timeout_delay_function__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./calculate-timeout-delay-function */ "./node_modules/timing-object/build/es2019/types/calculate-timeout-delay-function.js");
+/* harmony import */ var _connection_state__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./connection-state */ "./node_modules/timing-object/build/es2019/types/connection-state.js");
+/* harmony import */ var _error_event_handler__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./error-event-handler */ "./node_modules/timing-object/build/es2019/types/error-event-handler.js");
+/* harmony import */ var _event_handler__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./event-handler */ "./node_modules/timing-object/build/es2019/types/event-handler.js");
+/* harmony import */ var _event_target_constructor__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./event-target-constructor */ "./node_modules/timing-object/build/es2019/types/event-target-constructor.js");
+/* harmony import */ var _event_target_constructor_factory__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./event-target-constructor-factory */ "./node_modules/timing-object/build/es2019/types/event-target-constructor-factory.js");
+/* harmony import */ var _event_target_factory__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./event-target-factory */ "./node_modules/timing-object/build/es2019/types/event-target-factory.js");
+/* harmony import */ var _event_target_factory_factory__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./event-target-factory-factory */ "./node_modules/timing-object/build/es2019/types/event-target-factory-factory.js");
+/* harmony import */ var _filter_timing_state_vector_update_function__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./filter-timing-state-vector-update-function */ "./node_modules/timing-object/build/es2019/types/filter-timing-state-vector-update-function.js");
+/* harmony import */ var _filtered_timing_state_vector_update__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./filtered-timing-state-vector-update */ "./node_modules/timing-object/build/es2019/types/filtered-timing-state-vector-update.js");
+/* harmony import */ var _illegal_value_error_factory__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./illegal-value-error-factory */ "./node_modules/timing-object/build/es2019/types/illegal-value-error-factory.js");
+/* harmony import */ var _invalid_state_error_factory__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! ./invalid-state-error-factory */ "./node_modules/timing-object/build/es2019/types/invalid-state-error-factory.js");
+/* harmony import */ var _native_event_target__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! ./native-event-target */ "./node_modules/timing-object/build/es2019/types/native-event-target.js");
+/* harmony import */ var _timing_object_constructor_factory__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! ./timing-object-constructor-factory */ "./node_modules/timing-object/build/es2019/types/timing-object-constructor-factory.js");
+/* harmony import */ var _timing_state_vector_update__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! ./timing-state-vector-update */ "./node_modules/timing-object/build/es2019/types/timing-state-vector-update.js");
+/* harmony import */ var _translate_timing_state_vector_function__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! ./translate-timing-state-vector-function */ "./node_modules/timing-object/build/es2019/types/translate-timing-state-vector-function.js");
+/* harmony import */ var _wrap_event_listener_function__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! ./wrap-event-listener-function */ "./node_modules/timing-object/build/es2019/types/wrap-event-listener-function.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/invalid-state-error-factory.js":
+/*!**************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/invalid-state-error-factory.js ***!
+  \**************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=invalid-state-error-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/native-event-target.js":
+/*!******************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/native-event-target.js ***!
+  \******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=native-event-target.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/timing-object-constructor-factory.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/timing-object-constructor-factory.js ***!
+  \********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=timing-object-constructor-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/timing-state-vector-update.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/timing-state-vector-update.js ***!
+  \*************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=timing-state-vector-update.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/translate-timing-state-vector-function.js":
+/*!*************************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/translate-timing-state-vector-function.js ***!
+  \*************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=translate-timing-state-vector-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-object/build/es2019/types/wrap-event-listener-function.js":
+/*!***************************************************************************************!*\
+  !*** ./node_modules/timing-object/build/es2019/types/wrap-event-listener-function.js ***!
+  \***************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=wrap-event-listener-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/factories/estimate-offset.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/factories/estimate-offset.js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createEstimateOffset": () => (/* binding */ createEstimateOffset)
+/* harmony export */ });
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/observable/empty.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/observable/zip.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/observable/interval.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/filter.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/map.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/catchError.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/startWith.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/tap.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/finalize.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/scan.js");
+
+
+const createEstimateOffset = (performance) => {
+    return (dataChannelSubject) => {
+        const ping$ = dataChannelSubject.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_0__.filter)((event) => event.type === 'ping'));
+        const pong$ = dataChannelSubject.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_0__.filter)((event) => event.type === 'pong'), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_1__.map)(({ message, timestamp }) => [message, timestamp !== null && timestamp !== void 0 ? timestamp : performance.now()]));
+        const sendPing = () => dataChannelSubject.next({ type: 'ping' });
+        const sendPong = (now) => dataChannelSubject.next({ message: now, type: 'pong' });
+        // Respond to every ping event with the current value returned by performance.now().
+        const pingSubjectSubscription = ping$.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_2__.catchError)(() => rxjs__WEBPACK_IMPORTED_MODULE_3__.EMPTY)).subscribe(() => sendPong(performance.now())); // tslint:disable-line:deprecation
+        return (0,rxjs__WEBPACK_IMPORTED_MODULE_4__.zip)((0,rxjs__WEBPACK_IMPORTED_MODULE_5__.interval)(1000).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_6__.startWith)(), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_7__.tap)(() => sendPing()), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_1__.map)(() => performance.now())), pong$).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_8__.finalize)(() => pingSubjectSubscription.unsubscribe()), 
+        // This will compute the offset with the formula "remoteTime - localTime".
+        (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_1__.map)(([pingTime, [pongTime, eventTime]]) => pongTime - (pingTime + eventTime) / 2), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_9__.scan)((latestValues, newValue) => [...latestValues.slice(-4), newValue], []), 
+        // @todo Do fire an update event whenever the offset changes.
+        (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_1__.map)((values) => values.reduce((sum, currentValue) => sum + currentValue, 0) / values.length), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_1__.map)((offset) => offset / 1000));
+    };
+};
+//# sourceMappingURL=estimate-offset.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/factories/event-target-constructor.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/factories/event-target-constructor.js ***!
+  \*****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createEventTargetConstructor": () => (/* binding */ createEventTargetConstructor)
+/* harmony export */ });
+const createEventTargetConstructor = (createEventTarget, wrapEventListener) => {
+    return class EventTarget {
+        constructor() {
+            this._listeners = new WeakMap();
+            this._nativeEventTarget = createEventTarget();
+        }
+        addEventListener(type, listener, options) {
+            if (listener !== null) {
+                let wrappedEventListener = this._listeners.get(listener);
+                if (wrappedEventListener === undefined) {
+                    wrappedEventListener = wrapEventListener(this, listener);
+                    if (typeof listener === 'function') {
+                        this._listeners.set(listener, wrappedEventListener);
+                    }
+                }
+                this._nativeEventTarget.addEventListener(type, wrappedEventListener, options);
+            }
+        }
+        dispatchEvent(event) {
+            return this._nativeEventTarget.dispatchEvent(event);
+        }
+        removeEventListener(type, listener, options) {
+            const wrappedEventListener = listener === null ? undefined : this._listeners.get(listener);
+            this._nativeEventTarget.removeEventListener(type, wrappedEventListener === undefined ? null : wrappedEventListener, options);
+        }
+    };
+};
+//# sourceMappingURL=event-target-constructor.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/factories/event-target-factory.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/factories/event-target-factory.js ***!
+  \*************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createEventTargetFactory": () => (/* binding */ createEventTargetFactory)
+/* harmony export */ });
+const createEventTargetFactory = (window) => {
+    return () => {
+        if (window === null) {
+            throw new Error('A native EventTarget could not be created.');
+        }
+        return window.document.createElement('p');
+    };
+};
+//# sourceMappingURL=event-target-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/factories/timing-provider-constructor.js":
+/*!********************************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/factories/timing-provider-constructor.js ***!
+  \********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "createTimingProviderConstructor": () => (/* binding */ createTimingProviderConstructor)
+/* harmony export */ });
+/* harmony import */ var backoff_rxjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! backoff-rxjs */ "./node_modules/backoff-rxjs/esm5/index.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/Subject.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/observable/concat.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/observable/from.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/observable/defer.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/observable/empty.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_17__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/observable/iif.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_21__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/observable/merge.js");
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_26__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/observable/combineLatest.js");
+/* harmony import */ var rxjs_broker__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! rxjs-broker */ "./node_modules/rxjs-broker/build/es2019/module.js");
+/* harmony import */ var rxjs_connector__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! rxjs-connector */ "./node_modules/rxjs-connector/build/es2019/module.js");
+/* harmony import */ var rxjs_etc_operators__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! rxjs-etc/operators */ "./node_modules/rxjs-etc/dist/esm/operators/equals.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/first.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/ignoreElements.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/catchError.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/map.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/connect.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/expand.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_18__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/endWith.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_19__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/scan.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_20__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/startWith.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_22__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/withLatestFrom.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_23__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/mergeMap.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_24__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/filter.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_25__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/tap.js");
+/* harmony import */ var rxjs_operators__WEBPACK_IMPORTED_MODULE_27__ = __webpack_require__(/*! rxjs/operators */ "./node_modules/rxjs/dist/esm5/internal/operators/distinctUntilChanged.js");
+/* harmony import */ var subscribable_things__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! subscribable-things */ "./node_modules/subscribable-things/build/es2019/module.js");
+/* harmony import */ var timing_object__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! timing-object */ "./node_modules/timing-object/build/es2019/module.js");
+
+
+
+
+
+
+
+
+const SUENC_URL = 'wss://matchmaker.suenc.io';
+const PROVIDER_ID_REGEX = /^[\dA-Za-z]{20}$/;
+const createTimingProviderConstructor = (estimateOffset, eventTargetConstructor, performance, setTimeout) => {
+    return class TimingProvider extends eventTargetConstructor {
+        constructor(providerIdOrUrl) {
+            super();
+            const timestamp = performance.now() / 1000;
+            this._endPosition = Number.POSITIVE_INFINITY;
+            this._error = null;
+            this._onadjust = null;
+            this._onchange = null;
+            this._onreadystatechange = null;
+            this._providerIdOrUrl = providerIdOrUrl;
+            this._readyState = 'connecting';
+            this._skew = 0;
+            this._startPosition = Number.NEGATIVE_INFINITY;
+            this._subscription = null;
+            this._timeOrigin = performance.timeOrigin / 1000 + timestamp;
+            this._updateRequestsSubject = new rxjs__WEBPACK_IMPORTED_MODULE_5__.Subject();
+            this._vector = { acceleration: 0, position: 0, timestamp, velocity: 0 };
+            this._createClient();
+        }
+        get endPosition() {
+            return this._endPosition;
+        }
+        get error() {
+            return this._error;
+        }
+        get onadjust() {
+            return this._onadjust === null ? this._onadjust : this._onadjust[0];
+        }
+        set onadjust(value) {
+            if (this._onadjust !== null) {
+                this.removeEventListener('adjust', this._onadjust[1]);
+            }
+            if (typeof value === 'function') {
+                const boundListener = value.bind(this);
+                this.addEventListener('adjust', boundListener);
+                this._onadjust = [value, boundListener];
+            }
+            else {
+                this._onadjust = null;
+            }
+        }
+        get onchange() {
+            return this._onchange === null ? this._onchange : this._onchange[0];
+        }
+        set onchange(value) {
+            if (this._onchange !== null) {
+                this.removeEventListener('change', this._onchange[1]);
+            }
+            if (typeof value === 'function') {
+                const boundListener = value.bind(this);
+                this.addEventListener('change', boundListener);
+                this._onchange = [value, boundListener];
+            }
+            else {
+                this._onchange = null;
+            }
+        }
+        get onreadystatechange() {
+            return this._onreadystatechange === null ? this._onreadystatechange : this._onreadystatechange[0];
+        }
+        set onreadystatechange(value) {
+            if (this._onreadystatechange !== null) {
+                this.removeEventListener('readystatechange', this._onreadystatechange[1]);
+            }
+            if (typeof value === 'function') {
+                const boundListener = value.bind(this);
+                this.addEventListener('readystatechange', boundListener);
+                this._onreadystatechange = [value, boundListener];
+            }
+            else {
+                this._onreadystatechange = null;
+            }
+        }
+        get readyState() {
+            return this._readyState;
+        }
+        get skew() {
+            return this._skew;
+        }
+        get startPosition() {
+            return this._startPosition;
+        }
+        get vector() {
+            return this._vector;
+        }
+        destroy() {
+            if (this._subscription === null) {
+                throw new Error('The timingProvider is already destroyed.');
+            }
+            this._readyState = 'closed';
+            this._subscription.unsubscribe();
+            this._subscription = null;
+            this._updateRequestsSubject.complete();
+            setTimeout(() => this.dispatchEvent(new Event('readystatechange')));
+        }
+        update(newVector) {
+            if (this._subscription === null) {
+                return Promise.reject(new Error("The timingProvider is destroyed and can't be updated."));
+            }
+            this._updateRequestsSubject.next({
+                ...(0,timing_object__WEBPACK_IMPORTED_MODULE_4__.translateTimingStateVector)(this._vector, performance.now() / 1000 - this._vector.timestamp),
+                ...(0,timing_object__WEBPACK_IMPORTED_MODULE_4__.filterTimingStateVectorUpdate)(newVector)
+            });
+            return Promise.resolve();
+        }
+        _createClient() {
+            const url = PROVIDER_ID_REGEX.test(this._providerIdOrUrl)
+                ? `${SUENC_URL}?providerId=${this._providerIdOrUrl}`
+                : this._providerIdOrUrl;
+            const subjectConfig = {
+                openObserver: {
+                    next: () => {
+                        this._readyState = 'open';
+                        this.dispatchEvent(new Event('readystatechange'));
+                    }
+                }
+            };
+            this._subscription = (0,rxjs__WEBPACK_IMPORTED_MODULE_6__.concat)((0,rxjs__WEBPACK_IMPORTED_MODULE_7__.from)((0,subscribable_things__WEBPACK_IMPORTED_MODULE_3__.online)()).pipe((0,rxjs_etc_operators__WEBPACK_IMPORTED_MODULE_8__.equals)(true), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_9__.first)(), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_10__.ignoreElements)()), (0,rxjs__WEBPACK_IMPORTED_MODULE_11__.defer)(() => (0,rxjs_connector__WEBPACK_IMPORTED_MODULE_2__.accept)(url, subjectConfig)))
+                .pipe((0,backoff_rxjs__WEBPACK_IMPORTED_MODULE_0__.retryBackoff)({ initialInterval: 1000, maxRetries: 4 }), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_12__.catchError)((err) => {
+                this._error = err;
+                this._readyState = 'closed';
+                this.dispatchEvent(new ErrorEvent('error', { error: err }));
+                return rxjs__WEBPACK_IMPORTED_MODULE_13__.EMPTY;
+            }), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_14__.map)((dataChannel) => (0,rxjs_broker__WEBPACK_IMPORTED_MODULE_1__.wrap)(dataChannel, {
+                deserializer: (event) => ({ ...JSON.parse(event.data), timestamp: event.timeStamp })
+            })), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_15__.connect)((dataChannelSubjects) => {
+                const currentlyActiveDataChannelSubjects = dataChannelSubjects.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_14__.map)((dataChannelSubject) => [dataChannelSubject, true]), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_16__.expand)(([dataChannelSubject, isExpandable]) => (0,rxjs__WEBPACK_IMPORTED_MODULE_17__.iif)(() => isExpandable, dataChannelSubject.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_12__.catchError)(() => rxjs__WEBPACK_IMPORTED_MODULE_13__.EMPTY), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_10__.ignoreElements)(), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_18__.endWith)([dataChannelSubject, false])), rxjs__WEBPACK_IMPORTED_MODULE_13__.EMPTY)), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_19__.scan)((activeDataChannelSubjects, [activeDataChannelSubject]) => {
+                    const index = activeDataChannelSubjects.indexOf(activeDataChannelSubject);
+                    if (index > -1) {
+                        return [
+                            ...activeDataChannelSubjects.slice(0, index),
+                            ...activeDataChannelSubjects.slice(index + 1)
+                        ];
+                    }
+                    return [...activeDataChannelSubjects, activeDataChannelSubject];
+                }, []), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_20__.startWith)([]));
+                return (0,rxjs__WEBPACK_IMPORTED_MODULE_21__.merge)(this._updateRequestsSubject.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_22__.withLatestFrom)(currentlyActiveDataChannelSubjects), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_14__.map)(([vector, activeDataChannelSubjects]) => {
+                    activeDataChannelSubjects.forEach((activeUpdateSubject) => activeUpdateSubject.send({ message: { ...vector, timeOrigin: this._timeOrigin }, type: 'update' }));
+                    this._setInternalVector(vector);
+                })), dataChannelSubjects.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_23__.mergeMap)((dataChannelSubject, index) => {
+                    if (index === 0) {
+                        dataChannelSubject.send({ type: 'request' });
+                    }
+                    return dataChannelSubject.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_24__.filter)(({ type }) => type === 'request'), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_12__.catchError)(() => rxjs__WEBPACK_IMPORTED_MODULE_13__.EMPTY), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_25__.tap)(() => {
+                        dataChannelSubject.send({
+                            message: { ...this._vector, timeOrigin: this._timeOrigin },
+                            type: 'update'
+                        });
+                    }));
+                })), dataChannelSubjects.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_23__.mergeMap)((dataChannelSubject) => (0,rxjs__WEBPACK_IMPORTED_MODULE_26__.combineLatest)([
+                    dataChannelSubject.pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_24__.filter)((event) => event.type === 'update'), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_14__.map)(({ message }) => message)),
+                    estimateOffset(dataChannelSubject)
+                ]).pipe((0,rxjs_operators__WEBPACK_IMPORTED_MODULE_12__.catchError)(() => rxjs__WEBPACK_IMPORTED_MODULE_13__.EMPTY), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_27__.distinctUntilChanged)(([vectorA], [vectorB]) => vectorA === vectorB))), (0,rxjs_operators__WEBPACK_IMPORTED_MODULE_14__.map)(([{ acceleration, position, timeOrigin, timestamp: remoteTimestamp, velocity }, offset]) => {
+                    const timestamp = remoteTimestamp - offset;
+                    if (this._timeOrigin < timeOrigin ||
+                        (this._timeOrigin === timeOrigin && this._vector.timestamp > timestamp)) {
+                        const vector = (0,timing_object__WEBPACK_IMPORTED_MODULE_4__.translateTimingStateVector)(this._vector, performance.now() / 1000 - this._vector.timestamp);
+                        this._updateRequestsSubject.next(vector);
+                    }
+                    else {
+                        if (this._timeOrigin > timeOrigin) {
+                            this._timeOrigin = timeOrigin;
+                        }
+                        this._setInternalVector({ acceleration, position, timestamp, velocity });
+                    }
+                })));
+            }))
+                .subscribe();
+        }
+        _setInternalVector(vector) {
+            this._vector = vector;
+            this.dispatchEvent(new CustomEvent('change', { detail: vector }));
+        }
+    };
+};
+//# sourceMappingURL=timing-provider-constructor.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/functions/wait-for-event.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/functions/wait-for-event.js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "waitForEvent": () => (/* binding */ waitForEvent)
+/* harmony export */ });
+/* harmony import */ var rxjs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! rxjs */ "./node_modules/rxjs/dist/esm5/internal/Observable.js");
+
+const waitForEvent = (eventTarget, type) => {
+    return new rxjs__WEBPACK_IMPORTED_MODULE_0__.Observable((observer) => {
+        const emitDataChannel = () => {
+            eventTarget.removeEventListener(type, emitDataChannel);
+            observer.next(eventTarget);
+            observer.complete();
+        };
+        eventTarget.addEventListener(type, emitDataChannel);
+        return () => eventTarget.removeEventListener(type, emitDataChannel);
+    });
+};
+//# sourceMappingURL=wait-for-event.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/functions/wrap-event-listener.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/functions/wrap-event-listener.js ***!
+  \************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "wrapEventListener": () => (/* binding */ wrapEventListener)
+/* harmony export */ });
+const wrapEventListener = (target, eventListener) => {
+    return (event) => {
+        const descriptor = { value: target };
+        Object.defineProperties(event, {
+            currentTarget: descriptor,
+            target: descriptor
+        });
+        if (typeof eventListener === 'function') {
+            return eventListener.call(target, event);
+        }
+        return eventListener.handleEvent.call(target, event);
+    };
+};
+//# sourceMappingURL=wrap-event-listener.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/module.js":
+/*!*************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/module.js ***!
+  \*************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "TimingProvider": () => (/* binding */ timingProviderConstructor)
+/* harmony export */ });
+/* harmony import */ var _factories_estimate_offset__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./factories/estimate-offset */ "./node_modules/timing-provider/build/es2019/factories/estimate-offset.js");
+/* harmony import */ var _factories_event_target_constructor__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./factories/event-target-constructor */ "./node_modules/timing-provider/build/es2019/factories/event-target-constructor.js");
+/* harmony import */ var _factories_event_target_factory__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./factories/event-target-factory */ "./node_modules/timing-provider/build/es2019/factories/event-target-factory.js");
+/* harmony import */ var _factories_timing_provider_constructor__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./factories/timing-provider-constructor */ "./node_modules/timing-provider/build/es2019/factories/timing-provider-constructor.js");
+/* harmony import */ var _functions_wait_for_event__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./functions/wait-for-event */ "./node_modules/timing-provider/build/es2019/functions/wait-for-event.js");
+/* harmony import */ var _functions_wrap_event_listener__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./functions/wrap-event-listener */ "./node_modules/timing-provider/build/es2019/functions/wrap-event-listener.js");
+/* harmony import */ var _types_index__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./types/index */ "./node_modules/timing-provider/build/es2019/types/index.js");
+
+
+
+
+
+
+/*
+ * @todo Explicitly referencing the barrel file seems to be necessary when enabling the
+ * isolatedModules compiler option.
+ */
+
+const timingProviderConstructor = (0,_factories_timing_provider_constructor__WEBPACK_IMPORTED_MODULE_3__.createTimingProviderConstructor)((0,_factories_estimate_offset__WEBPACK_IMPORTED_MODULE_0__.createEstimateOffset)(performance), (0,_factories_event_target_constructor__WEBPACK_IMPORTED_MODULE_1__.createEventTargetConstructor)((0,_factories_event_target_factory__WEBPACK_IMPORTED_MODULE_2__.createEventTargetFactory)(window), _functions_wrap_event_listener__WEBPACK_IMPORTED_MODULE_5__.wrapEventListener), performance, setTimeout, _functions_wait_for_event__WEBPACK_IMPORTED_MODULE_4__.waitForEvent);
+
+// @todo Expose an isSupported flag which checks for fetch and performance.now() support.
+//# sourceMappingURL=module.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/data-channel-event.js":
+/*!*******************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/data-channel-event.js ***!
+  \*******************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=data-channel-event.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/estimate-offset-factory.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/estimate-offset-factory.js ***!
+  \************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=estimate-offset-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/estimate-offset-function.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/estimate-offset-function.js ***!
+  \*************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=estimate-offset-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/event-handler.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/event-handler.js ***!
+  \**************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=event-handler.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/event-target-constructor-factory.js":
+/*!*********************************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/event-target-constructor-factory.js ***!
+  \*********************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=event-target-constructor-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/event-target-constructor.js":
+/*!*************************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/event-target-constructor.js ***!
+  \*************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=event-target-constructor.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/event-target-factory-factory.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/event-target-factory-factory.js ***!
+  \*****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=event-target-factory-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/event-target-factory.js":
+/*!*********************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/event-target-factory.js ***!
+  \*********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=event-target-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/index.js":
+/*!******************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/index.js ***!
+  \******************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var _data_channel_event__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! ./data-channel-event */ "./node_modules/timing-provider/build/es2019/types/data-channel-event.js");
+/* harmony import */ var _estimate_offset_factory__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! ./estimate-offset-factory */ "./node_modules/timing-provider/build/es2019/types/estimate-offset-factory.js");
+/* harmony import */ var _estimate_offset_function__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./estimate-offset-function */ "./node_modules/timing-provider/build/es2019/types/estimate-offset-function.js");
+/* harmony import */ var _event_handler__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./event-handler */ "./node_modules/timing-provider/build/es2019/types/event-handler.js");
+/* harmony import */ var _event_target_constructor__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./event-target-constructor */ "./node_modules/timing-provider/build/es2019/types/event-target-constructor.js");
+/* harmony import */ var _event_target_constructor_factory__WEBPACK_IMPORTED_MODULE_5__ = __webpack_require__(/*! ./event-target-constructor-factory */ "./node_modules/timing-provider/build/es2019/types/event-target-constructor-factory.js");
+/* harmony import */ var _event_target_factory__WEBPACK_IMPORTED_MODULE_6__ = __webpack_require__(/*! ./event-target-factory */ "./node_modules/timing-provider/build/es2019/types/event-target-factory.js");
+/* harmony import */ var _event_target_factory_factory__WEBPACK_IMPORTED_MODULE_7__ = __webpack_require__(/*! ./event-target-factory-factory */ "./node_modules/timing-provider/build/es2019/types/event-target-factory-factory.js");
+/* harmony import */ var _native_event_target__WEBPACK_IMPORTED_MODULE_8__ = __webpack_require__(/*! ./native-event-target */ "./node_modules/timing-provider/build/es2019/types/native-event-target.js");
+/* harmony import */ var _ping_event__WEBPACK_IMPORTED_MODULE_9__ = __webpack_require__(/*! ./ping-event */ "./node_modules/timing-provider/build/es2019/types/ping-event.js");
+/* harmony import */ var _pong_event__WEBPACK_IMPORTED_MODULE_10__ = __webpack_require__(/*! ./pong-event */ "./node_modules/timing-provider/build/es2019/types/pong-event.js");
+/* harmony import */ var _request_event__WEBPACK_IMPORTED_MODULE_11__ = __webpack_require__(/*! ./request-event */ "./node_modules/timing-provider/build/es2019/types/request-event.js");
+/* harmony import */ var _timing_provider_constructor__WEBPACK_IMPORTED_MODULE_12__ = __webpack_require__(/*! ./timing-provider-constructor */ "./node_modules/timing-provider/build/es2019/types/timing-provider-constructor.js");
+/* harmony import */ var _timing_provider_constructor_factory__WEBPACK_IMPORTED_MODULE_13__ = __webpack_require__(/*! ./timing-provider-constructor-factory */ "./node_modules/timing-provider/build/es2019/types/timing-provider-constructor-factory.js");
+/* harmony import */ var _update_event__WEBPACK_IMPORTED_MODULE_14__ = __webpack_require__(/*! ./update-event */ "./node_modules/timing-provider/build/es2019/types/update-event.js");
+/* harmony import */ var _wait_for_event_function__WEBPACK_IMPORTED_MODULE_15__ = __webpack_require__(/*! ./wait-for-event-function */ "./node_modules/timing-provider/build/es2019/types/wait-for-event-function.js");
+/* harmony import */ var _wrap_event_listener_function__WEBPACK_IMPORTED_MODULE_16__ = __webpack_require__(/*! ./wrap-event-listener-function */ "./node_modules/timing-provider/build/es2019/types/wrap-event-listener-function.js");
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//# sourceMappingURL=index.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/native-event-target.js":
+/*!********************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/native-event-target.js ***!
+  \********************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=native-event-target.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/ping-event.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/ping-event.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=ping-event.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/pong-event.js":
+/*!***********************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/pong-event.js ***!
+  \***********************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=pong-event.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/request-event.js":
+/*!**************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/request-event.js ***!
+  \**************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=request-event.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/timing-provider-constructor-factory.js":
+/*!************************************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/timing-provider-constructor-factory.js ***!
+  \************************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=timing-provider-constructor-factory.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/timing-provider-constructor.js":
+/*!****************************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/timing-provider-constructor.js ***!
+  \****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=timing-provider-constructor.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/update-event.js":
+/*!*************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/update-event.js ***!
+  \*************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=update-event.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/wait-for-event-function.js":
+/*!************************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/wait-for-event-function.js ***!
+  \************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=wait-for-event-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/timing-provider/build/es2019/types/wrap-event-listener-function.js":
+/*!*****************************************************************************************!*\
+  !*** ./node_modules/timing-provider/build/es2019/types/wrap-event-listener-function.js ***!
+  \*****************************************************************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+
+//# sourceMappingURL=wrap-event-listener-function.js.map
+
+/***/ }),
+
+/***/ "./node_modules/tslib/tslib.es6.js":
+/*!*****************************************!*\
+  !*** ./node_modules/tslib/tslib.es6.js ***!
+  \*****************************************/
+/***/ ((__unused_webpack_module, __webpack_exports__, __webpack_require__) => {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export */ __webpack_require__.d(__webpack_exports__, {
+/* harmony export */   "__extends": () => (/* binding */ __extends),
+/* harmony export */   "__assign": () => (/* binding */ __assign),
+/* harmony export */   "__rest": () => (/* binding */ __rest),
+/* harmony export */   "__decorate": () => (/* binding */ __decorate),
+/* harmony export */   "__param": () => (/* binding */ __param),
+/* harmony export */   "__metadata": () => (/* binding */ __metadata),
+/* harmony export */   "__awaiter": () => (/* binding */ __awaiter),
+/* harmony export */   "__generator": () => (/* binding */ __generator),
+/* harmony export */   "__createBinding": () => (/* binding */ __createBinding),
+/* harmony export */   "__exportStar": () => (/* binding */ __exportStar),
+/* harmony export */   "__values": () => (/* binding */ __values),
+/* harmony export */   "__read": () => (/* binding */ __read),
+/* harmony export */   "__spread": () => (/* binding */ __spread),
+/* harmony export */   "__spreadArrays": () => (/* binding */ __spreadArrays),
+/* harmony export */   "__spreadArray": () => (/* binding */ __spreadArray),
+/* harmony export */   "__await": () => (/* binding */ __await),
+/* harmony export */   "__asyncGenerator": () => (/* binding */ __asyncGenerator),
+/* harmony export */   "__asyncDelegator": () => (/* binding */ __asyncDelegator),
+/* harmony export */   "__asyncValues": () => (/* binding */ __asyncValues),
+/* harmony export */   "__makeTemplateObject": () => (/* binding */ __makeTemplateObject),
+/* harmony export */   "__importStar": () => (/* binding */ __importStar),
+/* harmony export */   "__importDefault": () => (/* binding */ __importDefault),
+/* harmony export */   "__classPrivateFieldGet": () => (/* binding */ __classPrivateFieldGet),
+/* harmony export */   "__classPrivateFieldSet": () => (/* binding */ __classPrivateFieldSet)
+/* harmony export */ });
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+/* global Reflect, Promise */
+
+var extendStatics = function(d, b) {
+    extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (Object.prototype.hasOwnProperty.call(b, p)) d[p] = b[p]; };
+    return extendStatics(d, b);
+};
+
+function __extends(d, b) {
+    if (typeof b !== "function" && b !== null)
+        throw new TypeError("Class extends value " + String(b) + " is not a constructor or null");
+    extendStatics(d, b);
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+}
+
+var __assign = function() {
+    __assign = Object.assign || function __assign(t) {
+        for (var s, i = 1, n = arguments.length; i < n; i++) {
+            s = arguments[i];
+            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p)) t[p] = s[p];
+        }
+        return t;
+    }
+    return __assign.apply(this, arguments);
+}
+
+function __rest(s, e) {
+    var t = {};
+    for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p) && e.indexOf(p) < 0)
+        t[p] = s[p];
+    if (s != null && typeof Object.getOwnPropertySymbols === "function")
+        for (var i = 0, p = Object.getOwnPropertySymbols(s); i < p.length; i++) {
+            if (e.indexOf(p[i]) < 0 && Object.prototype.propertyIsEnumerable.call(s, p[i]))
+                t[p[i]] = s[p[i]];
+        }
+    return t;
+}
+
+function __decorate(decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+}
+
+function __param(paramIndex, decorator) {
+    return function (target, key) { decorator(target, key, paramIndex); }
+}
+
+function __metadata(metadataKey, metadataValue) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(metadataKey, metadataValue);
+}
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+}
+
+function __generator(thisArg, body) {
+    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
+    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
+    function verb(n) { return function (v) { return step([n, v]); }; }
+    function step(op) {
+        if (f) throw new TypeError("Generator is already executing.");
+        while (_) try {
+            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
+            if (y = 0, t) op = [op[0] & 2, t.value];
+            switch (op[0]) {
+                case 0: case 1: t = op; break;
+                case 4: _.label++; return { value: op[1], done: false };
+                case 5: _.label++; y = op[1]; op = [0]; continue;
+                case 7: op = _.ops.pop(); _.trys.pop(); continue;
+                default:
+                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
+                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
+                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
+                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
+                    if (t[2]) _.ops.pop();
+                    _.trys.pop(); continue;
+            }
+            op = body.call(thisArg, _);
+        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
+        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
+    }
+}
+
+var __createBinding = Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+});
+
+function __exportStar(m, o) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(o, p)) __createBinding(o, m, p);
+}
+
+function __values(o) {
+    var s = typeof Symbol === "function" && Symbol.iterator, m = s && o[s], i = 0;
+    if (m) return m.call(o);
+    if (o && typeof o.length === "number") return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+    throw new TypeError(s ? "Object is not iterable." : "Symbol.iterator is not defined.");
+}
+
+function __read(o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+}
+
+/** @deprecated */
+function __spread() {
+    for (var ar = [], i = 0; i < arguments.length; i++)
+        ar = ar.concat(__read(arguments[i]));
+    return ar;
+}
+
+/** @deprecated */
+function __spreadArrays() {
+    for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
+    for (var r = Array(s), k = 0, i = 0; i < il; i++)
+        for (var a = arguments[i], j = 0, jl = a.length; j < jl; j++, k++)
+            r[k] = a[j];
+    return r;
+}
+
+function __spreadArray(to, from, pack) {
+    if (pack || arguments.length === 2) for (var i = 0, l = from.length, ar; i < l; i++) {
+        if (ar || !(i in from)) {
+            if (!ar) ar = Array.prototype.slice.call(from, 0, i);
+            ar[i] = from[i];
+        }
+    }
+    return to.concat(ar || Array.prototype.slice.call(from));
+}
+
+function __await(v) {
+    return this instanceof __await ? (this.v = v, this) : new __await(v);
+}
+
+function __asyncGenerator(thisArg, _arguments, generator) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var g = generator.apply(thisArg, _arguments || []), i, q = [];
+    return i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i;
+    function verb(n) { if (g[n]) i[n] = function (v) { return new Promise(function (a, b) { q.push([n, v, a, b]) > 1 || resume(n, v); }); }; }
+    function resume(n, v) { try { step(g[n](v)); } catch (e) { settle(q[0][3], e); } }
+    function step(r) { r.value instanceof __await ? Promise.resolve(r.value.v).then(fulfill, reject) : settle(q[0][2], r); }
+    function fulfill(value) { resume("next", value); }
+    function reject(value) { resume("throw", value); }
+    function settle(f, v) { if (f(v), q.shift(), q.length) resume(q[0][0], q[0][1]); }
+}
+
+function __asyncDelegator(o) {
+    var i, p;
+    return i = {}, verb("next"), verb("throw", function (e) { throw e; }), verb("return"), i[Symbol.iterator] = function () { return this; }, i;
+    function verb(n, f) { i[n] = o[n] ? function (v) { return (p = !p) ? { value: __await(o[n](v)), done: n === "return" } : f ? f(v) : v; } : f; }
+}
+
+function __asyncValues(o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+}
+
+function __makeTemplateObject(cooked, raw) {
+    if (Object.defineProperty) { Object.defineProperty(cooked, "raw", { value: raw }); } else { cooked.raw = raw; }
+    return cooked;
+};
+
+var __setModuleDefault = Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+};
+
+function __importStar(mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+}
+
+function __importDefault(mod) {
+    return (mod && mod.__esModule) ? mod : { default: mod };
+}
+
+function __classPrivateFieldGet(receiver, state, kind, f) {
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a getter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot read private member from an object whose class did not declare it");
+    return kind === "m" ? f : kind === "a" ? f.call(receiver) : f ? f.value : state.get(receiver);
+}
+
+function __classPrivateFieldSet(receiver, state, value, kind, f) {
+    if (kind === "m") throw new TypeError("Private method is not writable");
+    if (kind === "a" && !f) throw new TypeError("Private accessor was defined without a setter");
+    if (typeof state === "function" ? receiver !== state || !f : !state.has(receiver)) throw new TypeError("Cannot write private member to an object whose class did not declare it");
+    return (kind === "a" ? f.call(receiver, value) : f ? f.value = value : state.set(receiver, value)), value;
+}
+
 
 /***/ }),
 
