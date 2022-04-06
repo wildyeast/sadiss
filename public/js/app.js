@@ -9755,6 +9755,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 6:
                 if (!this.synchronizing) {
+                  synchronizing = true;
                   intervalId = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
                     var q;
                     return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
@@ -9775,13 +9776,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                       }
                     }, _callee);
                   })), 10);
-                  synchronizing = true;
                 } else {
                   window.clearInterval(intervalId);
                   synchronizing = false;
                 }
 
-              case 7:
+                console.log("Synchronizing: ", synchronizing);
+
+              case 8:
               case "end":
                 return _context2.stop();
             }

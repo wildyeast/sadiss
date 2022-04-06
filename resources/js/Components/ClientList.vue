@@ -63,15 +63,16 @@ export default {
         console.log("Set TimingObject velocity to 1.")
       }
       if (!this.synchronizing) {
+        synchronizing = true
         intervalId = window.setInterval(async () => {
           const q = await queryTimingObj()
           timingSrcPosition.value = q.position.toFixed(2)
         }, 10)
-        synchronizing = true
       } else {
         window.clearInterval(intervalId)
         synchronizing = false
       }
+      console.log("Synchronizing: ", synchronizing)
     }
 
     async function queryTimingObj () {
