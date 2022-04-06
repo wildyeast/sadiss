@@ -9736,15 +9736,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 console.log("Quering.");
-                _context.next = 3;
+                console.log("TimingObj: ", timingObj);
+                _context.next = 4;
                 return timingObj.query();
 
-              case 3:
+              case 4:
                 q = _context.sent;
                 console.log("Queried TimingObj: ", q);
                 return _context.abrupt("return", q);
 
-              case 6:
+              case 7:
               case "end":
                 return _context.stop();
             }
@@ -9771,7 +9772,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 3:
                 q = _context2.sent;
-                console.log("TimingObj: ", timingObj);
                 console.log("Queried TimingObject: ", q); // if (q.velocity !== 1) {
                 //   timingObj.update({ velocity: 1 })
                 //   console.log("Set TimingObject velocity to 1.")
@@ -9779,14 +9779,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 calculatedStartingPosition = q.position + 5;
                 console.log("Calculated starting position: ", calculatedStartingPosition);
-                _context2.next = 10;
+                _context2.next = 9;
                 return axios.post("/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition));
 
-              case 10:
+              case 9:
                 response = _context2.sent;
                 console.log(response.data.data);
 
-              case 12:
+              case 11:
               case "end":
                 return _context2.stop();
             }
