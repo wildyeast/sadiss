@@ -9780,9 +9780,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function queryTimingObj() {
-      // console.log("Quering.")
-      var q = timingObj.query(); // console.log("Queried TimingObj: ", q)
-
+      var q = timingObj.query();
       return q;
     }
 
@@ -9792,48 +9790,24 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
     function _startTrack() {
       _startTrack = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
-        var q, calculatedStartingPosition, response;
+        var calculatedStartingPosition, response;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                console.log("Start track pressed.");
-                _context3.next = 3;
-                return queryTimingObj();
-
-              case 3:
-                q = _context3.sent;
-
-                if (q.velocity !== 1) {
-                  timingObj.update({
-                    velocity: 1
-                  });
-                  console.log("Set TimingObject velocity to 1.");
-                }
-
-                console.log("Queried TimingObject: ", q);
-                _context3.next = 8;
-                return queryTimingObj();
-
-              case 8:
-                q = _context3.sent;
-                console.log("Queried TimingObject: ", q);
-                _context3.next = 12;
-                return queryTimingObj();
-
-              case 12:
-                q = _context3.sent;
-                console.log("Queried TimingObject: ", q);
-                calculatedStartingPosition = q.position + 5;
+                timingObj.update({
+                  position: 0
+                });
+                calculatedStartingPosition = timingSrcPosition.value + 5;
                 console.log("Calculated starting position: ", calculatedStartingPosition);
-                _context3.next = 18;
+                _context3.next = 5;
                 return axios.post("/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition));
 
-              case 18:
+              case 5:
                 response = _context3.sent;
                 console.log(response.data.data);
 
-              case 20:
+              case 7:
               case "end":
                 return _context3.stop();
             }
