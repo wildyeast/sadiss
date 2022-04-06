@@ -1,7 +1,12 @@
 // https://www.html5rocks.com/en/tutorials/audio/scheduling/
 
-const SCHEDULE_TIME = 400
-const OVERLAP = 200
+// Schedule values I tried 50 - 1000 (step: 100) overlap time values for:
+// s50 o100/200/300
+
+// Overlap values I tried 50 - 1000 (step: 100) schedule time values for:
+// 500
+const SCHEDULE_TIME = 1000
+const OVERLAP = 300
 
 let lastBreakpointTime = 0
 
@@ -27,17 +32,7 @@ export default class Player {
   oscillatorEndTimes = []
   ctxTimeOnSetup = null
 
-  constructor() {
-    this.timingProvider = new TimingProvider('wss://sadiss.net/zeitquelle');
-    this.timingObj = new TimingObject(this.timingProvider)
-    this.timingObj.onchange =  () => {
-      // console.log(this.timingObj.query().position - this.localTimingObj.query().position)
-      console.log("Player: Global time object changed.")
-    };
-  }
-
   mergeBreakpoints() {
-    console.log(this.partialData)
     for (const partial of this.partialData) {
       for (const breakpoint of partial.breakpoints) {
         breakpoint.oscIndex = partial.index
@@ -86,6 +81,7 @@ export default class Player {
     const oscObj = {
       osc,
       gain,
+      index: partialIndex,
       endTime: this.oscillatorEndTimes.find(el => el.oscIndex === partialIndex).endTime,
     }
 
@@ -121,16 +117,13 @@ export default class Player {
   //   return oscObj
   // }
 
-  play () {
-    this.playing = true
-    this.setSchedulingInterval(SCHEDULE_TIME / 1000, SCHEDULE_TIME - OVERLAP)
-    // console.log("Starting oscillators")
-    // for (const oscObj of this.oscillators) {
-    //   oscObj.osc.start(oscObj.startTime)
-    //   oscObj.osc.stop(oscObj.endTime)
-    //   oscObj.osc.onended = (src) => this.ended(src, oscObj.index)
-    // }
-  }
+  // play () {
+  //   this.playing = true
+  //   console.log("Global time when calling initial schedule: ", this.timingObj.query().position)
+  //   this.schedule(0.1)
+  //   console.log("Global time when calling setSchedulingInterval: ", this.timingObj.query().position)
+  //   this.setSchedulingInterval(SCHEDULE_TIME / 1000, SCHEDULE_TIME - OVERLAP)
+  // }
 
   startFrom = 0
 
@@ -148,32 +141,33 @@ export default class Player {
         }
       }
     }
+    // console.log("Finished prepare: ", this.audioContext.currentTime) // TOO MANY FOR PHONE
+    console.log(breakpointsToSchedule.length)
     return breakpointsToSchedule
   }
 
   schedule (timeInSecToScheduleInAdvance) {
-      const breakpointsToSchedule = this.prepare(timeInSecToScheduleInAdvance)
-      // console.log("Amount of oscillators currently active: ", this.oscillators.length)
-      // console.log("Amount of breakpoints to schedule: ", breakpointsToSchedule.length)
-      // console.log("Time", parseFloat(this.audioContext.currentTime).toFixed(3), " (+", 
-      //   parseFloat(this.audioContext.currentTime - lastBreakpointTime).toFixed(3), ")")
-      // lastBreakpointTime = this.audioContext.currentTime
-      // console.log(" ")
+    const breakpointsToSchedule = this.prepare(timeInSecToScheduleInAdvance)
+    // console.log("Amount of oscillators currently active: ", this.oscillators.length)
+    // console.log("Amount of breakpoints to schedule: ", breakpointsToSchedule.length)
+    // console.log("Time", parseFloat(this.audioContext.currentTime).toFixed(3), " (+", 
+    //   parseFloat(this.audioContext.currentTime - lastBreakpointTime).toFixed(3), ")")
+    // lastBreakpointTime = this.audioContext.currentTime
+    // console.log(" ")
 
-      for (const currentBreakpoint of breakpointsToSchedule) {
-        const oscIndex = currentBreakpoint.oscIndex
-        let oscObj = this.oscillators.find(osc => osc.index === oscIndex)
-        if (!oscObj) {
-          oscObj = this.setupOscillator(oscIndex)
-          console.log(oscObj)
-          oscObj.osc.start()
-          oscObj.osc.stop(oscObj.endTime)
-          oscObj.osc.onended = (src) => this.ended(src)
-        }
-        oscObj.osc.frequency.setValueAtTime(currentBreakpoint.freq, Number(currentBreakpoint.time + 5))
-        oscObj.gain.gain.setValueAtTime(currentBreakpoint.amp, Number(currentBreakpoint.time + 5))
-
+    for (const currentBreakpoint of breakpointsToSchedule) {
+      const oscIndex = currentBreakpoint.oscIndex
+      let oscObj = this.oscillators.find(osc => osc.index === oscIndex)
+      if (!oscObj) {
+        oscObj = this.setupOscillator(oscIndex)
+        oscObj.osc.start()
+        oscObj.osc.stop(oscObj.endTime)
+        oscObj.osc.onended = (src) => this.ended(src, oscObj.index)
       }
+      oscObj.osc.frequency.setValueAtTime(currentBreakpoint.freq, Number(currentBreakpoint.time ))
+      oscObj.gain.gain.setValueAtTime(currentBreakpoint.amp, Number(currentBreakpoint.time))
+
+    }
   }
 
   setSchedulingInterval (timeInSecToScheduleInAdvance, intervalTimeInMs) {
@@ -189,12 +183,10 @@ export default class Player {
     this.reset()
   }
 
-  ended (src) {
+  ended (src, idx) {
     this.endedSrc.push(src)
     const realIdx = this.oscillators.indexOf(this.oscillators.find(el => el.index === idx))
     this.oscillators.splice(realIdx, 1)
-    // const realIdx = this.oscillators.indexOf(this.oscillators.find(el => el.index === idx))
-    // this.oscillators.splice(realIdx, 1)
     if (this.endedSrc.length === this.partialData.length) {
       this.reset()
     }

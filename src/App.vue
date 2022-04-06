@@ -177,7 +177,16 @@ export default {
           console.log("Waiting on start. localTimeWithOffset: ", this.localTimeWithOffset())
           if (!this.hasStarted) {
             this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
-            this.player.play()
+            this.playing = true
+            console.log("Global time when calling initial schedule: ", this.timingObj.query().position)
+            // const initialBreakpointCount = this.player.mergedBreakpoints.length
+            this.player.schedule(0.1)
+            // const bpCountAfterScheduling = initialBreakpointCount - this.player.mergedBreakpoints.length
+            // console.log("BPs scheduled in initial scheduling round.", bpCountAfterScheduling)
+            console.log("audioCtx time when calling setSchedulingInterval: ", this.player.audioContext.currentTime)
+            console.log("Global time when calling setSchedulingInterval: ", this.timingObj.query().position)
+            this.player.setSchedulingInterval(100, 100)
+            // this.player.play()
             this.hasStarted = true
           }
           window.clearInterval(intervalId)
@@ -190,7 +199,6 @@ export default {
       console.log("Starting setup. localTimeWithOffset: ", this.localTimeWithOffset() + startInSec)
       const t1 = this.globalTime()
       this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
-      console.log("Time taken for setting up audioCtx: ", this.globalTime())
       this.player.setup(this.partials, startInSec, 0)
       this.isRegistered = false;
 
