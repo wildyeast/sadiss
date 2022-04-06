@@ -45,7 +45,9 @@ export default {
       getRegisteredClients()
       autoGetRegisteredClients()
       timingProvider = new TimingProvider('ws://sadiss.net:2276');
+      console.log("TimingProvider after creation: ", timingProvider)
       timingObj = new TimingObject(timingProvider)
+      console.log("TimingObject after creation: ", timingObj)
     })
 
     function registerClient () {
