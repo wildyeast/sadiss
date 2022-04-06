@@ -48,7 +48,7 @@ export default {
     onMounted (() => {
       getRegisteredClients()
       autoGetRegisteredClients()
-      timingProvider = new TimingProvider('ws://127.0.0.1:2276');
+      timingProvider = new TimingProvider('ws://sadiss.net:2276');
       // timingObj = new TimingObject(timingProvider)
     })
 
@@ -73,6 +73,7 @@ export default {
       } else {
         window.clearInterval(intervalId)
         synchronizing = false
+        timingObj.update({ velocity: 0 })
       }
       console.log("Synchronizing: ", synchronizing)
     }
