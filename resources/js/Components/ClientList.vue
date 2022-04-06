@@ -54,6 +54,10 @@ export default {
     }
 
     async function startTrack () {
+      if (this.timingObj.query().velocity !== 1) {
+        this.timingObj.update({ velocity: 1 })
+        console.log("Set TimingObject velocity to 1.")
+      }
       const startTime = timingObj.query().position + 5
       const response = await axios.post(`/api/track/${props.trackId}/start/${startTime}`)
       console.log(response.data.data)
