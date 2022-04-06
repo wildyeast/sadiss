@@ -9,6 +9,9 @@ const prepared = []
 
 let time1;
 
+import { TimingProvider } from 'timing-provider';
+import { TimingObject } from 'timing-object';
+
 export default class Player {
 
   oscillators = []
@@ -23,6 +26,15 @@ export default class Player {
   lastScheduledBreakpointIndex = 0
   oscillatorEndTimes = []
   ctxTimeOnSetup = null
+
+  constructor() {
+    this.timingProvider = new TimingProvider('wss://sadiss.net/zeitquelle');
+    this.timingObj = new TimingObject(this.timingProvider)
+    this.timingObj.onchange =  () => {
+      // console.log(this.timingObj.query().position - this.localTimingObj.query().position)
+      console.log("Player: Global time object changed.")
+    };
+  }
 
   // mergeBreakpoints(partialData) {
   //   for (const partial of this.partialData) {
@@ -45,7 +57,6 @@ export default class Player {
     this.partialData = partialData
     const ctxTime = this.audioContext.currentTime
     const timeToAddToStart = startInSec + ctxTime
-    console.log(timeToAddToStart)
     let totalTime = 0
     // Initialize oscillators, set all values for each oscillator
     for (const partial of this.partialData) {
@@ -59,8 +70,9 @@ export default class Player {
       this.oscillators.push(oscObj)
       totalTime += performance.now() - t2
     }
-    console.log("Finished osc setup and value setting. Duration (ms): ", performance.now() - t1)
-    console.log("Average time (ms) to initialize osc and set values for one partial:", totalTime / this.oscillators.length)
+    // console.log("Finished osc setup and value setting. Duration (ms): ", performance.now() - t1)
+    // console.log("Average time (ms) to initialize osc and set values for one partial:", totalTime / this.oscillators.length)
+    console.log("Global time after finishing setup: ", this.timingObj.query().position)
   }
 
   setupOscillator(partial, timeToAddToStart) {

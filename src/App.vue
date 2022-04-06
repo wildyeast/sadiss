@@ -104,7 +104,7 @@ export default {
       
       this.timingObj.onchange =  () => {
         // console.log(this.timingObj.query().position - this.localTimingObj.query().position)
-        console.log("Global time object changed.")
+        console.log("App: Global time object changed.")
       };
 
       // Start audio context.
@@ -185,12 +185,12 @@ export default {
     },
 
     async start () {
-      const startInSec = 10
+      const startInSec = 4
       console.log("Starting setup. localTimeWithOffset: ", this.localTimeWithOffset() + startInSec)
       // Start audioContext
       const t1 = this.globalTime()
       this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
-      console.log("Time taken for setting up audioCtx: ", this.globalTime() - t1)
+      console.log("Time taken for setting up audioCtx: ", this.globalTime())
       this.player.setup(this.partials, startInSec, 0)
       this.isRegistered = false;
 
