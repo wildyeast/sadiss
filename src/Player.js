@@ -44,22 +44,21 @@ export default class Player {
     // Start audioContext
     // this.audioContext = new(window.AudioContext || window.webkitAudioContext)()
 
-    console.log('Calculated offset: ', offset)
+    // console.log('Calculated offset: ', offset)
+
+    const ctxTime = this.audioContext.currentTime + offset
+
+    const t1 = performance.now()
 
     // const timeToAddToStart = Number(offsetInSec) + 10
-    const timeToAddToStart = startInSec + offset
+    const timeToAddToStart = startInSec + ctxTime
 
-    // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
-    if (typeof partialData === 'string') {
-      this.partialData = JSON.parse(partialData)
-      this.partialData.reverse()
-    } else {
-      this.partialData = partialData
-    }
+    this.partialData = JSON.parse(partialData)
 
+    let time = 0
     // Initialize oscillators, set all values for each oscillator
-    // const t1 = performance.now()
     for (const partial of this.partialData) {
+      const t2 = performance.now()
       const oscObj = this.setupOscillator(partial, timeToAddToStart)
       for (const breakpoint of partial.breakpoints) {
         const time = Number(breakpoint.time) + timeToAddToStart
@@ -67,9 +66,12 @@ export default class Player {
         oscObj.gain.gain.setValueAtTime(breakpoint.amp, time)
       }
       this.oscillators.push(oscObj)
+      time += performance.now() - t2
     }
-    // const t2 = performance.now()
-    console.log("Finished osc setup and value setting.")
+    console.log("Finished osc setup and value setting. Duration (ms): ", performance.now() - t1)
+    console.log("Average time (ms) to initialize osc and set values for one partial:", time / this.oscillators.length)
+    // console.log("Time set for first breakpoints of first partial | audioCtx current time: ",
+    //   Number(this.partialData[0].breakpoints[0].time) + timeToAddToStart, this.audioContext.currentTime)
   }
 
   setupOscillator(partial, timeToAddToStart) {
@@ -88,6 +90,10 @@ export default class Player {
 
     oscObj.osc.connect(oscObj.gain);
     oscObj.gain.connect(this.audioContext.destination)
+
+    oscObj.osc.start(oscObj.startTime)
+    oscObj.osc.stop(oscObj.endTime)
+    oscObj.osc.onended = (src) => this.ended(src, oscObj.index)
 
     return oscObj
   }
@@ -209,4 +215,9 @@ export default class Player {
     this.currentTime = 0
     this.lastScheduledBreakpointIndex = 0
   }
+
+  printTime (name, offset) {
+    console.log(name, this.audioContext.currentTime - offset)
+  }
+
 }
