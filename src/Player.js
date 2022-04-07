@@ -29,8 +29,10 @@ export default class Player {
   schedulingInterval = null
   currentTime = 0
   lastScheduledBreakpointIndex = 0
-  oscillatorEndTimes = []
+  oscillatorTimes = []
   ctxTimeOnSetup = null
+
+  offset = null
 
   mergeBreakpoints() {
     for (const partial of this.partialData) {
@@ -38,10 +40,11 @@ export default class Player {
         breakpoint.oscIndex = partial.index
         this.mergedBreakpoints.push(breakpoint)
       }
-      this.oscillatorEndTimes.push(
+      this.oscillatorTimes.push(
         {
           oscIndex: partial.index,
           endTime: Number(partial.endTime),
+          startTime: Number(partial.startTime)
         }
       )
     }
@@ -72,11 +75,14 @@ export default class Player {
     osc.frequency.value = 0
     gain.gain.value = 0
 
+    const times = this.oscillatorTimes.find(el => el.oscIndex === partialIndex)
+
     const oscObj = {
       osc,
       gain,
       index: partialIndex,
-      endTime: this.oscillatorEndTimes.find(el => el.oscIndex === partialIndex).endTime,
+      startTime: times.startTime,
+      endTime: times.endTime,
     }
 
     oscObj.osc.connect(oscObj.gain);
@@ -124,6 +130,7 @@ export default class Player {
   prepare (timeInSecToScheduleInAdvance) {
     const breakpointsToSchedule = []
     const now = this.audioContext.currentTime
+    console.log(now)
     // console.log(now)
     // let bp
     // while (bp = this.mergedBreakpoints.pop()) {
@@ -148,8 +155,8 @@ export default class Player {
   }
 
   schedule (timeInSecToScheduleInAdvance) {
-    const now = performance.now()
-    if (this.mergedBreakpoints[0].time < now + timeInSecToScheduleInAdvance) { // TODO: This doesn't seem to do anything.
+    // const now = performance.now()
+    // if (this.mergedBreakpoints[0].time < now + timeInSecToScheduleInAdvance) { // TODO: This doesn't seem to do anything.
       const breakpointsToSchedule = this.prepare(timeInSecToScheduleInAdvance)
       // console.log("Amount of oscillators currently active: ", this.oscillators.length)
       // console.log("Amount of breakpoints to schedule: ", breakpointsToSchedule.length)
@@ -165,7 +172,7 @@ export default class Player {
         // time += performance.now() - t1
         if (!oscObj) {
           oscObj = this.setupOscillator(oscIndex)
-          oscObj.osc.start()
+          oscObj.osc.start(oscObj.startTime)
           oscObj.osc.stop(oscObj.endTime)
           oscObj.osc.onended = (src) => this.ended(src, oscObj.index)
         }
@@ -175,9 +182,9 @@ export default class Player {
       }
       // console.log("Total amount of time for scheduling all breakpoints this round: ", performance.now() - t1)
       // console.log(`Scheduled ${breakpointsToSchedule.length} BPs at ${this.audioContext.currentTime} this round.`,)
-    }
-    const t2 = performance.now()
-    console.log("Current time: ", t2, "Time taken for scheduling: ", t2 - now)
+    // }
+    // const t2 = performance.now()
+    // console.log("Current time: ", t2, "Time taken for scheduling: ", t2 - now)
   }
 
   setSchedulingInterval (timeInSecToScheduleInAdvance, intervalTimeInMs) {

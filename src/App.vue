@@ -136,11 +136,17 @@ export default {
       const response = await fetch(`${this.hostUrl}/api/client/${token}`)
       const clientData = await response.json()
       if (clientData.client['start_time']) {
+
+        if (!this.player.offset) {
+          this.player.offset = 
+          console.log("Offset: ", this.player.offset)
+        }
+
         console.log("Start time from server: ", clientData.client['start_time'])
         window.clearInterval(this.intervalId)
         // const startTimeFromServer = Number(this.timingObj.query().position.toFixed(1)) + 3
         // this.startPrepAtPosition = clientData.client['start_time']
-        const startTimeFromServer = clientData.client['start_time']
+        const startTimeFromServer = Number(clientData.client['start_time'])
         const partialData = clientData.client['partials']
         // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
         if (typeof partialData === 'string') {
@@ -157,17 +163,17 @@ export default {
 
         const intervalId = window.setInterval(() => {
           // console.log(this.localTime(), this.globalTime(), this.globalToLocalTimeOffset())
-          if (this.localTimeWithOffset() >= startTimeFromServer) {
+          if (this.globalTime() >= startTimeFromServer) {
             // const startNextStepAtLocalPos = this.localTime() + 3
             const startNextStepAtLocalPos = 0
-            console.log("Start time reached at localTimeWithOffset: ", this.localTimeWithOffset())
+            console.log("Start time reached at globalTime: ", this.globalTime())
             if (!prepareStarted) { // Prevent multiple calls of prepare() if checkForStart() short interval time
               this.prepare(startNextStepAtLocalPos)
               prepareStarted = true
             }
             window.clearInterval(intervalId)
           }
-        }, 5)
+        }, 1)
       }
       return clientData
     },
@@ -186,26 +192,26 @@ export default {
             // console.log("BPs scheduled in initial scheduling round.", bpCountAfterScheduling)
             console.log("audioCtx time when calling setSchedulingInterval: ", this.player.audioContext.currentTime)
             console.log("Global time when calling setSchedulingInterval: ", this.timingObj.query().position)
-            this.player.setSchedulingInterval(1, 100)
+            this.player.setSchedulingInterval(0.2, 100)
             // this.player.play()
             this.hasStarted = true
           }
           window.clearInterval(intervalId)
         }
-      }, 5)
+      }, 1)
     },
 
-    async start () {
-      const startInSec = 4
-      console.log("Starting setup. localTimeWithOffset: ", this.localTimeWithOffset() + startInSec)
-      const t1 = this.globalTime()
-      this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
-      this.player.setup(this.partials, startInSec, 0)
-      this.isRegistered = false;
+    // async start () {
+    //   const startInSec = 4
+    //   console.log("Starting setup. localTimeWithOffset: ", this.localTimeWithOffset() + startInSec)
+    //   const t1 = this.globalTime()
+    //   // this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
+    //   this.player.setup(this.partials, startInSec, 0)
+    //   this.isRegistered = false;
 
-      // Reregister when done
-      // await this.register()
-    },
+    //   // Reregister when done
+    //   // await this.register()
+    // },
 
     globalTime () {
       return this.timingObj.query().position
