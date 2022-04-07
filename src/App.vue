@@ -108,10 +108,10 @@ export default {
     //   }
     // }, 1000)
 
-    // // Fetch tracks
-    // const res = await fetch(this.hostUrl + '/api/track')
-    // const json = await res.json()
-    // this.availableTracks = json
+    // Fetch tracks
+    const res = await fetch(this.hostUrl + '/api/track')
+    const json = await res.json()
+    this.availableTracks = json
   },
   methods: {
     async register () {
