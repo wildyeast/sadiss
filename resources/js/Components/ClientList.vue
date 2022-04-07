@@ -1,18 +1,25 @@
 <template>
   <div>
     <div class="flex justify-between">
-      <button @click="startTrack" class="border p-2">Start track</button>
-      <button @click="synchronizeTimingSrcPosition" class="border p-2">{{ synchronizing ? 'Sync running' : 'Sync' }}</button>
+      <button @click="startTrack"
+              class="border p-2" 
+              :class="synchronizing ? 'border-green-400' : 'border-red-400'"
+              :disabled="!synchronizing"
+             >Start track</button>
+      <div class="flex">
+        <button @click="synchronizeTimingSrcPosition" class="border p-2">Sync</button>
+        <div class="border-b border-t border-r p-2">{{ timingSrcPosition ? timingSrcPosition : "0.0" }}</div>
+      </div>
       <button @click="removeClients" class="border p-2">Remove all registered clients</button>
       <div>
         <button @click="getRegisteredClients"
                 class="border p-2"
-                :class="autoGetRegisteredClientsInterval ? 'border-b-red-400 border-l-red-400 border-t-red-400' : 'border'">
+                :class="autoGetRegisteredClientsInterval ? 'border-b-green-400 border-l-green-400 border-t-green-400' : 'border'">
                 Refresh list
         </button>
         <button @click="autoGetRegisteredClients"
                 class="border-b border-t border-r p-2"
-                :class="autoGetRegisteredClientsInterval ? 'border-red-400' : 'border-b border-t border-r'">
+                :class="autoGetRegisteredClientsInterval ? 'border-green-400' : 'border-b border-t border-r'">
                 Auto
         </button>
       </div>
@@ -42,15 +49,17 @@ export default {
     let timingProvider = null
     let timingObj = null
     let synchronizing = ref(false)
-    let timingSrcPosition = ref(0)
+    let timingSrcPosition = ref()
     let intervalId = null
 
     onMounted (() => {
       getRegisteredClients()
       autoGetRegisteredClients()
-      // timingProvider = new TimingProvider('ws://sadiss.net:2276');
-        timingProvider = new TimingProvider('wss://sadiss.net/zeitquelle');
-      // timingObj = new TimingObject(timingProvider)
+      timingProvider = new TimingProvider('wss://sadiss.net/zeitquelle');
+      timingObj = new TimingObject(timingProvider)
+      timingObj.onchange =  (event) => {
+        console.log("Global TimeObject onchange event triggered.")
+      };
     })
 
     function registerClient () {
@@ -60,22 +69,24 @@ export default {
 
     async function synchronizeTimingSrcPosition () {
       if (!synchronizing.value) {
-        timingObj = new TimingObject(timingProvider)
         if (queryTimingObj().velocity != 1) {
           timingObj.update({ velocity: 1 })
           console.log("Set TimingObject velocity to 1.")
         }
 
         synchronizing.value = true
-        intervalId = window.setInterval(async () => {
+        intervalId = window.setInterval(() => {
           const q = queryTimingObj()
-          timingSrcPosition.value = q.position.toFixed(2)
-          console.log(timingSrcPosition.value)
+          if (q.position.toFixed(1) - timingSrcPosition.value != 0) { // TODO: Weird calculation, doesn't work with !== for some reason, no time to look into it now
+            timingSrcPosition.value = q.position.toFixed(1)
+            // console.log(timingSrcPosition.value)
+          }
         }, 10)
       } else {
-        window.clearInterval(intervalId)
         synchronizing.value = false
-        timingObj.update({ velocity: 0 })
+        timingObj.update({ velocity: 0, position: 0 })
+        timingSrcPosition.value = queryTimingObj().position.toFixed(1)
+        window.clearInterval(intervalId)
       }
       console.log("Synchronizing: ", synchronizing.value)
     }
@@ -129,7 +140,8 @@ export default {
       startTrack,
       removeClients,
       synchronizing,
-      synchronizeTimingSrcPosition
+      synchronizeTimingSrcPosition,
+      timingSrcPosition
     }
 
   }
