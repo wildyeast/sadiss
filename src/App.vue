@@ -106,7 +106,7 @@ export default {
       };
 
       // Start audio context.
-      // this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
+      this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
 
       const response = await fetch(this.hostUrl + '/api/client/create', {
         method: 'POST',
@@ -126,10 +126,6 @@ export default {
         await this.checkForStart(data.token);
       }, 1000);
       this.isRegistered = true;
-
-      // window.setInterval(() => {
-      //   this.timingSrcPosCurr = this.timingObj.query().position
-      // }, 5)
     },
 
     async checkForStart (token) {
@@ -137,33 +133,19 @@ export default {
       const clientData = await response.json()
       if (clientData.client['start_time']) {
 
-        if (!this.player.offset) {
-          this.player.offset = 
-          console.log("Offset: ", this.player.offset)
-        }
-
         console.log("Start time from server: ", clientData.client['start_time'])
         window.clearInterval(this.intervalId)
-        // const startTimeFromServer = Number(this.timingObj.query().position.toFixed(1)) + 3
-        // this.startPrepAtPosition = clientData.client['start_time']
         const startTimeFromServer = Number(clientData.client['start_time'])
-        const partialData = clientData.client['partials']
         // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
-        if (typeof partialData === 'string') {
-          let json = JSON.parse(partialData)
-          this.partials = json.reverse()
-        } else {
-          this.partials = partialData
-        }
-        this.player.partialData = this.partials
-        this.player.mergeBreakpoints(this.partials)
-        console.log("Total amount of breakpoints: ", this.player.mergedBreakpoints.length)
+        this.partialData = this.convertPartialsIfNeeded(clientData.client['partials'])
+        this.player.partialData = this.partialData
         
         let prepareStarted = false
 
         const intervalId = window.setInterval(() => {
           // console.log(this.localTime(), this.globalTime(), this.globalToLocalTimeOffset())
           if (this.globalTime() >= startTimeFromServer) {
+            this.player.offset = this.globalTime() - this.player.audioContext.currentTime // Do not change!
             // const startNextStepAtLocalPos = this.localTime() + 3
             const startNextStepAtLocalPos = 0
             console.log("Start time reached at globalTime: ", this.globalTime())
@@ -180,20 +162,12 @@ export default {
 
     prepare (startNextStepAtLocalPos) {
       const intervalId = window.setInterval(() => {
-        if (this.localTimeWithOffset() >= startNextStepAtLocalPos) {
-          console.log("Waiting on start. localTimeWithOffset: ", this.localTimeWithOffset())
+        if (this.globalTime() >= startNextStepAtLocalPos) {
+          console.log("Waiting on start. Global Time: ", this.globalTime())
           if (!this.hasStarted) {
-            this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
             this.playing = true
-            console.log("Global time when calling initial schedule: ", this.timingObj.query().position)
-            // const initialBreakpointCount = this.player.mergedBreakpoints.length
-            this.player.schedule(0.1)
-            // const bpCountAfterScheduling = initialBreakpointCount - this.player.mergedBreakpoints.length
-            // console.log("BPs scheduled in initial scheduling round.", bpCountAfterScheduling)
-            console.log("audioCtx time when calling setSchedulingInterval: ", this.player.audioContext.currentTime)
-            console.log("Global time when calling setSchedulingInterval: ", this.timingObj.query().position)
-            this.player.setSchedulingInterval(0.2, 100)
-            // this.player.play()
+            console.log("Global time when starting: ", this.timingObj.query().position)
+            this.start()
             this.hasStarted = true
           }
           window.clearInterval(intervalId)
@@ -201,39 +175,35 @@ export default {
       }, 1)
     },
 
-    // async start () {
-    //   const startInSec = 4
-    //   console.log("Starting setup. localTimeWithOffset: ", this.localTimeWithOffset() + startInSec)
-    //   const t1 = this.globalTime()
-    //   // this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
-    //   this.player.setup(this.partials, startInSec, 0)
-    //   this.isRegistered = false;
+    async start () {
+      const startInSec = 4
+      const q = this.globalTime()
+      const ctxTime = this.player.audioContext.currentTime
+      const now = q - this.player.offset // Do not change!
+      console.log("ZQ - ctxTime - offset (should be 0): ", q - ctxTime - this.player.offset)
+      // console.log("Offset: ", this.player.offset)
+      // console.log("Now: ", now)
+      this.player.setup(this.partialData, startInSec, now)
+      this.isRegistered = false;
 
-    //   // Reregister when done
-    //   // await this.register()
-    // },
+      // Reregister when done
+      // await this.register()
+    },
 
     globalTime () {
       return this.timingObj.query().position
     },
 
-    localTime () {
-      return this.localTimingObj.query().position
+    convertPartialsIfNeeded(partialData) {
+      let partials;
+      if (typeof partialData === 'string') {
+        let json = JSON.parse(partialData)
+        partials = json.reverse()
+      } else {
+        partials = partialData
+      }
+      return partials
     },
-
-    globalToLocalTimeOffset () {
-      return this.globalTime() - this.localTime()
-    },
-
-    localTimeWithOffset () {
-      // return this.localTime() + this.globalToLocalTimeOffset()
-      return this.globalTime()
-    },
-
-
-
-
-
 
     convertPositionToCtxTime (pos) {
       return pos - this.offset
@@ -247,19 +217,19 @@ export default {
       return new Date().valueOf()
     },
 
-    async calculateTimeOffset () {
-      const now = new Date().valueOf()
-      const serverTime = await this.getTimeFromServer()
-      const nowAfterCall = new Date().valueOf()
-      this.serverTimeOffset = serverTime - now
-      this.callDuration = nowAfterCall - now
+    // async calculateTimeOffset () {
+    //   const now = new Date().valueOf()
+    //   const serverTime = await this.getTimeFromServer()
+    //   const nowAfterCall = new Date().valueOf()
+    //   this.serverTimeOffset = serverTime - now
+    //   this.callDuration = nowAfterCall - now
 
-      this.print += '<br>localtime: ' + this.formatUnixTime(now) + '<br>servertime: ' + this.formatUnixTime(serverTime) + '<br>offset: ' + this.serverTimeOffset + 'ms'
-      if (this.serverTimeOffset > 0) this.print += ' (server ahead)'
-      else this.print += ' (server behind)'
-      this.print += '<br>call duration: ' + this.formatUnixTime(this.callDuration)
-      this.print += '<br>localtime with offset: ' + this.formatUnixTime(this.nowWithOffset())
-    },
+    //   this.print += '<br>localtime: ' + this.formatUnixTime(now) + '<br>servertime: ' + this.formatUnixTime(serverTime) + '<br>offset: ' + this.serverTimeOffset + 'ms'
+    //   if (this.serverTimeOffset > 0) this.print += ' (server ahead)'
+    //   else this.print += ' (server behind)'
+    //   this.print += '<br>call duration: ' + this.formatUnixTime(this.callDuration)
+    //   this.print += '<br>localtime with offset: ' + this.formatUnixTime(this.nowWithOffset())
+    // },
 
     // async getTimeFromServer () {
     //   const response = await fetch(`${this.hostUrl}/api/time`)
