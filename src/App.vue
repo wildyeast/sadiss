@@ -78,16 +78,40 @@ export default {
     offset: null,
     time: 0,
     localTimingObj: null,
-    initialTimingSrcIntervalId: null
+    initialTimingSrcIntervalId: null,
+
+    clients: []
   }),
   async mounted () {
     this.timingProvider = new TimingProvider('wss://sadiss.net/zeitquelle');
     this.timingObj = new TimingObject(this.timingProvider)
 
-    // Fetch tracks
-    const res = await fetch(this.hostUrl + '/api/track')
-    const json = await res.json()
-    this.availableTracks = json
+    // Uncomment for timing server stress testing
+    window.setTimeout(() => {
+      this.timingObj.update({ velocity: 1 })
+    }, 1000)
+
+    // Test 1: Many clients on this device
+    // window.setInterval(() => {
+    //   this.clients.push(this.createClient())
+    //   console.log(this.clients[0].pos, this.clients.length)
+    // }, 500)
+
+    // Test 2: X clients on this device (Sehr stressig fuers phone)
+    // for (let i = 0; i < 5; i++) {
+    //   this.clients.push(this.createClient())
+    // }
+    // window.setInterval(() => {
+    //   console.log(" ")
+    //   for (const client of this.clients) {
+    //     console.log(client.pos)
+    //   }
+    // }, 1000)
+
+    // // Fetch tracks
+    // const res = await fetch(this.hostUrl + '/api/track')
+    // const json = await res.json()
+    // this.availableTracks = json
   },
   methods: {
     async register () {
@@ -194,6 +218,21 @@ export default {
         partials = partialData
       }
       return partials
+    },
+    createClient () {
+      class Client {
+        pos = 0
+        constructor () {
+          const timingProvider = new TimingProvider('wss://sadiss.net/zeitquelle');
+          const timingObj = new TimingObject(timingProvider)
+          window.setTimeout(() => {
+          }, 5000)
+          window.setInterval(() => {
+            this.pos = timingObj.query().position
+          }, 2)
+        }
+      }
+      return new Client()
     },
   }
 }
