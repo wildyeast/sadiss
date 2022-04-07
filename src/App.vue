@@ -1,7 +1,6 @@
 <template>
   <div class="app">
     <!-- <button @click="prepare">timingSrc update</button> -->
-    <!-- {{ timingSrcPosCurrFormatted }} -->
     <div style="display: flex; flex-direction: column; justify-content: center" class="md:w-1/2 w-11/12 border b-white p-4">
       <p>
         Select a track ID from the dropdown below and press Play to prepare the selected track. All partials will
@@ -26,6 +25,7 @@
         This ID changes with every registration.
       </p>
       <button @click="register" class="border b-white p-2 mt-4">Register</button>
+      {{ timingSrcPosition }}
       <div class="mt-4">
         <p v-if="countdownTime > 0" style="display: flex; justify-content: center; font-size: 50px;">{{ countdownTime }}</p>
         <p v-else-if="player && !player.playing && isRegistered">Device registered with ID {{ deviceRegistrationId }}. Waiting for track start.</p>
@@ -71,40 +71,37 @@ export default {
     timingProvider: null,
     timingObj: null,
     currentVel: 0,
-    timingSrcPosCurr: 0,
+    timingSrcPosition: null,
     hasStarted: false,
     timingSetupDone: false,
     beep: null,
     offset: null,
     time: 0,
-    localTimingObj: null
+    localTimingObj: null,
+    initialTimingSrcIntervalId: null
   }),
-  // computed: {
-  //   timingSrcPosCurrFormatted: function () {
-  //     return this.timingSrcPosCurr.toFixed(2)
-  //   }
-  // },
   async mounted () {
-    // this.timingProvider = new TimingProvider('ws://192.168.0.87:2276');
     this.timingProvider = new TimingProvider('wss://sadiss.net/zeitquelle');
     this.timingObj = new TimingObject(this.timingProvider)
-    this.localTimingObj = new TimingObject({ velocity: 1 })
 
     // Fetch tracks
-    // const res = await fetch(this.hostUrl + '/api/track')
-    // const json = await res.json()
-    // this.availableTracks = json
-
-    // Initialize player
-    this.player = new Player()
+    const res = await fetch(this.hostUrl + '/api/track')
+    const json = await res.json()
+    this.availableTracks = json
   },
   methods: {
     async register () {
-      this.timingObj.onchange =  () => {
-        // console.log(this.timingObj.query().position - this.localTimingObj.query().position)
-        console.log("App: Global time object changed.")
+      this.timingObj.onchange =  (event) => {
+        console.log("Global TimeObject onchange event triggered.")
       };
 
+      this.initialTimingSrcIntervalId = window.setInterval(() => {
+        const q = this.timingObj.query()
+        this.timingSrcPosition = q.position.toFixed(1)
+      }, 10)
+
+      // Initialize player
+      this.player = new Player()
       // Start audio context.
       this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
 
@@ -132,7 +129,6 @@ export default {
       const response = await fetch(`${this.hostUrl}/api/client/${token}`)
       const clientData = await response.json()
       if (clientData.client['start_time']) {
-
         console.log("Start time from server: ", clientData.client['start_time'])
         window.clearInterval(this.intervalId)
         const startTimeFromServer = Number(clientData.client['start_time'])
@@ -142,13 +138,12 @@ export default {
         
         let prepareStarted = false
 
+        window.clearInterval(this.initialTimingSrcIntervalId)
         const intervalId = window.setInterval(() => {
-          // console.log(this.localTime(), this.globalTime(), this.globalToLocalTimeOffset())
-          if (this.globalTime() >= startTimeFromServer) {
-            this.player.offset = this.globalTime() - this.player.audioContext.currentTime // Do not change!
-            // const startNextStepAtLocalPos = this.localTime() + 3
+          this.timingSrcPosition = this.globalTime()
+          if (this.timingSrcPosition >= startTimeFromServer) {
+            this.player.offset = this.timingSrcPosition - this.player.audioContext.currentTime // Do not change!
             const startNextStepAtLocalPos = 0
-            console.log("Start time reached at globalTime: ", this.globalTime())
             if (!prepareStarted) { // Prevent multiple calls of prepare() if checkForStart() short interval time
               this.prepare(startNextStepAtLocalPos)
               prepareStarted = true
@@ -162,11 +157,9 @@ export default {
 
     prepare (startNextStepAtLocalPos) {
       const intervalId = window.setInterval(() => {
-        if (this.globalTime() >= startNextStepAtLocalPos) {
-          console.log("Waiting on start. Global Time: ", this.globalTime())
+        this.timingSrcPosition = this.globalTime()
+        if (this.timingSrcPosition >= startNextStepAtLocalPos) {
           if (!this.hasStarted) {
-            this.playing = true
-            console.log("Global time when starting: ", this.timingObj.query().position)
             this.start()
             this.hasStarted = true
           }
@@ -181,8 +174,6 @@ export default {
       const ctxTime = this.player.audioContext.currentTime
       const now = q - this.player.offset // Do not change!
       console.log("ZQ - ctxTime - offset (should be 0): ", q - ctxTime - this.player.offset)
-      // console.log("Offset: ", this.player.offset)
-      // console.log("Now: ", now)
       this.player.setup(this.partialData, startInSec, now)
       this.isRegistered = false;
 
@@ -204,38 +195,6 @@ export default {
       }
       return partials
     },
-
-    convertPositionToCtxTime (pos) {
-      return pos - this.offset
-    },
-
-    // position  ctxTime   offset
-    // 600       100       -500
-    // 610       110       -500
-
-    now () {
-      return new Date().valueOf()
-    },
-
-    // async calculateTimeOffset () {
-    //   const now = new Date().valueOf()
-    //   const serverTime = await this.getTimeFromServer()
-    //   const nowAfterCall = new Date().valueOf()
-    //   this.serverTimeOffset = serverTime - now
-    //   this.callDuration = nowAfterCall - now
-
-    //   this.print += '<br>localtime: ' + this.formatUnixTime(now) + '<br>servertime: ' + this.formatUnixTime(serverTime) + '<br>offset: ' + this.serverTimeOffset + 'ms'
-    //   if (this.serverTimeOffset > 0) this.print += ' (server ahead)'
-    //   else this.print += ' (server behind)'
-    //   this.print += '<br>call duration: ' + this.formatUnixTime(this.callDuration)
-    //   this.print += '<br>localtime with offset: ' + this.formatUnixTime(this.nowWithOffset())
-    // },
-
-    // async getTimeFromServer () {
-    //   const response = await fetch(`${this.hostUrl}/api/time`)
-    //   const data = await response.json()
-    //   return data.time
-    // },
   }
 }
 </script>
