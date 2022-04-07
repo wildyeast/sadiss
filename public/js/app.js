@@ -9712,6 +9712,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var timingObj = null;
     var synchronizing = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
     var timingSrcPosition = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)();
+    var timingSrcConnected = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
     var intervalId = null;
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
       getRegisteredClients();
@@ -9721,6 +9722,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
       timingObj.onchange = function (event) {
         console.log("Global TimeObject onchange event triggered.");
+        timingSrcConnected.value = true;
       };
     });
 
@@ -9980,7 +9982,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       removeClients: removeClients,
       synchronizing: synchronizing,
       synchronizeTimingSrcPosition: synchronizeTimingSrcPosition,
-      timingSrcPosition: timingSrcPosition
+      timingSrcPosition: timingSrcPosition,
+      timingSrcConnected: timingSrcConnected
     };
   }
 });
@@ -11354,7 +11357,8 @@ var _hoisted_2 = ["disabled"];
 var _hoisted_3 = {
   "class": "flex"
 };
-var _hoisted_4 = {
+var _hoisted_4 = ["disabled"];
+var _hoisted_5 = {
   "class": "border-b border-t border-r p-2"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
@@ -11370,8 +11374,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     onClick: _cache[1] || (_cache[1] = function () {
       return $setup.synchronizeTimingSrcPosition && $setup.synchronizeTimingSrcPosition.apply($setup, arguments);
     }),
-    "class": "border p-2"
-  }, "Sync"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.timingSrcPosition ? $setup.timingSrcPosition : "0.0"), 1
+    "class": "border p-2",
+    disabled: !$setup.timingSrcConnected
+  }, "Sync", 8
+  /* PROPS */
+  , _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.timingSrcPosition ? $setup.timingSrcPosition : "0.0"), 1
   /* TEXT */
   )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: _cache[2] || (_cache[2] = function () {

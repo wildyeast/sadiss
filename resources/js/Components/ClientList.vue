@@ -7,7 +7,9 @@
               :disabled="!synchronizing"
              >Start track</button>
       <div class="flex">
-        <button @click="synchronizeTimingSrcPosition" class="border p-2">Sync</button>
+        <button @click="synchronizeTimingSrcPosition"
+                class="border p-2"
+                :disabled="!timingSrcConnected">Sync</button>
         <div class="border-b border-t border-r p-2">{{ timingSrcPosition ? timingSrcPosition : "0.0" }}</div>
       </div>
       <button @click="removeClients" class="border p-2">Remove all registered clients</button>
@@ -50,6 +52,7 @@ export default {
     let timingObj = null
     let synchronizing = ref(false)
     let timingSrcPosition = ref()
+    let timingSrcConnected = ref(false)
     let intervalId = null
 
     onMounted (() => {
@@ -59,6 +62,7 @@ export default {
       timingObj = new TimingObject(timingProvider)
       timingObj.onchange =  (event) => {
         console.log("Global TimeObject onchange event triggered.")
+        timingSrcConnected.value = true
       };
     })
 
@@ -141,7 +145,8 @@ export default {
       removeClients,
       synchronizing,
       synchronizeTimingSrcPosition,
-      timingSrcPosition
+      timingSrcPosition,
+      timingSrcConnected
     }
 
   }
