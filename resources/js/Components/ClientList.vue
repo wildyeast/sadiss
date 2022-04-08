@@ -83,7 +83,6 @@ export default {
           const q = queryTimingObj()
           if (q.position.toFixed(1) - timingSrcPosition.value != 0) { // TODO: Weird calculation, doesn't work with !== for some reason, no time to look into it now
             timingSrcPosition.value = q.position.toFixed(1)
-            // console.log(timingSrcPosition.value)
           }
         }, 10)
       } else {
