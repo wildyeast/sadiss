@@ -169,7 +169,8 @@ export default {
             this.player.offset = this.timingSrcPosition - this.player.audioContext.currentTime // Do not change!
             const startNextStepAtLocalPos = 0
             if (!prepareStarted) { // Prevent multiple calls of prepare() if checkForStart() short interval time
-              this.prepare(startNextStepAtLocalPos)
+              // this.prepare(startNextStepAtLocalPos)
+              this.start()
               prepareStarted = true
             }
             window.clearInterval(intervalId)
@@ -180,16 +181,16 @@ export default {
     },
 
     prepare (startNextStepAtLocalPos) {
-      const intervalId = window.setInterval(() => {
-        this.timingSrcPosition = this.globalTime()
-        if (this.timingSrcPosition >= startNextStepAtLocalPos) {
-          if (!this.hasStarted) {
+      // const intervalId = window.setInterval(() => {
+        // this.timingSrcPosition = this.globalTime()
+        // if (this.timingSrcPosition >= startNextStepAtLocalPos) {
+          // if (!this.hasStarted) {
             this.start()
-            this.hasStarted = true
-          }
-          window.clearInterval(intervalId)
-        }
-      }, 1)
+            // this.hasStarted = true
+          // }
+          // window.clearInterval(intervalId)
+        // }
+      // }, 1)
     },
 
     async start () {
