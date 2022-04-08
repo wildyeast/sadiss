@@ -9717,12 +9717,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
       getRegisteredClients();
       autoGetRegisteredClients();
-      timingProvider = new timing_provider__WEBPACK_IMPORTED_MODULE_4__.TimingProvider('wss://sadiss.net/zeitquelle');
-      timingObj = new timing_object__WEBPACK_IMPORTED_MODULE_5__.TimingObject(timingProvider);
+      timingProvider = new timing_provider__WEBPACK_IMPORTED_MODULE_4__.TimingProvider("wss://sadiss.net/zeitquelle"); // const t1 = performance.now()
 
-      timingObj.onchange = function (event) {
-        console.log("Global TimeObject onchange event triggered.");
-        timingSrcConnected.value = true;
+      timingProvider.onreadystatechange = function () {
+        if (timingProvider.readyState === "open") {
+          // console.log("Time elapsed until TP ready: ", performance.now() - t1)
+          timingObj = new timing_object__WEBPACK_IMPORTED_MODULE_5__.TimingObject(timingProvider);
+          timingSrcConnected.value = true;
+        }
       };
     });
 
@@ -9752,17 +9754,22 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
 
                   synchronizing.value = true;
-                  intervalId = window.setInterval(function () {
+
+                  (function query() {
                     var q = queryTimingObj();
 
                     if (q.position.toFixed(1) - timingSrcPosition.value != 0) {
                       // TODO: Weird calculation, doesn't work with !== for some reason, no time to look into it now
                       timingSrcPosition.value = q.position.toFixed(1);
                     }
-                  }, 10);
+
+                    if (synchronizing.value) {
+                      window.setTimeout(query, 10);
+                    }
+                  })();
                 } else {
                   synchronizing.value = false;
-                  timingObj.update({
+                  timingProvider.update({
                     velocity: 0,
                     position: 0
                   });
@@ -9830,7 +9837,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context3.prev = _context3.next) {
               case 0:
                 _context3.next = 2;
-                return axios.get('/api/client/active');
+                return axios.get("/api/client/active");
 
               case 2:
                 response = _context3.sent;
@@ -11368,7 +11375,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["border p-2", $setup.synchronizing ? 'border-green-400' : 'border-red-400']),
     disabled: !$setup.synchronizing
-  }, "Start track", 10
+  }, " Start track ", 10
   /* CLASS, PROPS */
   , _hoisted_2), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: _cache[1] || (_cache[1] = function () {
@@ -11376,7 +11383,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     }),
     "class": "border p-2",
     disabled: !$setup.timingSrcConnected
-  }, "Sync", 8
+  }, " Sync ", 8
   /* PROPS */
   , _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.timingSrcPosition ? $setup.timingSrcPosition : "0.0"), 1
   /* TEXT */
@@ -11385,7 +11392,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       return $setup.removeClients && $setup.removeClients.apply($setup, arguments);
     }),
     "class": "border p-2"
-  }, "Remove all registered clients"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  }, " Remove all registered clients "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: _cache[3] || (_cache[3] = function () {
       return $setup.getRegisteredClients && $setup.getRegisteredClients.apply($setup, arguments);
     }),
