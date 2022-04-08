@@ -137,9 +137,11 @@ export default {
 
       // Initialize player
       this.player = new Player()
+
+      // const audioCtx = window.AudioContext || window.webkitAudioContext
+      // this.player.audioContext = new audioCtx({sampleRate: 44100})
       // Start audio context.
-      const audioCtx = window.AudioContext || window.webkitAudioContext
-      this.player.audioContext = new audioCtx({sampleRate: 44100})
+      this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
 
       console.log("ctx sample rate: ", this.player.audioContext.sampleRate)
 
