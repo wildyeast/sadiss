@@ -98,7 +98,7 @@ class TrackController extends Controller
     }
 
     // return Response::json(['data' => $chunks]); // Commented for debuggin
-    return Response::json(['data' => $chunks]); // Used in debugging
+    return Response::json(['data' => $partials]); // Used in debugging
   }
 
   /**
