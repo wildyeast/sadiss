@@ -2,6 +2,7 @@
   <div class="app">
     <!-- <button @click="prepare">timingSrc update</button> -->
     <div style="display: flex; flex-direction: column; justify-content: center" class="md:w-1/2 w-11/12 border b-white p-4">
+      {{ outputLatency }}
       <p>
         Select a track ID from the dropdown below and press Play to prepare the selected track. All partials will
         be played on this device. The ID corresponds to the tracks's ID in the database (check the
@@ -80,9 +81,19 @@ export default {
     localTimingObj: null,
     initialTimingSrcIntervalId: null,
 
-    clients: []
+    clients: [],
+
+    userAgentOffset: 0,
+    outputLatency: 'not set'
   }),
   async mounted () {
+    const userAgent = window.navigator.userAgent
+    if (userAgent.includes('Mobile') && userAgent.includes('Chrome')) {
+      this.userAgentOffset = -0.3
+    }
+    console.log(userAgent)
+    console.log("userAgentOffset: ", this.userAgentOffset)
+
     this.timingProvider = new TimingProvider('wss://sadiss.net/zeitquelle');
     this.timingObj = new TimingObject(this.timingProvider)
 
@@ -109,9 +120,9 @@ export default {
     // }, 1000)
 
     // Fetch tracks
-    const res = await fetch(this.hostUrl + '/api/track')
-    const json = await res.json()
-    this.availableTracks = json
+    // const res = await fetch(this.hostUrl + '/api/track')
+    // const json = await res.json()
+    // this.availableTracks = json
   },
   methods: {
     async register () {
@@ -127,7 +138,10 @@ export default {
       // Initialize player
       this.player = new Player()
       // Start audio context.
-      this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
+      const audioCtx = window.AudioContext || window.webkitAudioContext
+      this.player.audioContext = new audioCtx({sampleRate: 44100})
+
+      console.log("ctx sample rate: ", this.player.audioContext.sampleRate)
 
       const response = await fetch(this.hostUrl + '/api/client/create', {
         method: 'POST',
@@ -167,6 +181,7 @@ export default {
           this.timingSrcPosition = this.globalTime()
           if (this.timingSrcPosition >= startTimeFromServer) {
             this.player.offset = this.timingSrcPosition - this.player.audioContext.currentTime // Do not change!
+            console.log("Offset: ", this.player.offset)
             const startNextStepAtLocalPos = 0
             if (!prepareStarted) { // Prevent multiple calls of prepare() if checkForStart() short interval time
               // this.prepare(startNextStepAtLocalPos)
@@ -194,12 +209,19 @@ export default {
     },
 
     async start () {
-      const startInSec = 4
+      const startInSec = 10
       const q = this.globalTime()
       const ctxTime = this.player.audioContext.currentTime
-      const now = q - this.player.offset // Do not change!
+      const now = q - this.player.offset + this.userAgentOffset // Do not change!
+      this.player.playOneShot(now)
+      console.log("ctx.baseLatency: ", this.player.audioContext.baseLatency)
+      console.log("ctx outputTimestamp ctx timestamp + offset:, ", this.player.audioContext.getOutputTimestamp().contextTime + this.player.offset)
       console.log("ZQ - ctxTime - offset (should be 0): ", q - ctxTime - this.player.offset)
+      // console.log("ctx output latency: ", this.player.audioContext.outputLatency)
+      this.outputLatency = this.player.audioContext.outputLatency
       this.player.setup(this.partialData, startInSec, now)
+      console.log("ctxTime + offset when setup finished: ", this.player.audioContext.currentTime + this.player.offset)
+      console.log(this.player.valuesSetForFirstPartial.map(val => val +  this.player.offset))
       this.isRegistered = false;
 
       // Reregister when done

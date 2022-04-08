@@ -34,6 +34,8 @@ export default class Player {
 
   offset = null
 
+  valuesSetForFirstPartial = []
+
   // mergeBreakpoints() {
   //   for (const partial of this.partialData) {
   //     for (const breakpoint of partial.breakpoints) {
@@ -53,15 +55,23 @@ export default class Player {
 
   setup (partialData, startInSec, now) {
     const timeToAddToStart = startInSec + now
+
     // Initialize oscillators, set all values for each oscillator
     for (const partial of partialData) {
       const oscObj = this.setupOscillator(partial, timeToAddToStart)
       for (const breakpoint of partial.breakpoints) {
         const time = Number(breakpoint.time) + timeToAddToStart
+        if (partial === partialData[0]) {
+          this.valuesSetForFirstPartial.push(time)
+          console.log("Start time of first oscillator: ", oscObj.startTime + this.offset)
+        }
         oscObj.osc.frequency.setValueAtTime(breakpoint.freq, time)
         oscObj.gain.gain.setValueAtTime(breakpoint.amp, time)
       }
       this.oscillators.push(oscObj)
+      if (partial === partialData[0]) {
+        console.log("audioCtx currentTime + offset after setting first set of partials: ", this.audioContext.currentTime + this.offset)
+      }
     }
   }
 
@@ -115,5 +125,19 @@ export default class Player {
     window.clearInterval(this.schedulingInterval)
     this.currentTime = 0
     this.lastScheduledBreakpointIndex = 0
+  }
+
+  playOneShot (now) {
+    const osc = this.audioContext.createOscillator()
+    const gain = this.audioContext.createGain()
+
+    osc.frequency.value = 400
+    gain.gain.value = 0.1
+
+    osc.connect(gain);
+    gain.connect(this.audioContext.destination)
+
+    osc.start(now)
+    osc.stop(now + 0.3)
   }
 }
