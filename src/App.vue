@@ -213,15 +213,18 @@ export default {
     async start () {
       const startInSec = 10
       const q = this.globalTime()
-      const ctxTime = this.player.audioContext.currentTime
-      const now = q - this.player.offset + this.userAgentOffset // Do not change!
+      // const ctxTime = this.player.audioContext.currentTime
+      const now = q - this.player.offset // Do not change!
+      // const now = q - this.player.offset + this.userAgentOffset // With sniffed offset estimation 
       this.player.playOneShot(now)
       console.log("ctx.baseLatency: ", this.player.audioContext.baseLatency)
       console.log("ctx outputTimestamp ctx timestamp + offset:, ", this.player.audioContext.getOutputTimestamp().contextTime + this.player.offset)
-      console.log("ZQ - ctxTime - offset (should be 0): ", q - ctxTime - this.player.offset)
+      // console.log("ZQ - ctxTime - offset (should be 0): ", q - ctxTime - this.player.offset)
       // console.log("ctx output latency: ", this.player.audioContext.outputLatency)
+      const calculatedOutputLatency = this.player.audioContext.currentTime - this.player.audioContext.getOutputTimestamp().contextTime
+      console.log("Calculated output latency: ", calculatedOutputLatency)
       this.outputLatency = this.player.audioContext.outputLatency
-      this.player.setup(this.partialData, startInSec, now)
+      this.player.setup(this.partialData, startInSec, now - calculatedOutputLatency)
       console.log("ctxTime + offset when setup finished: ", this.player.audioContext.currentTime + this.player.offset)
       console.log(this.player.valuesSetForFirstPartial.map(val => val +  this.player.offset))
       this.isRegistered = false;
