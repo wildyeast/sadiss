@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "scripts": {
     "dev": "vite --host --port 3001",
-    "build": "vite build",
+    "build": "vite build --base=/client/",
     "preview": "vite preview --port 5050"
   },
   "dependencies": {

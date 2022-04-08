@@ -46,6 +46,8 @@ import { TimingProvider } from 'timing-provider';
 import { TimingObject } from 'timing-object';
 import * as TIMINGSRC from 'timingsrc'
 
+// import clicks from './assets/clicks.wav'
+
 import Player from './Player'
 
 export default {
@@ -79,6 +81,7 @@ export default {
     time: 0,
     localTimingObj: null,
     initialTimingSrcIntervalId: null,
+    audio: null,
 
     clients: []
   }),
@@ -90,6 +93,8 @@ export default {
     window.setTimeout(() => {
       this.timingObj.update({ velocity: 1 })
     }, 1000)
+
+    this.audio = new Audio(clicks)
 
     // Test 1: Many clients on this device
     // window.setInterval(() => {
@@ -115,6 +120,11 @@ export default {
   },
   methods: {
     async register () {
+      this.audio.play()
+      await new Promise(r => setTimeout(r, 500));
+      this.audio.pause()
+      this.audio.currentTime = 0
+
       this.timingObj.onchange =  (event) => {
         console.log("Global TimeObject onchange event triggered.")
       };
@@ -163,14 +173,22 @@ export default {
         let prepareStarted = false
 
         window.clearInterval(this.initialTimingSrcIntervalId)
-        const intervalId = window.setInterval(() => {
+        const intervalId = window.setInterval(async () => {
           this.timingSrcPosition = this.globalTime()
           if (this.timingSrcPosition >= startTimeFromServer) {
             this.player.offset = this.timingSrcPosition - this.player.audioContext.currentTime // Do not change!
             const startNextStepAtLocalPos = 0
             if (!prepareStarted) { // Prevent multiple calls of prepare() if checkForStart() short interval time
               // this.prepare(startNextStepAtLocalPos)
-              this.start()
+              this.audio.play()
+              
+              const body = document.body
+              body.style.backgroundColor = 'white'
+              // await new Promise(r => setTimeout(r, 500));
+              // body.style.backgroundColor = 'black'
+
+              //Real code below
+              // this.start()
               prepareStarted = true
             }
             window.clearInterval(intervalId)
