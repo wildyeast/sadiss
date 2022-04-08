@@ -1,57 +1,84 @@
 <template>
   <div class="app">
     <!-- <button @click="prepare">timingSrc update</button> -->
-    <div style="display: flex; flex-direction: column; justify-content: center" class="md:w-1/2 w-11/12 border b-white p-4">
+    <div
+      style="display: flex; flex-direction: column; justify-content: center"
+      class="md:w-1/2 w-11/12 border b-white p-4"
+    >
       {{ outputLatency }}
       <p>
-        Select a track ID from the dropdown below and press Play to prepare the selected track. All partials will
-        be played on this device. The ID corresponds to the tracks's ID in the database (check the
-        <a :href="hostUrl + '/tracks'">Admin Interface</a> for a list of available tracks).
-        If the dropdown is empty, add a track to the database via the Admin Interface and afterwards refresh this page.
+        Select a track ID from the dropdown below and press Play to prepare the
+        selected track. All partials will be played on this device. The ID
+        corresponds to the tracks's ID in the database (check the
+        <a :href="hostUrl + '/tracks'">Admin Interface</a> for a list of
+        available tracks). If the dropdown is empty, add a track to the database
+        via the Admin Interface and afterwards refresh this page.
       </p>
       <div class="flex flex-row justify-between items-center py-4">
         <label>Select a track ID</label>
         <select v-model="trackId">
-          <option v-for="track of availableTracks" :key="track.id">{{ track.id }} - {{ track.title }}</option>
+          <option v-for="track of availableTracks" :key="track.id">
+            {{ track.id }} - {{ track.title }}
+          </option>
         </select>
-        <button v-if="player && !player.playing" @click="prepare" class="border b-white p-2">Play</button>
-        <button v-else @click="player.stop" class="border b-white p-2">Stop</button>
+        <button
+          v-if="player && !player.playing"
+          @click="prepare"
+          class="border b-white p-2"
+        >
+          Play
+        </button>
+        <button v-else @click="player.stop" class="border b-white p-2">
+          Stop
+        </button>
       </div>
     </div>
     <div class="md:w-1/2 w-11/12 border b-white p-4">
       <p>
-        Press Register below to register this device to receive partials when 'Start track' is pressed
-        in the track details page of a track in the Admin Interface. The registration ID of the device displayed after
-        pressing Register will be visible in the list of registered clients in the track details page in the Admin Interface.
-        This ID changes with every registration.
+        Press Register below to register this device to receive partials when
+        'Start track' is pressed in the track details page of a track in the
+        Admin Interface. The registration ID of the device displayed after
+        pressing Register will be visible in the list of registered clients in
+        the track details page in the Admin Interface. This ID changes with
+        every registration.
       </p>
-      <button @click="register" class="border b-white p-2 mt-4">Register</button>
+      <button @click="register" class="border b-white p-2 mt-4">
+        Register
+      </button>
       {{ timingSrcPosition }}
       <div class="mt-4">
-        <p v-if="countdownTime > 0" style="display: flex; justify-content: center; font-size: 50px;">{{ countdownTime }}</p>
-        <p v-else-if="player && !player.playing && isRegistered">Device registered with ID {{ deviceRegistrationId }}. Waiting for track start.</p>
+        <p
+          v-if="countdownTime > 0"
+          style="display: flex; justify-content: center; font-size: 50px"
+        >
+          {{ countdownTime }}
+        </p>
+        <p v-else-if="player && !player.playing && isRegistered">
+          Device registered with ID {{ deviceRegistrationId }}. Waiting for
+          track start.
+        </p>
         <p v-else-if="player && player.playing">Track currently playing.</p>
         <p v-else>Device not registered.</p>
-        <div v-html="print" style="margin-top: 1rem;" />
+        <div v-html="print" style="margin-top: 1rem" />
       </div>
     </div>
   </div>
 </template>
 <script>
 /* global getOscillator */
-import { modules, bps } from './constants'
-import dayjs from 'dayjs'
-import dayjsPluginUTC from 'dayjs/plugin/utc'
-dayjs.extend(dayjsPluginUTC)
-import { TimingProvider } from 'timing-provider';
-import { TimingObject } from 'timing-object';
-import * as TIMINGSRC from 'timingsrc'
+import { modules, bps } from "./constants";
+import dayjs from "dayjs";
+import dayjsPluginUTC from "dayjs/plugin/utc";
+dayjs.extend(dayjsPluginUTC);
+import { TimingProvider } from "timing-provider";
+import { TimingObject } from "timing-object";
+import * as TIMINGSRC from "timingsrc";
 
-import Player from './Player'
+import Player from "./Player";
 
 export default {
-  name: 'App',
-  components: { },
+  name: "App",
+  components: {},
   data: () => ({
     modules,
     player: null,
@@ -67,8 +94,8 @@ export default {
     intervalId: null,
     // hostUrl: 'http://sadiss.test.test',
     // hostUrl: 'http://8hz.at',
-    hostUrl: 'https://sadiss.net',
-    print: '',
+    hostUrl: "https://sadiss.net",
+    print: "",
     timingProvider: null,
     timingObj: null,
     currentVel: 0,
@@ -84,23 +111,27 @@ export default {
     clients: [],
 
     userAgentOffset: 0,
-    outputLatency: 'not set'
+    outputLatency: "not set",
   }),
-  async mounted () {
-    const userAgent = window.navigator.userAgent
-    if (userAgent.includes('Mobile') && userAgent.includes('Chrome')) {
-      this.userAgentOffset = -0.3
+  async mounted() {
+    const userAgent = window.navigator.userAgent;
+    if (userAgent.includes("Mobile") && userAgent.includes("Chrome")) {
+      this.userAgentOffset = -0.3;
     }
-    console.log(userAgent)
-    console.log("userAgentOffset: ", this.userAgentOffset)
+    console.log(userAgent);
+    console.log("userAgentOffset: ", this.userAgentOffset);
 
-    this.timingProvider = new TimingProvider('wss://sadiss.net/zeitquelle');
-    this.timingObj = new TimingObject(this.timingProvider)
+    // this.timingProvider = new TimingProvider('wss://sadiss.net/zeitquelle');
+    // this.timingProvider.onreadystatechange = () => {
+    //   if (this.timingProvider.readyState === "open") {
+    //     this.timingObj = new TimingObject(this.timingProvider);
+    //   }
+    // }
 
     // Uncomment for timing server stress testing
-    window.setTimeout(() => {
-      this.timingObj.update({ velocity: 1 })
-    }, 1000)
+    // window.setTimeout(() => {
+    //   this.timingObj.update({ velocity: 1 })
+    // }, 1000)
 
     // Test 1: Many clients on this device
     // window.setInterval(() => {
@@ -125,36 +156,40 @@ export default {
     // this.availableTracks = json
   },
   methods: {
-    async register () {
-      this.timingObj.onchange =  (event) => {
-        console.log("Global TimeObject onchange event triggered.")
+    async register() {
+      this.timingProvider = new TimingProvider("wss://sadiss.net/zeitquelle");
+      this.timingProvider.onreadystatechange = () => {
+        if (this.timingProvider.readyState === "open") {
+          this.timingObj = new TimingObject(this.timingProvider);
+          window.setTimeout(() => {}, 1000);
+          this.initialTimingSrcIntervalId = window.setInterval(() => {
+            const q = this.timingObj.query();
+            this.timingSrcPosition = q.position.toFixed(1);
+          }, 10);
+          this.timingObj.onchange = (e) => {
+            console.log("Global TimeObject onchange event triggered.");
+          };
+        }
       };
 
-      this.initialTimingSrcIntervalId = window.setInterval(() => {
-        const q = this.timingObj.query()
-        this.timingSrcPosition = q.position.toFixed(1)
-      }, 10)
-
       // Initialize player
-      this.player = new Player()
+      this.player = new Player();
 
       // const audioCtx = window.AudioContext || window.webkitAudioContext
-      // this.player.audioContext = new audioCtx({sampleRate: 44100})
       // Start audio context.
-      this.player.audioContext = new(window.AudioContext || window.webkitAudioContext)()
+      this.player.audioContext = new (window.AudioContext ||
+        window.webkitAudioContext)();
 
-      console.log("ctx sample rate: ", this.player.audioContext.sampleRate)
-
-      const response = await fetch(this.hostUrl + '/api/client/create', {
-        method: 'POST',
-        mode: 'cors',
+      const response = await fetch(this.hostUrl + "/api/client/create", {
+        method: "POST",
+        mode: "cors",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({performance_id: 1})
-      })
-      const data = await response.json()
-      this.deviceRegistrationId = data.id // Only used in UI.
+        body: JSON.stringify({ performance_id: 1 }),
+      });
+      const data = await response.json();
+      this.deviceRegistrationId = data.id; // Only used in UI.
 
       // Check for start immediately, afterwards check in intervals of 1 second.
       await this.checkForStart(data.token);
@@ -165,108 +200,125 @@ export default {
       this.isRegistered = true;
     },
 
-    async checkForStart (token) {
-      const response = await fetch(`${this.hostUrl}/api/client/${token}`)
-      const clientData = await response.json()
-      if (clientData.client['start_time']) {
-        console.log("Start time from server: ", clientData.client['start_time'])
-        window.clearInterval(this.intervalId)
-        const startTimeFromServer = Number(clientData.client['start_time'])
+    async checkForStart(token) {
+      const response = await fetch(`${this.hostUrl}/api/client/${token}`);
+      const clientData = await response.json();
+      if (clientData.client["start_time"]) {
+        console.log(
+          "Start time from server: ",
+          clientData.client["start_time"]
+        );
+        window.clearInterval(this.intervalId);
+        const startTimeFromServer = Number(clientData.client["start_time"]);
         // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
-        this.partialData = this.convertPartialsIfNeeded(clientData.client['partials'])
-        this.player.partialData = this.partialData
-        
-        let prepareStarted = false
+        this.partialData = this.convertPartialsIfNeeded(
+          clientData.client["partials"]
+        );
+        this.player.partialData = this.partialData;
 
-        window.clearInterval(this.initialTimingSrcIntervalId)
+        let prepareStarted = false;
+
+        window.clearInterval(this.initialTimingSrcIntervalId);
         const intervalId = window.setInterval(() => {
-          this.timingSrcPosition = this.globalTime()
+          this.timingSrcPosition = this.globalTime();
           if (this.timingSrcPosition >= startTimeFromServer) {
-            this.player.offset = this.timingSrcPosition - this.player.audioContext.currentTime // Do not change!
-            console.log("Offset: ", this.player.offset)
-            const startNextStepAtLocalPos = 0
-            if (!prepareStarted) { // Prevent multiple calls of prepare() if checkForStart() short interval time
-              // this.prepare(startNextStepAtLocalPos)
-              this.start()
-              prepareStarted = true
+            this.player.offset =
+              this.timingSrcPosition - this.player.audioContext.currentTime; // Do not change!
+            console.log("Offset: ", this.player.offset);
+            if (!prepareStarted) {
+              // Prevent multiple calls of prepare() if checkForStart() short interval time
+              this.start();
+              prepareStarted = true;
             }
-            window.clearInterval(intervalId)
+            window.clearInterval(intervalId);
           }
-        }, 1)
+        }, 1);
       }
-      return clientData
+      return clientData;
     },
 
-    prepare (startNextStepAtLocalPos) {
-      // const intervalId = window.setInterval(() => {
-        // this.timingSrcPosition = this.globalTime()
-        // if (this.timingSrcPosition >= startNextStepAtLocalPos) {
-          // if (!this.hasStarted) {
-            this.start()
-            // this.hasStarted = true
-          // }
-          // window.clearInterval(intervalId)
-        // }
-      // }, 1)
-    },
-
-    async start () {
-      const startInSec = 10
-      const q = this.globalTime()
+    async start() {
+      const startInSec = 10;
+      const q = this.globalTime();
       // const ctxTime = this.player.audioContext.currentTime
-      const now = q - this.player.offset // Do not change!
-      // const now = q - this.player.offset + this.userAgentOffset // With sniffed offset estimation 
-      this.player.playOneShot(now)
-      console.log("ctx.baseLatency: ", this.player.audioContext.baseLatency)
-      console.log("ctx outputTimestamp ctx timestamp + offset:, ", this.player.audioContext.getOutputTimestamp().contextTime + this.player.offset)
+      const now = q - this.player.offset; // Do not change!
+      // const now = q - this.player.offset + this.userAgentOffset // With sniffed offset estimation
+      this.player.playOneShot(now);
+      console.log("ctx.baseLatency: ", this.player.audioContext.baseLatency);
+      console.log(
+        "ctx outputTimestamp ctx timestamp + offset:, ",
+        this.player.audioContext.getOutputTimestamp().contextTime +
+          this.player.offset
+      );
       // console.log("ZQ - ctxTime - offset (should be 0): ", q - ctxTime - this.player.offset)
-      // console.log("ctx output latency: ", this.player.audioContext.outputLatency)
-      const calculatedOutputLatency = this.player.audioContext.currentTime - this.player.audioContext.getOutputTimestamp().contextTime
-      console.log("Calculated output latency: ", calculatedOutputLatency)
-      this.outputLatency = this.player.audioContext.outputLatency
-      this.player.setup(this.partialData, startInSec, now - calculatedOutputLatency)
-      console.log("ctxTime + offset when setup finished: ", this.player.audioContext.currentTime + this.player.offset)
-      console.log(this.player.valuesSetForFirstPartial.map(val => val +  this.player.offset))
+      console.log(
+        "ctx output latency: ",
+        this.player.audioContext.outputLatency
+      );
+
+      // const calculatedOutputLatency = this.player.audioContext.currentTime - this.player.audioContext.getOutputTimestamp().contextTime
+      console.log("Calculated output latency: ", calculatedOutputLatency);
+
+      this.outputLatency = this.player.audioContext.outputLatency;
+      this.player.setup(
+        this.partialData,
+        startInSec,
+        now - this.player.audioContext.getOutputTimestamp().outputLatency
+      ); // For Firefox only!
+      // this.player.setup(this.partialData, startInSec, now - calculatedOutputLatency)
+      console.log(
+        "ctxTime + offset when setup finished: ",
+        this.player.audioContext.currentTime + this.player.offset
+      );
+      console.log(
+        this.player.valuesSetForFirstPartial.map(
+          (val) => val + this.player.offset
+        )
+      );
       this.isRegistered = false;
+      this.timingObj = null
+      this.timingProvider = null
 
       // Reregister when done
       // await this.register()
     },
 
-    globalTime () {
-      return this.timingObj.query().position
+    globalTime() {
+      return this.timingObj.query().position;
     },
 
     convertPartialsIfNeeded(partialData) {
       let partials;
-      if (typeof partialData === 'string') {
-        let json = JSON.parse(partialData)
-        partials = json.reverse()
+      if (typeof partialData === "string") {
+        let json = JSON.parse(partialData);
+        partials = json.reverse();
       } else {
-        partials = partialData
+        partials = partialData;
       }
-      return partials
+      return partials;
     },
-    createClient () {
+    createClient() {
       class Client {
-        pos = 0
-        constructor () {
-          const timingProvider = new TimingProvider('wss://sadiss.net/zeitquelle');
-          const timingObj = new TimingObject(timingProvider)
-          window.setTimeout(() => {
-          }, 5000)
+        pos = 0;
+        constructor() {
+          const timingProvider = new TimingProvider(
+            "wss://sadiss.net/zeitquelle"
+          );
+          const timingObj = new TimingObject(timingProvider);
+          window.setTimeout(() => {}, 5000);
           window.setInterval(() => {
-            this.pos = timingObj.query().position
-          }, 2)
+            this.pos = timingObj.query().position;
+          }, 2);
         }
       }
-      return new Client()
+      return new Client();
     },
-  }
-}
+  },
+};
 </script>
 <style>
-html, body {
+html,
+body {
   background-color: black;
 }
 
