@@ -154,31 +154,26 @@ export default {
     // const res = await fetch(this.hostUrl + '/api/track')
     // const json = await res.json()
     // this.availableTracks = json
+    this.timingProvider = new TimingProvider("wss://sadiss.net/zeitquelle");
   },
   methods: {
     async register() {
-      this.timingProvider = new TimingProvider("wss://sadiss.net/zeitquelle");
-      this.timingProvider.onreadystatechange = () => {
-        if (this.timingProvider.readyState === "open") {
-          this.timingObj = new TimingObject(this.timingProvider);
-          window.setTimeout(() => {}, 1000);
-          this.initialTimingSrcIntervalId = window.setInterval(() => {
-            const q = this.timingObj.query();
-            this.timingSrcPosition = q.position.toFixed(1);
-          }, 10);
-          this.timingObj.onchange = (e) => {
-            console.log("Global TimeObject onchange event triggered.");
-          };
-        }
-      };
+      this.timingObj = new TimingObject(this.timingProvider);
+      this.initialTimingSrcIntervalId = window.setInterval(() => {
+        const q = this.timingObj.query();
+        this.timingSrcPosition = q.position.toFixed(1);
+      }, 10);
+      // this.timingObj.onchange = (e) => {
+      //   console.log("Global TimeObject onchange event triggered.");
+      // };
 
       // Initialize player
       this.player = new Player();
 
-      // const audioCtx = window.AudioContext || window.webkitAudioContext
+      const audioCtx = window.AudioContext || window.webkitAudioContext
       // Start audio context.
-      this.player.audioContext = new (window.AudioContext ||
-        window.webkitAudioContext)();
+      this.player.audioContext = new audioCtx({ latencyHint: 0, sampleRate: 24500 });
+      console.log(this.player.audioContext)
 
       const response = await fetch(this.hostUrl + "/api/client/create", {
         method: "POST",
@@ -238,7 +233,7 @@ export default {
     },
 
     async start() {
-      const startInSec = 10;
+      const startInSec = 5;
       const q = this.globalTime();
       // const ctxTime = this.player.audioContext.currentTime
       const now = q - this.player.offset; // Do not change!
@@ -251,21 +246,21 @@ export default {
           this.player.offset
       );
       // console.log("ZQ - ctxTime - offset (should be 0): ", q - ctxTime - this.player.offset)
-      console.log(
-        "ctx output latency: ",
-        this.player.audioContext.outputLatency
-      );
+      // console.log(
+      //   "ctx output latency: ",
+      //   this.player.audioContext.outputLatency
+      // );
 
-      // const calculatedOutputLatency = this.player.audioContext.currentTime - this.player.audioContext.getOutputTimestamp().contextTime
+      const calculatedOutputLatency =
+        this.player.audioContext.currentTime -
+        this.player.audioContext.getOutputTimestamp().contextTime;
       console.log("Calculated output latency: ", calculatedOutputLatency);
 
-      this.outputLatency = this.player.audioContext.outputLatency;
       this.player.setup(
         this.partialData,
         startInSec,
-        now - this.player.audioContext.getOutputTimestamp().outputLatency
-      ); // For Firefox only!
-      // this.player.setup(this.partialData, startInSec, now - calculatedOutputLatency)
+        now
+      );
       console.log(
         "ctxTime + offset when setup finished: ",
         this.player.audioContext.currentTime + this.player.offset
@@ -276,8 +271,7 @@ export default {
         )
       );
       this.isRegistered = false;
-      this.timingObj = null
-      this.timingProvider = null
+      this.timingObj = null;
 
       // Reregister when done
       // await this.register()
