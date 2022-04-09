@@ -5,7 +5,6 @@
       style="display: flex; flex-direction: column; justify-content: center"
       class="md:w-1/2 w-11/12 border b-white p-4"
     >
-      {{ outputLatency }}
       <p>
         Select a track ID from the dropdown below and press Play to prepare the
         selected track. All partials will be played on this device. The ID
@@ -111,12 +110,14 @@ export default {
     clients: [],
 
     userAgentOffset: 0,
-    outputLatency: "not set",
+    outputLatency: 0,
+    useCalculatedOutputLatency: false
   }),
   async mounted() {
     const userAgent = window.navigator.userAgent;
     if (userAgent.includes("Mobile") && userAgent.includes("Chrome")) {
-      this.userAgentOffset = -0.3;
+      // this.userAgentOffset = -0.3;
+      this.useCalculatedOutputLatency = true
     }
     console.log(userAgent);
     console.log("userAgentOffset: ", this.userAgentOffset);
@@ -173,7 +174,8 @@ export default {
       const audioCtx = window.AudioContext || window.webkitAudioContext
       // Start audio context.
       // this.player.audioContext = new audioCtx({ latencyHint: 0, sampleRate: 48000 });
-      this.player.audioContext = new audioCtx({ latencyHint: 0, sampleRate: 31000 });
+      this.player.audioContext = new audioCtx({ latencyHint: 0, sampleRate: 22050 });
+      console.log("AudioCtx: ", this.player.audioContext)
 
       const response = await fetch(this.hostUrl + "/api/client/create", {
         method: "POST",
@@ -256,10 +258,14 @@ export default {
         this.player.audioContext.getOutputTimestamp().contextTime;
       console.log("Calculated output latency: ", calculatedOutputLatency);
 
+      const latencyToSubtract = this.useCalculatedOutputLatency ? calculatedOutputLatency : 0
+
       this.player.setup(
         this.partialData,
         startInSec,
-        now
+        // now - calculatedOutputLatency - this.player.audioContext.baseLatency // O
+        // now // no O
+        now - latencyToSubtract // O only on Chrome
       );
       console.log(
         "ctxTime + offset when setup finished: ",
