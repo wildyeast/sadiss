@@ -75,9 +75,6 @@ import * as TIMINGSRC from "timingsrc";
 
 import Player from "./Player";
 
-import Echo from 'laravel-echo'
-import Pusher from 'pusher-js'
-
 export default {
   name: "App",
   components: {},

@@ -1,8 +1,6 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import './index.css'
-import VueEcho from 'vue-echo-laravel'
-import Pusher from "pusher-js"
 
 const app = createApp(App)
 
