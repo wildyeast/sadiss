@@ -111,13 +111,13 @@ export default {
 
     userAgentOffset: 0,
     outputLatency: 0,
-    useCalculatedOutputLatency: false
+    useCalculatedOutputLatency: false,
   }),
   async mounted() {
     const userAgent = window.navigator.userAgent;
     if (userAgent.includes("Mobile") && userAgent.includes("Chrome")) {
       // this.userAgentOffset = -0.3;
-      this.useCalculatedOutputLatency = true
+      this.useCalculatedOutputLatency = true;
     }
     console.log(userAgent);
     console.log("userAgentOffset: ", this.userAgentOffset);
@@ -171,11 +171,14 @@ export default {
       // Initialize player
       this.player = new Player();
 
-      const audioCtx = window.AudioContext || window.webkitAudioContext
+      const audioCtx = window.AudioContext || window.webkitAudioContext;
       // Start audio context.
       // this.player.audioContext = new audioCtx({ latencyHint: 0, sampleRate: 48000 });
-      this.player.audioContext = new audioCtx({ latencyHint: 0, sampleRate: 22050 });
-      console.log("AudioCtx: ", this.player.audioContext)
+      this.player.audioContext = new audioCtx({
+        latencyHint: 0,
+        // sampleRate: 31000,
+      });
+      console.log("AudioCtx: ", this.player.audioContext);
 
       const response = await fetch(this.hostUrl + "/api/client/create", {
         method: "POST",
@@ -258,7 +261,11 @@ export default {
         this.player.audioContext.getOutputTimestamp().contextTime;
       console.log("Calculated output latency: ", calculatedOutputLatency);
 
-      const latencyToSubtract = this.useCalculatedOutputLatency ? calculatedOutputLatency : 0
+      const latencyToSubtract = this.useCalculatedOutputLatency
+        ? calculatedOutputLatency - this.player.audioContext.baseLatency
+        : 0;
+
+      console.log("Latency to subract: ", latencyToSubtract)
 
       this.player.setup(
         this.partialData,
