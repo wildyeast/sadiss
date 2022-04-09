@@ -266,7 +266,7 @@ export default {
         ? calculatedOutputLatency - this.player.audioContext.baseLatency
         : 0;
 
-      console.log("Latency to subract: ", latencyToSubtract)
+      console.log("Latency to subract: ", latencyToSubtract);
 
       this.player.setup(
         this.partialData,
