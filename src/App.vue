@@ -1,212 +1,335 @@
 <template>
   <div class="app">
-    <div style="display: flex; flex-direction: column; justify-content: center" class="md:w-1/2 w-11/12 border b-white p-4">
+    <!-- <button @click="prepare">timingSrc update</button> -->
+    <div
+      style="display: flex; flex-direction: column; justify-content: center"
+      class="md:w-1/2 w-11/12 border b-white p-4"
+    >
       <p>
-        Select a track ID from the dropdown below and press Play to play the selected track. All partials will
-        be played on this device. The ID corresponds to the tracks's ID in the database (check the
-        <a :href="hostUrl + '/tracks'">Admin Interface</a> for a list of available tracks).
-        If the dropdown is empty, add a track to the database via the Admin Interface and afterwards refresh this page.
+        Select a track ID from the dropdown below and press Play to prepare the
+        selected track. All partials will be played on this device. The ID
+        corresponds to the tracks's ID in the database (check the
+        <a :href="hostUrl + '/tracks'">Admin Interface</a> for a list of
+        available tracks). If the dropdown is empty, add a track to the database
+        via the Admin Interface and afterwards refresh this page.
       </p>
       <div class="flex flex-row justify-between items-center py-4">
         <label>Select a track ID</label>
         <select v-model="trackId">
-          <option v-for="track of availableTracks" :key="track.id">{{ track.id }} - {{ track.title }}</option>
+          <option v-for="track of availableTracks" :key="track.id">
+            {{ track.id }} - {{ track.title }}
+          </option>
         </select>
-        <button v-if="player && !player.playing" @click="play" class="border b-white p-2">Play</button>
-        <button v-else @click="player.stop" class="border b-white p-2">Stop</button>
+        <button
+          v-if="player && !player.playing"
+          @click="prepare"
+          class="border b-white p-2"
+        >
+          Play
+        </button>
+        <button v-else @click="player.stop" class="border b-white p-2">
+          Stop
+        </button>
       </div>
     </div>
     <div class="md:w-1/2 w-11/12 border b-white p-4">
       <p>
-        Press Register below to register this device to receive partials when 'Start track' is pressed
-        in the track details page of a track in the Admin Interface. The registration ID of the device displayed after
-        pressing Register will be visible in the list of registered clients in the track details page in the Admin Interface.
-        This ID changes with every registration.
+        Press Register below to register this device to receive partials when
+        'Start track' is pressed in the track details page of a track in the
+        Admin Interface. The registration ID of the device displayed after
+        pressing Register will be visible in the list of registered clients in
+        the track details page in the Admin Interface. This ID changes with
+        every registration.
       </p>
-      <button @click="register" class="border b-white p-2 mt-4">Register</button>
+      <button @click="register" class="border b-white p-2 mt-4">
+        Register
+      </button>
+      {{ timingSrcPosition }}
       <div class="mt-4">
-        <p v-if="countdownTime > 0" style="display: flex; justify-content: center; font-size: 50px;">{{ countdownTime }}</p>
-        <p v-else-if="player && !player.playing && isRegistered">Device registered with ID {{ deviceRegistrationId }}. Waiting for track start.</p>
+        <p
+          v-if="countdownTime > 0"
+          style="display: flex; justify-content: center; font-size: 50px"
+        >
+          {{ countdownTime }}
+        </p>
+        <p v-else-if="player && !player.playing && isRegistered">
+          Device registered with ID {{ deviceRegistrationId }}. Waiting for
+          track start.
+        </p>
         <p v-else-if="player && player.playing">Track currently playing.</p>
         <p v-else>Device not registered.</p>
+        <div v-html="print" style="margin-top: 1rem" />
       </div>
     </div>
   </div>
 </template>
 <script>
 /* global getOscillator */
-import { modules, bps } from './constants'
-import dayjs from 'dayjs'
-import dayjsPluginUTC from 'dayjs/plugin/utc'
-dayjs.extend(dayjsPluginUTC)
+import { modules, bps } from "./constants";
+import dayjs from "dayjs";
+import dayjsPluginUTC from "dayjs/plugin/utc";
+dayjs.extend(dayjsPluginUTC);
+import { TimingProvider } from "timing-provider";
+import { TimingObject } from "timing-object";
+import * as TIMINGSRC from "timingsrc";
 
-import Player from './Player'
+import Player from "./Player";
 
 import Echo from 'laravel-echo'
 import Pusher from 'pusher-js'
 
 export default {
-  name: 'App',
-  components: { },
+  name: "App",
+  components: {},
   data: () => ({
     modules,
     player: null,
-    token: null,
     partials: null,
-    startTime: null,
+    startPrepAtPosition: null,
     serverTimeOffset: null,
+    callDuration: null,
     countdownTime: -1,
     isRegistered: false,
     trackId: 1,
     availableTracks: [],
     deviceRegistrationId: null,
-    intervalId: null, // This variable is used for the id of two different intervals. They are never active at the same time, still probably not ideal though.
-    hostUrl: 'http://sadiss.test.test',
+    intervalId: null,
+    // hostUrl: 'http://sadiss.test.test',
     // hostUrl: 'http://8hz.at',
-    // hostUrl: 'https://sadiss.net'
+    hostUrl: "https://sadiss.net",
+    print: "",
+    timingProvider: null,
+    timingObj: null,
+    currentVel: 0,
+    timingSrcPosition: null,
+    hasStarted: false,
+    timingSetupDone: false,
+    beep: null,
+    offset: null,
+    time: 0,
+    localTimingObj: null,
+    initialTimingSrcIntervalId: null,
+    audio: null,
+
+    clients: [],
+
+    userAgentOffset: 0,
+    outputLatency: 0,
+    useCalculatedOutputLatency: false,
   }),
-  async mounted () {
+  async mounted() {
+    const userAgent = window.navigator.userAgent;
+    if (userAgent.includes("Mobile") && userAgent.includes("Chrome")) {
+      // this.userAgentOffset = -0.3;
+      this.useCalculatedOutputLatency = true;
+    }
+    console.log(userAgent);
+    console.log("userAgentOffset: ", this.userAgentOffset);
 
-    window.Echo = new Echo({
-      broadcaster: 'pusher',
-      key: 'laravel_rdb',
-      cluster: 'mt1',
-      wsHost: window.location.hostname,
-      wsPort: 6001,
-      forceTLS: false,
-      disableStats: true
-    });
+    // this.timingProvider = new TimingProvider('wss://sadiss.net/zeitquelle');
+    // this.timingProvider.onreadystatechange = () => {
+    //   if (this.timingProvider.readyState === "open") {
+    //     this.timingObj = new TimingObject(this.timingProvider);
+    //   }
+    // }
 
-    // window.Echo.channel('EventTriggered')
-    //   .listen('.TrackStarted', (e) => {
-    //       console.log(e)
-    //   })
+    // Uncomment for timing server stress testing
+    // window.setTimeout(() => {
+    //   this.timingObj.update({ velocity: 1 })
+    // }, 1000)
 
-    const res = await fetch (this.hostUrl + '/api/track')
-    const json = await res.json()
-    this.availableTracks = json
+    // Test 1: Many clients on this device
+    // window.setInterval(() => {
+    //   this.clients.push(this.createClient())
+    //   console.log(this.clients[0].pos, this.clients.length)
+    // }, 500)
 
-    // Initialize player
-    this.player = new Player()
+    // Test 2: X clients on this device (Sehr stressig fuers phone)
+    // for (let i = 0; i < 5; i++) {
+    //   this.clients.push(this.createClient())
+    // }
+    // window.setInterval(() => {
+    //   console.log(" ")
+    //   for (const client of this.clients) {
+    //     console.log(client.pos)
+    //   }
+    // }, 1000)
 
+    // Fetch tracks
+    // const res = await fetch(this.hostUrl + '/api/track')
+    // const json = await res.json()
+    // this.availableTracks = json
+    this.timingProvider = new TimingProvider("wss://sadiss.net/zeitquelle");
   },
   methods: {
-    async register () {
-      const response = await fetch(this.hostUrl + '/api/client/create', {
-        method: 'POST',
-        mode: 'cors',
+    async register() {
+      this.timingObj = new TimingObject(this.timingProvider);
+      this.initialTimingSrcIntervalId = window.setInterval(() => {
+        const q = this.timingObj.query();
+        this.timingSrcPosition = q.position.toFixed(1);
+      }, 10);
+      // this.timingObj.onchange = (e) => {
+      //   console.log("Global TimeObject onchange event triggered.");
+      // };
+
+      // Initialize player
+      this.player = new Player();
+
+      const audioCtx = window.AudioContext || window.webkitAudioContext;
+      // Start audio context.
+      // this.player.audioContext = new audioCtx({ latencyHint: 0, sampleRate: 48000 });
+      this.player.audioContext = new audioCtx({
+        latencyHint: 0,
+        // sampleRate: 31000,
+      });
+      console.log("AudioCtx: ", this.player.audioContext);
+
+      const response = await fetch(this.hostUrl + "/api/client/create", {
+        method: "POST",
+        mode: "cors",
         headers: {
-          'Content-Type': 'application/json'
+          "Content-Type": "application/json",
         },
-        body: JSON.stringify({performance_id: 1})
-      })
-      // console.log(response)
-      const data = await response.json()
-      this.token = data.token
-      this.deviceRegistrationId = data.id
+        body: JSON.stringify({ performance_id: 1 }),
+      });
+      const data = await response.json();
+      this.deviceRegistrationId = data.id; // Only used in UI.
 
-      // Check for start immediately, afterwards check in intervals.
-      await this.checkForStart();
-
+      // Check for start immediately, afterwards check in intervals of 1 second.
+      await this.checkForStart(data.token);
       this.intervalId = window.setInterval(async () => {
-        await this.checkForStart();
-      }, 1500);
+        // console.log(this.timingObj.query().position)
+        await this.checkForStart(data.token);
+      }, 1000);
       this.isRegistered = true;
     },
-    async checkForStart () {
-      const response = await fetch(`${this.hostUrl}/api/client/${this.token}`)
-      const clientData = await response.json()
-      if (clientData.client['start_time']) {
 
-        // window.clearInterval(this.intervalId)
-        // this.startTime = clientData.client['start_time']
-        // // console.log(this.partials)
-        // for (const partial of JSON.parse(this.partials)) {
-          //   // console.log("Partial: " + partial.index)
-        // }
-        // // const oneWayLatency = (dayjs.utc().valueOf() - localNow) / 2
-        // this.serverTimeOffset = dayjs.utc().valueOf() - clientData.time
-        // console.log(this.serverTimeOffset, clientData.time - dayjs.utc().valueOf() + this.serverTimeOffset)
+    async checkForStart(token) {
+      const response = await fetch(`${this.hostUrl}/api/client/${token}`);
+      const clientData = await response.json();
+      if (clientData.client["start_time"]) {
+        console.log(
+          "Start time from server: ",
+          clientData.client["start_time"]
+        );
+        window.clearInterval(this.intervalId);
+        const startTimeFromServer = Number(clientData.client["start_time"]);
+        // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
+        this.partialData = this.convertPartialsIfNeeded(
+          clientData.client["partials"]
+        );
+        this.player.partialData = this.partialData;
 
-        this.partials = clientData.client['partials']
-        this.waitForStart()
-      } else {
-        console.log(clientData.client, clientData.time)
+        let prepareStarted = false;
+
+        window.clearInterval(this.initialTimingSrcIntervalId);
+        const intervalId = window.setInterval(() => {
+          this.timingSrcPosition = this.globalTime();
+          if (this.timingSrcPosition >= startTimeFromServer) {
+            this.player.offset =
+              this.timingSrcPosition - this.player.audioContext.currentTime; // Do not change!
+            console.log("Offset: ", this.player.offset);
+            if (!prepareStarted) {
+              // Prevent multiple calls of prepare() if checkForStart() short interval time
+              this.start();
+              prepareStarted = true;
+            }
+            window.clearInterval(intervalId);
+          }
+        }, 1);
       }
-      return clientData
-    },
-    async waitForStart () {
-      this.player = new Player()
-      this.player.mergeBreakpoints(this.partials)
-
-      window.Echo.channel('EventTriggered')
-      .listen('.TrackStarted', (e) => {
-          console.log(e)
-          this.player.setup()
-          this.player.play()
-      })
-
-      // const times = []
-
-      // for (let i = 0; i < 10; i++) {
-      //   const t1 = dayjs.utc().valueOf()
-      //   let sTime = await this.getTimeFromServer()
-      //   const t2 = dayjs.utc().valueOf()
-      //   const halfLatency = (t2 - t1) / 2
-      //   times.push(dayjs.utc().valueOf() - sTime + halfLatency)
-      // }
-
-      // const sum = times.reduce((a, b) => a + b, 0);
-      // const avgServertimeDifference = (sum / times.length) || 0;
-
-      // console.log("Average server time to local time difference: ", avgServertimeDifference)
-
-      // // const serverTime = await this.getTimeFromServer()
-      // // console.log("Servertime: ", serverTime)
-      // console.log("Local time: ", dayjs.utc().valueOf())
-      // // const localAheadBy = dayjs.utc().valueOf() - serverTime
-      // // console.log("Local ahead of server by: ", localAheadBy)
-      // this.intervalId = window.setInterval(async () => {
-      //   const startTime = dayjs.utc(this.startTime).valueOf()
-      //   // console.log(startTime, nowServer, Date.now())
-      //   const localNow = dayjs.utc().valueOf()
-
-      //   if (startTime <= localNow - avgServertimeDifference) {
-      //     window.clearInterval(this.intervalId)
-      //     // console.log('Starting. Server time should be: ', localNow - this.serverTimeOffset, "Compare this to the output of other registered devices to judge how accurately synced the starting time is.")
-      //     // this.player.partialData = this.partials
-      //     this.player.setup()
-      //     this.player.play()
-      //     this.isRegistered = false;
-      //     // Reregister when done
-      //     await this.register()
-      //   } else {
-      //     this.countdownTime = Math.floor((startTime - localNow + this.serverTimeOffset) / 1000)
-      //     // console.log(this.countdownTime)
-      //   }
-      // }, 5);
+      return clientData;
     },
 
-    async play () {
-      // Fetch breakpoints from server
-      const res = await fetch (this.hostUrl + '/api/track/' + this.trackId)
-      const json = await res.json()
-      const partialData = JSON.parse(json.partials)
-      this.player.mergeBreakpoints(partialData)
-      this.player.setup()
-      this.player.play()
+    async start() {
+      const startInSec = 5;
+      const q = this.globalTime();
+      // const ctxTime = this.player.audioContext.currentTime
+      const now = q - this.player.offset; // Do not change!
+      // const now = q - this.player.offset + this.userAgentOffset // With sniffed offset estimation
+      this.player.playOneShot(now);
+      console.log("ctx.baseLatency: ", this.player.audioContext.baseLatency);
+      console.log(
+        "ctx outputTimestamp ctx timestamp + offset:, ",
+        this.player.audioContext.getOutputTimestamp().contextTime +
+          this.player.offset
+      );
+      // console.log("ZQ - ctxTime - offset (should be 0): ", q - ctxTime - this.player.offset)
+      // console.log(
+      //   "ctx output latency: ",
+      //   this.player.audioContext.outputLatency
+      // );
+
+      const calculatedOutputLatency =
+        this.player.audioContext.currentTime -
+        this.player.audioContext.getOutputTimestamp().contextTime;
+      console.log("Calculated output latency: ", calculatedOutputLatency);
+
+      const latencyToSubtract = this.useCalculatedOutputLatency
+        ? calculatedOutputLatency - this.player.audioContext.baseLatency
+        : 0;
+
+      console.log("Latency to subract: ", latencyToSubtract)
+
+      this.player.setup(
+        this.partialData,
+        startInSec,
+        // now - calculatedOutputLatency - this.player.audioContext.baseLatency // O
+        // now // no O
+        now - latencyToSubtract // O only on Chrome
+      );
+      console.log(
+        "ctxTime + offset when setup finished: ",
+        this.player.audioContext.currentTime + this.player.offset
+      );
+      console.log(
+        this.player.valuesSetForFirstPartial.map(
+          (val) => val + this.player.offset
+        )
+      );
+      this.isRegistered = false;
+      this.timingObj = null;
+
+      // Reregister when done
+      // await this.register()
     },
 
-    async getTimeFromServer () {
-      const response = await fetch(`${this.hostUrl}/api/time`)
-      const data = await response.json()
-      return data.time
+    globalTime() {
+      return this.timingObj.query().position;
     },
-  }
-}
+
+    convertPartialsIfNeeded(partialData) {
+      let partials;
+      if (typeof partialData === "string") {
+        let json = JSON.parse(partialData);
+        partials = json.reverse();
+      } else {
+        partials = partialData;
+      }
+      return partials;
+    },
+    createClient() {
+      class Client {
+        pos = 0;
+        constructor() {
+          const timingProvider = new TimingProvider(
+            "wss://sadiss.net/zeitquelle"
+          );
+          const timingObj = new TimingObject(timingProvider);
+          window.setTimeout(() => {}, 5000);
+          window.setInterval(() => {
+            this.pos = timingObj.query().position;
+          }, 2);
+        }
+      }
+      return new Client();
+    },
+  },
+};
 </script>
 <style>
-html, body {
+html,
+body {
   background-color: black;
 }
 
