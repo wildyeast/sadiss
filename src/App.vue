@@ -106,6 +106,7 @@ export default {
     time: 0,
     localTimingObj: null,
     initialTimingSrcIntervalId: null,
+    audio: null,
 
     clients: [],
 
