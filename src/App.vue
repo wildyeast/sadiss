@@ -203,6 +203,12 @@ export default {
 
     async checkForStart(token) {
       const response = await fetch(`${this.hostUrl}/api/client/${token}`);
+      if (response.status === 404) {
+        console.log("Client removed via Admin Interface");
+        this.isRegistered = false;
+        window.clearInterval(this.intervalId);
+        return;
+      }
       const clientData = await response.json();
       if (clientData.client["start_time"]) {
         console.log(
