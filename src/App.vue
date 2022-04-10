@@ -160,6 +160,8 @@ export default {
   },
   methods: {
     async register() {
+      if (this.isRegistered) return;
+
       this.timingObj = new TimingObject(this.timingProvider);
       this.initialTimingSrcIntervalId = window.setInterval(() => {
         const q = this.timingObj.query();
