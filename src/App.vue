@@ -104,7 +104,6 @@ export default {
     beep: null,
     offset: null,
     time: 0,
-    localTimingObj: null,
     initialTimingSrcIntervalId: null,
     audio: null,
 
@@ -122,6 +121,8 @@ export default {
     }
     console.log(userAgent);
     console.log("userAgentOffset: ", this.userAgentOffset);
+
+    this.player = new Player();
 
     // this.timingProvider = new TimingProvider('wss://sadiss.net/zeitquelle');
     // this.timingProvider.onreadystatechange = () => {
@@ -156,13 +157,18 @@ export default {
     // const res = await fetch(this.hostUrl + '/api/track')
     // const json = await res.json()
     // this.availableTracks = json
+
     this.timingProvider = new TimingProvider("wss://sadiss.net/zeitquelle");
+    this.timingProvider.onreadystatechange = () => {
+      if (this.timingProvider.readyState === "open") {
+        this.timingObj = new TimingObject(this.timingProvider);
+      }
+    };
   },
   methods: {
     async register() {
       if (this.isRegistered) return;
 
-      this.timingObj = new TimingObject(this.timingProvider);
       this.initialTimingSrcIntervalId = window.setInterval(() => {
         const q = this.timingObj.query();
         this.timingSrcPosition = q.position.toFixed(1);
@@ -173,6 +179,8 @@ export default {
 
       // Initialize player
       this.player = new Player();
+      // Pass over register function from this file to player
+      this.player.registerFunction = this.register;
 
       const audioCtx = window.AudioContext || window.webkitAudioContext;
       // Start audio context.
@@ -293,7 +301,6 @@ export default {
         )
       );
       this.isRegistered = false;
-      this.timingObj = null;
 
       // Reregister when done
       // await this.register()

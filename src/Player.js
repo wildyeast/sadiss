@@ -36,6 +36,8 @@ export default class Player {
 
   valuesSetForFirstPartial = []
 
+  registerFunction = null
+
   // mergeBreakpoints() {
   //   for (const partial of this.partialData) {
   //     for (const breakpoint of partial.breakpoints) {
@@ -53,7 +55,7 @@ export default class Player {
   //   this.mergedBreakpoints.sort((a, b) => a.time - b.time)
   // }
 
-  setup (partialData, startInSec, now) {
+  setup(partialData, startInSec, now) {
     const timeToAddToStart = startInSec + now
 
     // Initialize oscillators, set all values for each oscillator
@@ -101,14 +103,14 @@ export default class Player {
 
   startFrom = 0
 
-  stop () {
+  stop() {
     for (const oscObj of this.oscillators) {
       oscObj.osc.stop()
     }
     this.reset()
   }
 
-  ended (src, idx) {
+  ended(src, idx) {
     this.endedSrc.push(src)
     // const realIdx = this.oscillators.indexOf(this.oscillators.find(el => el.index === idx))
     // this.oscillators.splice(realIdx, 1)
@@ -117,7 +119,7 @@ export default class Player {
     }
   }
 
-  reset () {
+  reset() {
     this.oscillators = []
     this.endedSrc = []
     this.playing = false
@@ -125,9 +127,11 @@ export default class Player {
     window.clearInterval(this.schedulingInterval)
     this.currentTime = 0
     this.lastScheduledBreakpointIndex = 0
+
+    this.registerFunction()
   }
 
-  playOneShot (now) {
+  playOneShot(now) {
     const osc = this.audioContext.createOscillator()
     const gain = this.audioContext.createGain()
 
