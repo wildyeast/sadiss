@@ -69,7 +69,7 @@ export default {
   },
   setup(props) {
     const registeredClients = reactive([]);
-    const autoGetRegisteredClientsInterval = ref(true);
+    const autoGetRegisteredClientsInterval = ref(null);
     let timingProvider = null;
     let timingObj = null;
     let synchronizing = ref(false);
@@ -78,7 +78,7 @@ export default {
     let intervalId = null;
 
     onMounted(() => {
-      getRegisteredClients();
+      // getRegisteredClients();
       autoGetRegisteredClients();
       timingProvider = new TimingProvider("wss://sadiss.net/zeitquelle");
 
@@ -104,19 +104,17 @@ export default {
           console.log("Set TimingObject velocity to 1.");
         }
 
-        synchronizing.value = true
-
-        ;(function query () {
+        synchronizing.value = true;
+        (function query() {
           const q = queryTimingObj();
           if (q.position.toFixed(1) - timingSrcPosition.value != 0) {
             // TODO: Weird calculation, doesn't work with !== for some reason, no time to look into it now
             timingSrcPosition.value = q.position.toFixed(1);
           }
           if (synchronizing.value) {
-            window.setTimeout(query, 10)
+            window.setTimeout(query, 10);
           }
-        })()
-
+        })();
       } else {
         synchronizing.value = false;
         timingProvider.update({ velocity: 0, position: 0 });
@@ -149,6 +147,7 @@ export default {
     }
 
     async function autoGetRegisteredClients() {
+      console.log(autoGetRegisteredClientsInterval.value);
       if (!autoGetRegisteredClientsInterval.value) {
         await getRegisteredClients();
 

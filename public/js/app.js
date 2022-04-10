@@ -9707,7 +9707,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   setup: function setup(props) {
     var registeredClients = (0,vue__WEBPACK_IMPORTED_MODULE_2__.reactive)([]);
-    var autoGetRegisteredClientsInterval = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(true);
+    var autoGetRegisteredClientsInterval = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(null);
     var timingProvider = null;
     var timingObj = null;
     var synchronizing = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
@@ -9715,7 +9715,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var timingSrcConnected = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
     var intervalId = null;
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
-      getRegisteredClients();
+      // getRegisteredClients();
       autoGetRegisteredClients();
       timingProvider = new timing_provider__WEBPACK_IMPORTED_MODULE_4__.TimingProvider("wss://sadiss.net/zeitquelle"); // const t1 = performance.now()
 
@@ -9875,15 +9875,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context5.prev = _context5.next) {
               case 0:
+                console.log(autoGetRegisteredClientsInterval.value);
+
                 if (autoGetRegisteredClientsInterval.value) {
-                  _context5.next = 6;
+                  _context5.next = 7;
                   break;
                 }
 
-                _context5.next = 3;
+                _context5.next = 4;
                 return getRegisteredClients();
 
-              case 3:
+              case 4:
                 autoGetRegisteredClientsInterval.value = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
                   return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
                     while (1) {
@@ -9899,13 +9901,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     }
                   }, _callee4);
                 })), 2000);
-                _context5.next = 7;
+                _context5.next = 8;
                 break;
 
-              case 6:
+              case 7:
                 autoGetRegisteredClientsInterval.value = null;
 
-              case 7:
+              case 8:
               case "end":
                 return _context5.stop();
             }
