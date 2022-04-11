@@ -67,27 +67,43 @@ class TrackController extends Controller
     $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request);
     $partials = json_decode(Track::where('id', $id)->firstOrFail()->partials);
     
-    // Commented for debugging to make all clients get all partials
-    // $unique_partials = $partials;
-    // // If more clients than partials, duplicate original partials until this is no longer the case.
-    // while (count($clients) > count($partials)) {
-    //   $partials = array_merge($partials, $unique_partials);
-    // }
+    $unique_partials = $partials;
+    // If more clients than partials, duplicate original partials until this is no longer the case.
+    while (count($clients) > count($partials)) {
+      $partials = array_merge($partials, $unique_partials);
+    }
     
-    // // Array of chunk arrays, same length as registered clients array.
-    // $chunks = array_fill(0, count($clients), []);
+    // Array of chunk arrays, same length as registered clients array.
+    $chunks = array_fill(0, count($clients), []);
 
-    // // Distribute partials between chunks.
-    // // In conjuction with partial duplication above, this guarantees that all partials are played equally often.
-    // // Not all clients get the same amount of partials though.
-    // $counter = 0;
-    // while ($partial = array_pop($partials)) {
-    //   array_push($chunks[$counter], $partial);
-    //   $counter++;
-    //   if ($counter > count($clients) - 1) {
-    //     $counter = 0;
-    //   }
-    // }
+    // Distribute partials between chunks.
+    // In conjuction with partial duplication above, this guarantees that all partials are played equally often.
+    // Not all clients get the same amount of partials though.
+    $counter = 0;
+    while ($partial = array_pop($partials)) {
+      array_push($chunks[$counter], $partial);
+      $counter++;
+      if ($counter > count($clients) - 1) {
+        $counter = 0;
+      }
+    }
+
+    foreach($clients as $i=>$value) {
+      $client = Client::where('id', $value->id)->firstOrFail();
+      // $client->partials = $chunks[$i]; // Commented for debugging
+      $client->partials = $partials; // Used in debugging
+      $client->start_time = $startTime;
+      $client->save();
+    }
+
+    // return Response::json(['data' => $chunks]); // Commented for debuggin
+    return Response::json(['data' => $partials]); // Used in debugging
+  }
+
+  // Used for sending all partials to all clients
+  public function start_track_all_partials (Request $request, $id, $startTime) {
+    $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request);
+    $partials = json_decode(Track::where('id', $id)->firstOrFail()->partials);
 
     foreach($clients as $i=>$value) {
       $client = Client::where('id', $value->id)->firstOrFail();

@@ -1,5 +1,9 @@
 <template>
   <div>
+    <div class="flex items-center mb-4">
+      <input class="mr-2" type="checkbox" v-model="allPartialsAllDevices" />
+      <label for="">All partials to all devices</label>
+    </div>
     <div class="flex justify-between">
       <button
         @click="startTrack"
@@ -76,6 +80,7 @@ export default {
     let timingSrcPosition = ref();
     let timingSrcConnected = ref(false);
     let intervalId = null;
+    let allPartialsAllDevices = ref(false);
 
     onMounted(() => {
       // getRegisteredClients();
@@ -131,6 +136,14 @@ export default {
 
     async function startTrack() {
       const calculatedStartingPosition = timingObj.query().position + 5;
+      let route;
+
+      if (allPartialsAllDevices.value) {
+        route = `/api/track/${props.trackId}/start_all/${calculatedStartingPosition}`;
+      } else {
+        route = `/api/track/${props.trackId}/start/${calculatedStartingPosition}`;
+      }
+
       console.log("Calculated starting position: ", calculatedStartingPosition);
       const response = await axios.post(
         `/api/track/${props.trackId}/start/${calculatedStartingPosition}`
@@ -181,6 +194,7 @@ export default {
       synchronizeTimingSrcPosition,
       timingSrcPosition,
       timingSrcConnected,
+      allPartialsAllDevices,
     };
   },
 };

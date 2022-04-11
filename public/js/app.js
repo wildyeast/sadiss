@@ -9714,6 +9714,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var timingSrcPosition = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)();
     var timingSrcConnected = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
     var intervalId = null;
+    var allPartialsAllDevices = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
       // getRegisteredClients();
       autoGetRegisteredClients();
@@ -9800,21 +9801,28 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
     function _startTrack() {
       _startTrack = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
-        var calculatedStartingPosition, response;
+        var calculatedStartingPosition, route, response;
         return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 calculatedStartingPosition = timingObj.query().position + 5;
+
+                if (allPartialsAllDevices.value) {
+                  route = "/api/track/".concat(props.trackId, "/start_all/").concat(calculatedStartingPosition);
+                } else {
+                  route = "/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition);
+                }
+
                 console.log("Calculated starting position: ", calculatedStartingPosition);
-                _context2.next = 4;
+                _context2.next = 5;
                 return axios.post("/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition));
 
-              case 4:
+              case 5:
                 response = _context2.sent;
                 console.log(response.data.data);
 
-              case 6:
+              case 7:
               case "end":
                 return _context2.stop();
             }
@@ -9992,7 +10000,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       synchronizing: synchronizing,
       synchronizeTimingSrcPosition: synchronizeTimingSrcPosition,
       timingSrcPosition: timingSrcPosition,
-      timingSrcConnected: timingSrcConnected
+      timingSrcConnected: timingSrcConnected,
+      allPartialsAllDevices: allPartialsAllDevices
     };
   }
 });
@@ -11360,49 +11369,67 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 var _hoisted_1 = {
-  "class": "flex justify-between"
+  "class": "flex items-center mb-4"
 };
-var _hoisted_2 = ["disabled"];
+
+var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "for": ""
+}, "All partials to all devices", -1
+/* HOISTED */
+);
+
 var _hoisted_3 = {
-  "class": "flex"
+  "class": "flex justify-between"
 };
 var _hoisted_4 = ["disabled"];
 var _hoisted_5 = {
+  "class": "flex"
+};
+var _hoisted_6 = ["disabled"];
+var _hoisted_7 = {
   "class": "border-b border-t border-r p-2"
 };
 function render(_ctx, _cache, $props, $setup, $data, $options) {
-  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[0] || (_cache[0] = function () {
+  return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    "class": "mr-2",
+    type: "checkbox",
+    "onUpdate:modelValue": _cache[0] || (_cache[0] = function ($event) {
+      return $setup.allPartialsAllDevices = $event;
+    })
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $setup.allPartialsAllDevices]]), _hoisted_2]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    onClick: _cache[1] || (_cache[1] = function () {
       return $setup.startTrack && $setup.startTrack.apply($setup, arguments);
     }),
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["border p-2", $setup.synchronizing ? 'border-green-400' : 'border-red-400']),
     disabled: !$setup.synchronizing
   }, " Start track ", 10
   /* CLASS, PROPS */
-  , _hoisted_2), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[1] || (_cache[1] = function () {
+  , _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    onClick: _cache[2] || (_cache[2] = function () {
       return $setup.synchronizeTimingSrcPosition && $setup.synchronizeTimingSrcPosition.apply($setup, arguments);
     }),
     "class": "border p-2",
     disabled: !$setup.timingSrcConnected
   }, " Sync ", 8
   /* PROPS */
-  , _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.timingSrcPosition ? $setup.timingSrcPosition : "0.0"), 1
+  , _hoisted_6), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.timingSrcPosition ? $setup.timingSrcPosition : "0.0"), 1
   /* TEXT */
   )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[2] || (_cache[2] = function () {
+    onClick: _cache[3] || (_cache[3] = function () {
       return $setup.removeClients && $setup.removeClients.apply($setup, arguments);
     }),
     "class": "border p-2"
   }, " Remove all registered clients "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[3] || (_cache[3] = function () {
+    onClick: _cache[4] || (_cache[4] = function () {
       return $setup.getRegisteredClients && $setup.getRegisteredClients.apply($setup, arguments);
     }),
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["border p-2", $setup.autoGetRegisteredClientsInterval ? 'border-b-green-400 border-l-green-400 border-t-green-400' : 'border'])
   }, " Refresh list ", 2
   /* CLASS */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[4] || (_cache[4] = function () {
+    onClick: _cache[5] || (_cache[5] = function () {
       return $setup.autoGetRegisteredClients && $setup.autoGetRegisteredClients.apply($setup, arguments);
     }),
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["border-b border-t border-r p-2", $setup.autoGetRegisteredClientsInterval ? 'border-green-400' : 'border-b border-t border-r'])
