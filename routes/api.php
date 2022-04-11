@@ -31,10 +31,15 @@ Route::post('/track/delete/{id}', [TrackController::class, 'delete'])
   ->name('track.delete');
 Route::post('/track/edit/{id}', [TrackController::class, 'edit'])
   ->name('track.edit');
-Route::post('/track/{id}/start', [TrackController::class, 'start_track'])
+Route::post('/track/{id}/start/{startTime}', [TrackController::class, 'start_track'])
   ->name('track.start');
+<<<<<<< HEAD
 Route::post('/track/{id}/start_real', [TrackController::class, 'start_track_real'])
   ->name('track.startreal');
+=======
+  Route::post('/track/{id}/start_all/{startTime}', [TrackController::class, 'start_track_all_partials'])
+  ->name('track.startall');
+>>>>>>> master
 Route::get('/track', [TrackController::class, 'get']);
 Route::get('/track/{id}', [TrackController::class, 'get']);
 

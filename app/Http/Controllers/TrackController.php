@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use App\Models\Track;
 use App\Models\Client;
+use Carbon\Carbon;
 use Response;
 
 use App\Providers\TrackStarted;
@@ -64,12 +65,11 @@ class TrackController extends Controller
     return $columns;
   }
 
-  public function start_track (Request $request, $id) {
+  public function start_track (Request $request, $id, $startTime) {
     $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request);
     $partials = json_decode(Track::where('id', $id)->firstOrFail()->partials);
-
+    
     $unique_partials = $partials;
-
     // If more clients than partials, duplicate original partials until this is no longer the case.
     while (count($clients) > count($partials)) {
       $partials = array_merge($partials, $unique_partials);
@@ -89,13 +89,32 @@ class TrackController extends Controller
         $counter = 0;
       }
     }
+
     foreach($clients as $i=>$value) {
       $client = Client::where('id', $value->id)->firstOrFail();
       $client->partials = $chunks[$i];
-      $client->start_time = date('Y-m-d H:i:s', strtotime('+ 15 second'));
+      $client->start_time = $startTime;
       $client->save();
     }
-    return Response::json(['data' => $chunks]);
+
+    // return Response::json(['data' => $chunks]); // Commented for debuggin
+    return Response::json(['data' => $partials]); // Used in debugging
+  }
+
+  // Used for sending all partials to all clients
+  public function start_track_all_partials (Request $request, $id, $startTime) {
+    $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request);
+    $partials = json_decode(Track::where('id', $id)->firstOrFail()->partials);
+
+    foreach($clients as $i=>$value) {
+      $client = Client::where('id', $value->id)->firstOrFail();
+      // $client->partials = $chunks[$i]; // Commented for debugging
+      $client->partials = $partials;
+      $client->start_time = $startTime;
+      $client->save();
+    }
+
+    return Response::json(['data' => $partials]);
   }
 
   public function start_track_real (Request $request) {
