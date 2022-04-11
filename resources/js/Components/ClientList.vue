@@ -5,11 +5,6 @@
       <label for="">All partials to all devices</label>
     </div>
     <div class="flex justify-between">
-<<<<<<< HEAD
-      <button @click="startTrack" class="border p-2">Send partials to clients</button>
-      <button @click="startTrackForReal" class="border p-2">Start track</button>
-      <button @click="removeClients" class="border p-2">Remove all registered clients</button>
-=======
       <button
         @click="startTrack"
         class="border p-2"
@@ -33,7 +28,6 @@
       <button @click="removeClients" class="border p-2">
         Remove all registered clients
       </button>
->>>>>>> master
       <div>
         <button
           @click="getRegisteredClients"
@@ -155,20 +149,9 @@ export default {
       console.log(response.data.data);
     }
 
-<<<<<<< HEAD
-    async function startTrackForReal () {
-      const response = await axios.post(`/api/track/${props.trackId}/start_real`)
-      console.log(response)
-    }
-
-    async function getRegisteredClients () {
-      const response = await axios.get('/api/client/active')
-      registeredClients.splice(0)
-=======
     async function getRegisteredClients() {
       const response = await axios.get("/api/client/active");
       registeredClients.splice(0);
->>>>>>> master
       for (const client of response.data) {
         registeredClients.push(client);
       }
@@ -204,14 +187,6 @@ export default {
       registeredClients,
       getRegisteredClients,
       startTrack,
-<<<<<<< HEAD
-      startTrackForReal,
-      removeClients
-    }
-
-  }
-}
-=======
       removeClients,
       synchronizing,
       synchronizeTimingSrcPosition,
@@ -221,5 +196,4 @@ export default {
     };
   },
 };
->>>>>>> master
 </script>

@@ -7270,6 +7270,9 @@ select {
 .-mt-px {
   margin-top: -1px;
 }
+.mb-4 {
+  margin-bottom: 1rem;
+}
 .-mr-0\.5 {
   margin-right: -0.125rem;
 }
@@ -7281,9 +7284,6 @@ select {
 }
 .mt-6 {
   margin-top: 1.5rem;
-}
-.mb-4 {
-  margin-bottom: 1rem;
 }
 .mr-4 {
   margin-right: 1rem;
