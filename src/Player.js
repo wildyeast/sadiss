@@ -1,59 +1,13 @@
-// https://www.html5rocks.com/en/tutorials/audio/scheduling/
-
-// Schedule values I tried 50 - 1000 (step: 100) overlap time values for:
-// s50 o100/200/300
-
-// Overlap values I tried 50 - 1000 (step: 100) schedule time values for:
-// 500
-const SCHEDULE_TIME = 1000
-const OVERLAP = 300
-
-let lastBreakpointTime = 0
-
-const prepared = []
-
-let time1;
-
-import { TimingProvider } from 'timing-provider';
-import { TimingObject } from 'timing-object';
-
 export default class Player {
 
-  oscillators = []
-  endedSrc = []
-  merger = null
   audioContext = null
-  playing = false
+  endedSrc = []
   partialData = null
-  mergedBreakpoints = []
-  schedulingInterval = null
-  currentTime = 0
-  lastScheduledBreakpointIndex = 0
-  oscillatorTimes = []
-  ctxTimeOnSetup = null
-
+  playing = false
   offset = null
-
-  valuesSetForFirstPartial = []
-
+  oscillators = []
   registerFunction = null
-
-  // mergeBreakpoints() {
-  //   for (const partial of this.partialData) {
-  //     for (const breakpoint of partial.breakpoints) {
-  //       breakpoint.oscIndex = partial.index
-  //       this.mergedBreakpoints.push(breakpoint)
-  //     }
-  //     this.oscillatorTimes.push(
-  //       {
-  //         oscIndex: partial.index,
-  //         endTime: Number(partial.endTime),
-  //         startTime: Number(partial.startTime)
-  //       }
-  //     )
-  //   }
-  //   this.mergedBreakpoints.sort((a, b) => a.time - b.time)
-  // }
+  valuesSetForFirstPartial = []
 
   setup(partialData, startInSec, now) {
     const timeToAddToStart = startInSec + now
@@ -75,6 +29,7 @@ export default class Player {
         console.log("audioCtx currentTime + offset after setting first set of partials: ", this.audioContext.currentTime + this.offset)
       }
     }
+    this.playing = true;
   }
 
   setupOscillator(partial, timeToAddToStart) {
@@ -101,8 +56,6 @@ export default class Player {
     return oscObj
   }
 
-  startFrom = 0
-
   stop() {
     for (const oscObj of this.oscillators) {
       oscObj.osc.stop()
@@ -110,10 +63,8 @@ export default class Player {
     this.reset()
   }
 
-  ended(src, idx) {
+  ended(src) {
     this.endedSrc.push(src)
-    // const realIdx = this.oscillators.indexOf(this.oscillators.find(el => el.index === idx))
-    // this.oscillators.splice(realIdx, 1)
     if (this.endedSrc.length === this.partialData.length) {
       this.reset()
     }
@@ -123,11 +74,6 @@ export default class Player {
     this.oscillators = []
     this.endedSrc = []
     this.playing = false
-
-    window.clearInterval(this.schedulingInterval)
-    this.currentTime = 0
-    this.lastScheduledBreakpointIndex = 0
-
     this.registerFunction()
   }
 
