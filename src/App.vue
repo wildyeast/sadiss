@@ -58,7 +58,7 @@
         </select>
         <button
           v-if="player && !player.playing"
-          @click="prepare"
+          @click="playLocally"
           class="border b-white p-2"
         >
           Play
@@ -93,9 +93,9 @@ export default {
     availableTracks: [],
     deviceRegistrationId: null,
     intervalId: null,
-    // hostUrl: 'http://sadiss.test.test',
+    hostUrl: "http://sadiss.test.test",
     // hostUrl: 'http://8hz.at',
-    hostUrl: "https://sadiss.net",
+    // hostUrl: "https://sadiss.net",
     print: "",
     timingProvider: null,
     timingObj: null,
@@ -153,9 +153,9 @@ export default {
     // }, 1000)
 
     // Fetch tracks
-    // const res = await fetch(this.hostUrl + '/api/track')
-    // const json = await res.json()
-    // this.availableTracks = json
+    const res = await fetch(this.hostUrl + "/api/track");
+    const json = await res.json();
+    this.availableTracks = json;
 
     this.timingProvider = new TimingProvider("wss://sadiss.net/zeitquelle");
     this.timingProvider.onreadystatechange = () => {
@@ -302,6 +302,17 @@ export default {
 
       // Reregister when done
       // await this.register()
+    },
+
+    async playLocally() {
+      const res = await fetch(`${this.hostUrl}/api/track/${this.trackId}`);
+      const data = await res.json();
+      this.player.partialData = JSON.parse(data.partials);
+      console.log(this.partials);
+      if (!this.player.audioContext) {
+        this.player.audioContext = new AudioContext();
+      }
+      this.player.setup(this.player.partialData, 0, 0);
     },
 
     globalTime() {
