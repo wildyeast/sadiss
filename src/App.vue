@@ -1,5 +1,42 @@
 <template>
   <div class="app">
+    <div class="md:w-1/2 w-11/12 border b-white p-4 flex flex-col">
+      <!-- <p>
+        Press Register below to register this device to receive partials when
+        'Start track' is pressed in the track details page of a track in the
+        Admin Interface. The registration ID of the device displayed after
+        pressing Register will be visible in the list of registered clients in
+        the track details page in the Admin Interface. This ID changes with
+        every registration.
+      </p> -->
+      <div class="flex items-center">
+        <input
+          type="checkbox"
+          v-model="useCalculatedOutputLatency"
+          class="mr-4"
+        />
+        <label for="">Use calculated output latency</label>
+      </div>
+      <button @click="register" class="border b-white p-2 mt-4">
+        Register
+      </button>
+      {{ timingSrcPosition }}
+      <div class="mt-4">
+        <p
+          v-if="countdownTime > 0"
+          style="display: flex; justify-content: center; font-size: 50px"
+        >
+          {{ countdownTime }}
+        </p>
+        <p v-else-if="player && !player.playing && isRegistered">
+          Device registered with ID {{ deviceRegistrationId }}. Waiting for
+          track start.
+        </p>
+        <p v-else-if="player && player.playing">Track currently playing.</p>
+        <p v-else>Device not registered.</p>
+        <div v-html="print" style="margin-top: 1rem" />
+      </div>
+    </div>
     <!-- <button @click="prepare">timingSrc update</button> -->
     <div
       style="display: flex; flex-direction: column; justify-content: center"
@@ -30,35 +67,6 @@
         <button v-else @click="player.stop" class="border b-white p-2">
           Stop
         </button>
-      </div>
-    </div>
-    <div class="md:w-1/2 w-11/12 border b-white p-4">
-      <p>
-        Press Register below to register this device to receive partials when
-        'Start track' is pressed in the track details page of a track in the
-        Admin Interface. The registration ID of the device displayed after
-        pressing Register will be visible in the list of registered clients in
-        the track details page in the Admin Interface. This ID changes with
-        every registration.
-      </p>
-      <button @click="register" class="border b-white p-2 mt-4">
-        Register
-      </button>
-      {{ timingSrcPosition }}
-      <div class="mt-4">
-        <p
-          v-if="countdownTime > 0"
-          style="display: flex; justify-content: center; font-size: 50px"
-        >
-          {{ countdownTime }}
-        </p>
-        <p v-else-if="player && !player.playing && isRegistered">
-          Device registered with ID {{ deviceRegistrationId }}. Waiting for
-          track start.
-        </p>
-        <p v-else-if="player && player.playing">Track currently playing.</p>
-        <p v-else>Device not registered.</p>
-        <div v-html="print" style="margin-top: 1rem" />
       </div>
     </div>
   </div>
@@ -111,16 +119,17 @@ export default {
 
     userAgentOffset: 0,
     outputLatency: 0,
-    useCalculatedOutputLatency: false,
+    // useCalculatedOutputLatency: false, // Use this line when sniffing user agent in mounted
+    useCalculatedOutputLatency: true,
   }),
   async mounted() {
-    const userAgent = window.navigator.userAgent;
-    if (userAgent.includes("Mobile") && userAgent.includes("Chrome")) {
-      // this.userAgentOffset = -0.3;
-      this.useCalculatedOutputLatency = true;
-    }
-    console.log(userAgent);
-    console.log("userAgentOffset: ", this.userAgentOffset);
+    // const userAgent = window.navigator.userAgent;
+    // if (userAgent.includes("Mobile") && userAgent.includes("Chrome")) {
+    //   // this.userAgentOffset = -0.3;
+    //   this.useCalculatedOutputLatency = true;
+    // }
+    // console.log(userAgent);
+    // console.log("userAgentOffset: ", this.userAgentOffset);
 
     this.player = new Player();
 
