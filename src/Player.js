@@ -4,13 +4,19 @@ export default class Player {
   endedSrc = []
   partialData = null
   playing = false
+  playingLocally = false
   offset = null
   oscillators = []
   registerFunction = null
   valuesSetForFirstPartial = []
 
-  setup(partialData, startInSec, now) {
+  setup(partialData, startInSec, now, playingLocally = false) {
+    this.partialData = partialData
     const timeToAddToStart = startInSec + now
+
+    if (playingLocally) {
+      this.playingLocally = true
+    }
 
     // Initialize oscillators, set all values for each oscillator
     for (const partial of partialData) {
@@ -74,7 +80,9 @@ export default class Player {
     this.oscillators = []
     this.endedSrc = []
     this.playing = false
-    this.registerFunction()
+    if (!this.playingLocally) {
+      this.registerFunction()
+    }
   }
 
   playOneShot(now) {

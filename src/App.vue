@@ -154,8 +154,7 @@ export default {
 
     // Fetch tracks
     const res = await fetch(this.hostUrl + "/api/track");
-    const json = await res.json();
-    this.availableTracks = json;
+    this.availableTracks = await res.json();
 
     this.timingProvider = new TimingProvider("wss://sadiss.net/zeitquelle");
     this.timingProvider.onreadystatechange = () => {
@@ -312,7 +311,7 @@ export default {
       if (!this.player.audioContext) {
         this.player.audioContext = new AudioContext();
       }
-      this.player.setup(this.partialData, 0, 0);
+      this.player.setup(this.partialData, 0, 0, true);
     },
 
     globalTime() {
