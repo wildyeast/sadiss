@@ -307,12 +307,12 @@ export default {
     async playLocally() {
       const res = await fetch(`${this.hostUrl}/api/track/${this.trackId}`);
       const data = await res.json();
-      this.player.partialData = JSON.parse(data.partials);
+      this.partialData = JSON.parse(data.partials);
       console.log(this.partials);
       if (!this.player.audioContext) {
         this.player.audioContext = new AudioContext();
       }
-      this.player.setup(this.player.partialData, 0, 0);
+      this.player.setup(this.partialData, 0, 0);
     },
 
     globalTime() {
