@@ -37,7 +37,6 @@
         <div v-html="print" style="margin-top: 1rem" />
       </div>
     </div>
-    <!-- <button @click="prepare">timingSrc update</button> -->
     <div
       style="display: flex; flex-direction: column; justify-content: center"
       class="md:w-1/2 w-11/12 border b-white p-4"
@@ -73,7 +72,6 @@
 </template>
 <script>
 /* global getOscillator */
-import { modules, bps } from "./constants";
 import dayjs from "dayjs";
 import dayjsPluginUTC from "dayjs/plugin/utc";
 dayjs.extend(dayjsPluginUTC);
@@ -87,12 +85,8 @@ export default {
   name: "App",
   components: {},
   data: () => ({
-    modules,
     player: null,
     partials: null,
-    startPrepAtPosition: null,
-    serverTimeOffset: null,
-    callDuration: null,
     countdownTime: -1,
     isRegistered: false,
     trackId: 1,
@@ -105,11 +99,7 @@ export default {
     print: "",
     timingProvider: null,
     timingObj: null,
-    currentVel: 0,
     timingSrcPosition: null,
-    hasStarted: false,
-    timingSetupDone: false,
-    beep: null,
     offset: null,
     time: 0,
     initialTimingSrcIntervalId: null,
@@ -193,7 +183,6 @@ export default {
 
       const audioCtx = window.AudioContext || window.webkitAudioContext;
       // Start audio context.
-      // this.player.audioContext = new audioCtx({ latencyHint: 0, sampleRate: 48000 });
       this.player.audioContext = new audioCtx({
         latencyHint: 0,
         // sampleRate: 31000,
