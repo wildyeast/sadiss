@@ -144,6 +144,8 @@ export default {
         route = `/api/track/${props.trackId}/start/${calculatedStartingPosition}`;
       }
 
+      console.log(route);
+
       console.log("Calculated starting position: ", calculatedStartingPosition);
       const response = await axios.post(
         `/api/track/${props.trackId}/start/${calculatedStartingPosition}`

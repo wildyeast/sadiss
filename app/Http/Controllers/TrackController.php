@@ -90,8 +90,7 @@ class TrackController extends Controller
 
     foreach($clients as $i=>$value) {
       $client = Client::where('id', $value->id)->firstOrFail();
-      // $client->partials = $chunks[$i]; // Commented for debugging
-      $client->partials = $partials; // Used in debugging
+      $client->partials = $chunks[$i];
       $client->start_time = $startTime;
       $client->save();
     }
@@ -108,13 +107,12 @@ class TrackController extends Controller
     foreach($clients as $i=>$value) {
       $client = Client::where('id', $value->id)->firstOrFail();
       // $client->partials = $chunks[$i]; // Commented for debugging
-      $client->partials = $partials; // Used in debugging
+      $client->partials = $partials;
       $client->start_time = $startTime;
       $client->save();
     }
 
-    // return Response::json(['data' => $chunks]); // Commented for debuggin
-    return Response::json(['data' => $partials]); // Used in debugging
+    return Response::json(['data' => $partials]);
   }
 
   /**

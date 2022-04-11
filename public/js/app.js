@@ -9814,15 +9814,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   route = "/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition);
                 }
 
+                console.log(route);
                 console.log("Calculated starting position: ", calculatedStartingPosition);
-                _context2.next = 5;
+                _context2.next = 6;
                 return axios.post("/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition));
 
-              case 5:
+              case 6:
                 response = _context2.sent;
                 console.log(response.data.data);
 
-              case 7:
+              case 8:
               case "end":
                 return _context2.stop();
             }
