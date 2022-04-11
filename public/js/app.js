@@ -9817,7 +9817,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 console.log(route);
                 console.log("Calculated starting position: ", calculatedStartingPosition);
                 _context2.next = 6;
-                return axios.post("/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition));
+                return axios.post(route);
 
               case 6:
                 response = _context2.sent;
