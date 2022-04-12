@@ -157,6 +157,7 @@ export default {
     this.availableTracks = await res.json();
 
     this.timingProvider = new TimingProvider("wss://sadiss.net/zeitquelle");
+    // this.timingProvider = new TimingProvider("ws://localhost:2276");
     this.timingProvider.onreadystatechange = () => {
       if (this.timingProvider.readyState === "open") {
         this.timingObj = new TimingObject(this.timingProvider);
