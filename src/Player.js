@@ -21,12 +21,13 @@ export default class Player {
     // Initialize oscillators, set all values for each oscillator
     for (const partial of partialData) {
       const oscObj = this.setupOscillator(partial, timeToAddToStart)
+      // const times = []
       for (const breakpoint of partial.breakpoints) {
         const time = Number(breakpoint.time) + timeToAddToStart
-        if (partial === partialData[0]) {
-          this.valuesSetForFirstPartial.push(time)
-          console.log("Start time of first oscillator: ", oscObj.startTime + this.offset)
-        }
+        // times.push(time)
+        // if (partial === partialData[0]) {
+        //   console.log("Start time of first oscillator: ", oscObj.startTime + this.offset)
+        // }
         oscObj.osc.frequency.setValueAtTime(breakpoint.freq, time)
         oscObj.gain.gain.setValueAtTime(breakpoint.amp, time)
       }
@@ -34,8 +35,15 @@ export default class Player {
       if (partial === partialData[0]) {
         console.log("audioCtx currentTime + offset after setting first set of partials: ", this.audioContext.currentTime + this.offset)
       }
+      // this.valuesSetForFirstPartial.push(times)
     }
     this.playing = true;
+    // console.log(this.oscillators.map(val => val.startTime + this.offset))
+
+    window.setInterval(() => {
+      console.log(this.audioContext.currentTime + this.offset)
+    }, 1000)
+
   }
 
   setupOscillator(partial, timeToAddToStart) {
@@ -57,7 +65,8 @@ export default class Player {
 
     oscObj.osc.start(oscObj.startTime)
     oscObj.osc.stop(oscObj.endTime)
-    oscObj.osc.onended = (src) => this.ended(src, oscObj.index)
+    // oscObj.osc.onended = (src, gain) => this.ended(src, gain)
+    oscObj.osc.onended = (src) => this.ended(src, gain)
 
     return oscObj
   }
@@ -69,8 +78,10 @@ export default class Player {
     this.reset()
   }
 
-  ended(src) {
+  ended(src, gain) {
     this.endedSrc.push(src)
+    gain.disconnect()
+    // oscObj.gain.disconnect()
     if (this.endedSrc.length === this.partialData.length) {
       this.reset()
     }

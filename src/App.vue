@@ -295,7 +295,7 @@ export default {
       );
       console.log(
         this.player.valuesSetForFirstPartial.map(
-          (val) => val + this.player.offset
+          (val) => val.map(v => v + this.player.offset)
         )
       );
       this.isRegistered = false;
