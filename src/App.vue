@@ -78,6 +78,7 @@ dayjs.extend(dayjsPluginUTC);
 import { TimingProvider } from "timing-provider";
 import { TimingObject } from "timing-object";
 import * as TIMINGSRC from "timingsrc";
+// import * as MCorp from "./MotionCorp.js"
 
 import Player from "./Player";
 
@@ -93,9 +94,9 @@ export default {
     availableTracks: [],
     deviceRegistrationId: null,
     intervalId: null,
-    // hostUrl: "http://sadiss.test.test",
+    hostUrl: "http://sadiss.test.test",
     // hostUrl: 'http://8hz.at',
-    hostUrl: "https://sadiss.net",
+    // hostUrl: "https://sadiss.net",
     print: "",
     timingProvider: null,
     timingObj: null,
@@ -111,8 +112,26 @@ export default {
     outputLatency: 0,
     // useCalculatedOutputLatency: false, // Use this line when sniffing user agent in mounted
     useCalculatedOutputLatency: true,
+    motion: null
   }),
   async mounted() {
+
+    const mCorpApp = MCorp.app("1838773087003283590")
+    mCorpApp.run = () => {
+      this.motion = mCorpApp.motions['shared']
+    }
+    mCorpApp.init()
+    
+    while (!this.motion) {
+      await new Promise(r => setTimeout(r, 500));
+    }
+    this.motion.update(null, 1, null)
+
+    // window.setInterval(() => {
+    //   console.log(this.motion.query().pos)
+    // }, 5)
+
+
     // const userAgent = window.navigator.userAgent;
     // if (userAgent.includes("Mobile") && userAgent.includes("Chrome")) {
     //   // this.userAgentOffset = -0.3;
@@ -156,13 +175,13 @@ export default {
     const res = await fetch(this.hostUrl + "/api/track");
     this.availableTracks = await res.json();
 
-    this.timingProvider = new TimingProvider("wss://sadiss.net/zeitquelle");
-    // this.timingProvider = new TimingProvider("ws://localhost:2276");
-    this.timingProvider.onreadystatechange = () => {
-      if (this.timingProvider.readyState === "open") {
-        this.timingObj = new TimingObject(this.timingProvider);
-      }
-    };
+    // this.timingProvider = new TimingProvider("wss://sadiss.net/zeitquelle");
+    // // this.timingProvider = new TimingProvider("ws://localhost:2276");
+    // this.timingProvider.onreadystatechange = () => {
+    //   if (this.timingProvider.readyState === "open") {
+    //     this.timingObj = new TimingObject(this.timingProvider);
+    //   }
+    // };
   },
   methods: {
     async register() {
