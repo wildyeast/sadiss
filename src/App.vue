@@ -1,5 +1,6 @@
 <template>
   <div class="app">
+    <button @click="startStop">Start/Stop</button>
     <div class="md:w-1/2 w-11/12 border b-white p-4 flex flex-col">
       <!-- <p>
         Press Register below to register this device to receive partials when
@@ -131,6 +132,16 @@ export default {
     //   console.log(this.motion.query().pos)
     // }, 5)
 
+    // this.motion.on("change", () => {
+    //   console.log("Stopped at: ", this.motion.query().pos)
+    // })
+
+    // window.setTimeout(() => {
+    //   console.log(this.motion.query().pos)
+    //   this.motion.update(null, 0, null)
+    //   console.log(this.motion.query().pos)
+    // }, 3000)
+
 
     // const userAgent = window.navigator.userAgent;
     // if (userAgent.includes("Mobile") && userAgent.includes("Chrome")) {
@@ -184,6 +195,10 @@ export default {
     // };
   },
   methods: {
+    startStop () {
+      this.motion.update(null, 0, null)
+    },
+
     async register() {
       if (this.isRegistered) return;
 
