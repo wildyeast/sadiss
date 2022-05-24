@@ -109,57 +109,21 @@ export default {
 
     clients: [],
 
-    userAgentOffset: 0,
     outputLatency: 0,
-    // useCalculatedOutputLatency: false, // Use this line when sniffing user agent in mounted
     useCalculatedOutputLatency: true,
     motion: null
   }),
   async mounted() {
-
     const mCorpApp = MCorp.app("1838773087003283590")
     mCorpApp.run = () => {
       this.motion = mCorpApp.motions['shared']
     }
     mCorpApp.init()
-    
     while (!this.motion) {
       await new Promise(r => setTimeout(r, 500));
     }
     this.motion.update(null, 1, null)
-
-    // window.setInterval(() => {
-    //   console.log(this.motion.query().pos)
-    // }, 5)
-
-    // this.motion.on("change", () => {
-    //   console.log("Stopped at: ", this.motion.query().pos)
-    // })
-
-    // window.setTimeout(() => {
-    //   console.log(this.motion.query().pos)
-    //   this.motion.update(null, 0, null)
-    //   console.log(this.motion.query().pos)
-    // }, 3000)
-
-
-    // const userAgent = window.navigator.userAgent;
-    // if (userAgent.includes("Mobile") && userAgent.includes("Chrome")) {
-    //   // this.userAgentOffset = -0.3;
-    //   this.useCalculatedOutputLatency = true;
-    // }
-    // console.log(userAgent);
-    // console.log("userAgentOffset: ", this.userAgentOffset);
-
     this.player = new Player();
-
-    // this.timingProvider = new TimingProvider('wss://sadiss.net/zeitquelle');
-    // this.timingProvider.onreadystatechange = () => {
-    //   if (this.timingProvider.readyState === "open") {
-    //     this.timingObj = new TimingObject(this.timingProvider);
-    //   }
-    // }
-
     // Fetch tracks
     const res = await fetch(this.hostUrl + "/api/track");
     this.availableTracks = await res.json();
@@ -259,22 +223,14 @@ export default {
     async start() {
       const startInSec = 5;
       const q = this.globalTime();
-      // const ctxTime = this.player.audioContext.currentTime
       const now = q - this.player.offset; // Do not change!
-      // const now = q - this.player.offset + this.userAgentOffset // With sniffed offset estimation
       this.player.playOneShot(now);
       console.log("ctx.baseLatency: ", this.player.audioContext.baseLatency);
       console.log(
         "ctx outputTimestamp ctx timestamp + offset:, ",
         this.player.audioContext.getOutputTimestamp().contextTime +
           this.player.offset
-      );
-      // console.log("ZQ - ctxTime - offset (should be 0): ", q - ctxTime - this.player.offset)
-      // console.log(
-      //   "ctx output latency: ",
-      //   this.player.audioContext.outputLatency
-      // );
-
+      )
       const calculatedOutputLatency =
         this.player.audioContext.currentTime -
         this.player.audioContext.getOutputTimestamp().contextTime;
