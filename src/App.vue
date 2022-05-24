@@ -114,7 +114,7 @@ export default {
     motion: null
   }),
   async mounted() {
-    const mCorpApp = MCorp.app("1838773087003283590")
+    const mCorpApp = MCorp.app("8844095860530063641")
     mCorpApp.run = () => {
       this.motion = mCorpApp.motions['shared']
     }
