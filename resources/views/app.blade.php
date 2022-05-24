@@ -16,7 +16,7 @@
         <!-- Scripts -->
         @routes
         <script src="{{ mix('js/app.js') }}" defer></script>
-        <script type="text/javascript" src="http://www.mcorp.no/lib/mcorp-2.0.js"></script>
+        <script type="text/javascript" src="https://www.mcorp.no/lib/mcorp-2.0.js"></script>
     </head>
     <body class="font-sans antialiased">
         @inertia
