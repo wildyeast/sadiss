@@ -95,9 +95,9 @@ export default {
     availableTracks: [],
     deviceRegistrationId: null,
     intervalId: null,
-    hostUrl: "http://sadiss.test.test",
+    // hostUrl: "http://sadiss.test.test",
     // hostUrl: 'http://8hz.at',
-    // hostUrl: "https://sadiss.net",
+    hostUrl: "https://sadiss.net",
     print: "",
     timingProvider: null,
     timingObj: null,
@@ -160,51 +160,21 @@ export default {
     //   }
     // }
 
-    // Uncomment for timing server stress testing
-    // window.setTimeout(() => {
-    //   this.timingObj.update({ velocity: 1 })
-    // }, 1000)
-
-    // Test 1: Many clients on this device
-    // window.setInterval(() => {
-    //   this.clients.push(this.createClient())
-    //   console.log(this.clients[0].pos, this.clients.length)
-    // }, 500)
-
-    // Test 2: X clients on this device (Sehr stressig fuers phone)
-    // for (let i = 0; i < 5; i++) {
-    //   this.clients.push(this.createClient())
-    // }
-    // window.setInterval(() => {
-    //   console.log(" ")
-    //   for (const client of this.clients) {
-    //     console.log(client.pos)
-    //   }
-    // }, 1000)
-
     // Fetch tracks
     const res = await fetch(this.hostUrl + "/api/track");
     this.availableTracks = await res.json();
-
-    // this.timingProvider = new TimingProvider("wss://sadiss.net/zeitquelle");
-    // // this.timingProvider = new TimingProvider("ws://localhost:2276");
-    // this.timingProvider.onreadystatechange = () => {
-    //   if (this.timingProvider.readyState === "open") {
-    //     this.timingObj = new TimingObject(this.timingProvider);
-    //   }
-    // };
   },
   methods: {
     startStop () {
       this.motion.update(null, 0, null)
+      console.log(this.motion)
     },
 
     async register() {
       if (this.isRegistered) return;
 
       this.initialTimingSrcIntervalId = window.setInterval(() => {
-        const q = this.timingObj.query();
-        this.timingSrcPosition = q.position.toFixed(1);
+        this.timingSrcPosition = this.motion.pos.toFixed(1)
       }, 10);
       // this.timingObj.onchange = (e) => {
       //   console.log("Global TimeObject onchange event triggered.");
@@ -350,7 +320,7 @@ export default {
     },
 
     globalTime() {
-      return this.timingObj.query().position;
+      return this.motion.pos;
     },
 
     convertPartialsIfNeeded(partialData) {
