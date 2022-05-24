@@ -9715,18 +9715,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var timingSrcConnected = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
     var intervalId = null;
     var allPartialsAllDevices = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
+    var motion;
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
       // getRegisteredClients();
       autoGetRegisteredClients();
-      timingProvider = new timing_provider__WEBPACK_IMPORTED_MODULE_4__.TimingProvider("wss://sadiss.net/zeitquelle"); // const t1 = performance.now()
+      var mCorpApp = MCorp.app("1838773087003283590");
 
-      timingProvider.onreadystatechange = function () {
-        if (timingProvider.readyState === "open") {
-          // console.log("Time elapsed until TP ready: ", performance.now() - t1)
-          timingObj = new timing_object__WEBPACK_IMPORTED_MODULE_5__.TimingObject(timingProvider);
-          timingSrcConnected.value = true;
-        }
-      };
+      mCorpApp.run = function () {
+        motion = mCorpApp.motions['shared'];
+        timingSrcConnected.value = true;
+      }; // timingProvider.onreadystatechange = () => {
+      // if (timingProvider.readyState === "open") {
+      // console.log("Time elapsed until TP ready: ", performance.now() - t1)
+      // timingObj = new TimingObject(timingProvider);
+      // timingSrcConnected.value = true;
+      // }
+      // };
+
     });
 
     function registerClient() {
@@ -9747,21 +9752,17 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context.prev = _context.next) {
               case 0:
                 if (!synchronizing.value) {
-                  if (queryTimingObj().velocity != 1) {
-                    timingObj.update({
-                      velocity: 1
-                    });
+                  if (motion.vel != 1) {
+                    motion.update(null, 1, null);
                     console.log("Set TimingObject velocity to 1.");
                   }
 
                   synchronizing.value = true;
 
                   (function query() {
-                    var q = queryTimingObj();
-
-                    if (q.position.toFixed(1) - timingSrcPosition.value != 0) {
+                    if (motion.pos.toFixed(1) - timingSrcPosition.value != 0) {
                       // TODO: Weird calculation, doesn't work with !== for some reason, no time to look into it now
-                      timingSrcPosition.value = q.position.toFixed(1);
+                      timingSrcPosition.value = motion.pos.toFixed(1);
                     }
 
                     if (synchronizing.value) {
@@ -9770,12 +9771,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 } else {
                   synchronizing.value = false;
-                  timingProvider.update({
-                    velocity: 0,
-                    position: 0
-                  });
-                  timingSrcPosition.value = queryTimingObj().position.toFixed(1);
-                  window.clearInterval(intervalId);
+                  motion.update(0, 0, 0);
+                  timingSrcPosition.value = motion.pos.toFixed(1);
                 }
 
                 console.log("Synchronizing: ", synchronizing.value);
@@ -9790,11 +9787,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return _synchronizeTimingSrcPosition.apply(this, arguments);
     }
 
-    function queryTimingObj() {
-      var q = timingObj.query();
-      return q;
-    }
-
     function startTrack() {
       return _startTrack.apply(this, arguments);
     }
@@ -9806,7 +9798,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                calculatedStartingPosition = timingObj.query().position + 5;
+                calculatedStartingPosition = motion.pos + 5;
 
                 if (allPartialsAllDevices.value) {
                   route = "/api/track/".concat(props.trackId, "/start_all/").concat(calculatedStartingPosition);

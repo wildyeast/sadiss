@@ -66,6 +66,7 @@ import { onMounted, reactive, ref } from "vue";
 import Button from "./Button.vue";
 import { TimingProvider } from "timing-provider";
 import { TimingObject } from "timing-object";
+
 export default {
   components: { Button },
   props: {
@@ -81,20 +82,23 @@ export default {
     let timingSrcConnected = ref(false);
     let intervalId = null;
     let allPartialsAllDevices = ref(false);
+    let motion;
 
     onMounted(() => {
       // getRegisteredClients();
       autoGetRegisteredClients();
-      timingProvider = new TimingProvider("wss://sadiss.net/zeitquelle");
-
-      // const t1 = performance.now()
-      timingProvider.onreadystatechange = () => {
-        if (timingProvider.readyState === "open") {
+      const mCorpApp = MCorp.app("1838773087003283590")
+      mCorpApp.run = () => {
+        motion = mCorpApp.motions['shared']
+        timingSrcConnected.value = true;
+      }
+      // timingProvider.onreadystatechange = () => {
+        // if (timingProvider.readyState === "open") {
           // console.log("Time elapsed until TP ready: ", performance.now() - t1)
-          timingObj = new TimingObject(timingProvider);
-          timingSrcConnected.value = true;
-        }
-      };
+          // timingObj = new TimingObject(timingProvider);
+          // timingSrcConnected.value = true;
+        // }
+      // };
     });
 
     function registerClient() {
@@ -104,17 +108,16 @@ export default {
 
     async function synchronizeTimingSrcPosition() {
       if (!synchronizing.value) {
-        if (queryTimingObj().velocity != 1) {
-          timingObj.update({ velocity: 1 });
+        if (motion.vel != 1) {
+          motion.update(null, 1, null);
           console.log("Set TimingObject velocity to 1.");
         }
 
         synchronizing.value = true;
         (function query() {
-          const q = queryTimingObj();
-          if (q.position.toFixed(1) - timingSrcPosition.value != 0) {
+          if (motion.pos.toFixed(1) - timingSrcPosition.value != 0) {
             // TODO: Weird calculation, doesn't work with !== for some reason, no time to look into it now
-            timingSrcPosition.value = q.position.toFixed(1);
+            timingSrcPosition.value = motion.pos.toFixed(1);
           }
           if (synchronizing.value) {
             window.setTimeout(query, 10);
@@ -122,20 +125,14 @@ export default {
         })();
       } else {
         synchronizing.value = false;
-        timingProvider.update({ velocity: 0, position: 0 });
-        timingSrcPosition.value = queryTimingObj().position.toFixed(1);
-        window.clearInterval(intervalId);
+        motion.update(0, 0, 0)
+        timingSrcPosition.value = motion.pos.toFixed(1);
       }
       console.log("Synchronizing: ", synchronizing.value);
     }
 
-    function queryTimingObj() {
-      const q = timingObj.query();
-      return q;
-    }
-
     async function startTrack() {
-      const calculatedStartingPosition = timingObj.query().position + 5;
+      const calculatedStartingPosition = motion.pos + 5;
       let route;
 
       if (allPartialsAllDevices.value) {
@@ -160,14 +157,13 @@ export default {
     async function autoGetRegisteredClients() {
       console.log(autoGetRegisteredClientsInterval.value);
       if (!autoGetRegisteredClientsInterval.value) {
-        await getRegisteredClients();
+        await getRegisteredClients()
 
         autoGetRegisteredClientsInterval.value = window.setInterval(
           async () => {
             await getRegisteredClients();
-          },
-          2000
-        );
+          }, 2000
+        )
       } else {
         autoGetRegisteredClientsInterval.value = null;
       }

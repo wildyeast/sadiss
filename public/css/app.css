@@ -7460,6 +7460,9 @@ select {
 .overflow-hidden {
   overflow: hidden;
 }
+.break-all {
+  word-break: break-all;
+}
 .rounded-bulma-input-border-radius {
   border-radius: 4px;
 }
