@@ -122,7 +122,7 @@ export default {
     while (!this.motion) {
       await new Promise(r => setTimeout(r, 500));
     }
-    this.motion.update(null, 1, null)
+    // this.motion.update(null, 1, null)
     this.player = new Player();
     // Fetch tracks
     const res = await fetch(this.hostUrl + "/api/track");
