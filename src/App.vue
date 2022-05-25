@@ -76,9 +76,6 @@
 import dayjs from "dayjs";
 import dayjsPluginUTC from "dayjs/plugin/utc";
 dayjs.extend(dayjsPluginUTC);
-import { TimingProvider } from "timing-provider";
-import { TimingObject } from "timing-object";
-import * as TIMINGSRC from "timingsrc";
 // import * as MCorp from "./MotionCorp.js"
 
 import Player from "./Player";
@@ -95,9 +92,9 @@ export default {
     availableTracks: [],
     deviceRegistrationId: null,
     intervalId: null,
-    // hostUrl: "http://sadiss.test.test",
+    hostUrl: "http://sadiss.test.test",
     // hostUrl: 'http://8hz.at',
-    hostUrl: "https://sadiss.net",
+    // hostUrl: "https://sadiss.net",
     print: "",
     timingProvider: null,
     timingObj: null,
@@ -120,6 +117,7 @@ export default {
     document.head.appendChild(externalScript)
 
     // const mCorpApp = MCorp.app("8844095860530063641", { anon: true })
+    // console.log(mCorpApp.motions)
     // mCorpApp.run = () => {
     //   this.motion = mCorpApp.motions['shared']
     // }
@@ -127,6 +125,7 @@ export default {
     // while (!this.motion) {
     //   await new Promise(r => setTimeout(r, 500));
     // }
+
     // this.motion.update(null, 1, null)
     this.player = new Player();
     // Fetch tracks
@@ -135,7 +134,7 @@ export default {
   },
   methods: {
     startStop () {
-      this.motion.update(null, 0, null)
+      // this.motion.update(null, 0, null)
       console.log(this.motion)
     },
 
@@ -154,6 +153,7 @@ export default {
 
       this.initialTimingSrcIntervalId = window.setInterval(() => {
         this.timingSrcPosition = this.motion.pos.toFixed(1)
+        // console.log(this.timingSrcPosition)
       }, 10);
       // this.timingObj.onchange = (e) => {
       //   console.log("Global TimeObject onchange event triggered.");
