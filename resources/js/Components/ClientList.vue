@@ -92,6 +92,7 @@ export default {
         motion = mCorpApp.motions['shared']
         timingSrcConnected.value = true;
       }
+      mCorpApp.init()
       // timingProvider.onreadystatechange = () => {
         // if (timingProvider.readyState === "open") {
           // console.log("Time elapsed until TP ready: ", performance.now() - t1)
