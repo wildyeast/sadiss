@@ -91,6 +91,7 @@ export default {
       mCorpApp.run = () => {
         motion = mCorpApp.motions['shared']
         timingSrcConnected.value = true;
+        console.log('MCorpApp:', mCorpApp)
       }
       mCorpApp.init()
       // timingProvider.onreadystatechange = () => {

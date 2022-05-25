@@ -9719,19 +9719,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
       // getRegisteredClients();
       autoGetRegisteredClients();
-      var mCorpApp = MCorp.app("1838773087003283590");
+      var mCorpApp = MCorp.app("8844095860530063641");
 
       mCorpApp.run = function () {
         motion = mCorpApp.motions['shared'];
         timingSrcConnected.value = true;
-      }; // timingProvider.onreadystatechange = () => {
+        console.log('MCorpApp:', mCorpApp);
+      };
+
+      mCorpApp.init(); // timingProvider.onreadystatechange = () => {
       // if (timingProvider.readyState === "open") {
       // console.log("Time elapsed until TP ready: ", performance.now() - t1)
       // timingObj = new TimingObject(timingProvider);
       // timingSrcConnected.value = true;
       // }
       // };
-
     });
 
     function registerClient() {
