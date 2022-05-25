@@ -87,7 +87,9 @@ export default {
     onMounted(() => {
       // getRegisteredClients();
       autoGetRegisteredClients();
-      const mCorpApp = MCorp.app("8844095860530063641")
+      const mCorpAppId = "8844095860530063641"
+      console.log("Id: ", mCorpAppId)
+      const mCorpApp = MCorp.app(mCorpAppId)
       mCorpApp.run = () => {
         motion = mCorpApp.motions['shared']
         timingSrcConnected.value = true;
