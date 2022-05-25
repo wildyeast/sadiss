@@ -114,14 +114,19 @@ export default {
     motion: null
   }),
   async mounted() {
-    const mCorpApp = MCorp.app("8844095860530063641", { anon: true })
-    mCorpApp.run = () => {
-      this.motion = mCorpApp.motions['shared']
-    }
-    mCorpApp.init()
-    while (!this.motion) {
-      await new Promise(r => setTimeout(r, 500));
-    }
+
+    const externalScript = document.createElement('script')
+    externalScript.setAttribute('src', 'https://www.mcorp.no/lib/mcorp-2.0.js')
+    document.head.appendChild(externalScript)
+
+    // const mCorpApp = MCorp.app("8844095860530063641", { anon: true })
+    // mCorpApp.run = () => {
+    //   this.motion = mCorpApp.motions['shared']
+    // }
+    // mCorpApp.init()
+    // while (!this.motion) {
+    //   await new Promise(r => setTimeout(r, 500));
+    // }
     // this.motion.update(null, 1, null)
     this.player = new Player();
     // Fetch tracks
@@ -136,6 +141,16 @@ export default {
 
     async register() {
       if (this.isRegistered) return;
+
+      const mCorpApp = MCorp.app("8844095860530063641", { anon: true })
+      mCorpApp.run = () => {
+        this.motion = mCorpApp.motions['shared']
+      }
+      mCorpApp.init()
+
+      while (!this.motion) {
+        await new Promise(r => setTimeout(r, 500));
+      }
 
       this.initialTimingSrcIntervalId = window.setInterval(() => {
         this.timingSrcPosition = this.motion.pos.toFixed(1)
