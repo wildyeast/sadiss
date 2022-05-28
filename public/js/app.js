@@ -9709,12 +9709,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   setup: function setup(props) {
     var registeredClients = (0,vue__WEBPACK_IMPORTED_MODULE_2__.reactive)([]);
     var autoGetRegisteredClientsInterval = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(null);
-    var timingProvider = null;
-    var timingObj = null;
     var synchronizing = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
     var timingSrcPosition = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)();
     var timingSrcConnected = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
-    var intervalId = null;
     var allPartialsAllDevices = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
     var motion;
     var ttsLanguages = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)([]);
@@ -9733,13 +9730,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               autoGetRegisteredClients();
               mCorpAppId = "8844095860530063641";
-              console.log("Id: ", mCorpAppId);
               mCorpApp = MCorp.app(mCorpAppId);
 
               mCorpApp.run = function () {
                 motion = mCorpApp.motions['shared'];
                 timingSrcConnected.value = true;
-                console.log('MCorpApp:', mCorpApp);
               };
 
               mCorpApp.init(); // timingProvider.onreadystatechange = () => {
@@ -9750,7 +9745,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               // }
               // };
 
-            case 7:
+            case 6:
             case "end":
               return _context.stop();
           }
@@ -9903,17 +9898,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context6.prev = _context6.next) {
               case 0:
-                console.log(autoGetRegisteredClientsInterval.value);
-
                 if (autoGetRegisteredClientsInterval.value) {
-                  _context6.next = 7;
+                  _context6.next = 6;
                   break;
                 }
 
-                _context6.next = 4;
+                _context6.next = 3;
                 return getRegisteredClients();
 
-              case 4:
+              case 3:
                 autoGetRegisteredClientsInterval.value = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
                   return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
                     while (1) {
@@ -9929,13 +9922,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     }
                   }, _callee5);
                 })), 2000);
-                _context6.next = 8;
+                _context6.next = 7;
                 break;
 
-              case 7:
+              case 6:
                 autoGetRegisteredClientsInterval.value = null;
 
-              case 8:
+              case 7:
               case "end":
                 return _context6.stop();
             }
@@ -11419,6 +11412,19 @@ var _hoisted_7 = {
 var _hoisted_8 = {
   key: 0
 };
+
+var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "mr-2"
+}, "Select TTS language", -1
+/* HOISTED */
+);
+
+var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: ""
+}, "No TTS", -1
+/* HOISTED */
+);
+
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     "class": "mr-2",
@@ -11446,11 +11452,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* PROPS */
   , _hoisted_6), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.timingSrcPosition ? $setup.timingSrcPosition : "0.0"), 1
   /* TEXT */
-  )]), $setup.ttsLanguages.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  )]), $setup.ttsLanguages.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
       return $setup.ttsLanguage = $event;
     })
-  }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.ttsLanguages, function (lang) {
+  }, [_hoisted_10, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.ttsLanguages, function (lang) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(lang), 1
     /* TEXT */
     );

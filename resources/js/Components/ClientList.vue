@@ -26,7 +26,9 @@
         </div>
       </div>
       <div v-if="ttsLanguages.length">
+        <label class="mr-2">Select TTS language</label>
         <select v-model="ttsLanguage">
+          <option value="">No TTS</option>
           <option v-for="lang of ttsLanguages">{{ lang }}</option>
         </select>
       </div>
@@ -81,12 +83,9 @@ export default {
   setup(props) {
     const registeredClients = reactive([]);
     const autoGetRegisteredClientsInterval = ref(null);
-    let timingProvider = null;
-    let timingObj = null;
     let synchronizing = ref(false);
     let timingSrcPosition = ref();
     let timingSrcConnected = ref(false);
-    let intervalId = null;
     let allPartialsAllDevices = ref(false);
     let motion;
     const ttsLanguages = ref([])
@@ -102,12 +101,10 @@ export default {
       // getRegisteredClients();
       autoGetRegisteredClients();
       const mCorpAppId = "8844095860530063641"
-      console.log("Id: ", mCorpAppId)
       const mCorpApp = MCorp.app(mCorpAppId)
       mCorpApp.run = () => {
         motion = mCorpApp.motions['shared']
         timingSrcConnected.value = true;
-        console.log('MCorpApp:', mCorpApp)
       }
       mCorpApp.init()
       // timingProvider.onreadystatechange = () => {
@@ -173,7 +170,6 @@ export default {
     }
 
     async function autoGetRegisteredClients() {
-      console.log(autoGetRegisteredClientsInterval.value);
       if (!autoGetRegisteredClientsInterval.value) {
         await getRegisteredClients()
 
