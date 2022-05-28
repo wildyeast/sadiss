@@ -14,7 +14,7 @@ class AddTtsInstructionsToTracksTable extends Migration
     public function up()
     {
         Schema::table('tracks', function (Blueprint $table) {
-            $table->longText('tts_instructions')->nullable();
+            $table->json('tts_instructions')->nullable();
         });
     }
 
