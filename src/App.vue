@@ -100,6 +100,7 @@ export default {
     timingObj: null,
     timingSrcPosition: null,
     ttsInstructions: null,
+    ttsLanguage: null,
     offset: null,
     time: 0,
     initialTimingSrcIntervalId: null,
@@ -207,10 +208,10 @@ export default {
           "Start time from server: ",
           clientData.client["start_time"]
         );
-        console.log("TTS instruction data: ", clientData.client["tts_instructions"])
         window.clearInterval(this.intervalId);
         const startTimeFromServer = Number(clientData.client["start_time"]);
         this.ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
+        this.ttsLanguage = clientData.client["tts_language"]
         // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
         this.partialData = this.convertPartialsIfNeeded(
           clientData.client["partials"]
@@ -279,26 +280,27 @@ export default {
       this.isRegistered = false;
 
       /* TEXT TO SPEECH TESTING */
-
-      const langCode = 'en-US'
-      const ttsTimestamps = Object.keys(this.ttsInstructions)
-
-      let nextTimestamp = ttsTimestamps.shift()
-      let nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][langCode])
-      nextUtterance.lang = langCode
-
-      const speechIntervalId = window.setInterval(() => {
-        if (this.globalTime() - this.player.offset >= now + Number(nextTimestamp) + startInSec) {
-          speechSynthesis.speak(nextUtterance)
-          if (ttsTimestamps.length) {
-            nextTimestamp = ttsTimestamps.shift()
-            nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][langCode])
-            nextUtterance.lang = langCode
-          } else {
-            window.clearInterval(speechIntervalId)
+      if (this.ttsInstructions) {
+        console.log("Starting TTS.")
+        const ttsTimestamps = Object.keys(this.ttsInstructions)
+  
+        let nextTimestamp = ttsTimestamps.shift()
+        let nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
+        nextUtterance.lang = this.ttsLanguage
+  
+        const speechIntervalId = window.setInterval(() => {
+          if (this.globalTime() - this.player.offset >= now + Number(nextTimestamp) + startInSec) {
+            speechSynthesis.speak(nextUtterance)
+            if (ttsTimestamps.length) {
+              nextTimestamp = ttsTimestamps.shift()
+              nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
+              nextUtterance.lang = this.ttsLanguage
+            } else {
+              window.clearInterval(speechIntervalId)
+            }
           }
-        }
-      }, 1)
+        }, 1)
+      }
       
       /* END OF TEXT TO SPEECH TESTING */
 
