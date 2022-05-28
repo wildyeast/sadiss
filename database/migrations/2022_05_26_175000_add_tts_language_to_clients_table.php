@@ -14,7 +14,7 @@ class AddTtsLanguageToClientsTable extends Migration
     public function up()
     {
         Schema::table('clients', function (Blueprint $table) {
-            $table->json('tts_language')->nullable();
+            $table->string('tts_language')->nullable();
         });
     }
 
