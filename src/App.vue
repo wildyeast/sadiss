@@ -280,7 +280,7 @@ export default {
       this.isRegistered = false;
 
       /* TEXT TO SPEECH TESTING */
-      if (this.ttsInstructions) {
+      if (this.ttsInstructions && this.ttsLanguage) {
         console.log("Starting TTS.")
         const ttsTimestamps = Object.keys(this.ttsInstructions)
   
