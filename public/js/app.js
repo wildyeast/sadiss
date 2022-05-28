@@ -12299,7 +12299,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         /* PROPS */
         , ["onFileInput"])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), field === 'tts_instructions' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
           type: "file",
-          accept: ".txt",
+          accept: ".json",
           onInput: _cache[0] || (_cache[0] = function ($event) {
             return $setup.onTtsInstructionsFileInput($event.target.files[0]);
           })

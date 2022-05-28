@@ -21,10 +21,12 @@ class TrackController extends Controller
     }
     $sourcefile = file_get_contents($request->file('sourcefile')->getRealPath());
     $converted = $this->convert_source_file($sourcefile);
+    $tts_instructions = file_get_contents($request->file('tts_instructions')->getRealPath());
     $track = new Track;
     $track->title = $request->title;
     $track->description = $request->description;
     $track->partials = $converted;
+    $track->tts_instructions = $tts_instructions;
     $track->save();
     return back()->with('flash', [
         'message' => 'success',

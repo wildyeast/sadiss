@@ -27,7 +27,7 @@
                   </label>
                   <input
                     type="file"
-                    accept=".txt"
+                    accept=".json"
                     @input="onTtsInstructionsFileInput($event.target.files[0])" />
                 </div>
                 <div v-else-if="fields[field].type === 'datetime'">
@@ -101,7 +101,6 @@ export default {
           type: field.Type,
           editable: isEditable(field.Field)
         }
-        console.log(field)
       }
 
       if (addOrEdit == 'edit') {
