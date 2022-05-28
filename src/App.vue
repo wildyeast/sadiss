@@ -92,13 +92,14 @@ export default {
     availableTracks: [],
     deviceRegistrationId: null,
     intervalId: null,
-    // hostUrl: "http://sadiss.test.test",
+    hostUrl: "http://sadiss.test.test",
     // hostUrl: 'http://8hz.at',
-    hostUrl: "https://sadiss.net",
+    // hostUrl: "https://sadiss.net",
     print: "",
     timingProvider: null,
     timingObj: null,
     timingSrcPosition: null,
+    ttsInstructions: null,
     offset: null,
     time: 0,
     initialTimingSrcIntervalId: null,
@@ -206,8 +207,10 @@ export default {
           "Start time from server: ",
           clientData.client["start_time"]
         );
+        console.log("TTS instruction data: ", clientData.client["tts_instructions"])
         window.clearInterval(this.intervalId);
         const startTimeFromServer = Number(clientData.client["start_time"]);
+        this.ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
         // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
         this.partialData = this.convertPartialsIfNeeded(
           clientData.client["partials"]
@@ -277,41 +280,27 @@ export default {
 
       /* TEXT TO SPEECH TESTING */
 
-      const speechCommands = [
-        {
-          time: 0,
-          text: 'Start'
-        },
-        {
-          time: 2,
-          text: 'Two'
-        },
-        {
-          time: 4,
-          text: 'Four'
-        },
-        {
-          time: 6,
-          text: 'Six'
-        },
-      ]
+      const langCode = 'en-US'
+      const ttsTimestamps = Object.keys(this.ttsInstructions)
 
-      let nextSpeechCommand = speechCommands.shift()
-      let nextUtterance = new SpeechSynthesisUtterance(nextSpeechCommand.text)
+      let nextTimestamp = ttsTimestamps.shift()
+      let nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][langCode])
+      nextUtterance.lang = langCode
 
       const speechIntervalId = window.setInterval(() => {
-        if (this.globalTime() - this.player.offset >= now + nextSpeechCommand.time + startInSec) {
+        if (this.globalTime() - this.player.offset >= now + Number(nextTimestamp) + startInSec) {
           speechSynthesis.speak(nextUtterance)
-          if (speechCommands.length) {
-            nextSpeechCommand = speechCommands.shift()
-            nextUtterance = new SpeechSynthesisUtterance(nextSpeechCommand.text)
+          if (ttsTimestamps.length) {
+            nextTimestamp = ttsTimestamps.shift()
+            nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][langCode])
+            nextUtterance.lang = langCode
           } else {
             window.clearInterval(speechIntervalId)
           }
         }
       }, 1)
       
-      /* EOND OF TEXT TO SPEECH TESTING */
+      /* END OF TEXT TO SPEECH TESTING */
 
       // Reregister when done
       // await this.register()

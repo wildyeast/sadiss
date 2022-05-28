@@ -40,9 +40,9 @@ export default class Player {
     this.playing = true;
     // console.log(this.oscillators.map(val => val.startTime + this.offset))
 
-    window.setInterval(() => {
-      console.log(this.audioContext.currentTime + this.offset)
-    }, 1000)
+    // window.setInterval(() => {
+    //   console.log(this.audioContext.currentTime + this.offset)
+    // }, 1000)
 
   }
 
