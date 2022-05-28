@@ -275,6 +275,44 @@ export default {
       );
       this.isRegistered = false;
 
+      /* TEXT TO SPEECH TESTING */
+
+      const speechCommands = [
+        {
+          time: 0,
+          text: 'Start'
+        },
+        {
+          time: 2,
+          text: 'Two'
+        },
+        {
+          time: 4,
+          text: 'Four'
+        },
+        {
+          time: 6,
+          text: 'Six'
+        },
+      ]
+
+      let nextSpeechCommand = speechCommands.shift()
+      let nextUtterance = new SpeechSynthesisUtterance(nextSpeechCommand.text)
+
+      const speechIntervalId = window.setInterval(() => {
+        if (this.globalTime() - this.player.offset >= now + nextSpeechCommand.time + startInSec) {
+          speechSynthesis.speak(nextUtterance)
+          if (speechCommands.length) {
+            nextSpeechCommand = speechCommands.shift()
+            nextUtterance = new SpeechSynthesisUtterance(nextSpeechCommand.text)
+          } else {
+            window.clearInterval(speechIntervalId)
+          }
+        }
+      }, 1)
+      
+      /* EOND OF TEXT TO SPEECH TESTING */
+
       // Reregister when done
       // await this.register()
     },
