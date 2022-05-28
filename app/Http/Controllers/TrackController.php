@@ -72,6 +72,7 @@ class TrackController extends Controller
     $track = Track::where('id', $id)->firstOrFail();
     $partials = json_decode($track->partials);
     $tts_instructions = $track->tts_instructions;
+    $tts_language = $request->query->get('tts_language');
 
     $unique_partials = $partials;
     // If more clients than partials, duplicate original partials until this is no longer the case.
@@ -99,6 +100,7 @@ class TrackController extends Controller
       $client->partials = $chunks[$i];
       $client->start_time = $startTime;
       $client->tts_instructions = $tts_instructions;
+      $client->tts_language = $tts_language;
       $client->save();
     }
 
@@ -110,12 +112,16 @@ class TrackController extends Controller
   public function start_track_all_partials (Request $request, $id, $startTime) {
     $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request);
     $partials = json_decode(Track::where('id', $id)->firstOrFail()->partials);
+    $tts_instructions = $track->tts_instructions;
+    $tts_language = $request->query('tts_language')->get();
 
     foreach($clients as $i=>$value) {
       $client = Client::where('id', $value->id)->firstOrFail();
       // $client->partials = $chunks[$i]; // Commented for debugging
       $client->partials = $partials;
       $client->start_time = $startTime;
+      $client->tts_instructions = $tts_instructions;
+      $client->tts_language = $tts_language;
       $client->save();
     }
 

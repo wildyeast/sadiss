@@ -44,7 +44,7 @@
                   </div>
                   <!-- Below -->
                   <div>
-                    <ClientList :trackId="id" />
+                    <ClientList :trackId="id" :ttsInstructions="JSON.parse(data['tts_instructions'])" />
                   </div>
                 </template>
                 <!-- Composer -->

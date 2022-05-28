@@ -9703,7 +9703,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     Button: _Button_vue__WEBPACK_IMPORTED_MODULE_3__["default"]
   },
   props: {
-    trackId: String
+    trackId: String,
+    ttsInstructions: String
   },
   setup: function setup(props) {
     var registeredClients = (0,vue__WEBPACK_IMPORTED_MODULE_2__.reactive)([]);
@@ -9716,27 +9717,46 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var intervalId = null;
     var allPartialsAllDevices = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
     var motion;
-    (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
-      // getRegisteredClients();
-      autoGetRegisteredClients();
-      var mCorpAppId = "8844095860530063641";
-      console.log("Id: ", mCorpAppId);
-      var mCorpApp = MCorp.app(mCorpAppId);
+    var ttsLanguages = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)([]);
+    var ttsLanguage = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)();
+    (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
+      var mCorpAppId, mCorpApp;
+      return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+        while (1) {
+          switch (_context.prev = _context.next) {
+            case 0:
+              if (props.ttsInstructions) {
+                ttsLanguages.value = Object.keys(props.ttsInstructions[0]);
+                console.log(ttsLanguages.value);
+              } // getRegisteredClients();
 
-      mCorpApp.run = function () {
-        motion = mCorpApp.motions['shared'];
-        timingSrcConnected.value = true;
-        console.log('MCorpApp:', mCorpApp);
-      };
 
-      mCorpApp.init(); // timingProvider.onreadystatechange = () => {
-      // if (timingProvider.readyState === "open") {
-      // console.log("Time elapsed until TP ready: ", performance.now() - t1)
-      // timingObj = new TimingObject(timingProvider);
-      // timingSrcConnected.value = true;
-      // }
-      // };
-    });
+              autoGetRegisteredClients();
+              mCorpAppId = "8844095860530063641";
+              console.log("Id: ", mCorpAppId);
+              mCorpApp = MCorp.app(mCorpAppId);
+
+              mCorpApp.run = function () {
+                motion = mCorpApp.motions['shared'];
+                timingSrcConnected.value = true;
+                console.log('MCorpApp:', mCorpApp);
+              };
+
+              mCorpApp.init(); // timingProvider.onreadystatechange = () => {
+              // if (timingProvider.readyState === "open") {
+              // console.log("Time elapsed until TP ready: ", performance.now() - t1)
+              // timingObj = new TimingObject(timingProvider);
+              // timingSrcConnected.value = true;
+              // }
+              // };
+
+            case 7:
+            case "end":
+              return _context.stop();
+          }
+        }
+      }, _callee);
+    })));
 
     function registerClient() {
       (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.useForm)({
@@ -9750,10 +9770,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function _synchronizeTimingSrcPosition() {
-      _synchronizeTimingSrcPosition = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
+      _synchronizeTimingSrcPosition = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
                 if (!synchronizing.value) {
                   if (motion.vel != 1) {
@@ -9783,10 +9803,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 2:
               case "end":
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee);
+        }, _callee2);
       }));
       return _synchronizeTimingSrcPosition.apply(this, arguments);
     }
@@ -9796,11 +9816,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function _startTrack() {
-      _startTrack = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee2() {
+      _startTrack = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
         var calculatedStartingPosition, route, response;
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee2$(_context2) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
                 calculatedStartingPosition = motion.pos + 5;
 
@@ -9811,19 +9831,23 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 console.log("Calculated starting position: ", calculatedStartingPosition);
-                _context2.next = 5;
-                return axios.post(route);
+                _context3.next = 5;
+                return axios.post(route, null, {
+                  params: {
+                    tts_language: ttsLanguage.value
+                  }
+                });
 
               case 5:
-                response = _context2.sent;
+                response = _context3.sent;
                 console.log(response.data.data);
 
               case 7:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2);
+        }, _callee3);
       }));
       return _startTrack.apply(this, arguments);
     }
@@ -9833,18 +9857,18 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function _getRegisteredClients() {
-      _getRegisteredClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee3() {
+      _getRegisteredClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
         var response, _iterator, _step, client;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee3$(_context3) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
-                _context3.next = 2;
+                _context4.next = 2;
                 return axios.get("/api/client/active");
 
               case 2:
-                response = _context3.sent;
+                response = _context4.sent;
                 registeredClients.splice(0);
                 _iterator = _createForOfIteratorHelper(response.data);
 
@@ -9861,10 +9885,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 6:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3);
+        }, _callee4);
       }));
       return _getRegisteredClients.apply(this, arguments);
     }
@@ -9874,38 +9898,38 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function _autoGetRegisteredClients() {
-      _autoGetRegisteredClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
+      _autoGetRegisteredClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
                 console.log(autoGetRegisteredClientsInterval.value);
 
                 if (autoGetRegisteredClientsInterval.value) {
-                  _context5.next = 7;
+                  _context6.next = 7;
                   break;
                 }
 
-                _context5.next = 4;
+                _context6.next = 4;
                 return getRegisteredClients();
 
               case 4:
-                autoGetRegisteredClientsInterval.value = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee4() {
-                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee4$(_context4) {
+                autoGetRegisteredClientsInterval.value = window.setInterval( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee5() {
+                  return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee5$(_context5) {
                     while (1) {
-                      switch (_context4.prev = _context4.next) {
+                      switch (_context5.prev = _context5.next) {
                         case 0:
-                          _context4.next = 2;
+                          _context5.next = 2;
                           return getRegisteredClients();
 
                         case 2:
                         case "end":
-                          return _context4.stop();
+                          return _context5.stop();
                       }
                     }
-                  }, _callee4);
+                  }, _callee5);
                 })), 2000);
-                _context5.next = 8;
+                _context6.next = 8;
                 break;
 
               case 7:
@@ -9913,10 +9937,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               case 8:
               case "end":
-                return _context5.stop();
+                return _context6.stop();
             }
           }
-        }, _callee5);
+        }, _callee6);
       }));
       return _autoGetRegisteredClients.apply(this, arguments);
     }
@@ -9926,62 +9950,62 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function _removeClients() {
-      _removeClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee6() {
+      _removeClients = _asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee7() {
         var _iterator2, _step2, client, response;
 
-        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee6$(_context6) {
+        return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
                 _iterator2 = _createForOfIteratorHelper(registeredClients);
-                _context6.prev = 1;
+                _context7.prev = 1;
 
                 _iterator2.s();
 
               case 3:
                 if ((_step2 = _iterator2.n()).done) {
-                  _context6.next = 11;
+                  _context7.next = 11;
                   break;
                 }
 
                 client = _step2.value;
-                _context6.next = 7;
+                _context7.next = 7;
                 return axios.post("/api/client/delete/".concat(client.id));
 
               case 7:
-                response = _context6.sent;
+                response = _context7.sent;
                 console.log("Removed client with id " + client.id);
 
               case 9:
-                _context6.next = 3;
+                _context7.next = 3;
                 break;
 
               case 11:
-                _context6.next = 16;
+                _context7.next = 16;
                 break;
 
               case 13:
-                _context6.prev = 13;
-                _context6.t0 = _context6["catch"](1);
+                _context7.prev = 13;
+                _context7.t0 = _context7["catch"](1);
 
-                _iterator2.e(_context6.t0);
+                _iterator2.e(_context7.t0);
 
               case 16:
-                _context6.prev = 16;
+                _context7.prev = 16;
 
                 _iterator2.f();
 
-                return _context6.finish(16);
+                return _context7.finish(16);
 
               case 19:
                 getRegisteredClients();
 
               case 20:
               case "end":
-                return _context6.stop();
+                return _context7.stop();
             }
           }
-        }, _callee6, null, [[1, 13, 16, 19]]);
+        }, _callee7, null, [[1, 13, 16, 19]]);
       }));
       return _removeClients.apply(this, arguments);
     }
@@ -9997,7 +10021,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       synchronizeTimingSrcPosition: synchronizeTimingSrcPosition,
       timingSrcPosition: timingSrcPosition,
       timingSrcConnected: timingSrcConnected,
-      allPartialsAllDevices: allPartialsAllDevices
+      allPartialsAllDevices: allPartialsAllDevices,
+      ttsLanguage: ttsLanguage,
+      ttsLanguages: ttsLanguages
     };
   }
 });
@@ -11390,6 +11416,9 @@ var _hoisted_6 = ["disabled"];
 var _hoisted_7 = {
   "class": "border-b border-t border-r p-2"
 };
+var _hoisted_8 = {
+  key: 0
+};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     "class": "mr-2",
@@ -11417,20 +11446,32 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* PROPS */
   , _hoisted_6), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.timingSrcPosition ? $setup.timingSrcPosition : "0.0"), 1
   /* TEXT */
-  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[3] || (_cache[3] = function () {
+  )]), $setup.ttsLanguages.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
+      return $setup.ttsLanguage = $event;
+    })
+  }, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.ttsLanguages, function (lang) {
+    return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(lang), 1
+    /* TEXT */
+    );
+  }), 256
+  /* UNKEYED_FRAGMENT */
+  ))], 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $setup.ttsLanguage]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    onClick: _cache[4] || (_cache[4] = function () {
       return $setup.removeClients && $setup.removeClients.apply($setup, arguments);
     }),
     "class": "border p-2"
   }, " Remove all registered clients "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[4] || (_cache[4] = function () {
+    onClick: _cache[5] || (_cache[5] = function () {
       return $setup.getRegisteredClients && $setup.getRegisteredClients.apply($setup, arguments);
     }),
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["border p-2", $setup.autoGetRegisteredClientsInterval ? 'border-b-green-400 border-l-green-400 border-t-green-400' : 'border'])
   }, " Refresh list ", 2
   /* CLASS */
   ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: _cache[5] || (_cache[5] = function () {
+    onClick: _cache[6] || (_cache[6] = function () {
       return $setup.autoGetRegisteredClients && $setup.autoGetRegisteredClients.apply($setup, arguments);
     }),
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["border-b border-t border-r p-2", $setup.autoGetRegisteredClientsInterval ? 'border-green-400' : 'border-b border-t border-r'])
@@ -13247,10 +13288,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, null, 8
       /* PROPS */
       , ["partialData"])])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Below "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_ClientList, {
-        trackId: $setup.id
+        trackId: $setup.id,
+        ttsInstructions: JSON.parse($setup.data['tts_instructions'])
       }, null, 8
       /* PROPS */
-      , ["trackId"])])], 64
+      , ["trackId", "ttsInstructions"])])], 64
       /* STABLE_FRAGMENT */
       )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Composer "), $setup.category === 'composers' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Left hand side "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.data['name']), 1
       /* TEXT */

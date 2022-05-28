@@ -25,6 +25,11 @@
           {{ timingSrcPosition ? timingSrcPosition : "0.0" }}
         </div>
       </div>
+      <div v-if="ttsLanguages.length">
+        <select v-model="ttsLanguage">
+          <option v-for="lang of ttsLanguages">{{ lang }}</option>
+        </select>
+      </div>
       <button @click="removeClients" class="border p-2">
         Remove all registered clients
       </button>
@@ -71,6 +76,7 @@ export default {
   components: { Button },
   props: {
     trackId: String,
+    ttsInstructions: String
   },
   setup(props) {
     const registeredClients = reactive([]);
@@ -83,8 +89,16 @@ export default {
     let intervalId = null;
     let allPartialsAllDevices = ref(false);
     let motion;
+    const ttsLanguages = ref([])
+    const ttsLanguage = ref()
 
-    onMounted(() => {
+    onMounted(async () => {
+
+      if (props.ttsInstructions) {
+        ttsLanguages.value = Object.keys(props.ttsInstructions[0])
+        console.log(ttsLanguages.value)
+      }
+
       // getRegisteredClients();
       autoGetRegisteredClients();
       const mCorpAppId = "8844095860530063641"
@@ -146,7 +160,7 @@ export default {
       }
 
       console.log("Calculated starting position: ", calculatedStartingPosition);
-      const response = await axios.post(route);
+      const response = await axios.post(route, null, { params: { tts_language: ttsLanguage.value } });
       console.log(response.data.data);
     }
 
@@ -193,6 +207,8 @@ export default {
       timingSrcPosition,
       timingSrcConnected,
       allPartialsAllDevices,
+      ttsLanguage,
+      ttsLanguages
     };
   },
 };
