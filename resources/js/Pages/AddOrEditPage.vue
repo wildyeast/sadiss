@@ -21,6 +21,15 @@
                 <div v-if="field === 'partials'">
                   <PartialsUpload @fileInput="onPartialsFileInput" />
                 </div>
+                <div v-if="field === 'tts_instructions'">
+                 <label class="pb-6">
+                    Upload a Text-To-Speech instructions file
+                  </label>
+                  <input
+                    type="file"
+                    accept=".txt"
+                    @input="onTtsInstructionsFileInput($event.target.files[0])" />
+                </div>
                 <div v-else-if="fields[field].type === 'datetime'">
                   <o-datetimepicker placeholder="Click to select..." locale="en-GB" icon="event" v-model="form[field]" />
                 </div>
@@ -92,6 +101,7 @@ export default {
           type: field.Type,
           editable: isEditable(field.Field)
         }
+        console.log(field)
       }
 
       if (addOrEdit == 'edit') {
@@ -139,6 +149,9 @@ export default {
 
     function onPartialsFileInput (value) {
       form['sourcefile'] = value
+    }
+    function onTtsInstructionsFileInput (value) {
+      form['tts_instructions'] = value
     }
 
     function submit () {
@@ -189,6 +202,7 @@ export default {
       loadingFinished,
       title,
       onPartialsFileInput,
+      onTtsInstructionsFileInput,
       submit,
     }
   }

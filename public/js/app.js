@@ -9719,7 +9719,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)(function () {
       // getRegisteredClients();
       autoGetRegisteredClients();
-      var mCorpApp = MCorp.app("8844095860530063641");
+      var mCorpAppId = "8844095860530063641";
+      console.log("Id: ", mCorpAppId);
+      var mCorpApp = MCorp.app(mCorpAppId);
 
       mCorpApp.run = function () {
         motion = mCorpApp.motions['shared'];
@@ -10409,6 +10411,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     type: field.Type,
                     editable: isEditable(field.Field)
                   };
+                  console.log(field);
                 }
               } catch (err) {
                 _iterator.e(err);
@@ -10504,6 +10507,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       form['sourcefile'] = value;
     }
 
+    function onTtsInstructionsFileInput(value) {
+      form['tts_instructions'] = value;
+    }
+
     function submit() {
       // TODO: Do formatting somewhere else (during v-model?)
       // Oruga datetimepicker has a datetimeFormatter prop, maybe this helps https://oruga.io/components/datetimepicker.html
@@ -10557,6 +10564,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       loadingFinished: loadingFinished,
       title: title,
       onPartialsFileInput: onPartialsFileInput,
+      onTtsInstructionsFileInput: onTtsInstructionsFileInput,
       submit: submit
     };
   }
@@ -12201,30 +12209,40 @@ var _hoisted_7 = {
 var _hoisted_8 = {
   key: 1
 };
-var _hoisted_9 = {
-  key: 2
-};
-var _hoisted_10 = {
-  key: 3
-};
-var _hoisted_11 = {
-  key: 4
-};
-var _hoisted_12 = {
-  "class": "flex justify-center mt-2"
-};
 
-var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Submit");
-
-var _hoisted_14 = {
-  key: 1
-};
-
-var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Loading...", -1
+var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+  "class": "pb-6"
+}, " Upload a Text-To-Speech instructions file ", -1
 /* HOISTED */
 );
 
-var _hoisted_16 = [_hoisted_15];
+var _hoisted_10 = {
+  key: 2
+};
+var _hoisted_11 = {
+  key: 3
+};
+var _hoisted_12 = {
+  key: 4
+};
+var _hoisted_13 = {
+  key: 5
+};
+var _hoisted_14 = {
+  "class": "flex justify-center mt-2"
+};
+
+var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createTextVNode)("Submit");
+
+var _hoisted_16 = {
+  key: 1
+};
+
+var _hoisted_17 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, "Loading...", -1
+/* HOISTED */
+);
+
+var _hoisted_18 = [_hoisted_17];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   var _component_Head = (0,vue__WEBPACK_IMPORTED_MODULE_0__.resolveComponent)("Head");
 
@@ -12264,7 +12282,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }), 128
       /* KEYED_FRAGMENT */
       ))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("form", {
-        onSubmit: _cache[0] || (_cache[0] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
+        onSubmit: _cache[1] || (_cache[1] = (0,vue__WEBPACK_IMPORTED_MODULE_0__.withModifiers)(function () {
           return $setup.submit && $setup.submit.apply($setup, arguments);
         }, ["prevent"])),
         "class": "inline-block w-full md:w-1/2"
@@ -12279,7 +12297,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           onFileInput: $setup.onPartialsFileInput
         }, null, 8
         /* PROPS */
-        , ["onFileInput"])])) : $setup.fields[field].type === 'datetime' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_o_datetimepicker, {
+        , ["onFileInput"])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), field === 'tts_instructions' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+          type: "file",
+          accept: ".txt",
+          onInput: _cache[0] || (_cache[0] = function ($event) {
+            return $setup.onTtsInstructionsFileInput($event.target.files[0]);
+          })
+        }, null, 32
+        /* HYDRATE_EVENTS */
+        )])) : $setup.fields[field].type === 'datetime' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_o_datetimepicker, {
           placeholder: "Click to select...",
           locale: "en-GB",
           icon: "event",
@@ -12289,14 +12315,14 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }
         }, null, 8
         /* PROPS */
-        , ["modelValue", "onUpdate:modelValue"])])) : $setup.getInputType($setup.fields[field].type) === 'checkbox' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_o_switch, {
+        , ["modelValue", "onUpdate:modelValue"])])) : $setup.getInputType($setup.fields[field].type) === 'checkbox' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_o_switch, {
           modelValue: $setup.form[field],
           "onUpdate:modelValue": function onUpdateModelValue($event) {
             return $setup.form[field] = $event;
           }
         }, null, 8
         /* PROPS */
-        , ["modelValue", "onUpdate:modelValue"])])) : $setup.fields[field].type !== 'text' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_o_input, {
+        , ["modelValue", "onUpdate:modelValue"])])) : $setup.fields[field].type !== 'text' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_o_input, {
           type: $setup.getInputType($setup.fields[field].type),
           modelValue: $setup.form[field],
           "onUpdate:modelValue": function onUpdateModelValue($event) {
@@ -12304,7 +12330,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           }
         }, null, 8
         /* PROPS */
-        , ["type", "modelValue", "onUpdate:modelValue"])])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_11, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_o_input, {
+        , ["type", "modelValue", "onUpdate:modelValue"])])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_13, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_o_input, {
           type: "textarea",
           modelValue: $setup.form[field],
           "onUpdate:modelValue": function onUpdateModelValue($event) {
@@ -12315,11 +12341,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         , ["modelValue", "onUpdate:modelValue"])]))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
       }), 128
       /* KEYED_FRAGMENT */
-      )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_12, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, null, {
+      )), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_14, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_Button, null, {
         "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
           return [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)(_component_o_button, null, {
             "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-              return [_hoisted_13];
+              return [_hoisted_15];
             }),
             _: 1
             /* STABLE */
@@ -12331,7 +12357,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
       })])], 32
       /* HYDRATE_EVENTS */
-      )])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_14, _hoisted_16))];
+      )])) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_16, _hoisted_18))];
     }),
     _: 1
     /* STABLE */
