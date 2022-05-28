@@ -69,8 +69,10 @@ class TrackController extends Controller
 
   public function start_track (Request $request, $id, $startTime) {
     $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request);
-    $partials = json_decode(Track::where('id', $id)->firstOrFail()->partials);
-    
+    $track = Track::where('id', $id)->firstOrFail();
+    $partials = json_decode($track->partials);
+    $tts_instructions = $track->tts_instructions;
+
     $unique_partials = $partials;
     // If more clients than partials, duplicate original partials until this is no longer the case.
     while (count($clients) > count($partials)) {
@@ -96,6 +98,7 @@ class TrackController extends Controller
       $client = Client::where('id', $value->id)->firstOrFail();
       $client->partials = $chunks[$i];
       $client->start_time = $startTime;
+      $client->tts_instructions = $tts_instructions;
       $client->save();
     }
 

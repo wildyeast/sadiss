@@ -10411,7 +10411,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                     type: field.Type,
                     editable: isEditable(field.Field)
                   };
-                  console.log(field);
                 }
               } catch (err) {
                 _iterator.e(err);
