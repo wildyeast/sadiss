@@ -113,7 +113,7 @@ class TrackController extends Controller
     $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request);
     $partials = json_decode(Track::where('id', $id)->firstOrFail()->partials);
     $tts_instructions = $track->tts_instructions;
-    $tts_language = $request->query('tts_language')->get();
+    $tts_language = $request->query->get('tts_language');
 
     foreach($clients as $i=>$value) {
       $client = Client::where('id', $value->id)->firstOrFail();
