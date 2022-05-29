@@ -1,5 +1,8 @@
 <template>
   <div class="app">
+    <audio id="audioElement">
+      <source src="./assets/test.ogg" type="audio/ogg">
+    </audio>
     <button @click="startStop">Start/Stop</button>
     <div class="md:w-1/2 w-11/12 border b-white p-4 flex flex-col">
       <!-- <p>
@@ -76,7 +79,7 @@
 import dayjs from "dayjs";
 import dayjsPluginUTC from "dayjs/plugin/utc";
 dayjs.extend(dayjsPluginUTC);
-// import * as MCorp from "./MotionCorp.js"
+import {TimingObject, TimingSampler, TimingProgress } from "https://webtiming.github.io/timingsrc/lib/timingsrc-esm-v3.js";
 
 import Player from "./Player";
 
@@ -92,9 +95,9 @@ export default {
     availableTracks: [],
     deviceRegistrationId: null,
     intervalId: null,
-    hostUrl: "http://sadiss.test.test",
+    // hostUrl: "http://sadiss.test.test",
     // hostUrl: 'http://8hz.at',
-    // hostUrl: "https://sadiss.net",
+    hostUrl: "https://sadiss.net",
     print: "",
     timingProvider: null,
     timingObj: null,
@@ -110,13 +113,23 @@ export default {
 
     outputLatency: 0,
     useCalculatedOutputLatency: true,
-    motion: null
+    motion: null,
+    to: null,
+
+    audio: null
   }),
   async mounted() {
 
-    const externalScript = document.createElement('script')
-    externalScript.setAttribute('src', 'https://www.mcorp.no/lib/mcorp-2.0.js')
-    document.head.appendChild(externalScript)
+    this.audio = document.querySelector('#audioElement')
+    this.to = new TimingObject()
+
+    // const externalScript = document.createElement('script')
+    // externalScript.setAttribute('src', 'https://www.mcorp.no/lib/mcorp-2.0.js')
+    // document.head.appendChild(externalScript)
+
+    // const externalScript2 = document.createElement('script')
+    // externalScript.setAttribute('src', "https://mcorp.no/lib/mediasync.js")
+    // document.head.appendChild(externalScript2)
 
     // const mCorpApp = MCorp.app("8844095860530063641", { anon: true })
     // console.log(mCorpApp.motions)
@@ -136,18 +149,41 @@ export default {
   },
   methods: {
     startStop () {
-      // this.motion.update(null, 0, null)
-      console.log(this.motion)
+      if (this.motion.vel === 1) {
+        this.motion.update(0, 0, null)
+      } else {
+        this.motion.update(null, 1, null)
+        // this.to.update({velocity:1});
+      }
     },
 
     async register() {
       if (this.isRegistered) return;
 
       const mCorpApp = MCorp.app("8844095860530063641", { anon: true })
-      mCorpApp.run = () => {
+      // mCorpApp.run = () => {
+      //   this.motion = mCorpApp.motions['shared']
+      //   this.to.src = this.motion
+      //   MCorp.mediaSync(this.audio, this.to, { debug: true })
+      // }
+      mCorpApp.ready.then(() => {
         this.motion = mCorpApp.motions['shared']
-      }
-      mCorpApp.init()
+        this.to.src = this.motion
+
+        this.motion.on('change', () => {
+          if (this.motion.vel === 1) {
+            this.to.update({velocity:1});
+          } else {
+            this.to.update({velocity:0});
+          }
+          if (this.motion.pos === 0) {
+            this.to.update({position:0});
+          }
+        })
+
+        MCorp.mediaSync(this.audio, this.to, { debug: true })
+      })
+      // mCorpApp.init()
 
       while (!this.motion) {
         await new Promise(r => setTimeout(r, 500));
@@ -219,14 +255,18 @@ export default {
         this.player.partialData = this.partialData;
 
         let prepareStarted = false;
+        // const sampler = new TimingSampler(to, {period:100});
+        MCorp.mediaSync(this.audio, this.to, { debug: true })
 
         window.clearInterval(this.initialTimingSrcIntervalId);
         const intervalId = window.setInterval(() => {
           this.timingSrcPosition = this.globalTime();
-          if (this.timingSrcPosition >= startTimeFromServer) {
+          if (this.timingSrcPosition >= startTimeFromServer + 3) {
+            this.audio.play()
+            console.log(this.timingSrcPosition)
             this.player.offset =
               this.timingSrcPosition - this.player.audioContext.currentTime; // Do not change!
-            console.log("Offset: ", this.player.offset);
+            // console.log("Offset: ", this.player.offset);
             if (!prepareStarted) {
               // Prevent multiple calls of prepare() if checkForStart() short interval time
               this.start();
@@ -243,7 +283,7 @@ export default {
       const startInSec = 5;
       const q = this.globalTime();
       const now = q - this.player.offset; // Do not change!
-      this.player.playOneShot(now);
+      // this.player.playOneShot(now);
       console.log("ctx.baseLatency: ", this.player.audioContext.baseLatency);
       console.log(
         "ctx outputTimestamp ctx timestamp + offset:, ",
@@ -261,25 +301,26 @@ export default {
 
       console.log("Latency to subract: ", latencyToSubtract);
 
-      this.player.setup(
-        this.partialData,
-        startInSec,
-        // now - calculatedOutputLatency - this.player.audioContext.baseLatency // O
-        // now // no O
-        now - latencyToSubtract // O only on Chrome
-      );
+      // this.player.setup(
+      //   this.partialData,
+      //   startInSec,
+      //   // now - calculatedOutputLatency - this.player.audioContext.baseLatency // O
+      //   now // no O
+      //   // now - latencyToSubtract // O only on Chrome
+      // );
       console.log(
         "ctxTime + offset when setup finished: ",
         this.player.audioContext.currentTime + this.player.offset
       );
-      console.log(
-        this.player.valuesSetForFirstPartial.map(
-          (val) => val.map(v => v + this.player.offset)
-        )
-      );
+      // console.log(
+      //   this.player.valuesSetForFirstPartial.map(
+      //     (val) => val.map(v => v + this.player.offset)
+      //   )
+      // );
       this.isRegistered = false;
 
       /* TEXT TO SPEECH TESTING */
+
       if (this.ttsInstructions && this.ttsLanguage) {
         console.log("Starting TTS.")
         const ttsTimestamps = Object.keys(this.ttsInstructions)
@@ -299,7 +340,7 @@ export default {
               window.clearInterval(speechIntervalId)
             }
           }
-        }, 1)
+        }, 50)
       }
       
       /* END OF TEXT TO SPEECH TESTING */
