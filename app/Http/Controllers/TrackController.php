@@ -111,7 +111,8 @@ class TrackController extends Controller
   // Used for sending all partials to all clients
   public function start_track_all_partials (Request $request, $id, $startTime) {
     $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request);
-    $partials = json_decode(Track::where('id', $id)->firstOrFail()->partials);
+    $track = Track::where('id', $id)->firstOrFail();
+    $partials = json_decode($track->partials);
     $tts_instructions = $track->tts_instructions;
     $tts_language = $request->query->get('tts_language');
 
