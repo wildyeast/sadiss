@@ -22,7 +22,7 @@
           Sync
         </button>
         <div class="border-b border-t border-r p-2">
-          {{ timingSrcPosition ? timingSrcPosition : "0.0" }}
+          {{ synchronizing ? timingSrcPosition : "0.0" }}
         </div>
       </div>
       <div v-if="ttsLanguages.length">
@@ -140,8 +140,9 @@ export default {
         })();
       } else {
         synchronizing.value = false;
-        motion.update(0, 0, 0)
-        timingSrcPosition.value = motion.pos.toFixed(1);
+        motion.update(0, 0, null)
+        timingSrcPosition.value = motion.pos;
+        console.log(motion.pos)
       }
       console.log("Synchronizing: ", synchronizing.value);
     }
@@ -204,7 +205,8 @@ export default {
       timingSrcConnected,
       allPartialsAllDevices,
       ttsLanguage,
-      ttsLanguages
+      ttsLanguages,
+      motion
     };
   },
 };

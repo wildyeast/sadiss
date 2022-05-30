@@ -9790,8 +9790,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   })();
                 } else {
                   synchronizing.value = false;
-                  motion.update(0, 0, 0);
-                  timingSrcPosition.value = motion.pos.toFixed(1);
+                  motion.update(0, 0, null);
+                  timingSrcPosition.value = motion.pos;
+                  console.log(motion.pos);
                 }
 
                 console.log("Synchronizing: ", synchronizing.value);
@@ -10016,7 +10017,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       timingSrcConnected: timingSrcConnected,
       allPartialsAllDevices: allPartialsAllDevices,
       ttsLanguage: ttsLanguage,
-      ttsLanguages: ttsLanguages
+      ttsLanguages: ttsLanguages,
+      motion: motion
     };
   }
 });
@@ -11450,7 +11452,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     disabled: !$setup.timingSrcConnected
   }, " Sync ", 8
   /* PROPS */
-  , _hoisted_6), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.timingSrcPosition ? $setup.timingSrcPosition : "0.0"), 1
+  , _hoisted_6), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.synchronizing ? $setup.timingSrcPosition : "0.0"), 1
   /* TEXT */
   )]), $setup.ttsLanguages.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
