@@ -137,6 +137,35 @@ export default {
     async register() {
       if (this.isRegistered) return;
 
+      const mCorpApp = MCorp.app("8844095860530063641", { anon: true })
+      // mCorpApp.run = () => {
+      //   this.motion = mCorpApp.motions['shared']
+      //   this.to.src = this.motion
+      //   MCorp.mediaSync(this.audio, this.to, { debug: true })
+      // }
+      mCorpApp.ready.then(() => {
+        this.motion = mCorpApp.motions['shared']
+        this.to.src = this.motion
+
+        this.motion.on('change', () => {
+          if (this.motion.vel === 1) {
+            this.to.update({velocity:1});
+          } else {
+            this.to.update({velocity:0});
+          }
+          if (this.motion.pos === 0) {
+            this.to.update({position:0});
+          }
+        })
+
+        // MCorp.mediaSync(this.audio, this.to, { debug: true })
+      })
+      // mCorpApp.init()
+
+      while (!this.motion) {
+        await new Promise(r => setTimeout(r, 500));
+      }
+
       this.initialTimingSrcIntervalId = window.setInterval(() => {
         this.timingSrcPosition = this.motion.pos.toFixed(1)
       }, 10);
@@ -204,12 +233,17 @@ export default {
         window.clearInterval(this.initialTimingSrcIntervalId);
         const intervalId = window.setInterval(() => {
           this.timingSrcPosition = this.globalTime();
-          if (this.timingSrcPosition >= startTimeFromServer) {
+          if (this.timingSrcPosition >= startTimeFromServer + 3) {
+            const a = document.querySelector('.app')
+            a.style['background-color'] = 'red'
+            // this.audio.play()
+            console.log(this.timingSrcPosition)
             this.player.offset =
               this.timingSrcPosition - this.player.audioContext.currentTime; // Do not change!
             console.log("Offset: ", this.player.offset);
             if (!prepareStarted) {
               // Prevent multiple calls of prepare() if checkForStart() short interval time
+              a.style['background-color'] = 'blue'
               this.start();
               prepareStarted = true;
             }
@@ -245,9 +279,9 @@ export default {
       this.player.setup(
         this.partialData,
         startInSec,
-        // now - calculatedOutputLatency - this.player.audioContext.baseLatency // O
+        now - calculatedOutputLatency - this.player.audioContext.baseLatency // O
         // now // no O
-        now - latencyToSubtract // O only on Chrome
+        // now - latencyToSubtract // O only on Chrome
       );
       console.log(
         "ctxTime + offset when setup finished: ",
@@ -259,6 +293,34 @@ export default {
         )
       );
       this.isRegistered = false;
+
+      /* TEXT TO SPEECH TESTING */
+
+      if (this.ttsInstructions && this.ttsLanguage) {
+        console.log("Starting TTS.")
+        const ttsTimestamps = Object.keys(this.ttsInstructions)
+  
+        let nextTimestamp = ttsTimestamps.shift()
+        let nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
+        nextUtterance.lang = this.ttsLanguage
+  
+        const speechIntervalId = window.setInterval(() => {
+          if (this.globalTime() - this.player.offset >= now + Number(nextTimestamp) + startInSec) {
+            speechSynthesis.speak(nextUtterance)
+            console.log("AudioCtx time + offset: ", this.player.audioContext.currentTime + this.player.offset)
+            if (ttsTimestamps.length) {
+              nextTimestamp = ttsTimestamps.shift()
+              nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
+              nextUtterance.lang = this.ttsLanguage
+            } else {
+              window.clearInterval(speechIntervalId)
+            }
+          }
+        }, 50)
+      }
+      
+      /* END OF TEXT TO SPEECH TESTING */
+
 
       // Reregister when done
       // await this.register()
