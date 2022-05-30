@@ -21,7 +21,15 @@
                 <div v-if="field === 'partials'">
                   <PartialsUpload @fileInput="onPartialsFileInput" />
                 </div>
-                <div v-if="field === 'tts_instructions'">
+                <div v-else-if="field === 'tts_instructions'"
+                     class="flex
+                            flex-col
+                            bg-white
+                            p-6
+                            border-1
+                            rounded-bulma-input-border-radius
+                            border-bulma-input-border
+                            hover:border-bulma-input-border-hover">
                  <label class="pb-6">
                     Upload a Text-To-Speech instructions file
                   </label>

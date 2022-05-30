@@ -12253,7 +12253,8 @@ var _hoisted_7 = {
   key: 0
 };
 var _hoisted_8 = {
-  key: 1
+  key: 1,
+  "class": "flex flex-col bg-white p-6 border-1 rounded-bulma-input-border-radius border-bulma-input-border hover:border-bulma-input-border-hover"
 };
 
 var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
@@ -12343,7 +12344,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
           onFileInput: $setup.onPartialsFileInput
         }, null, 8
         /* PROPS */
-        , ["onFileInput"])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), field === 'tts_instructions' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+        , ["onFileInput"])])) : field === 'tts_instructions' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
           type: "file",
           accept: ".json",
           onInput: _cache[0] || (_cache[0] = function ($event) {
