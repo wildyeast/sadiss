@@ -78,7 +78,7 @@ export default {
   components: { Button },
   props: {
     trackId: String,
-    ttsInstructions: String
+    ttsInstructions: Object
   },
   setup(props) {
     const registeredClients = reactive([]);
@@ -95,7 +95,6 @@ export default {
 
       if (props.ttsInstructions) {
         ttsLanguages.value = Object.keys(props.ttsInstructions[0])
-        console.log(ttsLanguages.value)
       }
 
       // getRegisteredClients();

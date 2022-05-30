@@ -9704,7 +9704,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   props: {
     trackId: String,
-    ttsInstructions: String
+    ttsInstructions: Object
   },
   setup: function setup(props) {
     var registeredClients = (0,vue__WEBPACK_IMPORTED_MODULE_2__.reactive)([]);
@@ -9724,7 +9724,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             case 0:
               if (props.ttsInstructions) {
                 ttsLanguages.value = Object.keys(props.ttsInstructions[0]);
-                console.log(ttsLanguages.value);
               } // getRegisteredClients();
 
 
