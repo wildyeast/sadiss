@@ -111,7 +111,8 @@ export default {
     performances: null,
     ttsInstructions: null,
     ttsLanguage: null,
-    partialIdToRegisterWith: null
+    partialIdToRegisterWith: null,
+    waveform: null
   }),
   async mounted() {
     const mCorpApp = MCorp.app("8844095860530063641", {anon: true})
@@ -244,7 +245,17 @@ export default {
         const startTimeFromServer = Number(clientData.client["start_time"]);
         this.ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
         this.ttsLanguage = clientData.client["tts_language"]
-        // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
+        const wf = clientData.client["waveform"]
+        if (wf) {
+          if (['sine', 'sawtooth', 'square', 'triangle'].includes(wf)) {
+            this.player.waveform = wf
+          } else {
+            // TODO: Placeholder for custom wave
+            // Since you can't enter custom waves in the admin interface currently this is not implemented.
+          }
+        }
+
+        // Conversion only necessary if playing from chunks sent by db, not when playing all partials on one client directly
         this.partialData = this.convertPartialsIfNeeded(
           clientData.client["partials"]
         );

@@ -9,6 +9,7 @@ export default class Player {
   oscillators = []
   registerFunction = null
   valuesSetForFirstPartial = []
+  waveform = 'sine'
 
   setup(partialData, startInSec, now, playingLocally = false) {
     this.partialData = partialData
@@ -48,6 +49,7 @@ export default class Player {
 
   setupOscillator(partial, timeToAddToStart) {
     const osc = this.audioContext.createOscillator()
+    osc.type = this.waveform
     const gain = this.audioContext.createGain()
 
     osc.frequency.value = 0
