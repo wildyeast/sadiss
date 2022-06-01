@@ -9750,10 +9750,30 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                console.log(waveform.value);
-                return _context2.abrupt("return");
+                if (!synchronizing.value) {
+                  if (motion.vel != 1) {
+                    motion.update(null, 1, null);
+                  }
 
-              case 3:
+                  synchronizing.value = true;
+
+                  (function query() {
+                    if (motion.pos.toFixed(1) - timingSrcPosition.value != 0) {
+                      // TODO: Weird calculation, doesn't work with !== for some reason, no time to look into it now
+                      timingSrcPosition.value = motion.pos.toFixed(1);
+                    }
+
+                    if (synchronizing.value) {
+                      window.setTimeout(query, 10);
+                    }
+                  })();
+                } else {
+                  synchronizing.value = false;
+                  motion.update(0, 0, null);
+                  timingSrcPosition.value = motion.pos;
+                }
+
+              case 1:
               case "end":
                 return _context2.stop();
             }
@@ -9788,7 +9808,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 return axios.post(route, null, {
                   params: {
                     tts_language: ttsLanguage.value,
-                    choir_mode: choirMode.value
+                    choir_mode: choirMode.value,
+                    waveform: waveform.value
                   }
                 });
 
@@ -11550,9 +11571,31 @@ var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
-var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<option value=\"sine\" selected>Sine</option><option value=\"saw\">Saw</option><option value=\"square\">Square</option><option value=\"triangle\">Triangle</option><option value=\"\">Custom</option>", 5);
+var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: "sine",
+  selected: ""
+}, "Sine", -1
+/* HOISTED */
+);
 
-var _hoisted_17 = [_hoisted_12];
+var _hoisted_13 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: "square"
+}, "Square", -1
+/* HOISTED */
+);
+
+var _hoisted_14 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: "sawtooth"
+}, "Saw", -1
+/* HOISTED */
+);
+
+var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+  value: "triangle"
+}, "Triangle", -1
+/* HOISTED */
+);
+
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     "class": "mr-2",
@@ -11600,7 +11643,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
       return $setup.waveform = $event;
     })
-  }, _hoisted_17, 512
+  }, [_hoisted_12, _hoisted_13, _hoisted_14, _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <option value=\"\">Custom</option> ")], 512
   /* NEED_PATCH */
   ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $setup.waveform]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: $setup.removeClients,

@@ -31,8 +31,6 @@ onMounted(async () => {
 })
 
 async function synchronizeTimingSrcPosition() {
-  console.log(waveform.value)
-  return
   if (!synchronizing.value) {
     if (motion.vel != 1) {
       motion.update(null, 1, null)
