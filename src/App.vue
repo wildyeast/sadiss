@@ -172,7 +172,7 @@ export default {
         // })
 
         // MCorp.mediaSync(this.audio, this.to, { debug: true })
-      })
+      // })
       // mCorpApp.init()
 
       while (!this.motion) {
