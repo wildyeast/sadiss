@@ -8,8 +8,11 @@ const performanceTracks = ref([])
 const tracks = ref()
 
 onMounted(async () => {
-    const response = await axios.get(`/api/track`)
-    tracks.value = response.data
+    const trackResponse = await axios.get(`/api/track`)
+    tracks.value = trackResponse.data
+
+    const performanceTrackResponse = await axios.get(`/api/performance/get_tracks/${props.performance.id}`)
+    performanceTracks.value = performanceTrackResponse.data
 })
 
 console.log(props.performance)

@@ -10286,7 +10286,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var performanceTracks = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)([]);
     var tracks = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)();
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
-      var response;
+      var trackResponse, performanceTrackResponse;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
@@ -10295,10 +10295,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               return axios__WEBPACK_IMPORTED_MODULE_1___default().get("/api/track");
 
             case 2:
-              response = _context.sent;
-              tracks.value = response.data;
+              trackResponse = _context.sent;
+              tracks.value = trackResponse.data;
+              _context.next = 6;
+              return axios__WEBPACK_IMPORTED_MODULE_1___default().get("/api/performance/get_tracks/".concat(props.performance.id));
 
-            case 4:
+            case 6:
+              performanceTrackResponse = _context.sent;
+              performanceTracks.value = performanceTrackResponse.data;
+
+            case 8:
             case "end":
               return _context.stop();
           }

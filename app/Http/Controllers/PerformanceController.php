@@ -58,4 +58,10 @@ class PerformanceController extends Controller
       $tracks = $request->query->get('tracks');
       $performance->tracks()->attach($tracks);
     }
+
+    public function get_tracks (Request $request) {
+      $performance = Performance::find($request->id);
+      $tracks = $performance->tracks()->get();
+      return $tracks;
+    }
 }

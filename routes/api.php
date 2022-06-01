@@ -39,6 +39,7 @@ Route::get('/track', [TrackController::class, 'get']);
 Route::get('/track/{id}', [TrackController::class, 'get']);
 
 Route::post('/performance/add_tracks/{id}', [PerformanceController::class, 'attach_tracks_to_performance']);
+Route::get('/performance/get_tracks/{id}', [PerformanceController::class, 'get_tracks']);
 Route::get('/performance/columns', [PerformanceController::class, 'get_column_info']);
 Route::post('/performance/create', [PerformanceController::class, 'create'])
   ->name('performance.create');
