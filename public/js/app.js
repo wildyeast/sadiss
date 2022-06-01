@@ -11099,6 +11099,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var data = (0,vue__WEBPACK_IMPORTED_MODULE_3__.reactive)({});
     var selectedTrack = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)();
     var showPerformanceQRCode = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)(false);
+    var showPartialQRCodes = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)(false);
     (0,vue__WEBPACK_IMPORTED_MODULE_3__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
       var response, _i, _Object$keys, entry;
 
@@ -11147,6 +11148,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       console.log("Selected track: ", track);
     };
 
+    var generatePartialQRCodes = function generatePartialQRCodes() {
+      if (!selectedTrack.value) {
+        alert('Select a track.');
+        return;
+      }
+
+      var partials = JSON.parse(selectedTrack.value.partials);
+
+      if (confirm("This track has ".concat(partials.length, " partials. Depending on your system, displaying a QR code for each of these partials could take a long time and/or crash your machine. Do you want to display the QR codes?"))) {
+        showPartialQRCodes.value = true;
+      }
+    };
+
     var __returned__ = {
       pathname: pathname,
       category: category,
@@ -11155,7 +11169,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       data: data,
       selectedTrack: selectedTrack,
       showPerformanceQRCode: showPerformanceQRCode,
+      showPartialQRCodes: showPartialQRCodes,
       trackSelected: trackSelected,
+      generatePartialQRCodes: generatePartialQRCodes,
       BreezeAuthenticatedLayout: _Layouts_Authenticated_vue__WEBPACK_IMPORTED_MODULE_1__["default"],
       Head: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.Head,
       useForm: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_2__.useForm,
@@ -13429,10 +13445,17 @@ var _hoisted_31 = {
   "class": "text-rose-500"
 };
 var _hoisted_32 = {
+  "class": "flex flex-col"
+};
+var _hoisted_33 = {
+  key: 1,
+  "class": "flex flex-wrap gap-2"
+};
+var _hoisted_34 = {
   "class": "flex"
 };
 
-var _hoisted_33 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
+var _hoisted_35 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", {
   "class": "mr-4"
 }, [/*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "Start time:"), /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "End time:")], -1
 /* HOISTED */
@@ -13499,18 +13522,32 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* TEXT, PROPS */
       , _hoisted_26)])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Performance "), $setup.category === 'performances' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_29, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.data['location']), 1
       /* TEXT */
-      ), $setup.data['is_active'] ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_30, "Active")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_31, "Inactive"))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+      ), $setup.data['is_active'] ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_30, "Active")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_31, "Inactive"))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         onClick: _cache[0] || (_cache[0] = function ($event) {
           return $setup.showPerformanceQRCode = true;
         })
-      }, "Generate QR-Code for this performance"), $setup.showPerformanceQRCode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["QrcodeVue"], {
+      }, "Generate QR-Code for this performance"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+        onClick: $setup.generatePartialQRCodes
+      }, "Generate QR-Code for each partial of the selected track")]), $setup.showPerformanceQRCode ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["QrcodeVue"], {
         key: 0,
-        value: "http://192.168.0.87:3001?id=".concat($setup.id),
+        value: "http://sadiss.net/client?id=".concat($setup.id),
         size: 300,
         level: "H"
       }, null, 8
       /* PROPS */
-      , ["value"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [_hoisted_33, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.data['start_time']), 1
+      , ["value"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $setup.showPartialQRCodes ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_33, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(JSON.parse($setup.selectedTrack.partials), function (partial) {
+        return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "Index: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(partial.index), 1
+        /* TEXT */
+        ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["QrcodeVue"], {
+          value: "http://sadiss.net/client?id=".concat($setup.id, "&partial_id=").concat(partial.index),
+          size: 200,
+          level: "H"
+        }, null, 8
+        /* PROPS */
+        , ["value"])]);
+      }), 256
+      /* UNKEYED_FRAGMENT */
+      ))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_34, [_hoisted_35, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.data['start_time']), 1
       /* TEXT */
       ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.data['end_time']), 1
       /* TEXT */
@@ -13520,7 +13557,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       }, null, 8
       /* PROPS */
       , ["performance"]), $setup.selectedTrack ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["ClientList"], {
-        key: 1,
+        key: 2,
         trackId: $setup.selectedTrack.id,
         performanceId: $setup.id,
         ttsInstructions: JSON.parse($setup.selectedTrack.tts_instructions)

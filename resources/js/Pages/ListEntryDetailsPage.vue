@@ -14,6 +14,7 @@ const id = pathname.split('/')[1]
 const data = reactive({})
 const selectedTrack = ref()
 const showPerformanceQRCode = ref(false)
+const showPartialQRCodes = ref(false)
 
 onMounted(async () => {
   // TODO: This switch is identical to the one in ListPage.vue. Find a smart way to handle this.
@@ -37,6 +38,17 @@ onMounted(async () => {
 const trackSelected = (track) => {
   selectedTrack.value = track
   console.log("Selected track: ", track)
+}
+
+const generatePartialQRCodes = () => {
+  if (!selectedTrack.value) {
+    alert('Select a track.')
+    return
+  }
+  const partials = JSON.parse(selectedTrack.value.partials)
+  if (confirm(`This track has ${partials.length} partials. Depending on your system, displaying a QR code for each of these partials could take a long time and/or crash your machine. Do you want to display the QR codes?`)) {
+    showPartialQRCodes.value = true
+  }
 }
 
 </script>
@@ -120,8 +132,17 @@ const trackSelected = (track) => {
                       <p v-if="data['is_active']" class="text-green-700" >Active</p>
                       <p v-else class="text-rose-500">Inactive</p>
                     </div>
-                    <button @click="showPerformanceQRCode = true">Generate QR-Code for this performance</button>
+                    <div class="flex flex-col">
+                      <button @click="showPerformanceQRCode = true">Generate QR-Code for this performance</button>
+                      <button @click="generatePartialQRCodes">Generate QR-Code for each partial of the selected track</button>
+                    </div>
                     <qrcode-vue v-if="showPerformanceQRCode" :value="`http://sadiss.net/client?id=${id}`" :size="300" level="H" />
+                    <div v-if="showPartialQRCodes" class="flex flex-wrap gap-2">
+                      <div v-for="partial of JSON.parse(selectedTrack.partials)">
+                        <p>Index: {{ partial.index }}</p>
+                        <qrcode-vue :value="`http://sadiss.net/client?id=${id}&partial_id=${partial.index}`" :size="200" level="H"/>
+                      </div>
+                    </div>
                     <div class="flex">
                       <div class="mr-4">
                         <p>Start time:</p>
