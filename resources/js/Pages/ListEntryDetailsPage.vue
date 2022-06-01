@@ -87,6 +87,7 @@
                         <p>{{ data['end_time'] }}</p>
                       </div>
                     </div>
+                    <TrackList :performance="data" />
                   </div>
                 </template>
               </div>
@@ -101,6 +102,7 @@ import { Head, useForm, Link } from '@inertiajs/inertia-vue3'
 import { onMounted, reactive, toRefs } from 'vue'
 import Player from '@/Components/Player.vue'
 import ClientList from '@/Components/ClientList.vue'
+import TrackList from '@/Components/Tracklist.vue'
 
 export default {
   components: {
@@ -108,8 +110,9 @@ export default {
     Head,
     Link,
     Player,
-    ClientList
-  },
+    ClientList,
+    TrackList
+},
   setup () {
     const pathname = window.location.pathname.replace('/', '')
     const category = pathname.split('/')[0]

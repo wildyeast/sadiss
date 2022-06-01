@@ -51,4 +51,11 @@ class PerformanceController extends Controller
       $columns = DB::select( DB::raw('SHOW COLUMNS FROM performances'));
       return $columns;
     }
+
+    public function attach_tracks_to_performance (Request $request) {
+      $performance = Performance::find($request->id);
+      $performance->tracks()->detach(); // Detach all tracks from performance
+      $tracks = $request->query->get('tracks');
+      $performance->tracks()->attach($tracks);
+    }
 }
