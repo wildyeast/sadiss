@@ -110,7 +110,8 @@ export default {
     performanceId: null,
     performances: null,
     ttsInstructions: null,
-    ttsLanguage: null
+    ttsLanguage: null,
+    partialIdToRegisterWith: null
   }),
   async mounted() {
     const mCorpApp = MCorp.app("8844095860530063641", {anon: true})
@@ -130,10 +131,16 @@ export default {
     const performanceResponse = await fetch(this.hostUrl + "/api/performance")
     this.performances = await performanceResponse.json()
 
-    const performanceIdFromUrl = window.location.search.replace('?id=', '')
-    if (this.performances.map(p => p.id).includes(Number(performanceIdFromUrl))) {
-      this.performanceId = performanceIdFromUrl
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+
+    if (this.performances.map(p => p.id).includes(Number(params.id))) {
+      this.performanceId = Number(params.id)
     }
+
+    this.partialIdToRegisterWith = params.partial_id
+
   },
   methods: {
     startStop () {
@@ -205,7 +212,7 @@ export default {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ performance_id: this.performanceId }),
+        body: JSON.stringify({ performance_id: this.performanceId, partial_id: this.partialIdToRegisterWith }),
       });
       const data = await response.json();
       this.deviceRegistrationId = data.id; // Only used in UI.
