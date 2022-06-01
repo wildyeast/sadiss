@@ -16,6 +16,7 @@ class ClientController extends Controller
     $client = new Client;
     $client->token = $this->create_token();
     $client->performance_id = $request->performance_id;
+    $client->partial_id = $request->partial_id;
     $client->save();
     // return back()->with('flash', [
     //     'message' => 'success',
