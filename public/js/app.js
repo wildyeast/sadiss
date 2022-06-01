@@ -9712,6 +9712,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var ttsLanguages = (0,vue__WEBPACK_IMPORTED_MODULE_2__.computed)(function () {
       return props.ttsInstructions ? Object.keys(props.ttsInstructions[0]) : null;
     });
+    var choirMode = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
       var mCorpAppId, mCorpApp;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
@@ -9794,24 +9795,26 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               case 0:
                 calculatedStartingPosition = motion.pos + 5;
 
-                if (allPartialsAllDevices.value) {
+                if (!choirMode.value && allPartialsAllDevices.value) {
                   route = "/api/track/".concat(props.trackId, "/start_all/").concat(calculatedStartingPosition, "/").concat(props.performanceId);
                 } else {
                   route = "/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition, "/").concat(props.performanceId);
                 }
 
                 console.log("Calculated starting position: ", calculatedStartingPosition);
-                _context3.next = 5;
+                console.log('Choir mode:', choirMode.value);
+                _context3.next = 6;
                 return axios.post(route, null, {
                   params: {
-                    tts_language: ttsLanguage.value
+                    tts_language: ttsLanguage.value,
+                    choir_mode: choirMode.value
                   }
                 });
 
-              case 5:
+              case 6:
                 response = _context3.sent;
 
-              case 6:
+              case 7:
               case "end":
                 return _context3.stop();
             }
@@ -9988,6 +9991,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       motion: motion,
       ttsLanguage: ttsLanguage,
       ttsLanguages: ttsLanguages,
+      choirMode: choirMode,
       synchronizeTimingSrcPosition: synchronizeTimingSrcPosition,
       startTrack: startTrack,
       getRegisteredClients: getRegisteredClients,
@@ -11527,33 +11531,37 @@ var _hoisted_1 = {
 };
 
 var _hoisted_2 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
-  "for": ""
+  "class": "mr-5"
 }, "All partials to all devices", -1
 /* HOISTED */
 );
 
-var _hoisted_3 = {
+var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", null, "Choir mode", -1
+/* HOISTED */
+);
+
+var _hoisted_4 = {
   "class": "flex justify-between"
 };
-var _hoisted_4 = ["disabled"];
-var _hoisted_5 = {
+var _hoisted_5 = ["disabled"];
+var _hoisted_6 = {
   "class": "flex"
 };
-var _hoisted_6 = ["disabled"];
-var _hoisted_7 = {
+var _hoisted_7 = ["disabled"];
+var _hoisted_8 = {
   "class": "border-b border-t border-r p-2"
 };
-var _hoisted_8 = {
+var _hoisted_9 = {
   key: 0
 };
 
-var _hoisted_9 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
+var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("label", {
   "class": "mr-2"
 }, "Select TTS language", -1
 /* HOISTED */
 );
 
-var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
+var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
   value: ""
 }, "No TTS", -1
 /* HOISTED */
@@ -11568,25 +11576,33 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, null, 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $setup.allPartialsAllDevices]]), _hoisted_2]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $setup.allPartialsAllDevices]]), _hoisted_2, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    "class": "mr-2",
+    type: "checkbox",
+    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+      return $setup.choirMode = $event;
+    })
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelCheckbox, $setup.choirMode]]), _hoisted_3]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: $setup.startTrack,
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["border p-2", $setup.synchronizing ? 'border-green-400' : 'border-red-400']),
     disabled: !$setup.synchronizing
   }, " Start track ", 10
   /* CLASS, PROPS */
-  , _hoisted_4), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_5, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  , _hoisted_5), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_6, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: $setup.synchronizeTimingSrcPosition,
     "class": "border p-2",
     disabled: !$setup.timingSrcConnected
   }, " Sync ", 8
   /* PROPS */
-  , _hoisted_6), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.synchronizing ? $setup.timingSrcPosition : "0.0"), 1
+  , _hoisted_7), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_8, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.synchronizing ? $setup.timingSrcPosition : "0.0"), 1
   /* TEXT */
-  )]), $setup.ttsLanguages && $setup.ttsLanguages.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
-    "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
+  )]), $setup.ttsLanguages && $setup.ttsLanguages.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_9, [_hoisted_10, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    "onUpdate:modelValue": _cache[2] || (_cache[2] = function ($event) {
       return $setup.ttsLanguage = $event;
     })
-  }, [_hoisted_10, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.ttsLanguages, function (lang) {
+  }, [_hoisted_11, ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.ttsLanguages, function (lang) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("option", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(lang), 1
     /* TEXT */
     );

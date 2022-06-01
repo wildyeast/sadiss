@@ -18,9 +18,6 @@ class ClientController extends Controller
     $client->performance_id = $request->performance_id;
     $client->partial_id = $request->partial_id;
     $client->save();
-    // return back()->with('flash', [
-    //     'message' => 'success',
-    // ]);
     return Response::json(['token' => $client->token, 'id' => $client->id]);
   }
 

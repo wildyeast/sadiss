@@ -79,34 +79,48 @@ class TrackController extends Controller
     $tts_instructions = $track->tts_instructions;
     $tts_language = $request->query->get('tts_language');
 
-    $unique_partials = $partials;
-    // If more clients than partials, duplicate original partials until this is no longer the case.
-    while (count($clients) > count($partials)) {
-      $partials = array_merge($partials, $unique_partials);
-    }
-    
-    // Array of chunk arrays, same length as registered clients array.
-    $chunks = array_fill(0, count($clients), []);
+    $choir_mode = $request->query->get('choir_mode');
 
-    // Distribute partials between chunks.
-    // In conjuction with partial duplication above, this guarantees that all partials are played equally often.
-    // Not all clients get the same amount of partials though.
-    $counter = 0;
-    while ($partial = array_pop($partials)) {
-      array_push($chunks[$counter], $partial);
-      $counter++;
-      if ($counter > count($clients) - 1) {
-        $counter = 0;
+    if (!$choir_mode) {
+      $unique_partials = $partials;
+      // If more clients than partials, duplicate original partials until this is no longer the case.
+      while (count($clients) > count($partials)) {
+        $partials = array_merge($partials, $unique_partials);
+      }
+      
+      // Array of chunk arrays, same length as registered clients array.
+      $chunks = array_fill(0, count($clients), []);
+  
+      // Distribute partials between chunks.
+      // In conjuction with partial duplication above, this guarantees that all partials are played equally often.
+      // Not all clients get the same amount of partials though.
+      $counter = 0;
+      while ($partial = array_pop($partials)) {
+        array_push($chunks[$counter], $partial);
+        $counter++;
+        if ($counter > count($clients) - 1) {
+          $counter = 0;
+        }
+      }
+  
+      foreach($clients as $i=>$value) {
+        $client = Client::where('id', $value->id)->firstOrFail();
+        $client->partials = $chunks[$i];
+        $client->start_time = $startTime;
+        $client->tts_instructions = $tts_instructions;
+        $client->tts_language = $tts_language;
+        $client->save();
       }
     }
-
-    foreach($clients as $i=>$value) {
-      $client = Client::where('id', $value->id)->firstOrFail();
-      $client->partials = $chunks[$i];
-      $client->start_time = $startTime;
-      $client->tts_instructions = $tts_instructions;
-      $client->tts_language = $tts_language;
-      $client->save();
+    else {
+      foreach($clients as $i=>$value) {
+        $client = Client::where('id', $value->id)->firstOrFail();
+        $client->partials = array(0 => $partials[$value->partial_id]);
+        $client->start_time = $startTime;
+        $client->tts_instructions = $tts_instructions;
+        $client->tts_language = $tts_language;
+        $client->save();
+      }
     }
 
     // return Response::json(['data' => $chunks]); // Commented for debuggin

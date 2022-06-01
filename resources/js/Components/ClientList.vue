@@ -15,6 +15,7 @@ let motion;
 // const ttsLanguages = ref([])
 const ttsLanguage = ref()
 const ttsLanguages = computed(() => props.ttsInstructions ? Object.keys(props.ttsInstructions[0]) : null)
+const choirMode = ref(false)
 
 onMounted(async () => {
   // getRegisteredClients();
@@ -55,14 +56,15 @@ async function startTrack() {
   const calculatedStartingPosition = motion.pos + 5
   let route;
 
-  if (allPartialsAllDevices.value) {
+  if (!choirMode.value && allPartialsAllDevices.value) {
     route = `/api/track/${props.trackId}/start_all/${calculatedStartingPosition}/${props.performanceId}`
   } else {
     route = `/api/track/${props.trackId}/start/${calculatedStartingPosition}/${props.performanceId}`
   }
 
   console.log("Calculated starting position: ", calculatedStartingPosition)
-  const response = await axios.post(route, null, { params: { tts_language: ttsLanguage.value } })
+  console.log('Choir mode:', choirMode.value)
+  const response = await axios.post(route, null, { params: { tts_language: ttsLanguage.value, choir_mode: choirMode.value } })
 }
 
 async function getRegisteredClients() {
@@ -99,7 +101,9 @@ async function removeClients() {
   <div>
     <div class="flex items-center mb-4">
       <input class="mr-2" type="checkbox" v-model="allPartialsAllDevices" />
-      <label for="">All partials to all devices</label>
+      <label class="mr-5">All partials to all devices</label>
+      <input class="mr-2" type="checkbox" v-model="choirMode" />
+      <label>Choir mode</label>
     </div>
     <div class="flex justify-between">
       <button
