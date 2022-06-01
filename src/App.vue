@@ -108,7 +108,9 @@ export default {
     useCalculatedOutputLatency: true,
     motion: null,
     performanceId: null,
-    performances: null
+    performances: null,
+    ttsInstructions: null,
+    ttsLanguage: null
   }),
   async mounted() {
     const mCorpApp = MCorp.app("8844095860530063641")
@@ -227,6 +229,8 @@ export default {
         );
         window.clearInterval(this.intervalId);
         const startTimeFromServer = Number(clientData.client["start_time"]);
+        this.ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
+        this.ttsLanguage = clientData.client["tts_language"]
         // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
         this.partialData = this.convertPartialsIfNeeded(
           clientData.client["partials"]
@@ -300,6 +304,8 @@ export default {
       this.isRegistered = false;
 
       /* TEXT TO SPEECH TESTING */
+
+      console.log(this.ttsInstructions, this.ttsLanguage)
 
       if (this.ttsInstructions && this.ttsLanguage) {
         console.log("Starting TTS.")
