@@ -149,8 +149,8 @@ async function removeClients() {
       <div>
         <select v-model="waveform">
           <option value="sine" selected>Sine</option>
-          <option value="saw">Saw</option>
           <option value="square">Square</option>
+          <option value="sawtooth">Saw</option>
           <option value="triangle">Triangle</option>
           <!-- <option value="">Custom</option> -->
         </select>
