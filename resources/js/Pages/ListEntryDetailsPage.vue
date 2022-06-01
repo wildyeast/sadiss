@@ -1,3 +1,44 @@
+<script setup>
+import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
+import { Head, useForm, Link } from '@inertiajs/inertia-vue3'
+import { onMounted, reactive, toRefs, ref } from 'vue'
+import Player from '@/Components/Player.vue'
+import ClientList from '@/Components/ClientList.vue'
+import TrackList from '@/Components/Tracklist.vue'
+
+const pathname = window.location.pathname.replace('/', '')
+const category = pathname.split('/')[0]
+let routeCategory = ''
+const id = pathname.split('/')[1]
+const data = reactive({})
+const selectedTrack = ref()
+
+onMounted(async () => {
+  // TODO: This switch is identical to the one in ListPage.vue. Find a smart way to handle this.
+  switch (category) {
+    case 'tracks':
+      routeCategory = 'track'
+      break
+    case 'composers':
+      routeCategory = 'composer'
+      break
+    case 'performances':
+      routeCategory = 'performance'
+      break
+  }
+  const response = await axios.get(`/api/${routeCategory}/${id}`);
+  for (const entry of Object.keys(response.data)) {
+    data[entry] = response.data[entry]
+  }
+})
+
+const trackSelected = (track) => {
+  selectedTrack.value = track
+  console.log("Selected track: ", track)
+}
+
+</script>
+
 <template>
     <div>
         <Head title="Details" />
@@ -87,7 +128,8 @@
                         <p>{{ data['end_time'] }}</p>
                       </div>
                     </div>
-                    <TrackList :performance="data" />
+                    <TrackList :performance="data" @trackSelected="trackSelected" />
+                    <ClientList v-if="selectedTrack" :trackId="selectedTrack.id" />
                   </div>
                 </template>
               </div>
@@ -95,55 +137,3 @@
         </BreezeAuthenticatedLayout>
     </div>
 </template>
-
-<script>
-import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
-import { Head, useForm, Link } from '@inertiajs/inertia-vue3'
-import { onMounted, reactive, toRefs } from 'vue'
-import Player from '@/Components/Player.vue'
-import ClientList from '@/Components/ClientList.vue'
-import TrackList from '@/Components/Tracklist.vue'
-
-export default {
-  components: {
-    BreezeAuthenticatedLayout,
-    Head,
-    Link,
-    Player,
-    ClientList,
-    TrackList
-},
-  setup () {
-    const pathname = window.location.pathname.replace('/', '')
-    const category = pathname.split('/')[0]
-    let routeCategory = ''
-    const id = pathname.split('/')[1]
-    const data = reactive({})
-
-    onMounted(async () => {
-      // TODO: This switch is identical to the one in ListPage.vue. Find a smart way to handle this.
-      switch (category) {
-        case 'tracks':
-          routeCategory = 'track'
-          break
-        case 'composers':
-          routeCategory = 'composer'
-          break
-        case 'performances':
-          routeCategory = 'performance'
-          break
-      }
-      const response = await axios.get(`/api/${routeCategory}/${id}`);
-      for (const entry of Object.keys(response.data)) {
-        data[entry] = response.data[entry]
-      }
-    })
-
-    return {
-      category,
-      data,
-      id,
-    }
-  }
-}
-</script>
