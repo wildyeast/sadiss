@@ -9713,6 +9713,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return props.ttsInstructions ? Object.keys(props.ttsInstructions[0]) : null;
     });
     var choirMode = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
+    var waveform = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)('sine');
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
       var mCorpAppId, mCorpApp;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
@@ -9749,30 +9750,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                if (!synchronizing.value) {
-                  if (motion.vel != 1) {
-                    motion.update(null, 1, null);
-                  }
+                console.log(waveform.value);
+                return _context2.abrupt("return");
 
-                  synchronizing.value = true;
-
-                  (function query() {
-                    if (motion.pos.toFixed(1) - timingSrcPosition.value != 0) {
-                      // TODO: Weird calculation, doesn't work with !== for some reason, no time to look into it now
-                      timingSrcPosition.value = motion.pos.toFixed(1);
-                    }
-
-                    if (synchronizing.value) {
-                      window.setTimeout(query, 10);
-                    }
-                  })();
-                } else {
-                  synchronizing.value = false;
-                  motion.update(0, 0, null);
-                  timingSrcPosition.value = motion.pos;
-                }
-
-              case 1:
+              case 3:
               case "end":
                 return _context2.stop();
             }
@@ -9992,6 +9973,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       ttsLanguage: ttsLanguage,
       ttsLanguages: ttsLanguages,
       choirMode: choirMode,
+      waveform: waveform,
       synchronizeTimingSrcPosition: synchronizeTimingSrcPosition,
       startTrack: startTrack,
       getRegisteredClients: getRegisteredClients,
@@ -11562,11 +11544,15 @@ var _hoisted_10 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 );
 
 var _hoisted_11 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("option", {
-  value: ""
+  value: "",
+  selected: ""
 }, "No TTS", -1
 /* HOISTED */
 );
 
+var _hoisted_12 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createStaticVNode)("<option value=\"sine\" selected>Sine</option><option value=\"saw\">Saw</option><option value=\"square\">Square</option><option value=\"triangle\">Triangle</option><option value=\"\">Custom</option>", 5);
+
+var _hoisted_17 = [_hoisted_12];
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     "class": "mr-2",
@@ -11610,7 +11596,13 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* UNKEYED_FRAGMENT */
   ))], 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $setup.ttsLanguage]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $setup.ttsLanguage]])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+    "onUpdate:modelValue": _cache[3] || (_cache[3] = function ($event) {
+      return $setup.waveform = $event;
+    })
+  }, _hoisted_17, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $setup.waveform]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: $setup.removeClients,
     "class": "border p-2"
   }, " Remove all registered clients "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {

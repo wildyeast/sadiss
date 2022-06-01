@@ -78,8 +78,8 @@ class TrackController extends Controller
     $partials = json_decode($track->partials);
     $tts_instructions = $track->tts_instructions;
     $tts_language = $request->query->get('tts_language');
-
     $choir_mode = $request->query->get('choir_mode');
+    $waveform = $request->query->get('waveform');
 
     if (!$choir_mode) {
       $unique_partials = $partials;
@@ -109,6 +109,7 @@ class TrackController extends Controller
         $client->start_time = $startTime;
         $client->tts_instructions = $tts_instructions;
         $client->tts_language = $tts_language;
+        $client->waveform = $waveform;
         $client->save();
       }
     }
@@ -119,6 +120,7 @@ class TrackController extends Controller
         $client->start_time = $startTime;
         $client->tts_instructions = $tts_instructions;
         $client->tts_language = $tts_language;
+        $client->waveform = $waveform;
         $client->save();
       }
     }
@@ -139,6 +141,7 @@ class TrackController extends Controller
     $partials = json_decode($track->partials);
     $tts_instructions = $track->tts_instructions;
     $tts_language = $request->query->get('tts_language');
+    $waveform = $request->query->get('waveform');
 
     foreach($clients as $i=>$value) {
       $client = Client::where('id', $value->id)->firstOrFail();
@@ -147,6 +150,7 @@ class TrackController extends Controller
       $client->start_time = $startTime;
       $client->tts_instructions = $tts_instructions;
       $client->tts_language = $tts_language;
+      $client->waveform = $waveform;
       $client->save();
     }
 

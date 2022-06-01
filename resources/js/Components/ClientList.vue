@@ -16,6 +16,7 @@ let motion;
 const ttsLanguage = ref()
 const ttsLanguages = computed(() => props.ttsInstructions ? Object.keys(props.ttsInstructions[0]) : null)
 const choirMode = ref(false)
+const waveform = ref('sine')
 
 onMounted(async () => {
   // getRegisteredClients();
@@ -30,6 +31,8 @@ onMounted(async () => {
 })
 
 async function synchronizeTimingSrcPosition() {
+  console.log(waveform.value)
+  return
   if (!synchronizing.value) {
     if (motion.vel != 1) {
       motion.update(null, 1, null)
@@ -64,7 +67,17 @@ async function startTrack() {
 
   console.log("Calculated starting position: ", calculatedStartingPosition)
   console.log('Choir mode:', choirMode.value)
-  const response = await axios.post(route, null, { params: { tts_language: ttsLanguage.value, choir_mode: choirMode.value } })
+  const response = await axios.post(
+    route,
+    null,
+    {
+      params: {
+        tts_language: ttsLanguage.value,
+        choir_mode: choirMode.value,
+        waveform: waveform.value
+      }
+    }
+  )
 }
 
 async function getRegisteredClients() {
@@ -129,8 +142,17 @@ async function removeClients() {
       <div v-if="ttsLanguages && ttsLanguages.length">
         <label class="mr-2">Select TTS language</label>
         <select v-model="ttsLanguage">
-          <option value="">No TTS</option>
+          <option value='' selected>No TTS</option>
           <option v-for="lang of ttsLanguages">{{ lang }}</option>
+        </select>
+      </div>
+      <div>
+        <select v-model="waveform">
+          <option value="sine" selected>Sine</option>
+          <option value="saw">Saw</option>
+          <option value="square">Square</option>
+          <option value="triangle">Triangle</option>
+          <!-- <option value="">Custom</option> -->
         </select>
       </div>
       <button @click="removeClients" class="border p-2">
