@@ -149,15 +149,15 @@ export default {
         return
       }
 
-      const mCorpApp = MCorp.app("8844095860530063641", { anon: true })
+      // const mCorpApp = MCorp.app("8844095860530063641", { anon: true })
       // mCorpApp.run = () => {
         //   this.motion = mCorpApp.motions['shared']
       //   this.to.src = this.motion
       //   MCorp.mediaSync(this.audio, this.to, { debug: true })
       // }
-      mCorpApp.ready.then(() => {
-        console.log(mCorpApp)
-        this.motion = mCorpApp.motions['shared']
+      // mCorpApp.ready.then(() => {
+      //   console.log(mCorpApp)
+      //   this.motion = mCorpApp.motions['shared']
         // this.to.src = this.motion
 
         // this.motion.on('change', () => {
