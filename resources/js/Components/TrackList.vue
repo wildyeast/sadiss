@@ -35,7 +35,7 @@ const save = () => {
 </script>
 
 <template>
-  <div class="w-screen px-4 bg-[#EFEFEF] flex flex-col justify-center">
+  <div class="w-full px-4 bg-[#EFEFEF] flex flex-col justify-center">
     <div class="flex justify-center gap-2">
       <button @click="mode = 'perform'">Perform</button>
       <button @click="mode = 'edit'">Edit Tracklist</button>

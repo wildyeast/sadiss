@@ -7351,9 +7351,6 @@ select {
 .w-full {
   width: 100%;
 }
-.w-screen {
-  width: 100vw;
-}
 .w-1\/2 {
   width: 50%;
 }

@@ -11929,7 +11929,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 var _hoisted_1 = {
-  "class": "w-screen px-4 bg-[#EFEFEF] flex flex-col justify-center"
+  "class": "w-full px-4 bg-[#EFEFEF] flex flex-col justify-center"
 };
 var _hoisted_2 = {
   "class": "flex justify-center gap-2"
