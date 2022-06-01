@@ -2,6 +2,7 @@
 import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
 import { Head, useForm, Link } from '@inertiajs/inertia-vue3'
 import { onMounted, reactive, toRefs, ref } from 'vue'
+import QrcodeVue from 'qrcode.vue'
 import Player from '@/Components/Player.vue'
 import ClientList from '@/Components/ClientList.vue'
 import TrackList from '@/Components/Tracklist.vue'
@@ -12,6 +13,7 @@ let routeCategory = ''
 const id = pathname.split('/')[1]
 const data = reactive({})
 const selectedTrack = ref()
+const showPerformanceQRCode = ref(false)
 
 onMounted(async () => {
   // TODO: This switch is identical to the one in ListPage.vue. Find a smart way to handle this.
@@ -118,6 +120,8 @@ const trackSelected = (track) => {
                       <p v-if="data['is_active']" class="text-green-700" >Active</p>
                       <p v-else class="text-rose-500">Inactive</p>
                     </div>
+                    <button @click="showPerformanceQRCode = true">Generate QR-Code for this performance</button>
+                    <qrcode-vue v-if="showPerformanceQRCode" :value="`http://sadiss.net/client?id=${id}`" :size="300" level="H" />
                     <div class="flex">
                       <div class="mr-4">
                         <p>Start time:</p>

@@ -30,6 +30,7 @@
         "@oruga-ui/oruga-next": "^0.5.3",
         "@oruga-ui/theme-bulma": "^0.2.1",
         "material-icons": "^1.10.6",
+        "qrcode.vue": "^3.3.3",
         "timing-object": "^3.1.43",
         "timing-provider": "^5.0.16"
     }
