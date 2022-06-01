@@ -2,14 +2,9 @@
   <div class="app">
     <button @click="startStop">Start/Stop</button>
     <div class="md:w-1/2 w-11/12 border b-white p-4 flex flex-col">
-      <!-- <p>
-        Press Register below to register this device to receive partials when
-        'Start track' is pressed in the track details page of a track in the
-        Admin Interface. The registration ID of the device displayed after
-        pressing Register will be visible in the list of registered clients in
-        the track details page in the Admin Interface. This ID changes with
-        every registration.
-      </p> -->
+      <select v-model="performanceId">
+        <option v-for="performance of performances">{{ performance.id }}</option>
+      </select>
       <div class="flex items-center">
         <input
           type="checkbox"
@@ -95,9 +90,9 @@ export default {
     availableTracks: [],
     deviceRegistrationId: null,
     intervalId: null,
-    // hostUrl: "http://sadiss.test.test",
+    hostUrl: "http://sadiss.test.test",
     // hostUrl: 'http://8hz.at',
-    hostUrl: "https://sadiss.net",
+    // hostUrl: "https://sadiss.net",
     print: "",
     timingProvider: null,
     timingObj: null,
@@ -111,7 +106,9 @@ export default {
 
     outputLatency: 0,
     useCalculatedOutputLatency: true,
-    motion: null
+    motion: null,
+    performanceId: null,
+    performances: null
   }),
   async mounted() {
     const mCorpApp = MCorp.app("8844095860530063641")
@@ -127,6 +124,9 @@ export default {
     // Fetch tracks
     const res = await fetch(this.hostUrl + "/api/track");
     this.availableTracks = await res.json();
+
+    const performanceResponse = await fetch(this.hostUrl + "/api/performance")
+    this.performances = await performanceResponse.json()
   },
   methods: {
     startStop () {
@@ -137,6 +137,11 @@ export default {
     async register() {
       if (this.isRegistered) return;
 
+      if (!this.performanceId) {
+        alert("Select a performance id.")
+        return
+      }
+
       const mCorpApp = MCorp.app("8844095860530063641", { anon: true })
       // mCorpApp.run = () => {
       //   this.motion = mCorpApp.motions['shared']
@@ -145,18 +150,18 @@ export default {
       // }
       mCorpApp.ready.then(() => {
         this.motion = mCorpApp.motions['shared']
-        this.to.src = this.motion
+        // this.to.src = this.motion
 
-        this.motion.on('change', () => {
-          if (this.motion.vel === 1) {
-            this.to.update({velocity:1});
-          } else {
-            this.to.update({velocity:0});
-          }
-          if (this.motion.pos === 0) {
-            this.to.update({position:0});
-          }
-        })
+        // this.motion.on('change', () => {
+        //   if (this.motion.vel === 1) {
+        //     this.to.update({velocity:1});
+        //   } else {
+        //     this.to.update({velocity:0});
+        //   }
+        //   if (this.motion.pos === 0) {
+        //     this.to.update({position:0});
+        //   }
+        // })
 
         // MCorp.mediaSync(this.audio, this.to, { debug: true })
       })
@@ -192,7 +197,7 @@ export default {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ performance_id: 1 }),
+        body: JSON.stringify({ performance_id: this.performanceId }),
       });
       const data = await response.json();
       this.deviceRegistrationId = data.id; // Only used in UI.
@@ -234,8 +239,8 @@ export default {
         const intervalId = window.setInterval(() => {
           this.timingSrcPosition = this.globalTime();
           if (this.timingSrcPosition >= startTimeFromServer + 3) {
-            const a = document.querySelector('.app')
-            a.style['background-color'] = 'red'
+            // const a = document.querySelector('.app')
+            // a.style['background-color'] = 'red'
             // this.audio.play()
             console.log(this.timingSrcPosition)
             this.player.offset =
@@ -243,7 +248,7 @@ export default {
             console.log("Offset: ", this.player.offset);
             if (!prepareStarted) {
               // Prevent multiple calls of prepare() if checkForStart() short interval time
-              a.style['background-color'] = 'blue'
+              // a.style['background-color'] = 'blue'
               this.start();
               prepareStarted = true;
             }
