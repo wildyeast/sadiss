@@ -113,7 +113,7 @@ export default {
     ttsLanguage: null
   }),
   async mounted() {
-    const mCorpApp = MCorp.app("8844095860530063641")
+    const mCorpApp = MCorp.app("8844095860530063641", {anon: true})
     mCorpApp.run = () => {
       this.motion = mCorpApp.motions['shared']
     }
@@ -151,11 +151,12 @@ export default {
 
       const mCorpApp = MCorp.app("8844095860530063641", { anon: true })
       // mCorpApp.run = () => {
-      //   this.motion = mCorpApp.motions['shared']
+        //   this.motion = mCorpApp.motions['shared']
       //   this.to.src = this.motion
       //   MCorp.mediaSync(this.audio, this.to, { debug: true })
       // }
       mCorpApp.ready.then(() => {
+        console.log(mCorpApp)
         this.motion = mCorpApp.motions['shared']
         // this.to.src = this.motion
 
