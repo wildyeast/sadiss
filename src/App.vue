@@ -129,6 +129,11 @@ export default {
 
     const performanceResponse = await fetch(this.hostUrl + "/api/performance")
     this.performances = await performanceResponse.json()
+
+    const performanceIdFromUrl = window.location.search.replace('?id=', '')
+    if (this.performances.map(p => p.id).includes(Number(performanceIdFromUrl))) {
+      this.performanceId = performanceIdFromUrl
+    }
   },
   methods: {
     startStop () {
