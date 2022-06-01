@@ -9706,20 +9706,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var timingSrcPosition = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)();
     var timingSrcConnected = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
     var allPartialsAllDevices = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
-    var motion;
-    var ttsLanguages = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)([]);
+    var motion; // const ttsLanguages = ref([])
+
     var ttsLanguage = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)();
+    var ttsLanguages = (0,vue__WEBPACK_IMPORTED_MODULE_2__.computed)(function () {
+      return props.ttsInstructions ? Object.keys(props.ttsInstructions[0]) : null;
+    });
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
       var mCorpAppId, mCorpApp;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
         while (1) {
           switch (_context.prev = _context.next) {
             case 0:
-              if (props.ttsInstructions) {
-                ttsLanguages.value = Object.keys(props.ttsInstructions[0]);
-              } // getRegisteredClients();
-
-
+              // getRegisteredClients();
               autoGetRegisteredClients();
               mCorpAppId = "8844095860530063641";
               mCorpApp = MCorp.app(mCorpAppId);
@@ -9731,7 +9730,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
               mCorpApp.init();
 
-            case 6:
+            case 5:
             case "end":
               return _context.stop();
           }
@@ -9796,9 +9795,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 calculatedStartingPosition = motion.pos + 5;
 
                 if (allPartialsAllDevices.value) {
-                  route = "/api/track/".concat(props.trackId, "/start_all/").concat(calculatedStartingPosition);
+                  route = "/api/track/".concat(props.trackId, "/start_all/").concat(calculatedStartingPosition, "/").concat(props.performanceId);
                 } else {
-                  route = "/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition);
+                  route = "/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition, "/").concat(props.performanceId);
                 }
 
                 console.log("Calculated starting position: ", calculatedStartingPosition);
@@ -9987,14 +9986,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       timingSrcConnected: timingSrcConnected,
       allPartialsAllDevices: allPartialsAllDevices,
       motion: motion,
-      ttsLanguages: ttsLanguages,
       ttsLanguage: ttsLanguage,
+      ttsLanguages: ttsLanguages,
       synchronizeTimingSrcPosition: synchronizeTimingSrcPosition,
       startTrack: startTrack,
       getRegisteredClients: getRegisteredClients,
       autoGetRegisteredClients: autoGetRegisteredClients,
       removeClients: removeClients,
       useForm: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.useForm,
+      computed: vue__WEBPACK_IMPORTED_MODULE_2__.computed,
       onMounted: vue__WEBPACK_IMPORTED_MODULE_2__.onMounted,
       reactive: vue__WEBPACK_IMPORTED_MODULE_2__.reactive,
       ref: vue__WEBPACK_IMPORTED_MODULE_2__.ref,
@@ -11095,7 +11095,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var id = pathname.split('/')[1];
     var data = (0,vue__WEBPACK_IMPORTED_MODULE_3__.reactive)({});
     var selectedTrack = (0,vue__WEBPACK_IMPORTED_MODULE_3__.ref)();
-    console.log(id);
     (0,vue__WEBPACK_IMPORTED_MODULE_3__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
       var response, _i, _Object$keys, entry;
 
@@ -11561,7 +11560,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* PROPS */
   , _hoisted_6), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_7, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.synchronizing ? $setup.timingSrcPosition : "0.0"), 1
   /* TEXT */
-  )]), $setup.ttsLanguages.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
+  )]), $setup.ttsLanguages && $setup.ttsLanguages.length ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_8, [_hoisted_9, (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("select", {
     "onUpdate:modelValue": _cache[1] || (_cache[1] = function ($event) {
       return $setup.ttsLanguage = $event;
     })
@@ -13506,10 +13505,11 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       , ["performance"]), $setup.selectedTrack ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["ClientList"], {
         key: 0,
         trackId: $setup.selectedTrack.id,
-        performanceId: $setup.id
+        performanceId: $setup.id,
+        ttsInstructions: JSON.parse($setup.selectedTrack.tts_instructions)
       }, null, 8
       /* PROPS */
-      , ["trackId", "performanceId"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
+      , ["trackId", "performanceId", "ttsInstructions"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)];
     }),
     _: 1
     /* STABLE */

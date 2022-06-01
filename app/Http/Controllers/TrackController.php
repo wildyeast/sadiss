@@ -67,8 +67,13 @@ class TrackController extends Controller
     return $columns;
   }
 
-  public function start_track (Request $request, $id, $startTime) {
-    $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request);
+  public function start_track (Request $request, $id, $startTime, $performance_id=null) {
+    $clients = null;
+    if (isset($performance_id)) {
+      $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request, $performance_id);
+    } else {
+      $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request);
+    }
     $track = Track::where('id', $id)->firstOrFail();
     $partials = json_decode($track->partials);
     $tts_instructions = $track->tts_instructions;
@@ -109,8 +114,13 @@ class TrackController extends Controller
   }
 
   // Used for sending all partials to all clients
-  public function start_track_all_partials (Request $request, $id, $startTime) {
-    $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request);
+  public function start_track_all_partials (Request $request, $id, $startTime, $performance_id=null) {
+    $clients = null;
+    if (isset($performance_id)) {
+      $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request, $performance_id);
+    } else {
+      $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request);
+    }
     $track = Track::where('id', $id)->firstOrFail();
     $partials = json_decode($track->partials);
     $tts_instructions = $track->tts_instructions;

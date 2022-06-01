@@ -1,6 +1,6 @@
 <script setup>
 import { useForm } from "@inertiajs/inertia-vue3";
-import { onMounted, reactive, ref } from "vue";
+import { computed, onMounted, reactive, ref } from "vue";
 import Button from "./Button.vue";
 
 const props = defineProps(['trackId', 'ttsInstructions', 'performanceId'])
@@ -12,14 +12,11 @@ let timingSrcPosition = ref();
 let timingSrcConnected = ref(false);
 let allPartialsAllDevices = ref(false);
 let motion;
-const ttsLanguages = ref([])
+// const ttsLanguages = ref([])
 const ttsLanguage = ref()
+const ttsLanguages = computed(() => props.ttsInstructions ? Object.keys(props.ttsInstructions[0]) : null)
 
 onMounted(async () => {
-  if (props.ttsInstructions) {
-    ttsLanguages.value = Object.keys(props.ttsInstructions[0])
-  }
-
   // getRegisteredClients();
   autoGetRegisteredClients();
   const mCorpAppId = "8844095860530063641"
@@ -59,9 +56,9 @@ async function startTrack() {
   let route;
 
   if (allPartialsAllDevices.value) {
-    route = `/api/track/${props.trackId}/start_all/${calculatedStartingPosition}`
+    route = `/api/track/${props.trackId}/start_all/${calculatedStartingPosition}/${props.performanceId}`
   } else {
-    route = `/api/track/${props.trackId}/start/${calculatedStartingPosition}`
+    route = `/api/track/${props.trackId}/start/${calculatedStartingPosition}/${props.performanceId}`
   }
 
   console.log("Calculated starting position: ", calculatedStartingPosition)
@@ -125,7 +122,7 @@ async function removeClients() {
           {{ synchronizing ? timingSrcPosition : "0.0" }}
         </div>
       </div>
-      <div v-if="ttsLanguages.length">
+      <div v-if="ttsLanguages && ttsLanguages.length">
         <label class="mr-2">Select TTS language</label>
         <select v-model="ttsLanguage">
           <option value="">No TTS</option>

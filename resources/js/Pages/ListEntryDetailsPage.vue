@@ -129,7 +129,10 @@ const trackSelected = (track) => {
                       </div>
                     </div>
                     <TrackList :performance="data" @trackSelected="trackSelected" />
-                    <ClientList v-if="selectedTrack" :trackId="selectedTrack.id" :performanceId="id" />
+                    <ClientList v-if="selectedTrack"
+                      :trackId="selectedTrack.id"
+                      :performanceId="id"
+                      :ttsInstructions="JSON.parse(selectedTrack.tts_instructions)" />
                   </div>
                 </template>
               </div>

@@ -31,9 +31,9 @@ Route::post('/track/delete/{id}', [TrackController::class, 'delete'])
   ->name('track.delete');
 Route::post('/track/edit/{id}', [TrackController::class, 'edit'])
   ->name('track.edit');
-Route::post('/track/{id}/start/{startTime}', [TrackController::class, 'start_track'])
+Route::post('/track/{id}/start/{startTime}/{performance_id}', [TrackController::class, 'start_track'])
   ->name('track.start');
-  Route::post('/track/{id}/start_all/{startTime}', [TrackController::class, 'start_track_all_partials'])
+  Route::post('/track/{id}/start_all/{startTime}/{performance_id}', [TrackController::class, 'start_track_all_partials'])
   ->name('track.startall');
 Route::get('/track', [TrackController::class, 'get']);
 Route::get('/track/{id}', [TrackController::class, 'get']);
