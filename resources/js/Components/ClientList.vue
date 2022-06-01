@@ -16,7 +16,6 @@ const ttsLanguages = ref([])
 const ttsLanguage = ref()
 
 onMounted(async () => {
-
   if (props.ttsInstructions) {
     ttsLanguages.value = Object.keys(props.ttsInstructions[0])
   }
@@ -30,66 +29,50 @@ onMounted(async () => {
     timingSrcConnected.value = true;
   }
   mCorpApp.init()
-  // timingProvider.onreadystatechange = () => {
-    // if (timingProvider.readyState === "open") {
-      // console.log("Time elapsed until TP ready: ", performance.now() - t1)
-      // timingObj = new TimingObject(timingProvider);
-      // timingSrcConnected.value = true;
-    // }
-  // };
-});
-
-function registerClient() {
-  useForm({ performance_id: 1 }).post(`/api/client/create`);
-  getRegisteredClients();
-}
+})
 
 async function synchronizeTimingSrcPosition() {
   if (!synchronizing.value) {
     if (motion.vel != 1) {
-      motion.update(null, 1, null);
-      console.log("Set TimingObject velocity to 1.");
+      motion.update(null, 1, null)
     }
 
     synchronizing.value = true;
     (function query() {
       if (motion.pos.toFixed(1) - timingSrcPosition.value != 0) {
         // TODO: Weird calculation, doesn't work with !== for some reason, no time to look into it now
-        timingSrcPosition.value = motion.pos.toFixed(1);
+        timingSrcPosition.value = motion.pos.toFixed(1)
       }
       if (synchronizing.value) {
-        window.setTimeout(query, 10);
+        window.setTimeout(query, 10)
       }
     })();
   } else {
-    synchronizing.value = false;
+    synchronizing.value = false
     motion.update(0, 0, null)
-    timingSrcPosition.value = motion.pos;
-    console.log(motion.pos)
+    timingSrcPosition.value = motion.pos
   }
-  console.log("Synchronizing: ", synchronizing.value);
 }
 
 async function startTrack() {
-  const calculatedStartingPosition = motion.pos + 5;
+  const calculatedStartingPosition = motion.pos + 5
   let route;
 
   if (allPartialsAllDevices.value) {
-    route = `/api/track/${props.trackId}/start_all/${calculatedStartingPosition}`;
+    route = `/api/track/${props.trackId}/start_all/${calculatedStartingPosition}`
   } else {
-    route = `/api/track/${props.trackId}/start/${calculatedStartingPosition}`;
+    route = `/api/track/${props.trackId}/start/${calculatedStartingPosition}`
   }
 
-  console.log("Calculated starting position: ", calculatedStartingPosition);
-  const response = await axios.post(route, null, { params: { tts_language: ttsLanguage.value } });
-  console.log(response.data.data);
+  console.log("Calculated starting position: ", calculatedStartingPosition)
+  const response = await axios.post(route, null, { params: { tts_language: ttsLanguage.value } })
 }
 
 async function getRegisteredClients() {
   const response = await axios.get("/api/client/active");
   registeredClients.splice(0);
   for (const client of response.data) {
-    registeredClients.push(client);
+    registeredClients.push(client)
   }
 }
 
@@ -99,7 +82,7 @@ async function autoGetRegisteredClients() {
 
     autoGetRegisteredClientsInterval.value = window.setInterval(
       async () => {
-        await getRegisteredClients();
+        await getRegisteredClients()
       }, 2000
     )
   } else {
@@ -109,8 +92,8 @@ async function autoGetRegisteredClients() {
 
 async function removeClients() {
   for (const client of registeredClients) {
-    const response = await axios.post(`/api/client/delete/${client.id}`);
-    console.log("Removed client with id " + client.id);
+    const response = await axios.post(`/api/client/delete/${client.id}`)
+    console.log("Removed client with id " + client.id)
   }
   getRegisteredClients();
 }
