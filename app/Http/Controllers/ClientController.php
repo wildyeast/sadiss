@@ -51,10 +51,16 @@ class ClientController extends Controller
   // Returns all clients that have made a listening call in the last $DOWNTIME_CUTOFF_IN_SEC seconds
   // and deletes all others.
   // TODO: There must be a better way to do this. 
-  public function get_active_clients_delete_others(Request $request) {
+  public function get_active_clients_delete_others(Request $request, $performance_id=null) {
     $DOWNTIME_CUTOFF_IN_SEC = 5;
 
-    $clients = Client::all();
+    $clients = null;
+    if (isset($performance_id)) {
+      $clients = Client::where('performance_id', $performance_id)->get();
+    } else {
+      $clients = Client::all();
+    }
+
     $active_clients = [];
     foreach($clients as $i=>$client) {
       if ($client->last_listening_time == null) {
@@ -67,7 +73,6 @@ class ClientController extends Controller
         $client->delete();
       }
     }
-    
     return $active_clients;
   }
 

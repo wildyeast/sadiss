@@ -3,7 +3,7 @@ import { useForm } from "@inertiajs/inertia-vue3";
 import { onMounted, reactive, ref } from "vue";
 import Button from "./Button.vue";
 
-const props = defineProps(['trackId', 'ttsInstructions'])
+const props = defineProps(['trackId', 'ttsInstructions', 'performanceId'])
 
 const registeredClients = reactive([]);
 const autoGetRegisteredClientsInterval = ref(null);
@@ -69,8 +69,8 @@ async function startTrack() {
 }
 
 async function getRegisteredClients() {
-  const response = await axios.get("/api/client/active");
-  registeredClients.splice(0);
+  const response = await axios.get(`/api/client/active/${props.performanceId}`);
+  registeredClients.splice(0)
   for (const client of response.data) {
     registeredClients.push(client)
   }

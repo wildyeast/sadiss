@@ -74,6 +74,7 @@ Route::group(['excluded_middleware' => 'throttle:api'], function () {
   });
   Route::get('/client/active', [ClientController::class, 'get_active_clients_delete_others'])
     ->name('client.active');
+  Route::get('/client/active/{performance_id}', [ClientController::class, 'get_active_clients_delete_others']);
   Route::get('/client/{token}', [ClientController::class, 'get_by_token'])
     ->name('client.get_by_token');
   Route::get('/client', [ClientController::class, 'get']);
