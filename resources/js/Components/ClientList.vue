@@ -2,8 +2,8 @@
 import { useForm } from "@inertiajs/inertia-vue3";
 import { onMounted, reactive, ref } from "vue";
 import Button from "./Button.vue";
-import { TimingProvider } from "timing-provider";
-import { TimingObject } from "timing-object";
+
+const props = defineProps(['trackId', 'ttsInstructions'])
 
 const registeredClients = reactive([]);
 const autoGetRegisteredClientsInterval = ref(null);
