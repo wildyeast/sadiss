@@ -9714,6 +9714,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     });
     var choirMode = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
     var waveform = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)('sine');
+    var partialOverlap = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)();
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
       var mCorpAppId, mCorpApp;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
@@ -9809,7 +9810,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   params: {
                     tts_language: ttsLanguage.value,
                     choir_mode: choirMode.value,
-                    waveform: waveform.value
+                    waveform: waveform.value,
+                    partial_overlap: partialOverlap.value
                   }
                 });
 
@@ -9995,6 +9997,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       ttsLanguages: ttsLanguages,
       choirMode: choirMode,
       waveform: waveform,
+      partialOverlap: partialOverlap,
       synchronizeTimingSrcPosition: synchronizeTimingSrcPosition,
       startTrack: startTrack,
       getRegisteredClients: getRegisteredClients,
@@ -11645,7 +11648,15 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, [_hoisted_12, _hoisted_13, _hoisted_14, _hoisted_15, (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" <option value=\"\">Custom</option> ")], 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $setup.waveform]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelSelect, $setup.waveform]])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
+    type: "text",
+    placeholder: "Overlap",
+    "onUpdate:modelValue": _cache[4] || (_cache[4] = function ($event) {
+      return $setup.partialOverlap = $event;
+    })
+  }, null, 512
+  /* NEED_PATCH */
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $setup.partialOverlap]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: $setup.removeClients,
     "class": "border p-2"
   }, " Remove all registered clients "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {

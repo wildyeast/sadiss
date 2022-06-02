@@ -17,6 +17,7 @@ const ttsLanguage = ref()
 const ttsLanguages = computed(() => props.ttsInstructions ? Object.keys(props.ttsInstructions[0]) : null)
 const choirMode = ref(false)
 const waveform = ref('sine')
+const partialOverlap = ref()
 
 onMounted(async () => {
   // getRegisteredClients();
@@ -72,7 +73,8 @@ async function startTrack() {
       params: {
         tts_language: ttsLanguage.value,
         choir_mode: choirMode.value,
-        waveform: waveform.value
+        waveform: waveform.value,
+        partial_overlap: partialOverlap.value
       }
     }
   )
@@ -153,6 +155,7 @@ async function removeClients() {
           <!-- <option value="">Custom</option> -->
         </select>
       </div>
+      <input type="text" placeholder="Overlap" v-model="partialOverlap">
       <button @click="removeClients" class="border p-2">
         Remove all registered clients
       </button>

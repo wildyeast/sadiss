@@ -80,14 +80,24 @@ class TrackController extends Controller
     $tts_language = $request->query->get('tts_language');
     $choir_mode = $request->query->get('choir_mode');
     $waveform = $request->query->get('waveform');
+    $partial_overlap = $request->query->get('partial_overlap');
 
-    if (!$choir_mode) {
+    if ($choir_mode == "false") {
       $unique_partials = $partials;
-      // If more clients than partials, duplicate original partials until this is no longer the case.
-      while (count($clients) > count($partials)) {
-        $partials = array_merge($partials, $unique_partials);
+
+
+      if (!$partial_overlap) {
+        // If more clients than partials, duplicate original partials until this is no longer the case.
+        while (count($clients) > count($partials)) {
+          $partials = array_merge($partials, $unique_partials);
+        }
+      } else {
+        // If overlap is set, duplicate partials $partial_overlap times
+        for ($i = 1; $i < $partial_overlap; $i++) {
+          $partials = array_merge($partials, $unique_partials); 
+        } 
       }
-      
+
       // Array of chunk arrays, same length as registered clients array.
       $chunks = array_fill(0, count($clients), []);
   
