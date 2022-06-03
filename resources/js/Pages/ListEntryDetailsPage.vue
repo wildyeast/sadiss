@@ -41,6 +41,10 @@ const trackSelected = (track) => {
 }
 
 const generatePartialQRCodes = () => {
+  if (showPartialQRCodes.value === true) {
+    showPartialQRCodes.value = false
+    return
+  }
   if (!selectedTrack.value) {
     alert('Select a track.')
     return
@@ -133,7 +137,7 @@ const generatePartialQRCodes = () => {
                       <p v-else class="text-rose-500">Inactive</p>
                     </div>
                     <div class="flex flex-col">
-                      <button @click="showPerformanceQRCode = true">Generate QR-Code for this performance</button>
+                      <button @click="showPerformanceQRCode = !showPerformanceQRCode">Generate QR-Code for this performance</button>
                       <button @click="generatePartialQRCodes">Generate QR-Code for each partial of the selected track</button>
                     </div>
                     <qrcode-vue v-if="showPerformanceQRCode" :value="`http://sadiss.net/client?id=${id}`" :size="300" level="H" />

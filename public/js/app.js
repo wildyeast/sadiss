@@ -9795,6 +9795,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
+                if (!(registeredClients.length === 0)) {
+                  _context3.next = 3;
+                  break;
+                }
+
+                alert("No clients are registered.");
+                return _context3.abrupt("return");
+
+              case 3:
                 calculatedStartingPosition = motion.pos + 5;
 
                 if (!choirMode.value && allPartialsAllDevices.value) {
@@ -9805,7 +9814,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 console.log("Calculated starting position: ", calculatedStartingPosition);
                 console.log('Choir mode:', choirMode.value);
-                _context3.next = 6;
+                _context3.next = 9;
                 return axios.post(route, null, {
                   params: {
                     tts_language: ttsLanguage.value,
@@ -9815,10 +9824,10 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                   }
                 });
 
-              case 6:
+              case 9:
                 response = _context3.sent;
 
-              case 7:
+              case 10:
               case "end":
                 return _context3.stop();
             }
@@ -10318,6 +10327,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     };
 
     var save = function save() {
+      mode.value = 'perform';
       return axios__WEBPACK_IMPORTED_MODULE_1___default().post("/api/performance/add_tracks/".concat(props.performance.id), null, {
         params: {
           tracks: performanceTracks.value.map(function (track) {
@@ -11159,6 +11169,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     };
 
     var generatePartialQRCodes = function generatePartialQRCodes() {
+      if (showPartialQRCodes.value === true) {
+        showPartialQRCodes.value = false;
+        return;
+      }
+
       if (!selectedTrack.value) {
         alert('Select a track.');
         return;
@@ -11547,7 +11562,7 @@ var _hoisted_3 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementV
 );
 
 var _hoisted_4 = {
-  "class": "flex justify-between"
+  "class": "flex justify-between items-center"
 };
 var _hoisted_5 = ["disabled"];
 var _hoisted_6 = {
@@ -11599,6 +11614,9 @@ var _hoisted_15 = /*#__PURE__*/(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElement
 /* HOISTED */
 );
 
+var _hoisted_16 = {
+  "class": "flex flex-col"
+};
 function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.withDirectives)((0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("input", {
     "class": "mr-2",
@@ -11656,10 +11674,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     })
   }, null, 512
   /* NEED_PATCH */
-  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $setup.partialOverlap]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
-    onClick: $setup.removeClients,
-    "class": "border p-2"
-  }, " Remove all registered clients "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+  ), [[vue__WEBPACK_IMPORTED_MODULE_0__.vModelText, $setup.partialOverlap]]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", null, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: $setup.getRegisteredClients,
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["border p-2", $setup.autoGetRegisteredClientsInterval ? 'border-b-green-400 border-l-green-400 border-t-green-400' : 'border'])
   }, " Refresh list ", 2
@@ -11669,7 +11684,10 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["border-b border-t border-r p-2", $setup.autoGetRegisteredClientsInterval ? 'border-green-400' : 'border-b border-t border-r'])
   }, " Auto ", 2
   /* CLASS */
-  )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "IDs of registered clients (Total: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.registeredClients.length) + ")", 1
+  )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    onClick: $setup.removeClients,
+    "class": "border p-2"
+  }, " Remove all registered clients ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "IDs of registered clients (Total: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.registeredClients.length) + ")", 1
   /* TEXT */
   ), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.registeredClients, function (client) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
@@ -11989,10 +12007,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 
 var _hoisted_1 = {
-  "class": "w-full px-4 bg-[#EFEFEF] flex flex-col justify-center"
+  "class": "w-full px-4 border flex flex-col justify-center"
 };
 var _hoisted_2 = {
-  "class": "flex justify-center gap-2"
+  "class": "flex justify-center gap-2 mt-2"
 };
 var _hoisted_3 = {
   key: 0,
@@ -12014,12 +12032,18 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_1, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_2, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: _cache[0] || (_cache[0] = function ($event) {
       return $setup.mode = 'perform';
-    })
-  }, "Perform"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    }),
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["border p-2", $setup.mode === 'perform' ? 'bg-[#EEE]' : 'bg-transparent'])
+  }, "Perform", 2
+  /* CLASS */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: _cache[1] || (_cache[1] = function ($event) {
       return $setup.mode = 'edit';
-    })
-  }, "Edit Tracklist")]), $setup.mode === 'edit' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.performanceTracks, function (track) {
+    }),
+    "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)(["border p-2", $setup.mode === 'edit' ? 'bg-[#EEE]' : 'bg-transparent'])
+  }, "Edit Tracklist", 2
+  /* CLASS */
+  )]), $setup.mode === 'edit' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_4, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.performanceTracks, function (track) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
       onClick: function onClick($event) {
         return $setup.performanceTracks.splice($setup.performanceTracks.indexOf(track), 1);
@@ -12044,7 +12068,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       onClick: function onClick($event) {
         return $setup.trackSelected(track);
       },
-      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$setup.selectedTrack === track ? 'bg-white' : 'bg-transparent', "cursor-pointer"])
+      "class": (0,vue__WEBPACK_IMPORTED_MODULE_0__.normalizeClass)([$setup.selectedTrack === track ? 'bg-[#EEE]' : 'bg-transparent', "cursor-pointer"])
     }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)(track.title), 11
     /* TEXT, CLASS, PROPS */
     , _hoisted_9);
@@ -12052,7 +12076,8 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   /* UNKEYED_FRAGMENT */
   ))])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), $setup.mode === 'edit' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("button", {
     key: 2,
-    onClick: $setup.save
+    onClick: $setup.save,
+    "class": "border p-2 mb-2"
   }, "Save")) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]);
 }
 
@@ -13586,7 +13611,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* TEXT */
       ), $setup.data['is_active'] ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_30, "Active")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_31, "Inactive"))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         onClick: _cache[0] || (_cache[0] = function ($event) {
-          return $setup.showPerformanceQRCode = true;
+          return $setup.showPerformanceQRCode = !$setup.showPerformanceQRCode;
         })
       }, "Generate QR-Code for this performance"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         onClick: $setup.generatePartialQRCodes

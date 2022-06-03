@@ -25,6 +25,7 @@ const trackSelected = (track) => {
 }
 
 const save = () => {
+  mode.value = 'perform'
   return axios.post(`/api/performance/add_tracks/${props.performance.id}`, null, {
     params: {
       tracks: performanceTracks.value.map(track => track.id)
@@ -35,10 +36,10 @@ const save = () => {
 </script>
 
 <template>
-  <div class="w-full px-4 bg-[#EFEFEF] flex flex-col justify-center">
-    <div class="flex justify-center gap-2">
-      <button @click="mode = 'perform'">Perform</button>
-      <button @click="mode = 'edit'">Edit Tracklist</button>
+  <div class="w-full px-4 border flex flex-col justify-center">
+    <div class="flex justify-center gap-2 mt-2">
+      <button @click="mode = 'perform'" class="border p-2" :class="mode === 'perform' ? 'bg-[#EEE]' : 'bg-transparent'">Perform</button>
+      <button @click="mode = 'edit'" class="border p-2" :class="mode === 'edit' ? 'bg-[#EEE]' : 'bg-transparent'">Edit Tracklist</button>
     </div>
     <div v-if="mode === 'edit'" class="flex w-full">
       <div class="w-1/2 min-h-10 cursor-pointer">
@@ -55,11 +56,11 @@ const save = () => {
     <div v-if="mode === 'perform'">
         <div  v-for="track of performanceTracks"
               @click="trackSelected(track)"
-              :class="selectedTrack === track ? 'bg-white' : 'bg-transparent'"
+              :class="selectedTrack === track ? 'bg-[#EEE]' : 'bg-transparent'"
               class="cursor-pointer">
           {{ track.title }}
         </div>
     </div>
-    <button v-if="mode === 'edit'" @click="save">Save</button>
+    <button v-if="mode === 'edit'" @click="save" class="border p-2 mb-2">Save</button>
   </div>
 </template>
