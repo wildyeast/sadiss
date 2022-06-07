@@ -41,10 +41,6 @@ export default class Player {
     this.playing = true;
     // console.log(this.oscillators.map(val => val.startTime + this.offset))
 
-    window.setInterval(() => {
-      console.log(this.audioContext.currentTime + this.offset)
-    }, 1000)
-
   }
 
   setupOscillator(partial, timeToAddToStart) {
@@ -109,6 +105,6 @@ export default class Player {
     gain.connect(this.audioContext.destination)
 
     osc.start(now)
-    osc.stop(now + 0.3)
+    osc.stop(now + 0.1)
   }
 }
