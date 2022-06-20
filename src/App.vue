@@ -108,35 +108,6 @@ export default {
     outputLatency: 0,
     useCalculatedOutputLatency: true,
     motion: null,
-<<<<<<< HEAD
-    to: null,
-
-    audio: null
-  }),
-  async mounted() {
-
-    this.audio = document.querySelector('#audioElement')
-    this.to = new TimingObject()
-
-    // const externalScript = document.createElement('script')
-    // externalScript.setAttribute('src', 'https://www.mcorp.no/lib/mcorp-2.0.js')
-    // document.head.appendChild(externalScript)
-
-    // const externalScript2 = document.createElement('script')
-    // externalScript.setAttribute('src', "https://mcorp.no/lib/mediasync.js")
-    // document.head.appendChild(externalScript2)
-
-    // const mCorpApp = MCorp.app("8844095860530063641", { anon: true })
-    // console.log(mCorpApp.motions)
-    // mCorpApp.run = () => {
-    //   this.motion = mCorpApp.motions['shared']
-    // }
-    // mCorpApp.init()
-    // while (!this.motion) {
-    //   await new Promise(r => setTimeout(r, 500));
-    // }
-
-=======
     performanceId: 1,
     performances: null,
     ttsInstructions: null,
@@ -158,7 +129,6 @@ export default {
     while (!this.motion) {
       await new Promise(r => setTimeout(r, 500));
     }
->>>>>>> develop
     // this.motion.update(null, 1, null)
     this.player = new Player();
     // Fetch tracks
@@ -192,37 +162,10 @@ export default {
     async register() {
       if (this.isRegistered) return;
 
-<<<<<<< HEAD
-      const mCorpApp = MCorp.app("8844095860530063641", { anon: true })
-      // mCorpApp.run = () => {
-      //   this.motion = mCorpApp.motions['shared']
-      //   this.to.src = this.motion
-      //   MCorp.mediaSync(this.audio, this.to, { debug: true })
-      // }
-      mCorpApp.ready.then(() => {
-        this.motion = mCorpApp.motions['shared']
-        this.to.src = this.motion
-
-        this.motion.on('change', () => {
-          if (this.motion.vel === 1) {
-            this.to.update({velocity:1});
-          } else {
-            this.to.update({velocity:0});
-          }
-          if (this.motion.pos === 0) {
-            this.to.update({position:0});
-          }
-        })
-
-        MCorp.mediaSync(this.audio, this.to, { debug: true })
-      })
-      // mCorpApp.init()
-=======
       if (!this.performanceId) {
         alert("Select a performance id.")
         return
       }
->>>>>>> develop
 
       while (!this.motion) {
         await new Promise(r => setTimeout(r, 500));
@@ -287,9 +230,6 @@ export default {
         const startTimeFromServer = Number(clientData.client["start_time"]);
         this.ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
         this.ttsLanguage = clientData.client["tts_language"]
-<<<<<<< HEAD
-        // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
-=======
         const wf = clientData.client["waveform"]
         if (wf) {
           if (['sine', 'sawtooth', 'square', 'triangle'].includes(wf)) {
@@ -301,7 +241,6 @@ export default {
         }
 
         // Conversion only necessary if playing from chunks sent by db, not when playing all partials on one client directly
->>>>>>> develop
         this.partialData = this.convertPartialsIfNeeded(
           clientData.client["partials"]
         );
@@ -315,14 +254,10 @@ export default {
         const intervalId = window.setInterval(() => {
           this.timingSrcPosition = this.globalTime();
           if (this.timingSrcPosition >= startTimeFromServer + 3) {
-<<<<<<< HEAD
-            this.audio.play()
-=======
             this.print += this.timingSrcPosition + '\n'
             // const a = document.querySelector('.app')
             // a.style['background-color'] = 'red'
             // this.audio.play()
->>>>>>> develop
             console.log(this.timingSrcPosition)
             this.player.offset =
               this.timingSrcPosition - this.player.audioContext.currentTime; // Do not change!
@@ -344,38 +279,6 @@ export default {
       const startInSec = 5;
       const q = this.globalTime();
       const now = q - this.player.offset; // Do not change!
-<<<<<<< HEAD
-      // this.player.playOneShot(now);
-      console.log("ctx.baseLatency: ", this.player.audioContext.baseLatency);
-      console.log(
-        "ctx outputTimestamp ctx timestamp + offset:, ",
-        this.player.audioContext.getOutputTimestamp().contextTime +
-          this.player.offset
-      )
-      const calculatedOutputLatency =
-        this.player.audioContext.currentTime -
-        this.player.audioContext.getOutputTimestamp().contextTime;
-      console.log("Calculated output latency: ", calculatedOutputLatency);
-
-      const latencyToSubtract = this.useCalculatedOutputLatency
-        ? calculatedOutputLatency - this.player.audioContext.baseLatency
-        : 0;
-
-      console.log("Latency to subract: ", latencyToSubtract);
-
-      // this.player.setup(
-      //   this.partialData,
-      //   startInSec,
-      //   // now - calculatedOutputLatency - this.player.audioContext.baseLatency // O
-      //   now // no O
-      //   // now - latencyToSubtract // O only on Chrome
-      // );
-      console.log(
-        "ctxTime + offset when setup finished: ",
-        this.player.audioContext.currentTime + this.player.offset
-      );
-      // console.log(
-=======
       // this.print += this.player.audioContext.currentTime + "\n";
       // this.player.playOneShot(now + 2);
       // this.print += this.player.audioContext.currentTime + "\n";
@@ -425,7 +328,6 @@ export default {
       //   this.player.audioContext.currentTime + this.player.offset
       // );
       // console.log(
->>>>>>> develop
       //   this.player.valuesSetForFirstPartial.map(
       //     (val) => val.map(v => v + this.player.offset)
       //   )
@@ -434,11 +336,8 @@ export default {
 
       /* TEXT TO SPEECH TESTING */
 
-<<<<<<< HEAD
-=======
       console.log(this.ttsInstructions, this.ttsLanguage)
 
->>>>>>> develop
       if (this.ttsInstructions && this.ttsLanguage) {
         console.log("Starting TTS.")
         const ttsTimestamps = Object.keys(this.ttsInstructions)
@@ -446,18 +345,11 @@ export default {
         let nextTimestamp = ttsTimestamps.shift()
         let nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
         nextUtterance.lang = this.ttsLanguage
-<<<<<<< HEAD
-  
-        const speechIntervalId = window.setInterval(() => {
-          if (this.globalTime() - this.player.offset >= now + Number(nextTimestamp) + startInSec) {
-            speechSynthesis.speak(nextUtterance)
-=======
 
         const speechIntervalId = window.setInterval(() => {
           if (this.globalTime() - this.player.offset >= now + Number(nextTimestamp) + startInSec) {
             speechSynthesis.speak(nextUtterance)
             console.log("AudioCtx time + offset: ", this.player.audioContext.currentTime + this.player.offset)
->>>>>>> develop
             if (ttsTimestamps.length) {
               nextTimestamp = ttsTimestamps.shift()
               nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
@@ -471,10 +363,6 @@ export default {
       
       /* END OF TEXT TO SPEECH TESTING */
 
-<<<<<<< HEAD
-=======
-
->>>>>>> develop
       // Reregister when done
       // await this.register()
     },
