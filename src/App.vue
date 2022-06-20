@@ -1,12 +1,6 @@
 <template>
   <div class="app">
-<<<<<<< HEAD
-    <audio id="audioElement">
-      <source src="./assets/test.ogg" type="audio/ogg">
-    </audio>
-=======
     <OutputLatencyCalibration @calibrationFinished="calibrationFinished"/>
->>>>>>> develop
     <button @click="startStop">Start/Stop</button>
     <div class="md:w-1/2 w-11/12 border b-white p-4 flex flex-col">
       <select v-model="performanceId">
