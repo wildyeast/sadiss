@@ -248,7 +248,7 @@ export default {
 
         let prepareStarted = false;
         // const sampler = new TimingSampler(to, {period:100});
-        MCorp.mediaSync(this.audio, this.to, { debug: true })
+        // MCorp.mediaSync(this.audio, this.to, { debug: true })
 
         window.clearInterval(this.initialTimingSrcIntervalId);
         const intervalId = window.setInterval(() => {
