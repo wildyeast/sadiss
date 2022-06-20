@@ -84,6 +84,7 @@ export default {
     player: null,
     partials: null,
     countdownTime: -1,
+    
     isRegistered: false,
     trackId: 1,
     availableTracks: [],
