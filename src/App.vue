@@ -1,18 +1,17 @@
 <template>
   <div class="app">
+<<<<<<< HEAD
     <audio id="audioElement">
       <source src="./assets/test.ogg" type="audio/ogg">
     </audio>
+=======
+    <OutputLatencyCalibration @calibrationFinished="calibrationFinished"/>
+>>>>>>> develop
     <button @click="startStop">Start/Stop</button>
     <div class="md:w-1/2 w-11/12 border b-white p-4 flex flex-col">
-      <!-- <p>
-        Press Register below to register this device to receive partials when
-        'Start track' is pressed in the track details page of a track in the
-        Admin Interface. The registration ID of the device displayed after
-        pressing Register will be visible in the list of registered clients in
-        the track details page in the Admin Interface. This ID changes with
-        every registration.
-      </p> -->
+      <select v-model="performanceId">
+        <option v-for="performance of performances">{{ performance.id }}</option>
+      </select>
       <div class="flex items-center">
         <input
           type="checkbox"
@@ -82,10 +81,11 @@ dayjs.extend(dayjsPluginUTC);
 import {TimingObject, TimingSampler, TimingProgress } from "https://webtiming.github.io/timingsrc/lib/timingsrc-esm-v3.js";
 
 import Player from "./Player";
+import OutputLatencyCalibration from './components/OutputLatencyCalibration.vue'
 
 export default {
   name: "App",
-  components: {},
+  components: { OutputLatencyCalibration },
   data: () => ({
     player: null,
     partials: null,
@@ -114,6 +114,7 @@ export default {
     outputLatency: 0,
     useCalculatedOutputLatency: true,
     motion: null,
+<<<<<<< HEAD
     to: null,
 
     audio: null
@@ -141,11 +142,48 @@ export default {
     //   await new Promise(r => setTimeout(r, 500));
     // }
 
+=======
+    performanceId: 1,
+    performances: null,
+    ttsInstructions: null,
+    ttsLanguage: null,
+    partialIdToRegisterWith: null,
+    waveform: null,
+    print: '',
+    outputLatencyFromLocalStorage: null
+  }),
+  async mounted() {
+    const performanceResponse = await fetch(this.hostUrl + "/api/performance")
+    this.performances = await performanceResponse.json()
+
+    const mCorpApp = MCorp.app("8844095860530063641", {anon: true})
+    mCorpApp.run = () => {
+      this.motion = mCorpApp.motions['shared']
+    }
+    mCorpApp.init()
+    while (!this.motion) {
+      await new Promise(r => setTimeout(r, 500));
+    }
+>>>>>>> develop
     // this.motion.update(null, 1, null)
     this.player = new Player();
     // Fetch tracks
     const res = await fetch(this.hostUrl + "/api/track");
     this.availableTracks = await res.json();
+
+    const params = new Proxy(new URLSearchParams(window.location.search), {
+      get: (searchParams, prop) => searchParams.get(prop),
+    });
+
+    if (this.performances.map(p => p.id).includes(Number(params.id))) {
+      this.performanceId = Number(params.id)
+    }
+
+    this.partialIdToRegisterWith = params.partial_id
+
+    this.outputLatencyFromLocalStorage = Number(localStorage.getItem("outputLatency"));
+    this.print += this.outputLatencyFromLocalStorage + "\n"
+
   },
   methods: {
     startStop () {
@@ -160,6 +198,7 @@ export default {
     async register() {
       if (this.isRegistered) return;
 
+<<<<<<< HEAD
       const mCorpApp = MCorp.app("8844095860530063641", { anon: true })
       // mCorpApp.run = () => {
       //   this.motion = mCorpApp.motions['shared']
@@ -184,6 +223,12 @@ export default {
         MCorp.mediaSync(this.audio, this.to, { debug: true })
       })
       // mCorpApp.init()
+=======
+      if (!this.performanceId) {
+        alert("Select a performance id.")
+        return
+      }
+>>>>>>> develop
 
       while (!this.motion) {
         await new Promise(r => setTimeout(r, 500));
@@ -216,7 +261,7 @@ export default {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ performance_id: 1 }),
+        body: JSON.stringify({ performance_id: this.performanceId, partial_id: this.partialIdToRegisterWith }),
       });
       const data = await response.json();
       this.deviceRegistrationId = data.id; // Only used in UI.
@@ -248,7 +293,21 @@ export default {
         const startTimeFromServer = Number(clientData.client["start_time"]);
         this.ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
         this.ttsLanguage = clientData.client["tts_language"]
+<<<<<<< HEAD
         // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
+=======
+        const wf = clientData.client["waveform"]
+        if (wf) {
+          if (['sine', 'sawtooth', 'square', 'triangle'].includes(wf)) {
+            this.player.waveform = wf
+          } else {
+            // TODO: Placeholder for custom wave
+            // Since you can't enter custom waves in the admin interface currently this is not implemented.
+          }
+        }
+
+        // Conversion only necessary if playing from chunks sent by db, not when playing all partials on one client directly
+>>>>>>> develop
         this.partialData = this.convertPartialsIfNeeded(
           clientData.client["partials"]
         );
@@ -262,13 +321,21 @@ export default {
         const intervalId = window.setInterval(() => {
           this.timingSrcPosition = this.globalTime();
           if (this.timingSrcPosition >= startTimeFromServer + 3) {
+<<<<<<< HEAD
             this.audio.play()
+=======
+            this.print += this.timingSrcPosition + '\n'
+            // const a = document.querySelector('.app')
+            // a.style['background-color'] = 'red'
+            // this.audio.play()
+>>>>>>> develop
             console.log(this.timingSrcPosition)
             this.player.offset =
               this.timingSrcPosition - this.player.audioContext.currentTime; // Do not change!
             // console.log("Offset: ", this.player.offset);
             if (!prepareStarted) {
               // Prevent multiple calls of prepare() if checkForStart() short interval time
+              // a.style['background-color'] = 'blue'
               this.start();
               prepareStarted = true;
             }
@@ -283,6 +350,7 @@ export default {
       const startInSec = 5;
       const q = this.globalTime();
       const now = q - this.player.offset; // Do not change!
+<<<<<<< HEAD
       // this.player.playOneShot(now);
       console.log("ctx.baseLatency: ", this.player.audioContext.baseLatency);
       console.log(
@@ -313,6 +381,57 @@ export default {
         this.player.audioContext.currentTime + this.player.offset
       );
       // console.log(
+=======
+      // this.print += this.player.audioContext.currentTime + "\n";
+      // this.player.playOneShot(now + 2);
+      // this.print += this.player.audioContext.currentTime + "\n";
+      // console.log("ctx.baseLatency: ", this.player.audioContext.baseLatency);
+      // console.log(
+      //   "ctx outputTimestamp ctx timestamp + offset:, ",
+      //   this.player.audioContext.getOutputTimestamp().contextTime +
+      //     this.player.offset
+      // )
+      // const calculatedOutputLatency =
+      //   this.player.audioContext.currentTime -
+      //   this.player.audioContext.getOutputTimestamp().contextTime;
+      // console.log("Calculated output latency: ", calculatedOutputLatency);
+
+      // const latencyToSubtract = this.useCalculatedOutputLatency
+      //   ? calculatedOutputLatency - this.player.audioContext.baseLatency
+      //   : 0;
+
+      // console.log("Latency to subract: ", latencyToSubtract);
+
+      // let outputLatencyFromCalibration = localStorage.getItem("outputLatency");
+      // let latency = 0
+      // if (this.outputLatencyFromCalibration) {
+      //   latency = this.outputLatencyFromLocalStorage
+      // }
+
+      // const nowAdjusted = now - latency
+      // console.log("Now: ", now)
+      // console.log("Now adjusted by latency: ", nowAdjusted)
+      // console.log("Diff: ", now - nowAdjusted)
+
+      const adjustedNow = now + this.outputLatencyFromLocalStorage
+      console.log("LocalStorageOutputLatency: ", this.outputLatencyFromLocalStorage)
+      console.log("Adjusted Now: ", adjustedNow)
+      console.log("Diff: ", adjustedNow - now)
+
+      this.player.setup(
+        this.partialData,
+        startInSec,
+        // now - calculatedOutputLatency - this.player.audioContext.baseLatency // O
+        // now // no O
+        // now - latencyToSubtract // O only on Chrome
+        now + this.outputLatencyFromLocalStorage
+      );
+      // console.log(
+      //   "ctxTime + offset when setup finished: ",
+      //   this.player.audioContext.currentTime + this.player.offset
+      // );
+      // console.log(
+>>>>>>> develop
       //   this.player.valuesSetForFirstPartial.map(
       //     (val) => val.map(v => v + this.player.offset)
       //   )
@@ -321,6 +440,11 @@ export default {
 
       /* TEXT TO SPEECH TESTING */
 
+<<<<<<< HEAD
+=======
+      console.log(this.ttsInstructions, this.ttsLanguage)
+
+>>>>>>> develop
       if (this.ttsInstructions && this.ttsLanguage) {
         console.log("Starting TTS.")
         const ttsTimestamps = Object.keys(this.ttsInstructions)
@@ -328,10 +452,18 @@ export default {
         let nextTimestamp = ttsTimestamps.shift()
         let nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
         nextUtterance.lang = this.ttsLanguage
+<<<<<<< HEAD
   
         const speechIntervalId = window.setInterval(() => {
           if (this.globalTime() - this.player.offset >= now + Number(nextTimestamp) + startInSec) {
             speechSynthesis.speak(nextUtterance)
+=======
+
+        const speechIntervalId = window.setInterval(() => {
+          if (this.globalTime() - this.player.offset >= now + Number(nextTimestamp) + startInSec) {
+            speechSynthesis.speak(nextUtterance)
+            console.log("AudioCtx time + offset: ", this.player.audioContext.currentTime + this.player.offset)
+>>>>>>> develop
             if (ttsTimestamps.length) {
               nextTimestamp = ttsTimestamps.shift()
               nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
@@ -345,15 +477,24 @@ export default {
       
       /* END OF TEXT TO SPEECH TESTING */
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> develop
       // Reregister when done
       // await this.register()
+    },
+
+    calibrationFinished (e) {
+      this.outputLatencyFromLocalStorage = Number(e.calibratedLatency)
+      console.log(this.outputLatencyFromLocalStorage)
     },
 
     async playLocally() {
       const res = await fetch(`${this.hostUrl}/api/track/${this.trackId}`);
       const data = await res.json();
       this.partialData = JSON.parse(data.partials);
-      console.log(this.partials);
+      // console.log(this.partials);
       if (!this.player.audioContext) {
         this.player.audioContext = new AudioContext();
       }
