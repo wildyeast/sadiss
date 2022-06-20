@@ -10,6 +10,7 @@ const performanceTracks = ref([])
 const tracks = ref()
 const mode = ref('perform')
 const selectedTrack = ref()
+const loading = ref(true)
 
 onMounted(async () => {
     const trackResponse = await axios.get(`/api/track`)
@@ -17,6 +18,9 @@ onMounted(async () => {
 
     const performanceTrackResponse = await axios.get(`/api/performance/get_tracks/${props.performance.id}`)
     performanceTracks.value = performanceTrackResponse.data
+
+    loading.value = false
+
 })
 
 const trackSelected = (track) => {
@@ -36,7 +40,10 @@ const save = () => {
 </script>
 
 <template>
-  <div class="w-full px-4 border flex flex-col justify-center">
+  <div v-if="loading" class="flex justify-center">
+    <div class="lds-dual-ring" />
+  </div>
+  <div v-else class="w-full px-4 border flex flex-col justify-center">
     <div class="flex justify-center gap-2 mt-2">
       <button @click="mode = 'perform'" class="border p-2" :class="mode === 'perform' ? 'bg-[#EEE]' : 'bg-transparent'">Perform</button>
       <button @click="mode = 'edit'" class="border p-2" :class="mode === 'edit' ? 'bg-[#EEE]' : 'bg-transparent'">Edit Tracklist</button>
@@ -64,3 +71,31 @@ const save = () => {
     <button v-if="mode === 'edit'" @click="save" class="border p-2 mb-2">Save</button>
   </div>
 </template>
+
+<style scoped>
+/* https://loading.io/css/ */
+.lds-dual-ring {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid #fff;
+  border-color: #EEE transparent #EEE transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+</style>
