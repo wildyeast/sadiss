@@ -4,7 +4,7 @@ import { ref } from 'vue';
 
 const emit = defineEmits(['calibrationFinished'])
 
-const BEEP_FREQUENCY_MS = 1000;
+const BEEP_FREQUENCY_MS = 1400;
 
 let beepIntervalId;
 let player;
