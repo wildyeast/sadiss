@@ -28,6 +28,7 @@ const startCalibration = () => {
   const audioCtx = window.AudioContext || window.webkitAudioContext;
   // Start audio context.
   player.audioContext = new audioCtx({ latencyHint: 0 })
+  player.audioContext.resume()
   calibrating.value = true
   beepIntervalId = window.setInterval(() => {
     const now = player.audioContext.currentTime

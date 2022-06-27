@@ -191,7 +191,7 @@ export default {
         latencyHint: 0,
         // sampleRate: 31000,
       });
-      console.log("AudioCtx: ", this.player.audioContext);
+      this.player.audioContext.resume()
 
       const response = await fetch(this.hostUrl + "/api/client/create", {
         method: "POST",
