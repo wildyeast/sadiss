@@ -1,8 +1,9 @@
 <template>
   <div class="app">
     <OutputLatencyCalibration @calibrationFinished="calibrationFinished"/>
-    <button @click="startStop">Start/Stop</button>
+    <!-- <button @click="startStop">Start/Stop</button> -->
     <div class="md:w-1/2 w-11/12 border b-white p-4 flex flex-col">
+      Calibrated output latency: {{ outputLatencyFromLocalStorage }}
       <select v-model="performanceId">
         <option v-for="performance of performances">{{ performance.id }}</option>
       </select>
@@ -147,8 +148,6 @@ export default {
     this.partialIdToRegisterWith = params.partial_id
 
     this.outputLatencyFromLocalStorage = Number(localStorage.getItem("outputLatency"));
-    this.print += this.outputLatencyFromLocalStorage + "\n"
-
   },
   methods: {
     startStop () {
