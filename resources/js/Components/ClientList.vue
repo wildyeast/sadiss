@@ -144,7 +144,7 @@ function startCalibration () {
   let startingSecond = motion.pos.toFixed(0)
 
   beepIntervalId = setInterval(() => {
-    if (motion.pos.toFixed(0) > startingSecond) {
+    if (motion.pos > startingSecond) {
       startingSecond = motion.pos.toFixed(0)
       player.playOneShot(player.audioContext.currentTime)
     }
