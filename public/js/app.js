@@ -9679,6 +9679,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! @inertiajs/inertia-vue3 */ "./node_modules/@inertiajs/inertia-vue3/dist/index.js");
 /* harmony import */ var vue__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! vue */ "./node_modules/vue/dist/vue.esm-bundler.js");
 /* harmony import */ var _Button_vue__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./Button.vue */ "./resources/js/Components/Button.vue");
+/* harmony import */ var _Player_js__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ../Player.js */ "./resources/js/Player.js");
 function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
@@ -9690,6 +9691,7 @@ function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
 
 
 
@@ -9715,6 +9717,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var choirMode = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
     var waveform = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)('sine');
     var partialOverlap = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)();
+    var calibrating = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
+    var beepIntervalId = null;
     (0,vue__WEBPACK_IMPORTED_MODULE_2__.onMounted)( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/_babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().mark(function _callee() {
       var mCorpAppId, mCorpApp;
       return _babel_runtime_regenerator__WEBPACK_IMPORTED_MODULE_0___default().wrap(function _callee$(_context) {
@@ -9993,6 +9997,31 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return _removeClients.apply(this, arguments);
     }
 
+    function startCalibration() {
+      if (calibrating.value) {
+        calibrating.value = false;
+        window.clearInterval(beepIntervalId);
+        return;
+      }
+
+      var player = new _Player_js__WEBPACK_IMPORTED_MODULE_4__["default"]();
+      var audioCtx = window.AudioContext || window.webkitAudioContext; // Start audio context.
+
+      player.audioContext = new audioCtx({
+        latencyHint: 0
+      }); // This is necessary to make the audio context work on iOS.
+
+      player.audioContext.resume();
+      calibrating.value = true;
+      var startingSecond = motion.pos.toFixed(0);
+      beepIntervalId = setInterval(function () {
+        if (motion.pos.toFixed(0) > startingSecond) {
+          startingSecond = motion.pos.toFixed(0);
+          player.playOneShot(player.audioContext.currentTime);
+        }
+      }, 10);
+    }
+
     var __returned__ = {
       props: props,
       registeredClients: registeredClients,
@@ -10007,17 +10036,21 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       choirMode: choirMode,
       waveform: waveform,
       partialOverlap: partialOverlap,
+      calibrating: calibrating,
+      beepIntervalId: beepIntervalId,
       synchronizeTimingSrcPosition: synchronizeTimingSrcPosition,
       startTrack: startTrack,
       getRegisteredClients: getRegisteredClients,
       autoGetRegisteredClients: autoGetRegisteredClients,
       removeClients: removeClients,
+      startCalibration: startCalibration,
       useForm: _inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.useForm,
       computed: vue__WEBPACK_IMPORTED_MODULE_2__.computed,
       onMounted: vue__WEBPACK_IMPORTED_MODULE_2__.onMounted,
       reactive: vue__WEBPACK_IMPORTED_MODULE_2__.reactive,
       ref: vue__WEBPACK_IMPORTED_MODULE_2__.ref,
-      Button: _Button_vue__WEBPACK_IMPORTED_MODULE_3__["default"]
+      Button: _Button_vue__WEBPACK_IMPORTED_MODULE_3__["default"],
+      Player: _Player_js__WEBPACK_IMPORTED_MODULE_4__["default"]
     };
     Object.defineProperty(__returned__, '__isScriptSetup', {
       enumerable: false,
@@ -11690,7 +11723,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
   )]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: $setup.removeClients,
     "class": "border p-2"
-  }, " Remove all registered clients ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "IDs of registered clients (Total: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.registeredClients.length) + ")", 1
+  }, " Remove all registered clients ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
+    onClick: $setup.startCalibration
+  }, "Start calibration beep"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "IDs of registered clients (Total: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.registeredClients.length) + ")", 1
   /* TEXT */
   ), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.registeredClients, function (client) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {
@@ -13968,15 +14003,7 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   "default": () => (/* binding */ Player)
 /* harmony export */ });
-function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
-
-function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
-
-function _iterableToArrayLimit(arr, i) { var _i = arr == null ? null : typeof Symbol !== "undefined" && arr[Symbol.iterator] || arr["@@iterator"]; if (_i == null) return; var _arr = []; var _n = true; var _d = false; var _s, _e; try { for (_i = _i.call(arr); !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
-
-function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
-
-function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e2) { throw _e2; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e3) { didErr = true; err = _e3; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
+function _createForOfIteratorHelper(o, allowArrayLike) { var it = typeof Symbol !== "undefined" && o[Symbol.iterator] || o["@@iterator"]; if (!it) { if (Array.isArray(o) || (it = _unsupportedIterableToArray(o)) || allowArrayLike && o && typeof o.length === "number") { if (it) o = it; var i = 0; var F = function F() {}; return { s: F, n: function n() { if (i >= o.length) return { done: true }; return { done: false, value: o[i++] }; }, e: function e(_e) { throw _e; }, f: F }; } throw new TypeError("Invalid attempt to iterate non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); } var normalCompletion = true, didErr = false, err; return { s: function s() { it = it.call(o); }, n: function n() { var step = it.next(); normalCompletion = step.done; return step; }, e: function e(_e2) { didErr = true; err = _e2; }, f: function f() { try { if (!normalCompletion && it["return"] != null) it["return"](); } finally { if (didErr) throw err; } } }; }
 
 function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
 
@@ -13994,144 +14021,108 @@ var Player = /*#__PURE__*/function () {
   function Player() {
     _classCallCheck(this, Player);
 
-    _defineProperty(this, "oscillators", []);
+    _defineProperty(this, "audioContext", null);
 
     _defineProperty(this, "endedSrc", []);
 
-    _defineProperty(this, "merger", null);
-
-    _defineProperty(this, "audioContext", null);
+    _defineProperty(this, "partialData", null);
 
     _defineProperty(this, "playing", false);
 
-    _defineProperty(this, "partialData", null);
+    _defineProperty(this, "playingLocally", false);
+
+    _defineProperty(this, "offset", null);
+
+    _defineProperty(this, "oscillators", []);
+
+    _defineProperty(this, "registerFunction", null);
+
+    _defineProperty(this, "valuesSetForFirstPartial", []);
+
+    _defineProperty(this, "waveform", 'sine');
   }
 
   _createClass(Player, [{
-    key: "setupOscillator",
-    value: function setupOscillator(partial, startTime) {
-      var osc = this.audioContext.createOscillator();
-      var gain = this.audioContext.createGain();
-      osc.frequency.value = 0;
-      gain.gain.value = 0;
-      var time = this.now + Number(startTime);
+    key: "setup",
+    value: function setup(partialData, startInSec, now) {
+      var playingLocally = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : false;
+      this.partialData = partialData;
+      var timeToAddToStart = startInSec + now;
 
-      for (var i = 0; i < partial.breakpoints.length; i++) {
-        var currentBreakpoint = partial.breakpoints[i]; // if (times[i] - times[i-1] < 0) continue
+      if (playingLocally) {
+        this.playingLocally = true;
+      } // Initialize oscillators, set all values for each oscillator
 
-        if (i > 0) {
-          time += currentBreakpoint.time - partial.breakpoints[i - 1].time;
-        }
 
-        osc.frequency.setValueAtTime(currentBreakpoint.freq, time);
-        gain.gain.setValueAtTime(currentBreakpoint.amp, time);
-      }
-
-      return {
-        osc: osc,
-        gain: gain
-      };
-    }
-  }, {
-    key: "play",
-    value: function play() {
-      var _this = this;
-
-      // Conversion only necessary if playing from chunks sent by db (I think), not when playing all partials on one client directly
-      if (typeof this.partialData === 'string') {
-        this.partialData = JSON.parse(this.partialData);
-        this.partialData.reverse();
-      }
-
-      console.log("Partial Data: ", this.partialData);
-      this.audioContext = new (window.AudioContext || window.webkitAudioContext)(); // https://www.html5rocks.com/en/tutorials/audio/scheduling/
-
-      this.now = this.audioContext.currentTime;
-
-      var _iterator = _createForOfIteratorHelper(this.partialData),
+      var _iterator = _createForOfIteratorHelper(partialData),
           _step;
 
       try {
         for (_iterator.s(); !(_step = _iterator.n()).done;) {
           var partial = _step.value;
-          var osc = this.setupOscillator(partial, partial.startTime);
-          var oscObj = {
-            osc: osc.osc,
-            gain: osc.gain,
-            startTime: partial.startTime,
-            endTime: partial.endTime
-          };
-          this.oscillators.push(oscObj);
-        } // TODO:
-        // Problem: Connecting multiple oscillators to the destination directly produces really bad audio quality on phones.
-        // At this moment, I have discovered two ways of improving the audio quality on phones.
-        // 1. Using a ChannelMergerNode: This heavily improves the audio quality, making it sound like on laptop speakers.
-        //    At the same time, partials are lost. ATM I don't know how many partials are played when all oscillators are merged
-        //    with the same ChannelMergerNode, but e.g. 12 is too much.
-        //    UPDATE: ChannelMergerNode does not actually help. AFAICT CompressorNode is our best (and maybe only) option now.
-        // 2. Using a DynamicsCompressorNode: This improves audio quality, but there is still some buzzing/crackling. No partials
-        //    are lost using this approach.
-        // What we probably need is a lot of testing and a deeper understanding of how ChannelMergerNode and DynamicsCompressorNode
-        // work. One approach might be to use the Merger if the device has only a few partials to play and to use the Compressor if there
-        // are more.
-        // UPDATE: If there are two or less partials, we can assign one partial to the left channel and one to the right channel
-        // with ChannelMergerNode, resulting in really clean sound. The distortion problem arises when more than one partial is assigned to
-        // a channel, ChannelMergerNode does not help with that at all.
-        // Currently I haven't tested the Compressor with anything but default settings. These settings don't create too much of an
-        // audible difference (if any) in sound, but I can't be sure right now.
-        // https://stackoverflow.com/questions/59347938/webaudio-playing-two-oscillator-sounds-in-a-same-time-causes-vibration-sound
-        // https://stackoverflow.com/questions/29901577/distorted-audio-in-ios-7-1-with-webaudio-api
-        // Create merger to merge all osc outputs into
-        // Use one of the next two lines for ChannelMergerNode (two methods yielding same result)
-        // this.merger = this.audioContext.createChannelMerger(this.oscillators.length)
-        // this.merger = new ChannelMergerNode(this.audioContext, { numberOfInputs: this.oscillators.length})
-        // Use next line for DynamicsCompressorNode
+          var oscObj = this.setupOscillator(partial, timeToAddToStart); // const times = []
 
+          var _iterator2 = _createForOfIteratorHelper(partial.breakpoints),
+              _step2;
+
+          try {
+            for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
+              var breakpoint = _step2.value;
+              var time = Number(breakpoint.time) + timeToAddToStart; // times.push(time)
+              // if (partial === partialData[0]) {
+              //   console.log("Start time of first oscillator: ", oscObj.startTime + this.offset)
+              // }
+
+              oscObj.osc.frequency.setValueAtTime(breakpoint.freq, time);
+              oscObj.gain.gain.setValueAtTime(breakpoint.amp, time);
+            }
+          } catch (err) {
+            _iterator2.e(err);
+          } finally {
+            _iterator2.f();
+          }
+
+          this.oscillators.push(oscObj);
+
+          if (partial === partialData[0]) {
+            console.log("audioCtx currentTime + offset after setting first set of partials: ", this.audioContext.currentTime + this.offset);
+          } // this.valuesSetForFirstPartial.push(times)
+
+        }
       } catch (err) {
         _iterator.e(err);
       } finally {
         _iterator.f();
       }
 
-      this.merger = new DynamicsCompressorNode(this.audioContext); // Connect merger (which depending on code above can be Merger or Compressor)
-      // this.merger.connect(this.audioContext.destination)
+      this.playing = true; // console.log(this.oscillators.map(val => val.startTime + this.offset))
+    }
+  }, {
+    key: "setupOscillator",
+    value: function setupOscillator(partial, timeToAddToStart) {
+      var _this = this;
 
-      var _iterator2 = _createForOfIteratorHelper(this.oscillators.entries()),
-          _step2;
+      var osc = this.audioContext.createOscillator();
+      osc.type = this.waveform;
+      var gain = this.audioContext.createGain();
+      osc.frequency.value = 0;
+      gain.gain.value = 0;
+      var oscObj = {
+        osc: osc,
+        gain: gain,
+        startTime: Number(partial.startTime) + timeToAddToStart,
+        endTime: Number(partial.endTime) + timeToAddToStart
+      };
+      oscObj.osc.connect(oscObj.gain);
+      oscObj.gain.connect(this.audioContext.destination);
+      oscObj.osc.start(oscObj.startTime);
+      oscObj.osc.stop(oscObj.endTime); // oscObj.osc.onended = (src, gain) => this.ended(src, gain)
 
-      try {
-        for (_iterator2.s(); !(_step2 = _iterator2.n()).done;) {
-          var _step2$value = _slicedToArray(_step2.value, 2),
-              i = _step2$value[0],
-              _oscObj = _step2$value[1];
+      oscObj.osc.onended = function (src) {
+        return _this.ended(src, gain);
+      };
 
-          // Connect gain to osc 
-          _oscObj.osc.connect(_oscObj.gain); // Use next line for ChannelMergerNode
-          // const outputChannel = i % 2;
-          // console.log(outputChannel)
-          // oscObj.osc.connect(this.merger, 0, outputChannel)
-          // Use next line for DynamicsCompressorNode
-          // oscObj.gain.connect(this.merger, 0, 0)
-          // Use next line for connecting oscillators to destination directly
-
-
-          _oscObj.gain.connect(this.audioContext.destination);
-
-          _oscObj.osc.start(this.now);
-
-          _oscObj.osc.stop(this.now + Number(_oscObj.endTime));
-
-          _oscObj.osc.onended = function (src) {
-            return _this.ended(src);
-          };
-        }
-      } catch (err) {
-        _iterator2.e(err);
-      } finally {
-        _iterator2.f();
-      }
-
-      this.playing = true;
+      return oscObj;
     }
   }, {
     key: "stop",
@@ -14154,11 +14145,11 @@ var Player = /*#__PURE__*/function () {
     }
   }, {
     key: "ended",
-    value: function ended(src) {
+    value: function ended(src, gain) {
       this.endedSrc.push(src);
+      gain.disconnect(); // oscObj.gain.disconnect()
 
       if (this.endedSrc.length === this.partialData.length) {
-        // this.merger.disconnect(this.audioContext)
         this.reset();
       }
     }
@@ -14168,6 +14159,22 @@ var Player = /*#__PURE__*/function () {
       this.oscillators = [];
       this.endedSrc = [];
       this.playing = false;
+
+      if (!this.playingLocally) {
+        this.registerFunction();
+      }
+    }
+  }, {
+    key: "playOneShot",
+    value: function playOneShot(now) {
+      var osc = this.audioContext.createOscillator();
+      var gain = this.audioContext.createGain();
+      osc.frequency.value = 200;
+      gain.gain.value = 0.1;
+      osc.connect(gain);
+      gain.connect(this.audioContext.destination);
+      osc.start(now);
+      osc.stop(now + 0.1);
     }
   }]);
 

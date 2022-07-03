@@ -85,7 +85,6 @@ class TrackController extends Controller
     if ($choir_mode == "false") {
       $unique_partials = $partials;
 
-
       if (!$partial_overlap) {
         // If more clients than partials, duplicate original partials until this is no longer the case.
         while (count($clients) > count($partials)) {
@@ -124,6 +123,7 @@ class TrackController extends Controller
       }
     }
     else {
+      // Choir mode
       foreach($clients as $i=>$value) {
         $client = Client::where('id', $value->id)->firstOrFail();
         $client->partials = array(0 => $partials[$value->partial_id]);

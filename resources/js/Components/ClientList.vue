@@ -1,7 +1,8 @@
 <script setup>
-import { useForm } from "@inertiajs/inertia-vue3";
-import { computed, onMounted, reactive, ref } from "vue";
-import Button from "./Button.vue";
+import { useForm } from "@inertiajs/inertia-vue3"
+import { computed, onMounted, reactive, ref } from "vue"
+import Button from "./Button.vue"
+import Player from "../Player.js"
 
 const props = defineProps(['trackId', 'ttsInstructions', 'performanceId'])
 
@@ -18,6 +19,8 @@ const ttsLanguages = computed(() => props.ttsInstructions ? Object.keys(props.tt
 const choirMode = ref(false)
 const waveform = ref('sine')
 const partialOverlap = ref()
+const calibrating = ref(false)
+let beepIntervalId = null;
 
 onMounted(async () => {
   // getRegisteredClients();
@@ -115,6 +118,35 @@ async function removeClients() {
   }
   getRegisteredClients();
 }
+
+function startCalibration () {
+
+  if (calibrating.value) {
+    calibrating.value = false
+    window.clearInterval(beepIntervalId)
+    return
+  }
+
+  const player = new Player();
+
+  const audioCtx = window.AudioContext || window.webkitAudioContext;
+  // Start audio context.
+  player.audioContext = new audioCtx({ latencyHint: 0 })
+   // This is necessary to make the audio context work on iOS.
+  player.audioContext.resume()
+  calibrating.value = true
+
+  let startingSecond = motion.pos.toFixed(0)
+
+  beepIntervalId = setInterval(() => {
+    if (motion.pos.toFixed(0) > startingSecond) {
+      startingSecond = motion.pos.toFixed(0)
+      player.playOneShot(player.audioContext.currentTime)
+    }
+  }, 10)
+
+}
+
 </script>
 <template>
   <div>
@@ -182,6 +214,7 @@ async function removeClients() {
         </button>
       </div>
       </div>
+    <button @click="startCalibration">Start calibration beep</button>
     <p>IDs of registered clients (Total: {{ registeredClients.length }})</p>
     <div v-for="client of registeredClients" :key="client.id">
       {{ client.id }}
