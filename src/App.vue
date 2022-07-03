@@ -1,7 +1,6 @@
 <template>
   <div class="app">
-    <OutputLatencyCalibration @calibrationFinished="calibrationFinished"/>
-    <!-- <button @click="startStop">Start/Stop</button> -->
+    <OutputLatencyCalibration @calibrationFinished="calibrationFinished" :motion="motion" />
     <div class="md:w-1/2 w-11/12 border b-white p-4 flex flex-col">
       Calibrated output latency: {{ outputLatencyFromLocalStorage }}
       <select v-model="performanceId">
@@ -150,14 +149,7 @@ export default {
     this.outputLatencyFromLocalStorage = Number(localStorage.getItem("outputLatency"));
   },
   methods: {
-    startStop () {
-      if (this.motion.vel === 1) {
-        this.motion.update(0, 0, null)
-      } else {
-        this.motion.update(null, 1, null)
-        // this.to.update({velocity:1});
-      }
-    },
+
 
     async register() {
       if (this.isRegistered) return;
@@ -165,10 +157,6 @@ export default {
       if (!this.performanceId) {
         alert("Select a performance id.")
         return
-      }
-
-      while (!this.motion) {
-        await new Promise(r => setTimeout(r, 500));
       }
 
       this.initialTimingSrcIntervalId = window.setInterval(() => {

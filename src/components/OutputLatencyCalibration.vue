@@ -3,8 +3,7 @@ import Player from '../Player.js'
 import { ref } from 'vue';
 
 const emit = defineEmits(['calibrationFinished'])
-
-const BEEP_FREQUENCY_MS = 1400;
+const props = defineProps(['motion'])
 
 let beepIntervalId;
 let player;
@@ -14,8 +13,6 @@ let buffer = ref(0)
 const calibrating = ref(false)
 
 const startCalibration = () => {
-  const dot = document.querySelector('.dot')
-
   const outputLatencyFromCalibration = localStorage.getItem("outputLatency");
   if (outputLatencyFromCalibration) {
     buffer.value = outputLatencyFromCalibration * -1
@@ -31,16 +28,16 @@ const startCalibration = () => {
    // This is necessary to make the audio context work on iOS.
   player.audioContext.resume()
   calibrating.value = true
-  beepIntervalId = window.setInterval(() => {
-    const now = player.audioContext.currentTime
-    const time = now + Number(buffer.value)
-    player.playOneShot(time)
-    console.log(buffer.value)
-    dot.style['background'] = '#39FF14'
-    window.setTimeout(() => {
-      dot.style['background'] = 'black'
-    }, 50)
-  }, BEEP_FREQUENCY_MS)
+
+  let startingSecond = props.motion.pos.toFixed(0)
+
+  beepIntervalId = setInterval(() => {
+    if (props.motion.pos.toFixed(0) > startingSecond) {
+      startingSecond = props.motion.pos.toFixed(0)
+      player.playOneShot(player.audioContext.currentTime + Number(buffer.value))
+    }
+  }, 10)
+
 }
 
 const finishCalibration = () => {
