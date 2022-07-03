@@ -280,7 +280,7 @@ export default {
       const startInSec = 5;
       const q = this.globalTime();
       const now = q - this.player.offset; // Do not change!
-      
+
       const adjustedNow = now + this.outputLatencyFromLocalStorage
       console.log("LocalStorageOutputLatency: ", this.outputLatencyFromLocalStorage)
       console.log("Adjusted Now: ", adjustedNow)
@@ -302,7 +302,12 @@ export default {
 
       if (this.ttsInstructions && this.ttsLanguage) {
         console.log("Starting TTS.")
-        const ttsTimestamps = Object.keys(this.ttsInstructions)
+        let ttsTimestamps
+        if (this.partialIdToRegisterWith) {
+          ttsTimestamps = Object.keys(this.ttsInstructions[this.partialIdToRegisterWith])
+        } else {
+          ttsTimestamps = Object.keys(this.ttsInstructions)
+        }
   
         let nextTimestamp = ttsTimestamps.shift()
         let nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
