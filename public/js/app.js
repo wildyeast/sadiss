@@ -9998,6 +9998,11 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     function startCalibration() {
+      if (!motion) {
+        alert("No motion source connected. Try again in a few seconds.");
+        return;
+      }
+
       if (calibrating.value) {
         calibrating.value = false;
         window.clearInterval(beepIntervalId);
@@ -11725,7 +11730,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
     "class": "border p-2"
   }, " Remove all registered clients ")])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
     onClick: $setup.startCalibration
-  }, "Start calibration beep"), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "IDs of registered clients (Total: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.registeredClients.length) + ")", 1
+  }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.calibrating ? 'Stop' : 'Start') + " calibration beep", 1
+  /* TEXT */
+  ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", null, "IDs of registered clients (Total: " + (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.registeredClients.length) + ")", 1
   /* TEXT */
   ), ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)($setup.registeredClients, function (client) {
     return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", {

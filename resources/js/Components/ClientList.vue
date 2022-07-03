@@ -121,6 +121,11 @@ async function removeClients() {
 
 function startCalibration () {
 
+  if (!motion) {
+    alert("No motion source connected. Try again in a few seconds.")
+    return
+  }
+
   if (calibrating.value) {
     calibrating.value = false
     window.clearInterval(beepIntervalId)
@@ -214,7 +219,7 @@ function startCalibration () {
         </button>
       </div>
       </div>
-    <button @click="startCalibration">Start calibration beep</button>
+    <button @click="startCalibration">{{ calibrating ? 'Stop' : 'Start' }} calibration beep</button>
     <p>IDs of registered clients (Total: {{ registeredClients.length }})</p>
     <div v-for="client of registeredClients" :key="client.id">
       {{ client.id }}
