@@ -47,7 +47,7 @@ const finishCalibration = () => {
   localStorage.setItem("outputLatency", buffer.value * -1);
   calibrating.value = false
   window.clearInterval(beepIntervalId)
-  emit('calibrationFinished', { calibratedLatency: buffer.value * - 1 })
+  emit('calibrationFinished', { calibratedLatency: buffer.value * -1 })
 }
 </script>
 
