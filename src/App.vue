@@ -2,18 +2,10 @@
   <div class="app">
     <OutputLatencyCalibration @calibrationFinished="calibrationFinished" :motion="motion" />
     <div class="md:w-1/2 w-11/12 border b-white p-4 flex flex-col">
-      Calibrated output latency: {{ outputLatencyFromLocalStorage }}
-      <select v-model="performanceId">
+      <label>Select performance id:</label>
+      <select v-model="performanceId" class="border p-2">
         <option v-for="performance of performances">{{ performance.id }}</option>
       </select>
-      <div class="flex items-center">
-        <input
-          type="checkbox"
-          v-model="useCalculatedOutputLatency"
-          class="mr-4"
-        />
-        <label for="">Use calculated output latency</label>
-      </div>
       <button @click="register" class="border b-white p-2 mt-4">
         Register
       </button>
@@ -140,9 +132,11 @@ export default {
 
     // Try to get previously set output latency from local storage
     this.outputLatencyFromLocalStorage = Number(localStorage.getItem("outputLatency"));
+
+    // Initialize player
+    this.player = new Player()
   },
   methods: {
-    
     async initializeMCorp () {
       const mCorpApp = MCorp.app(import.meta.env.VITE_MCORP_API_KEY, {anon: true})
       mCorpApp.run = () => {
@@ -166,8 +160,6 @@ export default {
         this.timingSrcPosition = this.motion.pos.toFixed(1)
       }, 10);
 
-      // Initialize player
-      this.player = new Player();
       // Pass over register function from this file to player
       this.player.registerFunction = this.register;
 
@@ -319,7 +311,6 @@ export default {
       const res = await fetch(`${this.hostUrl}/api/track/${this.trackId}`);
       const data = await res.json();
       this.partialData = JSON.parse(data.partials);
-      // console.log(this.partials);
       if (!this.player.audioContext) {
         this.player.audioContext = new AudioContext();
       }
