@@ -119,39 +119,42 @@ export default {
     outputLatencyFromLocalStorage: null
   }),
   async mounted() {
+    // Get performances to later check against performanceId URL paramater (if present) to make sure performance exists
     const performanceResponse = await fetch(this.hostUrl + "/api/performance")
     this.performances = await performanceResponse.json()
 
-    const mCorpApp = MCorp.app(import.meta.env.VITE_MCORP_API_KEY, {anon: true})
-    mCorpApp.run = () => {
-      this.motion = mCorpApp.motions['shared']
-    }
-    mCorpApp.init()
-    while (!this.motion) {
-      await new Promise(r => setTimeout(r, 500));
-    }
-    // this.motion.update(null, 1, null)
-    this.player = new Player();
+    this.initializeMCorp()
+
     // Fetch tracks
     const res = await fetch(this.hostUrl + "/api/track");
     this.availableTracks = await res.json();
 
+    // Get URL parameters and set performanceId and partialId if present
     const params = new Proxy(new URLSearchParams(window.location.search), {
       get: (searchParams, prop) => searchParams.get(prop),
     });
-
     if (this.performances.map(p => p.id).includes(Number(params.id))) {
       this.performanceId = Number(params.id)
     }
-
     this.partialIdToRegisterWith = params.partial_id
 
+    // Try to get previously set output latency from local storage
     this.outputLatencyFromLocalStorage = Number(localStorage.getItem("outputLatency"));
   },
   methods: {
+    
+    async initializeMCorp () {
+      const mCorpApp = MCorp.app(import.meta.env.VITE_MCORP_API_KEY, {anon: true})
+      mCorpApp.run = () => {
+        this.motion = mCorpApp.motions['shared']
+      }
+      mCorpApp.init()
+      while (!this.motion) {
+        await new Promise(r => setTimeout(r, 500));
+      }
+    },
 
-
-    async register() {
+    async register () {
       if (this.isRegistered) return;
 
       if (!this.performanceId) {
@@ -161,11 +164,7 @@ export default {
 
       this.initialTimingSrcIntervalId = window.setInterval(() => {
         this.timingSrcPosition = this.motion.pos.toFixed(1)
-        // console.log(this.timingSrcPosition)
       }, 10);
-      // this.timingObj.onchange = (e) => {
-      //   console.log("Global TimeObject onchange event triggered.");
-      // };
 
       // Initialize player
       this.player = new Player();
@@ -236,24 +235,17 @@ export default {
         this.player.partialData = this.partialData;
 
         let prepareStarted = false;
-        // const sampler = new TimingSampler(to, {period:100});
-        // MCorp.mediaSync(this.audio, this.to, { debug: true })
 
         window.clearInterval(this.initialTimingSrcIntervalId);
         const intervalId = window.setInterval(() => {
           this.timingSrcPosition = this.globalTime();
           if (this.timingSrcPosition >= startTimeFromServer + 3) {
             this.print += this.timingSrcPosition + '\n'
-            // const a = document.querySelector('.app')
-            // a.style['background-color'] = 'red'
-            // this.audio.play()
             console.log(this.timingSrcPosition)
             this.player.offset =
               this.timingSrcPosition - this.player.audioContext.currentTime; // Do not change!
-            // console.log("Offset: ", this.player.offset);
-            if (!prepareStarted) {
               // Prevent multiple calls of prepare() if checkForStart() short interval time
-              // a.style['background-color'] = 'blue'
+            if (!prepareStarted) {
               this.start();
               prepareStarted = true;
             }
@@ -317,14 +309,10 @@ export default {
       }
       
       /* END OF TEXT TO SPEECH TESTING */
-
-      // Reregister when done
-      // await this.register()
     },
 
     calibrationFinished (e) {
       this.outputLatencyFromLocalStorage = Number(e.calibratedLatency)
-      console.log(this.outputLatencyFromLocalStorage)
     },
 
     async playLocally() {
