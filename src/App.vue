@@ -190,6 +190,7 @@ export default {
         latencyHint: 0,
         // sampleRate: 31000,
       });
+      // This is necessary to make the audio context work on iOS.
       this.player.audioContext.resume()
 
       const response = await fetch(this.hostUrl + "/api/client/create", {
@@ -279,37 +280,7 @@ export default {
       const startInSec = 5;
       const q = this.globalTime();
       const now = q - this.player.offset; // Do not change!
-      // this.print += this.player.audioContext.currentTime + "\n";
-      // this.player.playOneShot(now + 2);
-      // this.print += this.player.audioContext.currentTime + "\n";
-      // console.log("ctx.baseLatency: ", this.player.audioContext.baseLatency);
-      // console.log(
-      //   "ctx outputTimestamp ctx timestamp + offset:, ",
-      //   this.player.audioContext.getOutputTimestamp().contextTime +
-      //     this.player.offset
-      // )
-      // const calculatedOutputLatency =
-      //   this.player.audioContext.currentTime -
-      //   this.player.audioContext.getOutputTimestamp().contextTime;
-      // console.log("Calculated output latency: ", calculatedOutputLatency);
-
-      // const latencyToSubtract = this.useCalculatedOutputLatency
-      //   ? calculatedOutputLatency - this.player.audioContext.baseLatency
-      //   : 0;
-
-      // console.log("Latency to subract: ", latencyToSubtract);
-
-      // let outputLatencyFromCalibration = localStorage.getItem("outputLatency");
-      // let latency = 0
-      // if (this.outputLatencyFromCalibration) {
-      //   latency = this.outputLatencyFromLocalStorage
-      // }
-
-      // const nowAdjusted = now - latency
-      // console.log("Now: ", now)
-      // console.log("Now adjusted by latency: ", nowAdjusted)
-      // console.log("Diff: ", now - nowAdjusted)
-
+      
       const adjustedNow = now + this.outputLatencyFromLocalStorage
       console.log("LocalStorageOutputLatency: ", this.outputLatencyFromLocalStorage)
       console.log("Adjusted Now: ", adjustedNow)
@@ -323,15 +294,6 @@ export default {
         // now - latencyToSubtract // O only on Chrome
         now + this.outputLatencyFromLocalStorage
       );
-      // console.log(
-      //   "ctxTime + offset when setup finished: ",
-      //   this.player.audioContext.currentTime + this.player.offset
-      // );
-      // console.log(
-      //   this.player.valuesSetForFirstPartial.map(
-      //     (val) => val.map(v => v + this.player.offset)
-      //   )
-      // );
       this.isRegistered = false;
 
       /* TEXT TO SPEECH TESTING */
@@ -396,22 +358,6 @@ export default {
         partials = partialData;
       }
       return partials;
-    },
-    createClient() {
-      class Client {
-        pos = 0;
-        constructor() {
-          const timingProvider = new TimingProvider(
-            "wss://sadiss.net/zeitquelle"
-          );
-          const timingObj = new TimingObject(timingProvider);
-          window.setTimeout(() => {}, 5000);
-          window.setInterval(() => {
-            this.pos = timingObj.query().position;
-          }, 2);
-        }
-      }
-      return new Client();
     },
   },
 };
