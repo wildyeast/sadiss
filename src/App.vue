@@ -122,7 +122,7 @@ export default {
     const performanceResponse = await fetch(this.hostUrl + "/api/performance")
     this.performances = await performanceResponse.json()
 
-    const mCorpApp = MCorp.app("8844095860530063641", {anon: true})
+    const mCorpApp = MCorp.app(import.meta.env.VITE_MCORP_API_KEY, {anon: true})
     mCorpApp.run = () => {
       this.motion = mCorpApp.motions['shared']
     }
