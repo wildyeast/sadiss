@@ -99,12 +99,13 @@ export default class Player {
     const gain = this.audioContext.createGain()
 
     osc.frequency.value = 400
+    osc.type = 'sawtooth'
     gain.gain.value = 0.1
 
     osc.connect(gain);
     gain.connect(this.audioContext.destination)
 
     osc.start(now)
-    osc.stop(now + 0.1)
+    osc.stop(now + 0.01)
   }
 }
