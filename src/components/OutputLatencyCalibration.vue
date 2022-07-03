@@ -34,7 +34,7 @@ const startCalibration = () => {
   beepIntervalId = setInterval(() => {
     if (props.motion.pos.toFixed(0) > startingSecond) {
       startingSecond = props.motion.pos.toFixed(0)
-      player.playOneShot(player.audioContext.currentTime + Number(buffer.value))
+      player.playOneShot(player.audioContext.currentTime + 1 + Number(buffer.value) * -1)
     }
   }, 10)
 
