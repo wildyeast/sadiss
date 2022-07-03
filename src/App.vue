@@ -236,7 +236,7 @@ export default {
             console.log(this.timingSrcPosition)
             this.player.offset =
               this.timingSrcPosition - this.player.audioContext.currentTime; // Do not change!
-              // Prevent multiple calls of prepare() if checkForStart() short interval time
+            // Prevent multiple calls of prepare() if checkForStart() short interval time
             if (!prepareStarted) {
               this.start();
               prepareStarted = true;
