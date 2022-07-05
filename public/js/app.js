@@ -9711,10 +9711,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var motion; // const ttsLanguages = ref([])
 
     var ttsLanguage = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)();
-    var ttsLanguages = (0,vue__WEBPACK_IMPORTED_MODULE_2__.computed)(function () {
-      return props.ttsInstructions ? Object.keys(props.ttsInstructions[0]) : null;
-    });
     var choirMode = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
+    var ttsLanguages = (0,vue__WEBPACK_IMPORTED_MODULE_2__.computed)(function () {
+      if (choirMode.value) {
+        return props.ttsInstructions ? Object.keys(props.ttsInstructions[0][0]) : null;
+      } else {
+        return props.ttsInstructions ? Object.keys(props.ttsInstructions[0]) : null;
+      }
+    });
     var waveform = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)('sine');
     var partialOverlap = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)();
     var calibrating = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
@@ -10020,7 +10024,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       calibrating.value = true;
       var startingSecond = motion.pos.toFixed(0);
       beepIntervalId = setInterval(function () {
-        if (motion.pos.toFixed(0) > startingSecond) {
+        if (motion.pos > startingSecond) {
           startingSecond = motion.pos.toFixed(0);
           player.playOneShot(player.audioContext.currentTime);
         }
@@ -10037,8 +10041,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       allPartialsAllDevices: allPartialsAllDevices,
       motion: motion,
       ttsLanguage: ttsLanguage,
-      ttsLanguages: ttsLanguages,
       choirMode: choirMode,
+      ttsLanguages: ttsLanguages,
       waveform: waveform,
       partialOverlap: partialOverlap,
       calibrating: calibrating,

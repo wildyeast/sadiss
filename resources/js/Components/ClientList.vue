@@ -15,8 +15,14 @@ let allPartialsAllDevices = ref(false);
 let motion;
 // const ttsLanguages = ref([])
 const ttsLanguage = ref()
-const ttsLanguages = computed(() => props.ttsInstructions ? Object.keys(props.ttsInstructions[0]) : null)
 const choirMode = ref(false)
+const ttsLanguages = computed(() => {
+  if (choirMode.value) {
+    return props.ttsInstructions ? Object.keys(props.ttsInstructions[0][0]) : null
+  } else {
+    return props.ttsInstructions ? Object.keys(props.ttsInstructions[0]) : null
+  }
+})
 const waveform = ref('sine')
 const partialOverlap = ref()
 const calibrating = ref(false)
