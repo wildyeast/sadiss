@@ -209,6 +209,7 @@ export default {
         window.clearInterval(this.intervalId);
         const startTimeFromServer = Number(clientData.client["start_time"]);
         this.ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
+        console.log("Parsed instructions: ", this.ttsInstructions)
         this.ttsLanguage = clientData.client["tts_language"]
         const wf = clientData.client["waveform"]
         if (wf) {
@@ -280,9 +281,16 @@ export default {
         } else {
           ttsTimestamps = Object.keys(this.ttsInstructions)
         }
+
+        console.log("ttsTimestamps: ", ttsTimestamps)
   
         let nextTimestamp = ttsTimestamps.shift()
-        let nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
+        let nextUtterance
+        if (this.partialIdToRegisterWith) {
+          nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[this.partialIdToRegisterWith][nextTimestamp][this.ttsLanguage])
+        } else {
+          nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
+        }
         nextUtterance.lang = this.ttsLanguage
 
         const speechIntervalId = window.setInterval(() => {
@@ -291,7 +299,11 @@ export default {
             console.log("AudioCtx time + offset: ", this.player.audioContext.currentTime + this.player.offset)
             if (ttsTimestamps.length) {
               nextTimestamp = ttsTimestamps.shift()
-              nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
+              if (this.partialIdToRegisterWith) {
+                nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[this.partialIdToRegisterWith][nextTimestamp][this.ttsLanguage])
+              } else {
+                nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
+              }
               nextUtterance.lang = this.ttsLanguage
             } else {
               window.clearInterval(speechIntervalId)
