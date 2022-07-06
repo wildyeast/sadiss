@@ -102,7 +102,7 @@ export default class Player {
     gain.gain.value = 0.2
 
     osc.connect(gain);
-    osc.type = 'sawtooth'
+    osc.type = 'sine'
     gain.connect(this.audioContext.destination)
 
     osc.start(now)
