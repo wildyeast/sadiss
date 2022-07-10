@@ -23,7 +23,7 @@
       </div>
       
       <!-- Center -->
-      <button @click="register" id="registerBtn" class="border-2 p-2 mt-4 rounded-full h-28 w-28">
+      <button @click="register" id="registerBtn" class="border-2 p-2 mt-4 rounded-full h-28 w-28 transition-all duration-300">
         <span v-if="!isRegistered">Register</span>
         <span v-else>{{ deviceRegistrationId }}</span>
       </button>
