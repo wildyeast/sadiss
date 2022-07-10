@@ -5,26 +5,30 @@
 
     <!-- Register -->
     <div id="register" class="md:w-1/2 w-11/12 p-4 flex flex-col justify-center items-center h-screen">
-      <select v-if="!isRegistered" v-model="performanceId" class="border p-2 rounded-full h-10 w-10">
+      <!-- Top -->
+      <!-- Performance Id dropdown -->
+      <select v-if="!isRegistered" v-model="performanceId" class="border p-2 rounded-full h-10 w-10 fixed top-5 right-5">
         <option v-for="performance of performances">{{ performance.id }}</option>
       </select>
-      <button @click="register" id="registerBtn" class="border-2 p-2 mt-4 rounded-full h-28 w-28">
-        <span v-if="!isRegistered">Register</span>
-        <span v-else>{{ deviceRegistrationId }}</span>
-      </button>
-      <p v-if="isRegistered" class="mt-4">{{ timingSrcPosition }}</p>
-      <div class="mt-4">
-        <p
-          v-if="countdownTime > 0"
-          style="display: flex; justify-content: center; font-size: 50px"
-        >
+      <!-- Current global time and other information -->
+      <div class="fixed top-5 right-5">
+        <p v-if="isRegistered">{{ timingSrcPosition }}</p>
+        <p v-if="countdownTime > 0"
+          style="display: flex; justify-content: center; font-size: 50px">
           {{ countdownTime }}
         </p>
         <p v-else-if="player && player.playing">Track currently playing.</p>
         <!-- <p v-else>Device not registered.</p> -->
         <div v-html="print" style="margin-top: 1rem" />
       </div>
+      
+      <!-- Center -->
+      <button @click="register" id="registerBtn" class="border-2 p-2 mt-4 rounded-full h-28 w-28">
+        <span v-if="!isRegistered">Register</span>
+        <span v-else>{{ deviceRegistrationId }}</span>
+      </button>
     </div>
+
     <!-- Play track locally -->
     <!-- Currently hidden - display: none -->
     <div

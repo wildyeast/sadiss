@@ -15,7 +15,7 @@ const calibrating = ref(false)
 const startCalibration = () => {
   const outputLatencyFromCalibration = localStorage.getItem("outputLatency");
   if (outputLatencyFromCalibration) {
-    offset.value = outputLatencyFromCalibration * -1
+    offset.value = Number(outputLatencyFromCalibration)
   }
 
   player = null
@@ -48,7 +48,7 @@ const handleMousedown = (stepSize) => {
 const changeOffset = (stepSize) => {
   // Round to two decimal places (two prevent funky computed maths)
   const newValue = Math.round(((offset.value + stepSize) + Number.EPSILON) * 100) / 100
-  if (newValue >= 0 && newValue <= 0.6) {
+  if (newValue <= 0 && newValue >= -0.6) {
     if (holding.value) {
       offset.value = newValue
       window.setTimeout(() => changeOffset(stepSize), 100)
@@ -58,10 +58,10 @@ const changeOffset = (stepSize) => {
 // await new Promise(r => setTimeout(r, 10));
 
 const finishCalibration = () => {
-  localStorage.setItem("outputLatency", offset.value * -1);
+  localStorage.setItem("outputLatency", offset.value);
   calibrating.value = false
   window.clearInterval(beepIntervalId)
-  emit('calibrationFinished', { calibratedLatency: offset.value * -1 })
+  emit('calibrationFinished', { calibratedLatency: offset.value })
 }
 </script>
 
