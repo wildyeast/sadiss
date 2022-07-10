@@ -13,12 +13,6 @@ let buffer = ref(0)
 const calibrating = ref(false)
 
 const startCalibration = () => {
-
-  if (!props.motion) {
-    alert("No motion source connected. Try again in a few seconds.")
-    return
-  }
-
   const outputLatencyFromCalibration = localStorage.getItem("outputLatency");
   if (outputLatencyFromCalibration) {
     buffer.value = outputLatencyFromCalibration * -1

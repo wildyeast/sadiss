@@ -1,5 +1,5 @@
 <template>
-  <div class="app">
+  <div class="app" v-if="motion">
     <OutputLatencyCalibration @calibrationFinished="calibrationFinished" :motion="motion" />
     <div class="md:w-1/2 w-11/12 border b-white p-4 flex flex-col">
       <label>Select performance id:</label>
@@ -57,6 +57,10 @@
         </button>
       </div>
     </div>
+  </div>
+  <!-- Loading Spinner while waiting for motion -->
+  <div v-else class="flex justify-center items-center h-screen">
+    <div class="lds-dual-ring" />
   </div>
 </template>
 <script>
@@ -363,5 +367,32 @@ body {
   flex-flow: column;
   align-items: center;
   overflow: hidden;
+}
+
+/* Large loading spinner */
+/* https://loading.io/css/ */
+.lds-dual-ring {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid #fff;
+  border-color: #EEE transparent #EEE transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
 }
 </style>
