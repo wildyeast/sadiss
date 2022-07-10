@@ -27,14 +27,14 @@ const startCalibration = () => {
   player.audioContext = new audioCtx({ latencyHint: 0 })
    // This is necessary to make the audio context work on iOS.
   player.audioContext.resume()
+
   calibrating.value = true
 
   let startingSecond = props.motion.pos.toFixed(0)
-
   beepIntervalId = setInterval(() => {
     if (props.motion.pos.toFixed(0) > startingSecond) {
       startingSecond = props.motion.pos.toFixed(0)
-      player.playOneShot(player.audioContext.currentTime + 1 + Number(offset.value) * -1)
+      player.playOneShot(player.audioContext.currentTime + 1 + Number(offset.value))
     }
   }, 10)
 
