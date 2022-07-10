@@ -8,14 +8,14 @@ const props = defineProps(['motion'])
 let beepIntervalId;
 let player;
 
-let buffer = ref(0)
+let offset = ref(0.00)
 
 const calibrating = ref(false)
 
 const startCalibration = () => {
   const outputLatencyFromCalibration = localStorage.getItem("outputLatency");
   if (outputLatencyFromCalibration) {
-    buffer.value = outputLatencyFromCalibration * -1
+    offset.value = outputLatencyFromCalibration * -1
   }
 
   player = null
@@ -34,28 +34,47 @@ const startCalibration = () => {
   beepIntervalId = setInterval(() => {
     if (props.motion.pos.toFixed(0) > startingSecond) {
       startingSecond = props.motion.pos.toFixed(0)
-      player.playOneShot(player.audioContext.currentTime + 1 + Number(buffer.value) * -1)
+      player.playOneShot(player.audioContext.currentTime + 1 + Number(offset.value) * -1)
     }
   }, 10)
 
 }
 
+const holding = ref(false)
+const handleMousedown = (stepSize) => {
+  holding.value = true
+  changeOffset(stepSize)
+}
+const changeOffset = (stepSize) => {
+  // Round to two decimal places (two prevent funky computed maths)
+  const newValue = Math.round(((offset.value + stepSize) + Number.EPSILON) * 100) / 100
+  if (newValue >= 0 && newValue <= 0.6) {
+    if (holding.value) {
+      offset.value = newValue
+      window.setTimeout(() => changeOffset(stepSize), 100)
+    }
+  }
+}
+// await new Promise(r => setTimeout(r, 10));
+
 const finishCalibration = () => {
-  localStorage.setItem("outputLatency", buffer.value * -1);
+  localStorage.setItem("outputLatency", offset.value * -1);
   calibrating.value = false
   window.clearInterval(beepIntervalId)
-  emit('calibrationFinished', { calibratedLatency: buffer.value * -1 })
+  emit('calibrationFinished', { calibratedLatency: offset.value * -1 })
 }
 </script>
 
 <template>
 <div class="h-screen flex flex-col justify-center items-center">
-  <div class="dot h-10 w-10 bg-black rounded-full mb-40"></div>
   <button v-if="!calibrating" @click="startCalibration">Start calibration</button>
   <div v-else class="flex flex-col justify-center items-center">
-    <input type="range" min="0" max="0.6" step="0.01" v-model="buffer">
-    {{ buffer }}
-    <button @click="finishCalibration">Finish calibration</button>
+    <span class="text-5xl mb-4">{{ offset.toFixed(2) }}</span>
+    <div class="flex justify-between w-full">
+      <button class="border h-10 w-10" @mousedown="handleMousedown(-0.01)" @mouseup="holding = false">&lt;</button>
+      <button class="border h-10 w-10" @mousedown="handleMousedown(0.01)" @mouseup="holding = false">&gt;</button>
+    </div>
+    <button class="mt-4 border p-4" @click="finishCalibration">Finish calibration</button>
   </div>
 </div>
 </template>

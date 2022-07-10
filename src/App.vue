@@ -1,15 +1,18 @@
 <template>
   <div class="app" v-if="motion">
-    <OutputLatencyCalibration @calibrationFinished="calibrationFinished" :motion="motion" />
-    <div class="md:w-1/2 w-11/12 border b-white p-4 flex flex-col">
-      <label>Select performance id:</label>
-      <select v-model="performanceId" class="border p-2">
+    <!-- Only show if never registered this session and not currently registered -->
+    <OutputLatencyCalibration v-if="!player.audioContext && !isRegistered" @calibrationFinished="calibrationFinished" :motion="motion" />
+
+    <!-- Register -->
+    <div id="register" class="md:w-1/2 w-11/12 p-4 flex flex-col justify-center items-center h-screen">
+      <select v-if="!isRegistered" v-model="performanceId" class="border p-2 rounded-full h-10 w-10">
         <option v-for="performance of performances">{{ performance.id }}</option>
       </select>
-      <button @click="register" class="border b-white p-2 mt-4">
-        Register
+      <button @click="register" id="registerBtn" class="border-2 p-2 mt-4 rounded-full h-28 w-28">
+        <span v-if="!isRegistered">Register</span>
+        <span v-else>{{ deviceRegistrationId }}</span>
       </button>
-      {{ timingSrcPosition }}
+      <p v-if="isRegistered" class="mt-4">{{ timingSrcPosition }}</p>
       <div class="mt-4">
         <p
           v-if="countdownTime > 0"
@@ -17,17 +20,15 @@
         >
           {{ countdownTime }}
         </p>
-        <p v-else-if="player && !player.playing && isRegistered">
-          Device registered with ID {{ deviceRegistrationId }}. Waiting for
-          track start.
-        </p>
         <p v-else-if="player && player.playing">Track currently playing.</p>
-        <p v-else>Device not registered.</p>
+        <!-- <p v-else>Device not registered.</p> -->
         <div v-html="print" style="margin-top: 1rem" />
       </div>
     </div>
+    <!-- Play track locally -->
+    <!-- Currently hidden - display: none -->
     <div
-      style="display: flex; flex-direction: column; justify-content: center"
+      style="display: flex; flex-direction: column; justify-content: center; display: none"
       class="md:w-1/2 w-11/12 border b-white p-4"
     >
       <p>
@@ -84,7 +85,7 @@ export default {
     isRegistered: false,
     trackId: 1,
     availableTracks: [],
-    deviceRegistrationId: null,
+    deviceRegistrationId: null, // Only used in UI
     intervalId: null,
     // hostUrl: "http://sadiss.test.test",
     // hostUrl: 'http://8hz.at',
@@ -153,7 +154,11 @@ export default {
     },
 
     async register () {
-      if (this.isRegistered) return;
+      if (this.isRegistered) {
+        window.clearInterval(this.invervalId)
+        this.isRegistered = false
+        return
+      }
 
       if (!this.performanceId) {
         alert("Select a performance id.")
@@ -190,10 +195,11 @@ export default {
       // Check for start immediately, afterwards check in intervals of 1 second.
       await this.checkForStart(data.token);
       this.intervalId = window.setInterval(async () => {
-        // console.log(this.timingObj.query().position)
         await this.checkForStart(data.token);
       }, 1000);
+      
       this.isRegistered = true;
+      this.blink()
     },
 
     async checkForStart(token) {
@@ -206,10 +212,6 @@ export default {
       }
       const clientData = await response.json();
       if (clientData.client["start_time"]) {
-        console.log(
-          "Start time from server: ",
-          clientData.client["start_time"]
-        );
         window.clearInterval(this.intervalId);
         const startTimeFromServer = Number(clientData.client["start_time"]);
         this.ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
@@ -321,6 +323,19 @@ export default {
 
     calibrationFinished (e) {
       this.outputLatencyFromLocalStorage = Number(e.calibratedLatency)
+      const registerDiv = document.getElementById("register");
+      registerDiv.scrollIntoView({ behavior: 'smooth' });
+    },
+
+    blink () {
+      const btn = document.getElementById('registerBtn')
+      if (this.isRegistered || btn.style.borderColor !== 'white') {
+        btn.style.borderColor = btn.style.borderColor !== 'white' ? 'white' : '#FF6700'
+        window.setTimeout(() => {
+          this.blink()
+        }, 1000)
+      }
+      
     },
 
     async playLocally() {
