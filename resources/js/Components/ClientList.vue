@@ -32,7 +32,7 @@ onMounted(async () => {
   // getRegisteredClients();
   autoGetRegisteredClients();
   const mCorpAppId = "8844095860530063641"
-  const mCorpApp = MCorp.app(mCorpAppId)
+  const mCorpApp = MCorp.app(mCorpAppId, { anon: true })
   mCorpApp.run = () => {
     motion = mCorpApp.motions['shared']
     timingSrcConnected.value = true;
