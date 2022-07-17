@@ -73,7 +73,6 @@
 import dayjs from "dayjs";
 import dayjsPluginUTC from "dayjs/plugin/utc";
 dayjs.extend(dayjsPluginUTC);
-import {TimingObject, TimingSampler, TimingProgress } from "https://webtiming.github.io/timingsrc/lib/timingsrc-esm-v3.js";
 
 import Player from "./Player";
 import OutputLatencyCalibration from './components/OutputLatencyCalibration.vue'
