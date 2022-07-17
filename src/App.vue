@@ -1,3 +1,269 @@
+<script setup lang="ts">
+import Player from "./Player"
+import OutputLatencyCalibration from './components/OutputLatencyCalibration.vue'
+import { onMounted, Ref, ref } from "vue"
+
+const availableTracks: Ref<{ id: number, title: string }[]> = ref([])
+const countdownTime = ref(-1)
+const deviceRegistrationId = ref(-1) // Only used in UI
+const hasCalibratedThisSession = ref(false)
+// const hostUrl = "http://sadiss.test.test",
+// const hostUrl = 'http://8hz.at',
+const hostUrl = "https://sadiss.net"
+let intervalId: number
+let initialTimingSrcIntervalId: number
+const isRegistered = ref(false)
+const motion: Ref<{ pos: number }> = ref({ pos: 0 })
+const motionConnected = ref(false)
+let outputLatencyFromLocalStorage: number
+let partialData: []
+let partialIdToRegisterWith: number | null
+let performanceId = 1
+let performances: { id: number }[]
+const player: Ref<Player> = ref(new Player())
+let print = ''
+let timingSrcPosition: number
+let trackId = 1
+let ttsInstructions: null
+let ttsLanguage: string
+
+onMounted(async () => {
+  // Get performances to later check against performanceId URL paramater (if present) to make sure performance exists
+  try {
+    const performanceResponse = await fetch(hostUrl + "/api/performance")
+    performances = await performanceResponse.json()
+  } catch (e) {
+    throw new Error('Filed fetching performances.')
+  }
+
+  initializeMCorp()
+
+  // Fetch tracks
+  const res = await fetch(hostUrl + "/api/track")
+  availableTracks.value = await res.json()
+
+  // Get URL parameters and set performanceId and partialId if present
+  const params = new URLSearchParams(window.location.search)
+  if (performances.map(p => p.id).includes(Number(params.get('id')))) {
+    performanceId = Number(params.get('id'))
+  }
+  partialIdToRegisterWith = Number(params.get('partial_id'))
+
+  // Try to get previously set output latency from local storage
+  outputLatencyFromLocalStorage = Number(localStorage.getItem("outputLatency"))
+})
+
+const initializeMCorp = async () => {
+  // @ts-ignore: Can't find type for MCorp, which is added via <script> in index.html
+  const mCorpApp = MCorp.app(import.meta.env.VITE_MCORP_API_KEY, { anon: true })
+  mCorpApp.run = () => {
+    motion.value = mCorpApp.motions['shared']
+    motionConnected.value = true
+  }
+  mCorpApp.init()
+  while (!motion) {
+    await new Promise(r => setTimeout(r, 500))
+  }
+}
+
+const register = async () => {
+  if (isRegistered.value) {
+    window.clearInterval(intervalId)
+    isRegistered.value = false
+    return
+  }
+
+  if (!player.value) return
+
+  if (!performanceId) {
+    alert("Select a performance id.")
+    return
+  }
+
+  // Synthesize voice (with volume set to 0) on registration to make TTS work on iOS
+  const initialUtterance = new SpeechSynthesisUtterance('You are currentGlobalTimeInCtxTime registered.')
+  initialUtterance.volume = 0
+  speechSynthesis.speak(initialUtterance)
+
+  initialTimingSrcIntervalId = window.setInterval(() => {
+    timingSrcPosition = Number(motion.value.pos.toFixed(1))
+  }, 10)
+
+  // Pass over register function from this file to player
+  player.value.register = register
+
+  if (!player.value.audioContext) {
+    const audioCtx = window.AudioContext || window.webkitAudioContext
+    // Start audio context.
+    player.value.audioContext = new audioCtx({
+      latencyHint: 0,
+      // sampleRate: 31000,
+    })
+    // This is necessary to make the audio context work on iOS.
+    player.value.audioContext.resume()
+  }
+
+  const response = await fetch(hostUrl + "/api/client/create", {
+    method: "POST",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ performance_id: performanceId, partial_id: partialIdToRegisterWith }),
+  })
+  const data = await response.json()
+  deviceRegistrationId.value = data.id // Only used in UI.
+
+  // Check for start immediately, afterwards check in intervals of 1 second.
+  await checkForStart(data.token)
+  intervalId = window.setInterval(async () => {
+    await checkForStart(data.token)
+  }, 1000)
+
+  isRegistered.value = true
+  blink()
+}
+
+const checkForStart = async (token: string) => {
+  const response = await fetch(`${hostUrl}/api/client/${token}`)
+  if (response.status === 404) {
+    console.log("Client removed via Admin Interface")
+    isRegistered.value = false
+    window.clearInterval(intervalId)
+    return
+  }
+
+  const clientData = await response.json()
+  if (clientData.client["start_time"]) {
+    // @ts-ignore: intervalId supposedly declared here. TODO: Fix this.
+    window.clearInterval(intervalId)
+    const startTimeFromServer = Number(clientData.client["start_time"])
+    ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
+    ttsLanguage = clientData.client["tts_language"]
+    const wf = clientData.client["waveform"]
+    if (wf) {
+      if (['sine', 'sawtooth', 'square', 'triangle'].includes(wf)) {
+        player.value.waveform = wf
+      } else {
+        // TODO: Placeholder for custom wave
+        // Since you can't enter custom waves in the admin interface currently this is not implemented.
+      }
+    }
+
+    // Conversion only necessary if playing from chunks sent by db, not when playing all partials on one client directly
+    partialData = convertPartialsIfNeeded(
+      clientData.client["partials"]
+    )
+    player.value.partialData = partialData
+
+    let prepareStarted = false
+
+    window.clearInterval(initialTimingSrcIntervalId)
+    const intervalId = window.setInterval(() => {
+      timingSrcPosition = motion.value.pos
+      if (timingSrcPosition >= startTimeFromServer + 3) {
+        print += timingSrcPosition + '\n'
+        console.log(timingSrcPosition)
+        player.value.offset =
+          timingSrcPosition - player.value.audioContext.currentTime // Do not change!
+        // Prevent multiple calls of prepare()
+        if (!prepareStarted) {
+          start()
+          prepareStarted = true
+        }
+        window.clearInterval(intervalId)
+      }
+    }, 1)
+  }
+  return clientData
+}
+
+const start = async () => {
+  const startInSec = 5
+  const currentGlobalTimeInCtxTime = motion.value.pos - player.value.offset // Do not change!
+
+  player.value.setup(
+    partialData,
+    startInSec,
+    currentGlobalTimeInCtxTime,
+    outputLatencyFromLocalStorage
+  )
+
+  isRegistered.value = false
+
+  /* TEXT TO SPEECH */
+  if (ttsInstructions && ttsLanguage) {
+    const ttsTimestamps = Object.keys(ttsInstructions)
+
+    let nextTimestamp = ttsTimestamps.shift()
+    if (!nextTimestamp) return
+
+    let nextUtterance: SpeechSynthesisUtterance
+    if (partialIdToRegisterWith) {
+      nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
+    } else {
+      nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
+    }
+    nextUtterance.lang = ttsLanguage
+
+    const speechIntervalId = window.setInterval(() => {
+      if (motion.value.pos - player.value.offset >= currentGlobalTimeInCtxTime + Number(nextTimestamp) + startInSec) {
+        speechSynthesis.speak(nextUtterance)
+        if (ttsInstructions && ttsTimestamps.length) {
+          nextTimestamp = ttsTimestamps.shift()
+          if (!nextTimestamp) return
+          if (partialIdToRegisterWith) {
+            nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
+          } else {
+            nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
+          }
+          nextUtterance.lang = ttsLanguage
+        } else {
+          window.clearInterval(speechIntervalId)
+        }
+      }
+    }, 50)
+  }
+
+  /* END OF TEXT TO SPEECH */
+}
+
+const calibrationFinished = (calibratedLatency: number) => {
+  outputLatencyFromLocalStorage = Number(calibratedLatency)
+  const registerDiv = document.getElementById("register")
+  registerDiv?.scrollIntoView({ behavior: 'smooth' })
+  hasCalibratedThisSession.value = true
+}
+
+const blink = () => {
+  const btn = document.getElementById('registerBtn')
+  if (btn && (isRegistered.value || btn?.style.borderColor !== 'white')) {
+    btn.style.borderColor = btn.style.borderColor !== 'white' ? 'white' : '#FF6700'
+    window.setTimeout(() => {
+      blink()
+    }, 1000)
+  }
+}
+
+const playLocally = async () => {
+  const res = await fetch(`${hostUrl}/api/track/${trackId}`)
+  const data = await res.json()
+  partialData = JSON.parse(data.partials)
+  player.value.setup(partialData, 0, 0, outputLatencyFromLocalStorage)
+}
+
+const convertPartialsIfNeeded = (partialData: string | object) => {
+  let partials
+  if (typeof partialData === "string") {
+    let json = JSON.parse(partialData)
+    partials = json.reverse()
+  } else {
+    partials = partialData
+  }
+  return partials
+}
+</script>
+
 <template>
   <div class="app" v-if="motionConnected">
     <!-- Only show if never registered this session and not currently registered -->
@@ -65,289 +331,6 @@
     <div class="lds-dual-ring" />
   </div>
 </template>
-<script setup lang="ts">
-import Player from "./Player"
-import OutputLatencyCalibration from './components/OutputLatencyCalibration.vue'
-import { onMounted, Ref, ref } from "vue"
-
-const availableTracks: Ref<{ id: number, title: string }[]> = ref([])
-const countdownTime: Ref<number> = ref(-1)
-let deviceRegistrationId: number // Only used in UI
-const hasCalibratedThisSession = ref(false)
-// const hostUrl = "http://sadiss.test.test",
-// const hostUrl = 'http://8hz.at',
-const hostUrl = "https://sadiss.net"
-let intervalId: number
-let initialTimingSrcIntervalId: number
-let isRegistered = false
-const motion: Ref<{ pos: number }> = ref({ pos: 0 })
-const motionConnected = ref(false)
-let outputLatencyFromLocalStorage: number
-let partialData: []
-let partialIdToRegisterWith: number | null
-let performanceId = 1
-let performances: { id: number }[]
-const player: Ref<Player> = ref(new Player())
-let print = ''
-let timingSrcPosition: number
-let trackId = 1
-let ttsInstructions: null
-let ttsLanguage: string
-
-onMounted(async () => {
-  // Get performances to later check against performanceId URL paramater (if present) to make sure performance exists
-  try {
-    const performanceResponse = await fetch(hostUrl + "/api/performance")
-    performances = await performanceResponse.json()
-  } catch (e) {
-    throw new Error('Filed fetching performances.')
-  }
-
-  initializeMCorp()
-
-  // Fetch tracks
-  const res = await fetch(hostUrl + "/api/track")
-  availableTracks.value = await res.json()
-
-  // Get URL parameters and set performanceId and partialId if present
-  const params = new URLSearchParams(window.location.search)
-  if (performances.map(p => p.id).includes(Number(params.get('id')))) {
-    performanceId = Number(params.get('id'))
-  }
-  partialIdToRegisterWith = Number(params.get('partial_id'))
-
-  // Try to get previously set output latency from local storage
-  outputLatencyFromLocalStorage = Number(localStorage.getItem("outputLatency"))
-})
-
-const initializeMCorp = async () => {
-  // @ts-ignore: Can't find type for MCorp, which is added via <script> in index.html
-  const mCorpApp = MCorp.app(import.meta.env.VITE_MCORP_API_KEY, { anon: true })
-  mCorpApp.run = () => {
-    motion.value = mCorpApp.motions['shared']
-    motionConnected.value = true
-  }
-  mCorpApp.init()
-  while (!motion) {
-    await new Promise(r => setTimeout(r, 500))
-  }
-}
-
-const register = async () => {
-  if (isRegistered) {
-    window.clearInterval(intervalId)
-    isRegistered = false
-    return
-  }
-
-  if (!player.value) return
-
-  if (!performanceId) {
-    alert("Select a performance id.")
-    return
-  }
-
-  // Synthesize voice (with volume set to 0) on registration to make TTS work on iOS
-  const initialUtterance = new SpeechSynthesisUtterance('You are now registered.')
-  initialUtterance.volume = 0
-  speechSynthesis.speak(initialUtterance)
-
-  initialTimingSrcIntervalId = window.setInterval(() => {
-    timingSrcPosition = Number(motion.value.pos.toFixed(1))
-  }, 10)
-
-  // Pass over register function from this file to player
-  player.value.register = register
-
-  if (!player.value.audioContext) {
-    const audioCtx = window.AudioContext || window.webkitAudioContext
-    // Start audio context.
-    player.value.audioContext = new audioCtx({
-      latencyHint: 0,
-      // sampleRate: 31000,
-    })
-    // This is necessary to make the audio context work on iOS.
-    player.value.audioContext.resume()
-  }
-
-  const response = await fetch(hostUrl + "/api/client/create", {
-    method: "POST",
-    mode: "cors",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ performance_id: performanceId, partial_id: partialIdToRegisterWith }),
-  })
-  const data = await response.json()
-  deviceRegistrationId = data.id // Only used in UI.
-
-  // Check for start immediately, afterwards check in intervals of 1 second.
-  await checkForStart(data.token)
-  intervalId = window.setInterval(async () => {
-    await checkForStart(data.token)
-  }, 1000)
-
-  isRegistered = true
-  blink()
-}
-
-const checkForStart = async (token: string) => {
-  const response = await fetch(`${hostUrl}/api/client/${token}`)
-  if (response.status === 404) {
-    console.log("Client removed via Admin Interface")
-    isRegistered = false
-    window.clearInterval(intervalId)
-    return
-  }
-
-  const clientData = await response.json()
-  if (clientData.client["start_time"]) {
-    // @ts-ignore: intervalId supposedly declared here. TODO: Fix this.
-    window.clearInterval(intervalId)
-    const startTimeFromServer = Number(clientData.client["start_time"])
-    ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
-    console.log("Parsed instructions: ", ttsInstructions)
-    ttsLanguage = clientData.client["tts_language"]
-    const wf = clientData.client["waveform"]
-    if (wf) {
-      if (['sine', 'sawtooth', 'square', 'triangle'].includes(wf)) {
-        player.value.waveform = wf
-      } else {
-        // TODO: Placeholder for custom wave
-        // Since you can't enter custom waves in the admin interface currently this is not implemented.
-      }
-    }
-
-    // Conversion only necessary if playing from chunks sent by db, not when playing all partials on one client directly
-    partialData = convertPartialsIfNeeded(
-      clientData.client["partials"]
-    )
-    player.value.partialData = partialData
-
-    let prepareStarted = false
-
-    window.clearInterval(initialTimingSrcIntervalId)
-    const intervalId = window.setInterval(() => {
-      timingSrcPosition = globalTime()
-      if (timingSrcPosition >= startTimeFromServer + 3) {
-        print += timingSrcPosition + '\n'
-        console.log(timingSrcPosition)
-        player.value.offset =
-          timingSrcPosition - player.value.audioContext.currentTime // Do not change!
-        // Prevent multiple calls of prepare() if checkForStart() short interval time
-        if (!prepareStarted) {
-          start()
-          prepareStarted = true
-        }
-        window.clearInterval(intervalId)
-      }
-    }, 1)
-  }
-  return clientData
-}
-
-const start = async () => {
-  const startInSec = 5
-  const q = globalTime()
-  const now = q - player.value.offset // Do not change!
-
-  const adjustedNow = now + outputLatencyFromLocalStorage
-  console.log("LocalStorageOutputLatency: ", outputLatencyFromLocalStorage)
-  console.log("Adjusted Now: ", adjustedNow)
-  console.log("Diff: ", adjustedNow - now)
-
-  player.value.setup(
-    partialData,
-    startInSec,
-    // now - calculatedOutputLatency - player.audioContext.baseLatency // O
-    // now // no O
-    // now - latencyToSubtract // O only on Chrome
-    now + outputLatencyFromLocalStorage
-  )
-  isRegistered = false
-
-  /* TEXT TO SPEECH TESTING */
-
-  console.log(ttsInstructions, ttsLanguage)
-
-  if (ttsInstructions && ttsLanguage) {
-    console.log("Starting TTS.")
-    const ttsTimestamps = Object.keys(ttsInstructions)
-
-    console.log("ttsTimestamps: ", ttsTimestamps)
-
-    let nextTimestamp = ttsTimestamps.shift()
-    if (!nextTimestamp) return
-
-    let nextUtterance: SpeechSynthesisUtterance
-    if (partialIdToRegisterWith) {
-      nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
-    } else {
-      nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
-    }
-    nextUtterance.lang = ttsLanguage
-
-    const speechIntervalId = window.setInterval(() => {
-      if (globalTime() - player.value.offset >= now + Number(nextTimestamp) + startInSec) {
-        speechSynthesis.speak(nextUtterance)
-        if (ttsInstructions && ttsTimestamps.length) {
-          nextTimestamp = ttsTimestamps.shift()
-          if (!nextTimestamp) return
-          if (partialIdToRegisterWith) {
-            nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
-          } else {
-            nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
-          }
-          nextUtterance.lang = ttsLanguage
-        } else {
-          window.clearInterval(speechIntervalId)
-        }
-      }
-    }, 50)
-  }
-
-  /* END OF TEXT TO SPEECH TESTING */
-}
-
-const calibrationFinished = (calibratedLatency: number) => {
-  outputLatencyFromLocalStorage = Number(calibratedLatency)
-  const registerDiv = document.getElementById("register")
-  registerDiv?.scrollIntoView({ behavior: 'smooth' })
-  hasCalibratedThisSession.value = true
-}
-
-const blink = () => {
-  const btn = document.getElementById('registerBtn')
-  if (btn && (isRegistered || btn?.style.borderColor !== 'white')) {
-    btn.style.borderColor = btn.style.borderColor !== 'white' ? 'white' : '#FF6700'
-    window.setTimeout(() => {
-      blink()
-    }, 1000)
-  }
-}
-
-const playLocally = async () => {
-  const res = await fetch(`${hostUrl}/api/track/${trackId}`)
-  const data = await res.json()
-  partialData = JSON.parse(data.partials)
-  player.value.setup(partialData, 0, 0)
-}
-
-const globalTime = () => {
-  return motion.value.pos
-}
-
-const convertPartialsIfNeeded = (partialData: string | object) => {
-  let partials
-  if (typeof partialData === "string") {
-    let json = JSON.parse(partialData)
-    partials = json.reverse()
-  } else {
-    partials = partialData
-  }
-  return partials
-}
-</script>
 
 <style>
 html,

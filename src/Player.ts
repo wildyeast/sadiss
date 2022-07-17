@@ -6,7 +6,7 @@ export default class Player {
   partialData: SpearPartial[] = []
   playing = false
   offset = 0
-  oscillators: { osc: OscillatorNode, gain: GainNode, startTime: number, endTime: number }[] = []
+  oscillators: { oscNode: OscillatorNode, gainNode: GainNode, startTime: number, endTime: number }[] = []
   register: Function | null
   valuesSetForFirstPartial = []
   waveform: OscillatorType = 'sine'
@@ -20,27 +20,23 @@ export default class Player {
       latencyHint: 0,
       // sampleRate: 31000,
     })
-    // This is necessary to make the audio context work on iOS.
+    // This is necessary to make audio playback work on iOS.
     this.audioContext.resume()
   }
 
-  setup (partialData: SpearPartial[], startInSec: number, now: number) {
+  setup (partialData: SpearPartial[], startInSec: number, now: number, outputLatency: number) {
     this.partialData = partialData
-    const timeToAddToStart = startInSec + now
+    const timeToAddToStart = now + outputLatency + startInSec
 
     // Initialize oscillators, set all values for each oscillator
     for (const partial of partialData) {
       const oscObj = this.setupOscillator(partial, timeToAddToStart)
       for (const breakpoint of partial.breakpoints) {
-        const time = Number(breakpoint.time) + timeToAddToStart
-        oscObj.osc.frequency.setValueAtTime(breakpoint.freq, time)
-        oscObj.gain.gain.setValueAtTime(breakpoint.amp, time)
+        const time = breakpoint.time + timeToAddToStart
+        oscObj.oscNode.frequency.setValueAtTime(breakpoint.freq, time)
+        oscObj.gainNode.gain.setValueAtTime(breakpoint.amp, time)
       }
-      if (this.oscillators) {
-        this.oscillators.push(oscObj)
-      } else {
-        this.oscillators = [oscObj]
-      }
+      this.oscillators.push(oscObj)
     }
     this.playing = true;
 
@@ -51,27 +47,27 @@ export default class Player {
       throw new Error('Player.audioContext not set.')
     }
 
-    const osc = this.audioContext.createOscillator()
-    osc.type = this.waveform
-    const gain = this.audioContext.createGain()
+    const oscNode = this.audioContext.createOscillator()
+    const gainNode = this.audioContext.createGain()
 
-    osc.frequency.value = 0
-    gain.gain.value = 0
+    oscNode.type = this.waveform
+    oscNode.frequency.value = 0
+    gainNode.gain.value = 0
 
     const oscObj: OscObj = {
-      osc,
-      gain,
+      oscNode,
+      gainNode,
       startTime: Number(partial.startTime) + timeToAddToStart,
       endTime: Number(partial.endTime) + timeToAddToStart,
     }
 
-    oscObj.osc.connect(oscObj.gain);
-    oscObj.gain.connect(this.audioContext.destination)
+    oscObj.oscNode.connect(oscObj.gainNode);
+    oscObj.gainNode.connect(this.audioContext.destination)
 
-    oscObj.osc.start(oscObj.startTime)
-    oscObj.osc.stop(oscObj.endTime)
-    // oscObj.osc.onended = (src, gain) => this.ended(src, gain)
-    oscObj.osc.onended = () => this.ended(gain)
+    oscObj.oscNode.start(oscObj.startTime)
+    oscObj.oscNode.stop(oscObj.endTime)
+    // oscObj.oscNode.onended = (src, gainNode) => this.ended(src, gainNode)
+    oscObj.oscNode.onended = () => this.ended(gainNode)
 
     return oscObj
   }
@@ -80,14 +76,14 @@ export default class Player {
     console.log(this.oscillators)
     if (!this.oscillators) return
     for (const oscObj of this.oscillators) {
-      oscObj.osc.stop()
+      oscObj.oscNode.stop()
     }
     this.reset()
   }
 
-  ended (gain: GainNode): void {
-    const oscIndex = this.oscillators?.findIndex(oscObj => oscObj.gain = gain)
-    gain.disconnect()
+  ended (gainNode: GainNode): void {
+    const oscIndex = this.oscillators?.findIndex(oscObj => oscObj.gainNode = gainNode)
+    gainNode.disconnect()
     if (this.oscillators && oscIndex) {
       this.oscillators.splice(oscIndex, 1);
     }
@@ -109,24 +105,24 @@ export default class Player {
   }
 
   playOneShot (now: number): void {
-    const osc = this.audioContext.createOscillator()
-    const gain = this.audioContext.createGain()
+    const oscNode = this.audioContext.createOscillator()
+    const gainNode = this.audioContext.createGain()
 
-    osc.frequency.value = 400
-    osc.type = 'sawtooth'
-    gain.gain.value = 0.1
+    oscNode.frequency.value = 400
+    oscNode.type = 'sawtooth'
+    gainNode.gain.value = 0.1
 
-    osc.connect(gain);
-    gain.connect(this.audioContext.destination)
+    oscNode.connect(gainNode);
+    gainNode.connect(this.audioContext.destination)
 
-    osc.start(now)
-    osc.stop(now + 0.01)
+    oscNode.start(now)
+    oscNode.stop(now + 0.01)
   }
 }
 
 interface OscObj {
-  osc: OscillatorNode,
-  gain: GainNode,
+  oscNode: OscillatorNode,
+  gainNode: GainNode,
   startTime: number,
   endTime: number
 }
