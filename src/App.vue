@@ -180,14 +180,16 @@ export default {
       // Pass over register function from this file to player
       this.player.registerFunction = this.register;
 
-      const audioCtx = window.AudioContext || window.webkitAudioContext;
-      // Start audio context.
-      this.player.audioContext = new audioCtx({
-        latencyHint: 0,
-        // sampleRate: 31000,
-      });
-      // This is necessary to make the audio context work on iOS.
-      this.player.audioContext.resume()
+      if (!this.player.audioContext) {
+        const audioCtx = window.AudioContext || window.webkitAudioContext;
+        // Start audio context.
+        this.player.audioContext = new audioCtx({
+          latencyHint: 0,
+          // sampleRate: 31000,
+        });
+        // This is necessary to make the audio context work on iOS.
+        this.player.audioContext.resume()
+      }
 
       const response = await fetch(this.hostUrl + "/api/client/create", {
         method: "POST",
