@@ -169,6 +169,11 @@ export default {
         return
       }
 
+      // Synthesize voice (with volume set to 0) on registration to make TTS work on iOS
+      const initialUtterance = new SpeechSynthesisUtterance('You are now registered.')
+      initialUtterance.volume = 0
+      speechSynthesis.speak(initialUtterance)
+
       this.initialTimingSrcIntervalId = window.setInterval(() => {
         this.timingSrcPosition = this.motion.pos.toFixed(1)
       }, 10);
@@ -285,19 +290,14 @@ export default {
 
       if (this.ttsInstructions && this.ttsLanguage) {
         console.log("Starting TTS.")
-        let ttsTimestamps
-        if (this.partialIdToRegisterWith) {
-          ttsTimestamps = Object.keys(this.ttsInstructions[this.partialIdToRegisterWith])
-        } else {
-          ttsTimestamps = Object.keys(this.ttsInstructions)
-        }
+        const ttsTimestamps = Object.keys(this.ttsInstructions)
 
         console.log("ttsTimestamps: ", ttsTimestamps)
   
         let nextTimestamp = ttsTimestamps.shift()
         let nextUtterance
         if (this.partialIdToRegisterWith) {
-          nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[this.partialIdToRegisterWith][nextTimestamp][this.ttsLanguage])
+          nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.partialIdToRegisterWith][this.ttsLanguage])
         } else {
           nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
         }
@@ -306,11 +306,10 @@ export default {
         const speechIntervalId = window.setInterval(() => {
           if (this.globalTime() - this.player.offset >= now + Number(nextTimestamp) + startInSec) {
             speechSynthesis.speak(nextUtterance)
-            console.log("AudioCtx time + offset: ", this.player.audioContext.currentTime + this.player.offset)
             if (ttsTimestamps.length) {
               nextTimestamp = ttsTimestamps.shift()
               if (this.partialIdToRegisterWith) {
-                nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[this.partialIdToRegisterWith][nextTimestamp][this.ttsLanguage])
+                nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.partialIdToRegisterWith][this.ttsLanguage])
               } else {
                 nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
               }
