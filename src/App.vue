@@ -1,29 +1,32 @@
 <template>
-  <div class="app" v-if="motion">
+  <div class="app" v-if="motionConnected">
     <!-- Only show if never registered this session and not currently registered -->
-    <OutputLatencyCalibration v-if="!player.audioContext && !isRegistered" @calibrationFinished="calibrationFinished" :motion="motion" />
+    <OutputLatencyCalibration v-if="player && !hasCalibratedThisSession && !isRegistered"
+      @calibrationFinished="calibrationFinished" :motion="motion" />
 
     <!-- Register -->
     <div id="register" class="md:w-1/2 w-11/12 p-4 flex flex-col justify-center items-center h-screen">
+
       <!-- Top -->
       <!-- Performance Id dropdown -->
-      <select v-if="!isRegistered" v-model="performanceId" class="border p-2 rounded-full h-10 w-10 fixed top-5 right-5">
+      <select v-if="!isRegistered && !player.playing" v-model="performanceId"
+        class="border p-2 rounded-full h-10 w-10 fixed top-5 right-5">
         <option v-for="performance of performances">{{ performance.id }}</option>
       </select>
       <!-- Current global time and other information -->
       <div class="fixed top-5 right-5">
         <p v-if="isRegistered">{{ timingSrcPosition }}</p>
-        <p v-if="countdownTime > 0"
-          style="display: flex; justify-content: center; font-size: 50px">
+        <p v-if="countdownTime > 0" style="display: flex justify-content: center font-size: 50px">
           {{ countdownTime }}
         </p>
         <p v-else-if="player && player.playing">Track currently playing.</p>
         <!-- <p v-else>Device not registered.</p> -->
         <div v-html="print" style="margin-top: 1rem" />
       </div>
-      
+
       <!-- Center -->
-      <button @click="register" id="registerBtn" class="border-2 p-2 mt-4 rounded-full h-28 w-28 transition-all duration-300">
+      <button @click="register" id="registerBtn"
+        class="border-2 p-2 mt-4 rounded-full h-28 w-28 transition-all duration-300">
         <span v-if="!isRegistered">Register</span>
         <span v-else>{{ deviceRegistrationId }}</span>
       </button>
@@ -31,10 +34,8 @@
 
     <!-- Play track locally -->
     <!-- Currently hidden - display: none -->
-    <div
-      style="display: flex; flex-direction: column; justify-content: center; display: none"
-      class="md:w-1/2 w-11/12 border b-white p-4"
-    >
+    <div style="display: flex flex-direction: column justify-content: center"
+      class="md:w-1/2 w-11/12 border b-white p-4">
       <p>
         Select a track ID from the dropdown below and press Play to prepare the
         selected track. All partials will be played on this device. The ID
@@ -50,14 +51,10 @@
             {{ track.id }} - {{ track.title }}
           </option>
         </select>
-        <button
-          v-if="player && !player.playing"
-          @click="playLocally"
-          class="border b-white p-2"
-        >
+        <button v-if="player && !player.playing" @click="playLocally" class="border b-white p-2">
           Play
         </button>
-        <button v-else @click="player.stop" class="border b-white p-2">
+        <button v-else @click="player?.stop" class="border b-white p-2">
           Stop
         </button>
       </div>
@@ -68,324 +65,304 @@
     <div class="lds-dual-ring" />
   </div>
 </template>
-<script>
-/* global getOscillator */
-import dayjs from "dayjs";
-import dayjsPluginUTC from "dayjs/plugin/utc";
-dayjs.extend(dayjsPluginUTC);
-
-import Player from "./Player";
+<script setup lang="ts">
+import Player from "./Player"
 import OutputLatencyCalibration from './components/OutputLatencyCalibration.vue'
+import { onMounted, Ref, ref } from "vue"
 
-export default {
-  name: "App",
-  components: { OutputLatencyCalibration },
-  data: () => ({
-    player: null,
-    partials: null,
-    countdownTime: -1,
-    
-    isRegistered: false,
-    trackId: 1,
-    availableTracks: [],
-    deviceRegistrationId: null, // Only used in UI
-    intervalId: null,
-    // hostUrl: "http://sadiss.test.test",
-    // hostUrl: 'http://8hz.at',
-    hostUrl: "https://sadiss.net",
-    print: "",
-    timingProvider: null,
-    timingObj: null,
-    timingSrcPosition: null,
-    ttsInstructions: null,
-    ttsLanguage: null,
-    offset: null,
-    time: 0,
-    initialTimingSrcIntervalId: null,
-    audio: null,
+const availableTracks: Ref<{ id: number, title: string }[]> = ref([])
+const countdownTime: Ref<number> = ref(-1)
+let deviceRegistrationId: number // Only used in UI
+const hasCalibratedThisSession = ref(false)
+// const hostUrl = "http://sadiss.test.test",
+// const hostUrl = 'http://8hz.at',
+const hostUrl = "https://sadiss.net"
+let intervalId: number
+let initialTimingSrcIntervalId: number
+let isRegistered = false
+const motion: Ref<{ pos: number }> = ref({ pos: 0 })
+const motionConnected = ref(false)
+let outputLatencyFromLocalStorage: number
+let partialData: []
+let partialIdToRegisterWith: number | null
+let performanceId = 1
+let performances: { id: number }[]
+const player: Ref<Player> = ref(new Player())
+let print = ''
+let timingSrcPosition: number
+let trackId = 1
+let ttsInstructions: null
+let ttsLanguage: string
 
-    clients: [],
+onMounted(async () => {
+  // Get performances to later check against performanceId URL paramater (if present) to make sure performance exists
+  try {
+    const performanceResponse = await fetch(hostUrl + "/api/performance")
+    performances = await performanceResponse.json()
+  } catch (e) {
+    throw new Error('Filed fetching performances.')
+  }
 
-    outputLatency: 0,
-    useCalculatedOutputLatency: true,
-    motion: null,
-    performanceId: 1,
-    performances: null,
-    ttsInstructions: null,
-    ttsLanguage: null,
-    partialIdToRegisterWith: null,
-    waveform: null,
-    print: '',
-    outputLatencyFromLocalStorage: null
-  }),
-  async mounted() {
-    // Get performances to later check against performanceId URL paramater (if present) to make sure performance exists
-    const performanceResponse = await fetch(this.hostUrl + "/api/performance")
-    this.performances = await performanceResponse.json()
+  initializeMCorp()
 
-    this.initializeMCorp()
+  // Fetch tracks
+  const res = await fetch(hostUrl + "/api/track")
+  availableTracks.value = await res.json()
 
-    // Fetch tracks
-    const res = await fetch(this.hostUrl + "/api/track");
-    this.availableTracks = await res.json();
+  // Get URL parameters and set performanceId and partialId if present
+  const params = new URLSearchParams(window.location.search)
+  if (performances.map(p => p.id).includes(Number(params.get('id')))) {
+    performanceId = Number(params.get('id'))
+  }
+  partialIdToRegisterWith = Number(params.get('partial_id'))
 
-    // Get URL parameters and set performanceId and partialId if present
-    const params = new Proxy(new URLSearchParams(window.location.search), {
-      get: (searchParams, prop) => searchParams.get(prop),
-    });
-    if (this.performances.map(p => p.id).includes(Number(params.id))) {
-      this.performanceId = Number(params.id)
-    }
-    this.partialIdToRegisterWith = params.partial_id
+  // Try to get previously set output latency from local storage
+  outputLatencyFromLocalStorage = Number(localStorage.getItem("outputLatency"))
+})
 
-    // Try to get previously set output latency from local storage
-    this.outputLatencyFromLocalStorage = Number(localStorage.getItem("outputLatency"));
+const initializeMCorp = async () => {
+  // @ts-ignore: Can't find type for MCorp, which is added via <script> in index.html
+  const mCorpApp = MCorp.app(import.meta.env.VITE_MCORP_API_KEY, { anon: true })
+  mCorpApp.run = () => {
+    motion.value = mCorpApp.motions['shared']
+    motionConnected.value = true
+  }
+  mCorpApp.init()
+  while (!motion) {
+    await new Promise(r => setTimeout(r, 500))
+  }
+}
 
-    // Initialize player
-    this.player = new Player()
-  },
-  methods: {
-    async initializeMCorp () {
-      const mCorpApp = MCorp.app(import.meta.env.VITE_MCORP_API_KEY, {anon: true})
-      mCorpApp.run = () => {
-        this.motion = mCorpApp.motions['shared']
-      }
-      mCorpApp.init()
-      while (!this.motion) {
-        await new Promise(r => setTimeout(r, 500));
-      }
+const register = async () => {
+  if (isRegistered) {
+    window.clearInterval(intervalId)
+    isRegistered = false
+    return
+  }
+
+  if (!player.value) return
+
+  if (!performanceId) {
+    alert("Select a performance id.")
+    return
+  }
+
+  // Synthesize voice (with volume set to 0) on registration to make TTS work on iOS
+  const initialUtterance = new SpeechSynthesisUtterance('You are now registered.')
+  initialUtterance.volume = 0
+  speechSynthesis.speak(initialUtterance)
+
+  initialTimingSrcIntervalId = window.setInterval(() => {
+    timingSrcPosition = Number(motion.value.pos.toFixed(1))
+  }, 10)
+
+  // Pass over register function from this file to player
+  player.value.register = register
+
+  if (!player.value.audioContext) {
+    const audioCtx = window.AudioContext || window.webkitAudioContext
+    // Start audio context.
+    player.value.audioContext = new audioCtx({
+      latencyHint: 0,
+      // sampleRate: 31000,
+    })
+    // This is necessary to make the audio context work on iOS.
+    player.value.audioContext.resume()
+  }
+
+  const response = await fetch(hostUrl + "/api/client/create", {
+    method: "POST",
+    mode: "cors",
+    headers: {
+      "Content-Type": "application/json",
     },
+    body: JSON.stringify({ performance_id: performanceId, partial_id: partialIdToRegisterWith }),
+  })
+  const data = await response.json()
+  deviceRegistrationId = data.id // Only used in UI.
 
-    async register () {
-      if (this.isRegistered) {
-        window.clearInterval(this.invervalId)
-        this.isRegistered = false
-        return
-      }
+  // Check for start immediately, afterwards check in intervals of 1 second.
+  await checkForStart(data.token)
+  intervalId = window.setInterval(async () => {
+    await checkForStart(data.token)
+  }, 1000)
 
-      if (!this.performanceId) {
-        alert("Select a performance id.")
-        return
-      }
+  isRegistered = true
+  blink()
+}
 
-      // Synthesize voice (with volume set to 0) on registration to make TTS work on iOS
-      const initialUtterance = new SpeechSynthesisUtterance('You are now registered.')
-      initialUtterance.volume = 0
-      speechSynthesis.speak(initialUtterance)
+const checkForStart = async (token: string) => {
+  const response = await fetch(`${hostUrl}/api/client/${token}`)
+  if (response.status === 404) {
+    console.log("Client removed via Admin Interface")
+    isRegistered = false
+    window.clearInterval(intervalId)
+    return
+  }
 
-      this.initialTimingSrcIntervalId = window.setInterval(() => {
-        this.timingSrcPosition = this.motion.pos.toFixed(1)
-      }, 10);
-
-      // Pass over register function from this file to player
-      this.player.registerFunction = this.register;
-
-      if (!this.player.audioContext) {
-        const audioCtx = window.AudioContext || window.webkitAudioContext;
-        // Start audio context.
-        this.player.audioContext = new audioCtx({
-          latencyHint: 0,
-          // sampleRate: 31000,
-        });
-        // This is necessary to make the audio context work on iOS.
-        this.player.audioContext.resume()
-      }
-
-      const response = await fetch(this.hostUrl + "/api/client/create", {
-        method: "POST",
-        mode: "cors",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ performance_id: this.performanceId, partial_id: this.partialIdToRegisterWith }),
-      });
-      const data = await response.json();
-      this.deviceRegistrationId = data.id; // Only used in UI.
-
-      // Check for start immediately, afterwards check in intervals of 1 second.
-      await this.checkForStart(data.token);
-      this.intervalId = window.setInterval(async () => {
-        await this.checkForStart(data.token);
-      }, 1000);
-      
-      this.isRegistered = true;
-      this.blink()
-    },
-
-    async checkForStart(token) {
-      const response = await fetch(`${this.hostUrl}/api/client/${token}`);
-      if (response.status === 404) {
-        console.log("Client removed via Admin Interface");
-        this.isRegistered = false;
-        window.clearInterval(this.intervalId);
-        return;
-      }
-      const clientData = await response.json();
-      if (clientData.client["start_time"]) {
-        window.clearInterval(this.intervalId);
-        const startTimeFromServer = Number(clientData.client["start_time"]);
-        this.ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
-        console.log("Parsed instructions: ", this.ttsInstructions)
-        this.ttsLanguage = clientData.client["tts_language"]
-        const wf = clientData.client["waveform"]
-        if (wf) {
-          if (['sine', 'sawtooth', 'square', 'triangle'].includes(wf)) {
-            this.player.waveform = wf
-          } else {
-            // TODO: Placeholder for custom wave
-            // Since you can't enter custom waves in the admin interface currently this is not implemented.
-          }
-        }
-
-        // Conversion only necessary if playing from chunks sent by db, not when playing all partials on one client directly
-        this.partialData = this.convertPartialsIfNeeded(
-          clientData.client["partials"]
-        );
-        this.player.partialData = this.partialData;
-
-        let prepareStarted = false;
-
-        window.clearInterval(this.initialTimingSrcIntervalId);
-        const intervalId = window.setInterval(() => {
-          this.timingSrcPosition = this.globalTime();
-          if (this.timingSrcPosition >= startTimeFromServer + 3) {
-            this.print += this.timingSrcPosition + '\n'
-            console.log(this.timingSrcPosition)
-            this.player.offset =
-              this.timingSrcPosition - this.player.audioContext.currentTime; // Do not change!
-            // Prevent multiple calls of prepare() if checkForStart() short interval time
-            if (!prepareStarted) {
-              this.start();
-              prepareStarted = true;
-            }
-            window.clearInterval(intervalId);
-          }
-        }, 1);
-      }
-      return clientData;
-    },
-
-    async start() {
-      const startInSec = 5;
-      const q = this.globalTime();
-      const now = q - this.player.offset; // Do not change!
-
-      const adjustedNow = now + this.outputLatencyFromLocalStorage
-      console.log("LocalStorageOutputLatency: ", this.outputLatencyFromLocalStorage)
-      console.log("Adjusted Now: ", adjustedNow)
-      console.log("Diff: ", adjustedNow - now)
-
-      this.player.setup(
-        this.partialData,
-        startInSec,
-        // now - calculatedOutputLatency - this.player.audioContext.baseLatency // O
-        // now // no O
-        // now - latencyToSubtract // O only on Chrome
-        now + this.outputLatencyFromLocalStorage
-      );
-      this.isRegistered = false;
-
-      /* TEXT TO SPEECH TESTING */
-
-      console.log(this.ttsInstructions, this.ttsLanguage)
-
-      if (this.ttsInstructions && this.ttsLanguage) {
-        console.log("Starting TTS.")
-        const ttsTimestamps = Object.keys(this.ttsInstructions)
-
-        console.log("ttsTimestamps: ", ttsTimestamps)
-  
-        let nextTimestamp = ttsTimestamps.shift()
-        let nextUtterance
-        if (this.partialIdToRegisterWith) {
-          nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.partialIdToRegisterWith][this.ttsLanguage])
-        } else {
-          nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
-        }
-        nextUtterance.lang = this.ttsLanguage
-
-        const speechIntervalId = window.setInterval(() => {
-          if (this.globalTime() - this.player.offset >= now + Number(nextTimestamp) + startInSec) {
-            speechSynthesis.speak(nextUtterance)
-            if (ttsTimestamps.length) {
-              nextTimestamp = ttsTimestamps.shift()
-              if (this.partialIdToRegisterWith) {
-                nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.partialIdToRegisterWith][this.ttsLanguage])
-              } else {
-                nextUtterance = new SpeechSynthesisUtterance(this.ttsInstructions[nextTimestamp][this.ttsLanguage])
-              }
-              nextUtterance.lang = this.ttsLanguage
-            } else {
-              window.clearInterval(speechIntervalId)
-            }
-          }
-        }, 50)
-      }
-      
-      /* END OF TEXT TO SPEECH TESTING */
-    },
-
-    calibrationFinished (e) {
-      this.outputLatencyFromLocalStorage = Number(e.calibratedLatency)
-      const registerDiv = document.getElementById("register");
-      registerDiv.scrollIntoView({ behavior: 'smooth' });
-    },
-
-    blink () {
-      const btn = document.getElementById('registerBtn')
-      if (this.isRegistered || btn.style.borderColor !== 'white') {
-        btn.style.borderColor = btn.style.borderColor !== 'white' ? 'white' : '#FF6700'
-        window.setTimeout(() => {
-          this.blink()
-        }, 1000)
-      }
-      
-    },
-
-    async playLocally() {
-      const res = await fetch(`${this.hostUrl}/api/track/${this.trackId}`);
-      const data = await res.json();
-      this.partialData = JSON.parse(data.partials);
-      if (!this.player.audioContext) {
-        this.player.audioContext = new AudioContext();
-      }
-      this.player.setup(this.partialData, 0, 0, true);
-    },
-
-    globalTime() {
-      return this.motion.pos;
-    },
-
-    convertPartialsIfNeeded(partialData) {
-      let partials;
-      if (typeof partialData === "string") {
-        let json = JSON.parse(partialData);
-        partials = json.reverse();
+  const clientData = await response.json()
+  if (clientData.client["start_time"]) {
+    // @ts-ignore: intervalId supposedly declared here. TODO: Fix this.
+    window.clearInterval(intervalId)
+    const startTimeFromServer = Number(clientData.client["start_time"])
+    ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
+    console.log("Parsed instructions: ", ttsInstructions)
+    ttsLanguage = clientData.client["tts_language"]
+    const wf = clientData.client["waveform"]
+    if (wf) {
+      if (['sine', 'sawtooth', 'square', 'triangle'].includes(wf)) {
+        player.value.waveform = wf
       } else {
-        partials = partialData;
+        // TODO: Placeholder for custom wave
+        // Since you can't enter custom waves in the admin interface currently this is not implemented.
       }
-      return partials;
-    },
-  },
-};
+    }
+
+    // Conversion only necessary if playing from chunks sent by db, not when playing all partials on one client directly
+    partialData = convertPartialsIfNeeded(
+      clientData.client["partials"]
+    )
+    player.value.partialData = partialData
+
+    let prepareStarted = false
+
+    window.clearInterval(initialTimingSrcIntervalId)
+    const intervalId = window.setInterval(() => {
+      timingSrcPosition = globalTime()
+      if (timingSrcPosition >= startTimeFromServer + 3) {
+        print += timingSrcPosition + '\n'
+        console.log(timingSrcPosition)
+        player.value.offset =
+          timingSrcPosition - player.value.audioContext.currentTime // Do not change!
+        // Prevent multiple calls of prepare() if checkForStart() short interval time
+        if (!prepareStarted) {
+          start()
+          prepareStarted = true
+        }
+        window.clearInterval(intervalId)
+      }
+    }, 1)
+  }
+  return clientData
+}
+
+const start = async () => {
+  const startInSec = 5
+  const q = globalTime()
+  const now = q - player.value.offset // Do not change!
+
+  const adjustedNow = now + outputLatencyFromLocalStorage
+  console.log("LocalStorageOutputLatency: ", outputLatencyFromLocalStorage)
+  console.log("Adjusted Now: ", adjustedNow)
+  console.log("Diff: ", adjustedNow - now)
+
+  player.value.setup(
+    partialData,
+    startInSec,
+    // now - calculatedOutputLatency - player.audioContext.baseLatency // O
+    // now // no O
+    // now - latencyToSubtract // O only on Chrome
+    now + outputLatencyFromLocalStorage
+  )
+  isRegistered = false
+
+  /* TEXT TO SPEECH TESTING */
+
+  console.log(ttsInstructions, ttsLanguage)
+
+  if (ttsInstructions && ttsLanguage) {
+    console.log("Starting TTS.")
+    const ttsTimestamps = Object.keys(ttsInstructions)
+
+    console.log("ttsTimestamps: ", ttsTimestamps)
+
+    let nextTimestamp = ttsTimestamps.shift()
+    if (!nextTimestamp) return
+
+    let nextUtterance: SpeechSynthesisUtterance
+    if (partialIdToRegisterWith) {
+      nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
+    } else {
+      nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
+    }
+    nextUtterance.lang = ttsLanguage
+
+    const speechIntervalId = window.setInterval(() => {
+      if (globalTime() - player.value.offset >= now + Number(nextTimestamp) + startInSec) {
+        speechSynthesis.speak(nextUtterance)
+        if (ttsInstructions && ttsTimestamps.length) {
+          nextTimestamp = ttsTimestamps.shift()
+          if (!nextTimestamp) return
+          if (partialIdToRegisterWith) {
+            nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
+          } else {
+            nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
+          }
+          nextUtterance.lang = ttsLanguage
+        } else {
+          window.clearInterval(speechIntervalId)
+        }
+      }
+    }, 50)
+  }
+
+  /* END OF TEXT TO SPEECH TESTING */
+}
+
+const calibrationFinished = (calibratedLatency: number) => {
+  outputLatencyFromLocalStorage = Number(calibratedLatency)
+  const registerDiv = document.getElementById("register")
+  registerDiv?.scrollIntoView({ behavior: 'smooth' })
+  hasCalibratedThisSession.value = true
+}
+
+const blink = () => {
+  const btn = document.getElementById('registerBtn')
+  if (btn && (isRegistered || btn?.style.borderColor !== 'white')) {
+    btn.style.borderColor = btn.style.borderColor !== 'white' ? 'white' : '#FF6700'
+    window.setTimeout(() => {
+      blink()
+    }, 1000)
+  }
+}
+
+const playLocally = async () => {
+  const res = await fetch(`${hostUrl}/api/track/${trackId}`)
+  const data = await res.json()
+  partialData = JSON.parse(data.partials)
+  player.value.setup(partialData, 0, 0)
+}
+
+const globalTime = () => {
+  return motion.value.pos
+}
+
+const convertPartialsIfNeeded = (partialData: string | object) => {
+  let partials
+  if (typeof partialData === "string") {
+    let json = JSON.parse(partialData)
+    partials = json.reverse()
+  } else {
+    partials = partialData
+  }
+  return partials
+}
 </script>
+
 <style>
 html,
 body {
-  background-color: black;
+  background-color: black
 }
 
 .app {
-  --primaryColor: white;
-  --secondaryColor: maroon;
-  --tertiaryColor: lightblue;
-  color: var(--primaryColor);
   font-family: monospace;
   font-size: 1.1em;
   display: flex;
   flex-flow: column;
   align-items: center;
   overflow: hidden;
+  color: white;
 }
 
 /* Large loading spinner */
@@ -393,8 +370,9 @@ body {
 .lds-dual-ring {
   display: inline-block;
   width: 80px;
-  height: 80px;
+  height: 80px
 }
+
 .lds-dual-ring:after {
   content: " ";
   display: block;
@@ -404,14 +382,16 @@ body {
   border-radius: 50%;
   border: 6px solid #fff;
   border-color: #EEE transparent #EEE transparent;
-  animation: lds-dual-ring 1.2s linear infinite;
+  animation: lds-dual-ring 1.2s linear infinite
 }
+
 @keyframes lds-dual-ring {
   0% {
-    transform: rotate(0deg);
+    transform: rotate(0deg)
   }
+
   100% {
-    transform: rotate(360deg);
+    transform: rotate(360deg)
   }
 }
 </style>
