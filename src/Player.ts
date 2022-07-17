@@ -3,7 +3,7 @@ import { SpearPartial } from "./types/SpearPartial"
 export default class Player {
 
   audioContext: AudioContext
-  partialData: SpearPartial[] | null = null
+  partialData: SpearPartial[] = []
   playing = false
   offset = 0
   oscillators: { osc: OscillatorNode, gain: GainNode, startTime: number, endTime: number }[] = []
