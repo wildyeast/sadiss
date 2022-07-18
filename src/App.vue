@@ -7,9 +7,8 @@ const availableTracks: Ref<{ id: number, title: string }[]> = ref([])
 const countdownTime = ref(-1)
 const deviceRegistrationId = ref(-1) // Only used in UI
 const hasCalibratedThisSession = ref(false)
-// const hostUrl = "http://sadiss.test.test",
-// const hostUrl = 'http://8hz.at',
-const hostUrl = "https://sadiss.net"
+const hostUrl = "http://sadiss.test.test/v1"
+// const hostUrl = "https://sadiss.net/api/v1"
 let intervalId: number
 let initialTimingSrcIntervalId: number
 const isRegistered = ref(false)
@@ -29,17 +28,13 @@ let ttsLanguage: string
 
 onMounted(async () => {
   // Get performances to later check against performanceId URL paramater (if present) to make sure performance exists
-  try {
-    const performanceResponse = await fetch(hostUrl + "/api/performance")
-    performances = await performanceResponse.json()
-  } catch (e) {
-    throw new Error('Filed fetching performances.')
-  }
+  const performanceResponse = await fetch(hostUrl + '/performance')
+  performances = await performanceResponse.json()
 
   initializeMCorp()
 
   // Fetch tracks
-  const res = await fetch(hostUrl + "/api/track")
+  const res = await fetch(hostUrl + '/track')
   availableTracks.value = await res.json()
 
   // Get URL parameters and set performanceId and partialId if present
@@ -103,7 +98,7 @@ const register = async () => {
     player.value.audioContext.resume()
   }
 
-  const response = await fetch(hostUrl + "/api/client/create", {
+  const response = await fetch(hostUrl + '/client/create', {
     method: "POST",
     mode: "cors",
     headers: {
@@ -125,7 +120,7 @@ const register = async () => {
 }
 
 const checkForStart = async (token: string) => {
-  const response = await fetch(`${hostUrl}/api/client/${token}`)
+  const response = await fetch(`${hostUrl}/client/${token}`)
   if (response.status === 404) {
     console.log("Client removed via Admin Interface")
     isRegistered.value = false
@@ -246,7 +241,7 @@ const blink = () => {
 }
 
 const playLocally = async () => {
-  const partialData = await fetch(`${hostUrl}/api/track/${trackId}`)
+  const partialData = await fetch(`${hostUrl}/track/${trackId}`)
     .then(res => res.json())
     .then(data => JSON.parse(data.partials))
   player.value.setup(partialData, 0, 0, outputLatencyFromLocalStorage)
@@ -306,7 +301,7 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
         Select a track ID from the dropdown below and press Play to prepare the
         selected track. All partials will be played on this device. The ID
         corresponds to the tracks's ID in the database (check the
-        <a :href="hostUrl + '/tracks'">Admin Interface</a> for a list of
+        <a :href="hostUrl + 'tracks'">Admin Interface</a> for a list of
         available tracks). If the dropdown is empty, add a track to the database
         via the Admin Interface and afterwards refresh this page.
       </p>
