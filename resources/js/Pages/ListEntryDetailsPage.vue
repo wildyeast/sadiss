@@ -5,7 +5,7 @@ import { onMounted, reactive, toRefs, ref } from 'vue'
 import QrcodeVue from 'qrcode.vue'
 import Player from '@/Components/Player.vue'
 import ClientList from '@/Components/ClientList.vue'
-import TrackList from '@/Components/Tracklist.vue'
+import TrackList from '@/Components/TrackList.vue'
 
 const pathname = window.location.pathname.replace('/', '')
 const category = pathname.split('/')[0]
