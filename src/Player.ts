@@ -1,3 +1,4 @@
+import { OscObj } from "./types"
 import { SpearPartial } from "./types/SpearPartial"
 
 export default class Player {
@@ -15,7 +16,7 @@ export default class Player {
     this.register = register
 
     // Start audio context.
-    const audioCtx = window.AudioContext || window.webkitAudioContext;
+    const audioCtx = window.AudioContext || window.webkitAudioContext
     this.audioContext = new audioCtx({
       latencyHint: 0,
       // sampleRate: 31000,
@@ -118,9 +119,4 @@ export default class Player {
     oscNode.start(now)
     oscNode.stop(now + 0.01)
   }
-}
-
-interface OscObj {
-  oscNode: OscillatorNode,
-  gainNode: GainNode,
 }
