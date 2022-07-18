@@ -91,27 +91,22 @@ export default {
 
         const columnData = ref([])
         const columnNames = ref([])
-        const pathname = window.location.pathname.replace('/', '')
-        const category = pathname.split('/')[0] 
-        let routeCategory = ''
+	const pathname = window.location.pathname.split('/').pop()
         const title = ref('')
+	let routeCategory
 
         onMounted(async () => {
           title.value = formatPageTitle(pathname)
 
-          switch (category) {
-            case 'tracks':
+	if (pathname.endsWith('tracks')) {
               routeCategory = 'track'
-              break
-            case 'composers':
+	} else if (pathname.endsWith('composers')) {
               routeCategory = 'composer'
-              break
-            case 'performances':
-              routeCategory = 'performance'
-              break
-          }
+	} else {
+	      routeCategory = 'performance'
+	}
 
-          const response = await axios.get(`/api/${routeCategory}/columns`);
+          const response = await axios.get(`/api/v1/${routeCategory}/columns`);
           for (const column of response.data) {
             columnNames.value.push(column.Field)
           }
@@ -128,7 +123,7 @@ export default {
         }
 
         async function addData () {
-          const response = await axios.get(`/api/${routeCategory}`)
+          const response = await axios.get(`/api/v1/${routeCategory}`)
           for (const entry of response.data) {
             if (entry['description'] && entry['description'].length > 50) {
               entry['description'] = entry['description'].substring(0, 50) + '...'
@@ -139,7 +134,7 @@ export default {
 
         async function deleteRow (id) {
           if (confirm(`Do you really want to delete this ${routeCategory}? This cannot be reversed.`)) {
-            await axios.post(`/api/${routeCategory}/delete/${id}`)
+            await axios.post(`/api/v1/${routeCategory}/delete/${id}`)
             columnData.value = columnData.value.filter(row => row.id !== id)
           }
           oruga.notification.open({

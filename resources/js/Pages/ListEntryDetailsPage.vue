@@ -7,8 +7,7 @@ import Player from '@/Components/Player.vue'
 import ClientList from '@/Components/ClientList.vue'
 import TrackList from '@/Components/TrackList.vue'
 
-const pathname = window.location.pathname.replace('/', '')
-const category = pathname.split('/')[0]
+const pathname = window.location.pathname.split('/').pop()
 let routeCategory = ''
 const id = pathname.split('/')[1]
 const data = reactive({})
@@ -18,18 +17,15 @@ const showPartialQRCodes = ref(false)
 
 onMounted(async () => {
   // TODO: This switch is identical to the one in ListPage.vue. Find a smart way to handle this.
-  switch (category) {
-    case 'tracks':
-      routeCategory = 'track'
-      break
-    case 'composers':
-      routeCategory = 'composer'
-      break
-    case 'performances':
-      routeCategory = 'performance'
-      break
-  }
-  const response = await axios.get(`/api/${routeCategory}/${id}`);
+	if (pathname.endsWith('tracks')) {
+              routeCategory = 'track'
+	} else if (pathname.endsWith('composers')) {
+              routeCategory = 'composer'
+	} else {
+	      routeCategory = 'performance'
+	}
+
+  const response = await axios.get(`/api/v1/${routeCategory}/${id}`);
   for (const entry of Object.keys(response.data)) {
     data[entry] = response.data[entry]
   }
