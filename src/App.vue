@@ -246,9 +246,9 @@ const blink = () => {
 }
 
 const playLocally = async () => {
-  const res = await fetch(`${hostUrl}/api/track/${trackId}`)
-  const data = await res.json()
-  partialData = JSON.parse(data.partials)
+  const partialData = await fetch(`${hostUrl}/api/track/${trackId}`)
+    .then(res => res.json())
+    .then(data => JSON.parse(data.partials))
   player.value.setup(partialData, 0, 0, outputLatencyFromLocalStorage)
 }
 
