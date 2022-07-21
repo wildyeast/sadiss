@@ -40,14 +40,14 @@ onMounted(async () => {
   mCorpApp.init()
 })
 
-async function synchronizeTimingSrcPosition() {
+async function synchronizeTimingSrcPosition () {
   if (!synchronizing.value) {
     if (motion.vel != 1) {
       motion.update(null, 1, null)
     }
 
     synchronizing.value = true;
-    (function query() {
+    (function query () {
       if (motion.pos.toFixed(1) - timingSrcPosition.value != 0) {
         // TODO: Weird calculation, doesn't work with !== for some reason, no time to look into it now
         timingSrcPosition.value = motion.pos.toFixed(1)
@@ -63,7 +63,7 @@ async function synchronizeTimingSrcPosition() {
   }
 }
 
-async function startTrack() {
+async function startTrack () {
 
   if (registeredClients.length === 0) {
     alert("No clients are registered.")
@@ -74,9 +74,9 @@ async function startTrack() {
   let route;
 
   if (!choirMode.value && allPartialsAllDevices.value) {
-    route = `/api/track/${props.trackId}/start_all/${calculatedStartingPosition}/${props.performanceId}`
+    route = `${process.env.MIX_API_SLUG}/track/${props.trackId}/start_all/${calculatedStartingPosition}/${props.performanceId}`
   } else {
-    route = `/api/track/${props.trackId}/start/${calculatedStartingPosition}/${props.performanceId}`
+    route = `${process.env.MIX_API_SLUG}/track/${props.trackId}/start/${calculatedStartingPosition}/${props.performanceId}`
   }
 
   console.log("Calculated starting position: ", calculatedStartingPosition)
@@ -95,15 +95,15 @@ async function startTrack() {
   )
 }
 
-async function getRegisteredClients() {
-  const response = await axios.get(`/api/client/active/${props.performanceId}`);
+async function getRegisteredClients () {
+  const response = await axios.get(`${process.env.MIX_API_SLUG}/client/active/${props.performanceId}`);
   registeredClients.splice(0)
   for (const client of response.data) {
     registeredClients.push(client)
   }
 }
 
-async function autoGetRegisteredClients() {
+async function autoGetRegisteredClients () {
   if (!autoGetRegisteredClientsInterval.value) {
     await getRegisteredClients()
 
@@ -117,9 +117,9 @@ async function autoGetRegisteredClients() {
   }
 }
 
-async function removeClients() {
+async function removeClients () {
   for (const client of registeredClients) {
-    const response = await axios.post(`/api/client/delete/${client.id}`)
+    const response = await axios.post(`${process.env.MIX_API_SLUG}/client/delete/${client.id}`)
     console.log("Removed client with id " + client.id)
   }
   getRegisteredClients();
@@ -143,7 +143,7 @@ function startCalibration () {
   const audioCtx = window.AudioContext || window.webkitAudioContext;
   // Start audio context.
   player.audioContext = new audioCtx({ latencyHint: 0 })
-   // This is necessary to make the audio context work on iOS.
+  // This is necessary to make the audio context work on iOS.
   player.audioContext.resume()
   calibrating.value = true
 
@@ -162,26 +162,26 @@ function startCalibration () {
 <template>
   <div>
     <div class="flex items-center mb-4">
-      <input class="mr-2" type="checkbox" v-model="allPartialsAllDevices" />
+      <input class="mr-2"
+             type="checkbox"
+             v-model="allPartialsAllDevices" />
       <label class="mr-5">All partials to all devices</label>
-      <input class="mr-2" type="checkbox" v-model="choirMode" />
+      <input class="mr-2"
+             type="checkbox"
+             v-model="choirMode" />
       <label>Choir mode</label>
     </div>
     <div class="flex justify-between items-center">
-      <button
-        @click="startTrack"
-        class="border p-2"
-        :class="synchronizing ? 'border-green-400' : 'border-red-400'"
-        :disabled="!synchronizing"
-      >
+      <button @click="startTrack"
+              class="border p-2"
+              :class="synchronizing ? 'border-green-400' : 'border-red-400'"
+              :disabled="!synchronizing">
         Start track
       </button>
       <div class="flex">
-        <button
-          @click="synchronizeTimingSrcPosition"
-          class="border p-2"
-          :disabled="!timingSrcConnected"
-        >
+        <button @click="synchronizeTimingSrcPosition"
+                class="border p-2"
+                :disabled="!timingSrcConnected">
           Sync
         </button>
         <div class="border-b border-t border-r p-2">
@@ -191,43 +191,47 @@ function startCalibration () {
       <div v-if="ttsLanguages && ttsLanguages.length">
         <label class="mr-2">Select TTS language</label>
         <select v-model="ttsLanguage">
-          <option value='' selected>No TTS</option>
+          <option value=''
+                  selected>No TTS</option>
           <option v-for="lang of ttsLanguages">{{ lang }}</option>
         </select>
       </div>
       <div>
         <select v-model="waveform">
-          <option value="sine" selected>Sine</option>
+          <option value="sine"
+                  selected>Sine</option>
           <option value="square">Square</option>
           <option value="sawtooth">Saw</option>
           <option value="triangle">Triangle</option>
           <!-- <option value="">Custom</option> -->
         </select>
       </div>
-      <input type="text" placeholder="Overlap" v-model="partialOverlap">
+      <input type="text"
+             placeholder="Overlap"
+             v-model="partialOverlap">
       <div class="flex flex-col ">
         <div>
-          <button
-            @click="getRegisteredClients"
-            class="border p-2"
-            :class="autoGetRegisteredClientsInterval ? 'border-b-green-400 border-l-green-400 border-t-green-400' : 'border'">
+          <button @click="getRegisteredClients"
+                  class="border p-2"
+                  :class="autoGetRegisteredClientsInterval ? 'border-b-green-400 border-l-green-400 border-t-green-400' : 'border'">
             Refresh list
           </button>
-          <button
-            @click="autoGetRegisteredClients"
-            class="border-b border-t border-r p-2"
-            :class=" autoGetRegisteredClientsInterval ? 'border-green-400': 'border-b border-t border-r'">
+          <button @click="autoGetRegisteredClients"
+                  class="border-b border-t border-r p-2"
+                  :class="autoGetRegisteredClientsInterval ? 'border-green-400' : 'border-b border-t border-r'">
             Auto
           </button>
         </div>
-        <button @click="removeClients" class="border p-2">
+        <button @click="removeClients"
+                class="border p-2">
           Remove all registered clients
         </button>
       </div>
-      </div>
+    </div>
     <button @click="startCalibration">{{ calibrating ? 'Stop' : 'Start' }} calibration beep</button>
     <p>IDs of registered clients (Total: {{ registeredClients.length }})</p>
-    <div v-for="client of registeredClients" :key="client.id">
+    <div v-for="client of registeredClients"
+         :key="client.id">
       {{ client.id }}
     </div>
   </div>

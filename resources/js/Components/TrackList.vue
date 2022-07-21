@@ -13,10 +13,10 @@ const selectedTrack = ref()
 const loading = ref(true)
 
 onMounted(async () => {
-  const trackResponse = await axios.get(`/v1/track`)
+  const trackResponse = await axios.get(`${process.env.MIX_API_SLUG}/track`)
   tracks.value = trackResponse.data
 
-  const performanceTrackResponse = await axios.get(`/v1/performance/get_tracks/${props.performance.id}`)
+  const performanceTrackResponse = await axios.get(`${process.env.MIX_API_SLUG}/performance/get_tracks/${props.performance.id}`)
   performanceTracks.value = performanceTrackResponse.data
 
   loading.value = false
@@ -30,7 +30,7 @@ const trackSelected = (track) => {
 
 const save = () => {
   mode.value = 'perform'
-  return axios.post(`/api/performance/add_tracks/${props.performance.id}`, null, {
+  return axios.post(`${process.env.MIX_API_SLUG}/performance/add_tracks/${props.performance.id}`, null, {
     params: {
       tracks: performanceTracks.value.map(track => track.id)
     }
@@ -40,35 +40,47 @@ const save = () => {
 </script>
 
 <template>
-  <div v-if="loading" class="flex justify-center">
+  <div v-if="loading"
+       class="flex justify-center">
     <div class="lds-dual-ring" />
   </div>
-  <div v-else class="w-full px-4 border flex flex-col justify-center">
+  <div v-else
+       class="w-full px-4 border flex flex-col justify-center">
     <div class="flex justify-center gap-2 mt-2">
-      <button @click="mode = 'perform'" class="border p-2"
-        :class="mode === 'perform' ? 'bg-[#EEE]' : 'bg-transparent'">Perform</button>
-      <button @click="mode = 'edit'" class="border p-2" :class="mode === 'edit' ? 'bg-[#EEE]' : 'bg-transparent'">Edit
+      <button @click="mode = 'perform'"
+              class="border p-2"
+              :class="mode === 'perform' ? 'bg-[#EEE]' : 'bg-transparent'">Perform</button>
+      <button @click="mode = 'edit'"
+              class="border p-2"
+              :class="mode === 'edit' ? 'bg-[#EEE]' : 'bg-transparent'">Edit
         Tracklist</button>
     </div>
-    <div v-if="mode === 'edit'" class="flex w-full">
+    <div v-if="mode === 'edit'"
+         class="flex w-full">
       <div class="w-1/2 min-h-10 cursor-pointer">
-        <div v-for="track of performanceTracks" @click="performanceTracks.splice(performanceTracks.indexOf(track), 1)">
+        <div v-for="track of performanceTracks"
+             @click="performanceTracks.splice(performanceTracks.indexOf(track), 1)">
           {{ track.title }}
         </div>
       </div>
       <div class="w-1/2 cursor-pointer">
-        <div v-for="track of tracks" @click="performanceTracks.push(track)">
+        <div v-for="track of tracks"
+             @click="performanceTracks.push(track)">
           {{ track.title }}
         </div>
       </div>
     </div>
     <div v-if="mode === 'perform'">
-      <div v-for="track of performanceTracks" @click="trackSelected(track)"
-        :class="selectedTrack === track ? 'bg-[#EEE]' : 'bg-transparent'" class="cursor-pointer">
+      <div v-for="track of performanceTracks"
+           @click="trackSelected(track)"
+           :class="selectedTrack === track ? 'bg-[#EEE]' : 'bg-transparent'"
+           class="cursor-pointer">
         {{ track.title }}
       </div>
     </div>
-    <button v-if="mode === 'edit'" @click="save" class="border p-2 mb-2">Save</button>
+    <button v-if="mode === 'edit'"
+            @click="save"
+            class="border p-2 mb-2">Save</button>
   </div>
 </template>
 

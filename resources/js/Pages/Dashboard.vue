@@ -1,15 +1,16 @@
 <template>
-    <div>
-        <Head title="Dashboard" />
+  <div>
 
-        <BreezeAuthenticatedLayout>
-            <template #header>
-                <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                    Dashboard
-                </h2>
-            </template>
-        </BreezeAuthenticatedLayout>
-    </div>
+    <Head title="Dashboard" />
+
+    <BreezeAuthenticatedLayout>
+      <template #header>
+        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+          Dashboard
+        </h2>
+      </template>
+    </BreezeAuthenticatedLayout>
+  </div>
 </template>
 
 <script>
@@ -28,8 +29,8 @@ export default {
       title: 'title',
       description: 'desc'
     })
-    function submit() {
-      form.post('/api/track/create')
+    function submit () {
+      form.post(`${process.env.MIX_API_SLUG}/track/create`)
     }
     return { form, submit }
   }

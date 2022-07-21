@@ -20218,9 +20218,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 calculatedStartingPosition = motion.pos + 5;
 
                 if (!choirMode.value && allPartialsAllDevices.value) {
-                  route = "/api/track/".concat(props.trackId, "/start_all/").concat(calculatedStartingPosition, "/").concat(props.performanceId);
+                  route = "".concat("/v1", "/track/").concat(props.trackId, "/start_all/").concat(calculatedStartingPosition, "/").concat(props.performanceId);
                 } else {
-                  route = "/api/track/".concat(props.trackId, "/start/").concat(calculatedStartingPosition, "/").concat(props.performanceId);
+                  route = "".concat("/v1", "/track/").concat(props.trackId, "/start/").concat(calculatedStartingPosition, "/").concat(props.performanceId);
                 }
 
                 console.log("Calculated starting position: ", calculatedStartingPosition);
@@ -20261,7 +20261,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
             switch (_context4.prev = _context4.next) {
               case 0:
                 _context4.next = 2;
-                return axios.get("/api/client/active/".concat(props.performanceId));
+                return axios.get("".concat("/v1", "/client/active/").concat(props.performanceId));
 
               case 2:
                 response = _context4.sent;
@@ -20364,7 +20364,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
                 client = _step2.value;
                 _context7.next = 7;
-                return axios.post("/api/client/delete/".concat(client.id));
+                return axios.post("".concat("/v1", "/client/delete/").concat(client.id));
 
               case 7:
                 response = _context7.sent;
@@ -20748,13 +20748,13 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return axios__WEBPACK_IMPORTED_MODULE_0___default().get("/v1/track");
+              return axios__WEBPACK_IMPORTED_MODULE_0___default().get("".concat("/v1", "/track"));
 
             case 2:
               trackResponse = _context.sent;
               tracks.value = trackResponse.data;
               _context.next = 6;
-              return axios__WEBPACK_IMPORTED_MODULE_0___default().get("/v1/performance/get_tracks/".concat(props.performance.id));
+              return axios__WEBPACK_IMPORTED_MODULE_0___default().get("".concat("/v1", "/performance/get_tracks/").concat(props.performance.id));
 
             case 6:
               performanceTrackResponse = _context.sent;
@@ -20776,7 +20776,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
     var save = function save() {
       mode.value = 'perform';
-      return axios__WEBPACK_IMPORTED_MODULE_0___default().post("/api/performance/add_tracks/".concat(props.performance.id), null, {
+      return axios__WEBPACK_IMPORTED_MODULE_0___default().post("".concat("/v1", "/performance/add_tracks/").concat(props.performance.id), null, {
         params: {
           tracks: performanceTracks.value.map(function (track) {
             return track.id;
@@ -20974,7 +20974,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
 
             case 9:
               _context.next = 11;
-              return axios.get("/api/".concat(routeCategory, "/columns"));
+              return axios.get("".concat("/v1", "/").concat(routeCategory, "/columns"));
 
             case 11:
               response = _context.sent;
@@ -21103,9 +21103,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       }
 
       if (addOrEdit === 'add') {
-        (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.useForm)(formattedForm).post("/api/".concat(routeCategory, "/create"));
+        (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.useForm)(formattedForm).post("".concat("/v1", "/").concat(routeCategory, "/create"));
       } else if (addOrEdit === 'edit') {
-        (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.useForm)(formattedForm).post("/api/".concat(routeCategory, "/edit/").concat(id));
+        (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.useForm)(formattedForm).post("".concat("/v1", "/").concat(routeCategory, "/edit/").concat(id));
       }
 
       oruga.notification.open({
@@ -21511,7 +21511,7 @@ __webpack_require__.r(__webpack_exports__);
     });
 
     function submit() {
-      form.post('/api/track/create');
+      form.post("".concat("/v1", "/track/create"));
     }
 
     return {
@@ -21562,9 +21562,15 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   setup: function setup(__props, _ref) {
     var expose = _ref.expose;
     expose();
-    var pathname = window.location.pathname.split('/').pop();
-    var routeCategory = '';
-    var id = pathname.split('/')[1];
+    var path = {
+      name: '',
+      id: ''
+    };
+    var pathSplit = window.location.pathname.split('/');
+    path.name = pathSplit[pathSplit.length - 2];
+    path.id = pathSplit[pathSplit.length - 1];
+    var category = '';
+    var id = path.id;
     var data = (0,vue__WEBPACK_IMPORTED_MODULE_2__.reactive)({});
     var selectedTrack = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)();
     var showPerformanceQRCode = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
@@ -21577,16 +21583,16 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           switch (_context.prev = _context.next) {
             case 0:
               // TODO: This switch is identical to the one in ListPage.vue. Find a smart way to handle this.
-              if (pathname.endsWith('tracks')) {
-                routeCategory = 'track';
-              } else if (pathname.endsWith('composers')) {
-                routeCategory = 'composer';
+              if (path.name === 'tracks') {
+                category = 'track';
+              } else if (path.name === 'composers') {
+                category = 'composer';
               } else {
-                routeCategory = 'performance';
+                category = 'performance';
               }
 
               _context.next = 3;
-              return axios.get("/api/v1/".concat(routeCategory, "/").concat(id));
+              return axios.get("".concat("/v1", "/").concat(category, "/").concat(path.id));
 
             case 3:
               response = _context.sent;
@@ -21628,8 +21634,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     };
 
     var __returned__ = {
-      pathname: pathname,
-      routeCategory: routeCategory,
+      path: path,
+      pathSplit: pathSplit,
+      category: category,
       id: id,
       data: data,
       selectedTrack: selectedTrack,
@@ -21725,7 +21732,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
               }
 
               _context.next = 4;
-              return axios.get("/v1/".concat(routeCategory, "/columns"));
+              return axios.get("".concat("/v1", "/").concat(routeCategory, "/columns"));
 
             case 4:
               response = _context.sent;
@@ -21752,7 +21759,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
           }
         }
       }, _callee);
-    }))); // Adds columns that are not present in the database
+    })));
+    console.log("/v1"); // Adds columns that are not present in the database
 
     function addAdditionColumns() {
       columnNames.value.push('Edit');
@@ -21822,7 +21830,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 }
 
                 _context3.next = 3;
-                return axios.post("/api/v1/".concat(routeCategory, "/delete/").concat(id));
+                return axios.post("".concat("/v1", "/").concat(routeCategory, "/delete/").concat(id));
 
               case 3:
                 columnData.value = columnData.value.filter(function (row) {
@@ -24018,8 +24026,9 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* TEXT */
       ), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("span", null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.data['updated_at']), 1
       /* TEXT */
-      )])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createVNode)($setup["Link"], {
-        href: _ctx.route("".concat(_ctx.category, ".edit"), {
+      )])]), $setup.category ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createBlock)($setup["Link"], {
+        key: 0,
+        href: _ctx.route("".concat($setup.category, ".edit"), {
           id: $setup.id
         })
       }, {
@@ -24031,7 +24040,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
 
       }, 8
       /* PROPS */
-      , ["href"])]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Track "), _ctx.category === 'tracks' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
+      , ["href"])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true)]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Track "), $setup.path.name === 'tracks' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, {
         key: 0
       }, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_9, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Left hand side "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_10, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_11, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.data['title']), 1
       /* TEXT */
@@ -24048,7 +24057,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       /* PROPS */
       , ["trackId", "ttsInstructions"])])], 64
       /* STABLE_FRAGMENT */
-      )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Composer "), _ctx.category === 'composers' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Left hand side "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.data['name']), 1
+      )) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Composer "), $setup.path.name === 'composers' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_15, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Left hand side "), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_16, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_17, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_18, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.data['name']), 1
       /* TEXT */
       ), $setup.data['is_active'] ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_19, "Active")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_20, "Inactive"))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_21, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.data['description']), 1
       /* TEXT */
@@ -24063,7 +24072,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
         "class": "py-4 text-center"
       }, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.data['website_url']), 9
       /* TEXT, PROPS */
-      , _hoisted_26)])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Performance "), _ctx.category === 'performances' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_29, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.data['location']), 1
+      , _hoisted_26)])])])) : (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)("v-if", true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createCommentVNode)(" Performance "), $setup.path.name === 'performances' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_27, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_28, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("p", _hoisted_29, (0,vue__WEBPACK_IMPORTED_MODULE_0__.toDisplayString)($setup.data['location']), 1
       /* TEXT */
       ), $setup.data['is_active'] ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_30, "Active")) : ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", _hoisted_31, "Inactive"))]), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("div", _hoisted_32, [(0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementVNode)("button", {
         onClick: _cache[0] || (_cache[0] = function ($event) {
@@ -24904,7 +24913,7 @@ __webpack_require__.r(__webpack_exports__);
 
 var ___CSS_LOADER_EXPORT___ = _node_modules_css_loader_dist_runtime_api_js__WEBPACK_IMPORTED_MODULE_0___default()(function(i){return i[1]});
 // Module
-___CSS_LOADER_EXPORT___.push([module.id, "\n.toast-notification {\n    margin: 0.5em 0;\n    text-align: center;\n    box-shadow: 0 1px 4px rgb(0 0 0 / 12%), 0 0 6px rgb(0 0 0 / 4%);\n    border-radius: 2em;\n    padding: 0.75em 1.5em;\n    pointer-events: auto;\n    color: rgba(0, 0, 0, 0.7);\n    background: #f0ead6;\n}\n", ""]);
+___CSS_LOADER_EXPORT___.push([module.id, "\n.toast-notification {\n  margin: 0.5em 0;\n  text-align: center;\n  box-shadow: 0 1px 4px rgb(0 0 0 / 12%), 0 0 6px rgb(0 0 0 / 4%);\n  border-radius: 2em;\n  padding: 0.75em 1.5em;\n  pointer-events: auto;\n  color: rgba(0, 0, 0, 0.7);\n  background: #f0ead6;\n}\n", ""]);
 // Exports
 /* harmony default export */ const __WEBPACK_DEFAULT_EXPORT__ = (___CSS_LOADER_EXPORT___);
 
