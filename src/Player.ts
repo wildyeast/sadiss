@@ -51,8 +51,9 @@ export default class Player {
     const oscNode = this.audioContext.createOscillator()
     oscNode.type = this.waveform
     oscNode.frequency.value = 0
-    oscNode.start(partial.startTime + timeToAddToStart)
-    oscNode.stop(partial.endTime + timeToAddToStart)
+    console.log(Number(partial.startTime), timeToAddToStart)
+    oscNode.start(Number(partial.startTime) + timeToAddToStart)
+    oscNode.stop(Number(partial.endTime) + timeToAddToStart)
     oscNode.onended = () => this.handleOscillatorEndedEvent(gainNode)
 
     const gainNode = this.audioContext.createGain()
@@ -63,7 +64,7 @@ export default class Player {
     gainNode.connect(this.audioContext.destination)
 
     for (const breakpoint of partial.breakpoints) {
-      const time = breakpoint.time + timeToAddToStart
+      const time = Number(breakpoint.time) + timeToAddToStart
       oscNode.frequency.setValueAtTime(breakpoint.freq, time)
       gainNode.gain.setValueAtTime(breakpoint.amp, time)
     }

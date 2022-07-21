@@ -8,7 +8,7 @@ const countdownTime = ref(-1)
 const deviceRegistrationId = ref(-1) // Only used in UI
 const hasCalibratedThisSession = ref(false)
 // const hostUrl = "http://sadiss.test.test/v1"
-const hostUrl = "https://sadiss.net/api/v1"
+const hostUrl = "https://sadiss.org/api/v1"
 let intervalId: number
 let initialTimingSrcIntervalId: number
 const isRegistered = ref(false)
@@ -21,7 +21,7 @@ let performanceId = 1
 let performances: { id: number }[]
 const player: Ref<Player> = ref(new Player())
 let print = ''
-let timingSrcPosition: number
+let timingSrcPosition: Ref<number> = ref(-1)
 let trackId = 1
 let ttsInstructions: null
 let ttsLanguage: string
@@ -81,7 +81,7 @@ const register = async () => {
   speechSynthesis.speak(initialUtterance)
 
   initialTimingSrcIntervalId = window.setInterval(() => {
-    timingSrcPosition = Number(motion.value.pos.toFixed(1))
+    timingSrcPosition.value = Number(motion.value.pos.toFixed(1))
   }, 10)
 
   // Pass over register function from this file to player
@@ -130,7 +130,6 @@ const checkForStart = async (token: string) => {
 
   const clientData = await response.json()
   if (clientData.client["start_time"]) {
-    // @ts-ignore: intervalId supposedly declared here. TODO: Fix this.
     window.clearInterval(intervalId)
     const startTimeFromServer = Number(clientData.client["start_time"])
     ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
@@ -154,13 +153,13 @@ const checkForStart = async (token: string) => {
     let prepareStarted = false
 
     window.clearInterval(initialTimingSrcIntervalId)
-    const intervalId = window.setInterval(() => {
-      timingSrcPosition = motion.value.pos
-      if (timingSrcPosition >= startTimeFromServer + 3) {
+    intervalId = window.setInterval(() => {
+      timingSrcPosition.value = motion.value.pos
+      if (timingSrcPosition.value >= startTimeFromServer + 3) {
         print += timingSrcPosition + '\n'
         console.log(timingSrcPosition)
         player.value.offset =
-          timingSrcPosition - player.value.audioContext.currentTime // Do not change!
+          timingSrcPosition.value - player.value.audioContext.currentTime // Do not change!
         // Prevent multiple calls of prepare()
         if (!prepareStarted) {
           start()
