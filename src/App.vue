@@ -7,8 +7,8 @@ const availableTracks: Ref<{ id: number, title: string }[]> = ref([])
 const countdownTime = ref(-1)
 const deviceRegistrationId = ref(-1) // Only used in UI
 const hasCalibratedThisSession = ref(false)
-const hostUrl = "http://sadiss.test.test/v1"
-// const hostUrl = "https://sadiss.net/v1"
+// const hostUrl = "http://sadiss.test.test/v1"
+const hostUrl = "https://sadiss.net/api/v1"
 let intervalId: number
 let initialTimingSrcIntervalId: number
 const isRegistered = ref(false)
@@ -260,34 +260,41 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
 </script>
 
 <template>
-  <div class="app" v-if="motionConnected">
+  <div class="app"
+       v-if="motionConnected">
     <!-- Only show if never registered this session and not currently registered -->
     <OutputLatencyCalibration v-if="player && !hasCalibratedThisSession && !isRegistered"
-      @calibrationFinished="calibrationFinished" :motion="motion" />
+                              @calibrationFinished="calibrationFinished"
+                              :motion="motion" />
 
     <!-- Register -->
-    <div id="register" class="md:w-1/2 w-11/12 p-4 flex flex-col justify-center items-center h-screen">
+    <div id="register"
+         class="md:w-1/2 w-11/12 p-4 flex flex-col justify-center items-center h-screen">
 
       <!-- Top -->
       <!-- Performance Id dropdown -->
-      <select v-if="!isRegistered && !player.playing" v-model="performanceId"
-        class="border p-2 rounded-full h-10 w-10 fixed top-5 right-5">
+      <select v-if="!isRegistered && !player.playing"
+              v-model="performanceId"
+              class="border p-2 rounded-full h-10 w-10 fixed top-5 right-5">
         <option v-for="performance of performances">{{ performance.id }}</option>
       </select>
       <!-- Current global time and other information -->
       <div class="fixed top-5 right-5">
         <p v-if="isRegistered">{{ timingSrcPosition }}</p>
-        <p v-if="countdownTime > 0" style="display: flex justify-content: center font-size: 50px">
+        <p v-if="countdownTime > 0"
+           style="display: flex justify-content: center font-size: 50px">
           {{ countdownTime }}
         </p>
         <p v-else-if="player && player.playing">Track currently playing.</p>
         <!-- <p v-else>Device not registered.</p> -->
-        <div v-html="print" style="margin-top: 1rem" />
+        <div v-html="print"
+             style="margin-top: 1rem" />
       </div>
 
       <!-- Center -->
-      <button @click="register" id="registerBtn"
-        class="border-2 p-2 mt-4 rounded-full h-28 w-28 transition-all duration-300">
+      <button @click="register"
+              id="registerBtn"
+              class="border-2 p-2 mt-4 rounded-full h-28 w-28 transition-all duration-300">
         <span v-if="!isRegistered">Register</span>
         <span v-else>{{ deviceRegistrationId }}</span>
       </button>
@@ -296,7 +303,7 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
     <!-- Play track locally -->
     <!-- Currently hidden - display: none -->
     <div style="display: flex flex-direction: column justify-content: center"
-      class="md:w-1/2 w-11/12 border b-white p-4">
+         class="md:w-1/2 w-11/12 border b-white p-4">
       <p>
         Select a track ID from the dropdown below and press Play to prepare the
         selected track. All partials will be played on this device. The ID
@@ -308,21 +315,27 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
       <div class="flex flex-row justify-between items-center py-4">
         <label>Select a track ID</label>
         <select v-model="trackId">
-          <option v-for="track of availableTracks" :key="track.id">
+          <option v-for="track of availableTracks"
+                  :key="track.id">
             {{ track.id }} - {{ track.title }}
           </option>
         </select>
-        <button v-if="player && !player.playing" @click="playLocally" class="border b-white p-2">
+        <button v-if="player && !player.playing"
+                @click="playLocally"
+                class="border b-white p-2">
           Play
         </button>
-        <button v-else @click="player?.stop" class="border b-white p-2">
+        <button v-else
+                @click="player?.stop"
+                class="border b-white p-2">
           Stop
         </button>
       </div>
     </div>
   </div>
   <!-- Loading Spinner while waiting for motion -->
-  <div v-else class="flex justify-center items-center h-screen">
+  <div v-else
+       class="flex justify-center items-center h-screen">
     <div class="lds-dual-ring" />
   </div>
 </template>
