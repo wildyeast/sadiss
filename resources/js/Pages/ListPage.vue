@@ -133,7 +133,7 @@ export default {
     }
 
     async function addData () {
-      const response = await axios.get(`/v1/${routeCategory}`)
+      const response = await axios.get(`${process.env.MIX_API_SLUG}/${routeCategory}`)
       for (const entry of response.data) {
         if (entry['description'] && entry['description'].length > 50) {
           entry['description'] = entry['description'].substring(0, 50) + '...'
