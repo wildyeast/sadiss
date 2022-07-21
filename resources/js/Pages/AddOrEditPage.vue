@@ -95,9 +95,21 @@ export default {
     let addOrEdit = ''
     const id = window.location.toString().split('=')[1] // TODO: $route is undefined, need to expose somehow?
     const loadingFinished = ref(false)
-    const pathname = window.location.pathname.replace('/', '')
-    const category = pathname.split('/')[0]
-    let title = formatPageTitle(pathname)
+    // const pathname = window.location.pathname.replace('/', '')
+    const pathDebug = '/api/v1/composers/add'
+
+    const path = {
+      name: '',
+      type: '' // Types are 'add' and 'edit'
+    }
+
+    const pathSplit = window.location.pathname.split('/')
+
+    path.name = pathSplit[pathSplit.length - 2]
+    path.type = pathSplit[pathSplit.length - 1]
+
+    const category = path.name
+    let title = formatPageTitle(path)
     const fields = reactive({})
     const form = reactive({})
     let routeCategory = ''
@@ -206,9 +218,8 @@ export default {
       return `${labelText[0].toUpperCase()}${labelText.slice(1)}`.replace('_', ' ')
     }
 
-    function formatPageTitle (pathname) {
-      addOrEdit = pathname.split('/')[1]
-      return `${addOrEdit[0].toUpperCase()}${addOrEdit.slice(1)} ${category[0].toUpperCase()}${category.slice(1, category.length - 1)}`
+    function formatPageTitle () {
+      return `${path.type[0].toUpperCase()}${path.type.slice(1)} ${path.name[0].toUpperCase()}${path.name.slice(1, path.name.length - 1)}`
     }
 
     return {

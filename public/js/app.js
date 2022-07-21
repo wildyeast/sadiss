@@ -20942,10 +20942,19 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     var addOrEdit = '';
     var id = window.location.toString().split('=')[1]; // TODO: $route is undefined, need to expose somehow?
 
-    var loadingFinished = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
-    var pathname = window.location.pathname.replace('/', '');
-    var category = pathname.split('/')[0];
-    var title = formatPageTitle(pathname);
+    var loadingFinished = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false); // const pathname = window.location.pathname.replace('/', '')
+
+    var pathDebug = '/api/v1/composers/add';
+    var path = {
+      name: '',
+      type: '' // Types are 'add' and 'edit'
+
+    };
+    var pathSplit = window.location.pathname.split('/');
+    path.name = pathSplit[pathSplit.length - 2];
+    path.type = pathSplit[pathSplit.length - 1];
+    var category = path.name;
+    var title = formatPageTitle(path);
     var fields = (0,vue__WEBPACK_IMPORTED_MODULE_2__.reactive)({});
     var form = (0,vue__WEBPACK_IMPORTED_MODULE_2__.reactive)({});
     var routeCategory = '';
@@ -21123,9 +21132,8 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       return "".concat(labelText[0].toUpperCase()).concat(labelText.slice(1)).replace('_', ' ');
     }
 
-    function formatPageTitle(pathname) {
-      addOrEdit = pathname.split('/')[1];
-      return "".concat(addOrEdit[0].toUpperCase()).concat(addOrEdit.slice(1), " ").concat(category[0].toUpperCase()).concat(category.slice(1, category.length - 1));
+    function formatPageTitle() {
+      return "".concat(path.type[0].toUpperCase()).concat(path.type.slice(1), " ").concat(path.name[0].toUpperCase()).concat(path.name.slice(1, path.name.length - 1));
     }
 
     return {
