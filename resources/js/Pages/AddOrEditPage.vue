@@ -147,7 +147,7 @@ export default {
     }
 
     async function getData (routeCategory) {
-      const response = await axios.get(`/api/${routeCategory}/${id}`)
+      const response = await axios.get(`${process.env.MIX_API_SLUG}/${routeCategory}/${id}`)
       for (const field of Object.keys(response.data)) {
         if (field === 'start_time' || field == 'end_time') {
           form[field] = formatDateForDatetimePicker(response.data[field])
