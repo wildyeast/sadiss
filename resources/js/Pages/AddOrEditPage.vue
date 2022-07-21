@@ -13,7 +13,7 @@
       </template>
       <div v-if="loadingFinished"
            class="flex flex-col items-center mt-2 px-2 py-8 bg-white border border-gray-200 shadow md:px-6 md:justify-center">
-        <div v-if="addOrEdit === 'edit'"
+        <div v-if="path.type === 'edit'"
              class="inline-block w-full mb-4 text-slate-400 text-xs md:w-1/2">
           <p v-for="field in Object.keys(fields).filter(field => !fields[field].editable)"
              :key="field">{{ field }}: {{ form[field] }}</p>
@@ -92,16 +92,13 @@ export default {
   setup () {
     const oruga = inject('oruga')
 
-    let addOrEdit = ''
     const id = window.location.toString().split('=')[1] // TODO: $route is undefined, need to expose somehow?
     const loadingFinished = ref(false)
-    // const pathname = window.location.pathname.replace('/', '')
-    const pathDebug = '/api/v1/composers/add'
 
-    const path = {
+    const path = reactive({
       name: '',
       type: '' // Types are 'add' and 'edit'
-    }
+    })
 
     const pathSplit = window.location.pathname.split('/')
 
@@ -136,7 +133,7 @@ export default {
         }
       }
 
-      if (addOrEdit == 'edit') {
+      if (path.type == 'edit') {
         await getData(routeCategory)
       }
 
@@ -198,9 +195,9 @@ export default {
           formattedForm[field] = form[field]
         }
       }
-      if (addOrEdit === 'add') {
+      if (path.type === 'add') {
         useForm(formattedForm).post(`${process.env.MIX_API_SLUG}/${routeCategory}/create`)
-      } else if (addOrEdit === 'edit') {
+      } else if (path.type === 'edit') {
         useForm(formattedForm).post(`${process.env.MIX_API_SLUG}/${routeCategory}/edit/${id}`)
       }
       oruga.notification.open({
@@ -223,7 +220,6 @@ export default {
     }
 
     return {
-      addOrEdit,
       fields,
       form,
       formatLabel,
@@ -234,6 +230,7 @@ export default {
       title,
       onPartialsFileInput,
       onTtsInstructionsFileInput,
+      path,
       submit,
     }
   }

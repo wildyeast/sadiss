@@ -20939,17 +20939,14 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
   },
   setup: function setup() {
     var oruga = (0,vue__WEBPACK_IMPORTED_MODULE_2__.inject)('oruga');
-    var addOrEdit = '';
     var id = window.location.toString().split('=')[1]; // TODO: $route is undefined, need to expose somehow?
 
-    var loadingFinished = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false); // const pathname = window.location.pathname.replace('/', '')
-
-    var pathDebug = '/api/v1/composers/add';
-    var path = {
+    var loadingFinished = (0,vue__WEBPACK_IMPORTED_MODULE_2__.ref)(false);
+    var path = (0,vue__WEBPACK_IMPORTED_MODULE_2__.reactive)({
       name: '',
       type: '' // Types are 'add' and 'edit'
 
-    };
+    });
     var pathSplit = window.location.pathname.split('/');
     path.name = pathSplit[pathSplit.length - 2];
     path.type = pathSplit[pathSplit.length - 1];
@@ -21003,7 +21000,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
                 _iterator.f();
               }
 
-              if (!(addOrEdit == 'edit')) {
+              if (!(path.type == 'edit')) {
                 _context.next = 17;
                 break;
               }
@@ -21111,9 +21108,9 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
         }
       }
 
-      if (addOrEdit === 'add') {
+      if (path.type === 'add') {
         (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.useForm)(formattedForm).post("".concat("/v1", "/").concat(routeCategory, "/create"));
-      } else if (addOrEdit === 'edit') {
+      } else if (path.type === 'edit') {
         (0,_inertiajs_inertia_vue3__WEBPACK_IMPORTED_MODULE_1__.useForm)(formattedForm).post("".concat("/v1", "/").concat(routeCategory, "/edit/").concat(id));
       }
 
@@ -21137,7 +21134,6 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
     }
 
     return {
-      addOrEdit: addOrEdit,
       fields: fields,
       form: form,
       formatLabel: formatLabel,
@@ -21148,6 +21144,7 @@ function _asyncToGenerator(fn) { return function () { var self = this, args = ar
       title: title,
       onPartialsFileInput: onPartialsFileInput,
       onTtsInstructionsFileInput: onTtsInstructionsFileInput,
+      path: path,
       submit: submit
     };
   }
@@ -23084,7 +23081,7 @@ function render(_ctx, _cache, $props, $setup, $data, $options) {
       )])];
     }),
     "default": (0,vue__WEBPACK_IMPORTED_MODULE_0__.withCtx)(function () {
-      return [$setup.loadingFinished ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [$setup.addOrEdit === 'edit' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(Object.keys($setup.fields).filter(function (field) {
+      return [$setup.loadingFinished ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_3, [$setup.path.type === 'edit' ? ((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("div", _hoisted_4, [((0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(true), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)(vue__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,vue__WEBPACK_IMPORTED_MODULE_0__.renderList)(Object.keys($setup.fields).filter(function (field) {
         return !$setup.fields[field].editable;
       }), function (field) {
         return (0,vue__WEBPACK_IMPORTED_MODULE_0__.openBlock)(), (0,vue__WEBPACK_IMPORTED_MODULE_0__.createElementBlock)("p", {
