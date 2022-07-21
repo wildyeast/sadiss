@@ -156,7 +156,7 @@ const checkForStart = async (token: string) => {
     intervalId = window.setInterval(() => {
       timingSrcPosition.value = motion.value.pos
       if (timingSrcPosition.value >= startTimeFromServer + 3) {
-        print += timingSrcPosition + '\n'
+        print += timingSrcPosition.value + '\n'
         console.log(timingSrcPosition)
         player.value.offset =
           timingSrcPosition.value - player.value.audioContext.currentTime // Do not change!
