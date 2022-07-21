@@ -65,14 +65,14 @@ const finishCalibration = () => {
 
 <template>
   <div class="h-screen flex flex-col justify-center items-center">
-    <button v-if="!calibrating" @click="startCalibration">Start calibration</button>
+    <button v-if="!calibrating" @click="startCalibration" data-test="btn--start-calibration">Start calibration</button>
     <div v-else class="flex flex-col justify-center items-center">
       <span class="text-5xl mb-4">{{ calibratedLatency.toFixed(2) }}</span>
       <div class="flex justify-between w-full">
-        <button class="border h-10 w-10" @mousedown="handleMousedown(-0.01)" @mouseup="userHoldingButton
-        = false">&lt;</button>
+        <button class="border h-10 w-10" @mousedown="handleMousedown(-0.01)" @mouseup="userHoldingButton = false"
+          data-test="btn--increase-calibratedLatency">&lt;</button>
         <button class="border h-10 w-10" @mousedown="handleMousedown(0.01)" @mouseup="userHoldingButton
-        = false">&gt;</button>
+        = false" data-test="btn--decrease-calibratedLatency">&gt;</button>
       </div>
       <button class="mt-4 border p-4" @click="finishCalibration">Finish calibration</button>
     </div>
