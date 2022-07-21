@@ -302,7 +302,7 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
 
     <!-- Play track locally -->
     <!-- Currently hidden - display: none -->
-    <div style="display: flex flex-direction: column justify-content: center"
+    <div style="display: flex; flex-direction: column; justify-content: center; display:none;"
          class="md:w-1/2 w-11/12 border b-white p-4">
       <p>
         Select a track ID from the dropdown below and press Play to prepare the
