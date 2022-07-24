@@ -22,7 +22,7 @@ let performances: { id: number }[]
 const player: Ref<Player> = ref(new Player())
 let print = ''
 let timingSrcPosition: Ref<number> = ref(-1)
-let trackId = 1
+let trackId = ref(1)
 let ttsInstructions: null
 let ttsLanguage: string
 
@@ -75,6 +75,9 @@ const register = async () => {
     alert("Select a performance id.")
     return
   }
+
+  // Resume audioCtx for iOS
+  player.value.audioContext.resume()
 
   // Synthesize voice (with volume set to 0) on registration to make TTS work on iOS
   const initialUtterance = new SpeechSynthesisUtterance('You are currentGlobalTimeInCtxTime registered.')
@@ -241,7 +244,10 @@ const blink = () => {
 }
 
 const playLocally = async () => {
-  const partialData = await fetch(`${hostUrl}/track/${trackId}`)
+  // Resume audioCtx for iOS
+  player.value.audioContext.resume()
+
+  const partialData = await fetch(`${hostUrl}/track/${trackId.value}`)
     .then(res => res.json())
     .then(data => JSON.parse(data.partials))
   player.value.setup(partialData, 0, 0, outputLatencyFromLocalStorage)
