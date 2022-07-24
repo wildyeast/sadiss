@@ -2,6 +2,7 @@
 import Player from "./Player"
 import OutputLatencyCalibration from './components/OutputLatencyCalibration.vue'
 import { onMounted, Ref, ref } from "vue"
+import { ChoirTtsInstructions, SequencerTtsInstructions } from "./types";
 
 const availableTracks: Ref<{ id: number, title: string }[]> = ref([])
 const countdownTime = ref(-1)
@@ -138,6 +139,7 @@ const checkForStart = async (token: string) => {
     const startTimeFromServer = Number(clientData.client["start_time"])
     ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
     ttsLanguage = clientData.client["tts_language"]
+
     const wf = clientData.client["waveform"]
     if (wf) {
       if (['sine', 'sawtooth', 'square', 'triangle'].includes(wf)) {
@@ -193,23 +195,15 @@ const start = async () => {
   if (ttsInstructions && ttsLanguage) {
     const ttsTimestamps = Object.keys(ttsInstructions)
 
-    let nextTimestamp = ttsTimestamps.shift()
+    let nextTimestamp = Number(ttsTimestamps.shift())
     if (!nextTimestamp) return
 
     let nextUtterance: SpeechSynthesisUtterance | null
 
-    // TODO: Below is repeated once in the interval below. Refactor this!
     if (partialIdToRegisterWith !== null) {
-      if (ttsInstructions[nextTimestamp][partialIdToRegisterWith]
-        && ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage]) {
-        nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
-        nextUtterance.lang = ttsLanguage
-      }
+      nextUtterance = createChoirUtterance(ttsInstructions, nextTimestamp, ttsLanguage, partialIdToRegisterWith)
     } else {
-      if (ttsInstructions[nextTimestamp][ttsLanguage]) {
-        nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
-        nextUtterance.lang = ttsLanguage
-      }
+      nextUtterance = createSequencerUtterance(ttsInstructions, nextTimestamp, ttsLanguage)
     }
 
     const speechIntervalId = window.setInterval(() => {
@@ -219,19 +213,12 @@ const start = async () => {
           nextUtterance = null
         }
         if (ttsInstructions && ttsTimestamps.length) {
-          nextTimestamp = ttsTimestamps.shift()
+          nextTimestamp = Number(ttsTimestamps.shift())
           if (!nextTimestamp) return
           if (partialIdToRegisterWith !== null) {
-            if (ttsInstructions[nextTimestamp][partialIdToRegisterWith]
-              && ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage]) {
-              nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
-              nextUtterance.lang = ttsLanguage
-            }
+            nextUtterance = createChoirUtterance(ttsInstructions, nextTimestamp, ttsLanguage, partialIdToRegisterWith)
           } else {
-            if (ttsInstructions[nextTimestamp][ttsLanguage]) {
-              nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
-              nextUtterance.lang = ttsLanguage
-            }
+            nextUtterance = createSequencerUtterance(ttsInstructions, nextTimestamp, ttsLanguage)
           }
         } else {
           window.clearInterval(speechIntervalId)
@@ -241,6 +228,29 @@ const start = async () => {
   }
 
   /* END OF TEXT TO SPEECH */
+}
+
+const createSequencerUtterance = (ttsInstructions: SequencerTtsInstructions, nextTimestamp: number, ttsLanguage: string): SpeechSynthesisUtterance | null => {
+  console.log('Creating sequencer utterance.')
+  let utterance: SpeechSynthesisUtterance | null = null;
+  if (ttsInstructions[nextTimestamp][ttsLanguage]) {
+    console.log("TTS: ", ttsInstructions, nextTimestamp, partialIdToRegisterWith, ttsLanguage)
+    utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
+    utterance.lang = ttsLanguage
+  }
+  return utterance
+}
+
+const createChoirUtterance = (ttsInstructions: ChoirTtsInstructions, nextTimestamp: number, ttsLanguage: string, partialIdToRegisterWith: number): SpeechSynthesisUtterance | null => {
+  console.log('Creating choir utterance.')
+  let utterance: SpeechSynthesisUtterance | null = null;
+  if (ttsInstructions[nextTimestamp][partialIdToRegisterWith]
+    && ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage]) {
+    console.log("TTS: ", ttsInstructions, nextTimestamp, partialIdToRegisterWith, ttsLanguage)
+    utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
+    utterance.lang = ttsLanguage
+  }
+  return utterance
 }
 
 const calibrationFinished = (calibratedLatency: number) => {
