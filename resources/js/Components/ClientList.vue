@@ -232,7 +232,7 @@ function startCalibration () {
     <p>IDs of registered clients (Total: {{ registeredClients.length }})</p>
     <div v-for="client of registeredClients"
          :key="client.id">
-      {{ client.id }}
+      {{ client.id }} <span v-if="client.partial_id">(Partial-Id: {{ client.partial_id }})</span>
     </div>
   </div>
 </template>
