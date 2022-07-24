@@ -196,26 +196,43 @@ const start = async () => {
     let nextTimestamp = ttsTimestamps.shift()
     if (!nextTimestamp) return
 
-    let nextUtterance: SpeechSynthesisUtterance
-    if (partialIdToRegisterWith) {
-      nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
+    let nextUtterance: SpeechSynthesisUtterance | null
+
+    // TODO: Below is repeated once in the interval below. Refactor this!
+    if (partialIdToRegisterWith !== null) {
+      if (ttsInstructions[nextTimestamp][partialIdToRegisterWith]
+        && ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage]) {
+        nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
+        nextUtterance.lang = ttsLanguage
+      }
     } else {
-      nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
+      if (ttsInstructions[nextTimestamp][ttsLanguage]) {
+        nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
+        nextUtterance.lang = ttsLanguage
+      }
     }
-    nextUtterance.lang = ttsLanguage
 
     const speechIntervalId = window.setInterval(() => {
       if (motion.value.pos - player.value.offset >= currentGlobalTimeInCtxTime + Number(nextTimestamp) + startInSec) {
-        speechSynthesis.speak(nextUtterance)
+        if (nextUtterance) {
+          speechSynthesis.speak(nextUtterance)
+          nextUtterance = null
+        }
         if (ttsInstructions && ttsTimestamps.length) {
           nextTimestamp = ttsTimestamps.shift()
           if (!nextTimestamp) return
-          if (partialIdToRegisterWith) {
-            nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
+          if (partialIdToRegisterWith !== null) {
+            if (ttsInstructions[nextTimestamp][partialIdToRegisterWith]
+              && ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage]) {
+              nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
+              nextUtterance.lang = ttsLanguage
+            }
           } else {
-            nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
+            if (ttsInstructions[nextTimestamp][ttsLanguage]) {
+              nextUtterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
+              nextUtterance.lang = ttsLanguage
+            }
           }
-          nextUtterance.lang = ttsLanguage
         } else {
           window.clearInterval(speechIntervalId)
         }
