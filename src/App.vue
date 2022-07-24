@@ -31,18 +31,19 @@ onMounted(async () => {
   const performanceResponse = await fetch(hostUrl + '/performance')
   performances = await performanceResponse.json()
 
-  initializeMCorp()
-
-  // Fetch tracks
-  const res = await fetch(hostUrl + '/track')
-  availableTracks.value = await res.json()
-
   // Get URL parameters and set performanceId and partialId if present
   const params = new URLSearchParams(window.location.search)
   if (performances.map(p => p.id).includes(Number(params.get('id')))) {
     performanceId = Number(params.get('id'))
   }
   partialIdToRegisterWith = Number(params.get('partial_id'))
+
+  initializeMCorp()
+
+  // Fetch tracks
+  const res = await fetch(hostUrl + '/track')
+  availableTracks.value = await res.json()
+
 
   // Try to get previously set output latency from local storage
   outputLatencyFromLocalStorage = Number(localStorage.getItem("outputLatency"))
