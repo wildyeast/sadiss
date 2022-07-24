@@ -7,7 +7,7 @@ const availableTracks: Ref<{ id: number, title: string }[]> = ref([])
 const countdownTime = ref(-1)
 const deviceRegistrationId = ref(-1) // Only used in UI
 const hasCalibratedThisSession = ref(false)
-// const hostUrl = "http://sadiss.test.test/v1"
+// const hostUrl = "http://sadiss.test/v1"
 const hostUrl = "https://sadiss.org/api/v1"
 let intervalId: number
 let initialTimingSrcIntervalId: number
