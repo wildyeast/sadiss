@@ -26,7 +26,7 @@ class TrackController extends Controller
     $track = new Track;
     $track->title = $request->title;
     $track->description = $request->description;
-    if (!isNull($request->file('tts_instructions'))) {
+    if ($request->hasFile('tts_instructions')) {
       $tts_instructions = file_get_contents($request->file('tts_instructions')->getRealPath());
       $track->tts_instructions = $tts_instructions;
     }
