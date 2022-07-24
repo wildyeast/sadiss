@@ -37,7 +37,9 @@ onMounted(async () => {
   if (performances.map(p => p.id).includes(Number(params.get('id')))) {
     performanceId = Number(params.get('id'))
   }
-  partialIdToRegisterWith = Number(params.get('partial_id'))
+  if (params.get('partial_id')) {
+    partialIdToRegisterWith = Number(params.get('partial_id'))
+  }
 
   initializeMCorp()
 
@@ -193,14 +195,16 @@ const start = async () => {
 
   /* TEXT TO SPEECH */
   if (ttsInstructions && ttsLanguage) {
-    const ttsTimestamps = Object.keys(ttsInstructions)
+    const ttsTimestamps = Object.keys(ttsInstructions).map(timestamp => Number(timestamp))
 
-    let nextTimestamp = Number(ttsTimestamps.shift())
-    if (!nextTimestamp) return
+    let nextTimestamp = ttsTimestamps.shift()
+
+    // === undefined needed since it can be 0
+    if (!(typeof nextTimestamp === 'number')) return
 
     let nextUtterance: SpeechSynthesisUtterance | null
 
-    if (partialIdToRegisterWith !== null) {
+    if (typeof partialIdToRegisterWith === 'number') {
       nextUtterance = createChoirUtterance(ttsInstructions, nextTimestamp, ttsLanguage, partialIdToRegisterWith)
     } else {
       nextUtterance = createSequencerUtterance(ttsInstructions, nextTimestamp, ttsLanguage)
@@ -215,7 +219,7 @@ const start = async () => {
         if (ttsInstructions && ttsTimestamps.length) {
           nextTimestamp = Number(ttsTimestamps.shift())
           if (!nextTimestamp) return
-          if (partialIdToRegisterWith !== null) {
+          if (typeof partialIdToRegisterWith === 'number') {
             nextUtterance = createChoirUtterance(ttsInstructions, nextTimestamp, ttsLanguage, partialIdToRegisterWith)
           } else {
             nextUtterance = createSequencerUtterance(ttsInstructions, nextTimestamp, ttsLanguage)
@@ -234,7 +238,6 @@ const createSequencerUtterance = (ttsInstructions: SequencerTtsInstructions, nex
   console.log('Creating sequencer utterance.')
   let utterance: SpeechSynthesisUtterance | null = null;
   if (ttsInstructions[nextTimestamp][ttsLanguage]) {
-    console.log("TTS: ", ttsInstructions, nextTimestamp, partialIdToRegisterWith, ttsLanguage)
     utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
     utterance.lang = ttsLanguage
   }
@@ -246,7 +249,6 @@ const createChoirUtterance = (ttsInstructions: ChoirTtsInstructions, nextTimesta
   let utterance: SpeechSynthesisUtterance | null = null;
   if (ttsInstructions[nextTimestamp][partialIdToRegisterWith]
     && ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage]) {
-    console.log("TTS: ", ttsInstructions, nextTimestamp, partialIdToRegisterWith, ttsLanguage)
     utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
     utterance.lang = ttsLanguage
   }
