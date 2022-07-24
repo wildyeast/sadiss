@@ -12,6 +12,8 @@ use Response;
 use App\Providers\TrackStarted;
 use Illuminate\Support\Facades\Event;
 
+use function PHPUnit\Framework\isNull;
+
 class TrackController extends Controller
 {
   public function create(Request $request)
@@ -21,26 +23,30 @@ class TrackController extends Controller
     }
     $sourcefile = file_get_contents($request->file('sourcefile')->getRealPath());
     $converted = $this->convert_source_file($sourcefile);
-    $tts_instructions = file_get_contents($request->file('tts_instructions')->getRealPath());
     $track = new Track;
     $track->title = $request->title;
     $track->description = $request->description;
+    if (!isNull($request->file('tts_instructions'))) {
+      $tts_instructions = file_get_contents($request->file('tts_instructions')->getRealPath());
+      $track->tts_instructions = $tts_instructions;
+    }
     $track->partials = $converted;
-    $track->tts_instructions = $tts_instructions;
     $track->save();
     return back()->with('flash', [
-        'message' => 'success',
+      'message' => 'success',
     ]);
   }
 
-  public function delete(Request $request, $id) {
+  public function delete(Request $request, $id)
+  {
     Track::where('id', $id)->delete();
     return back()->with('flash', [
       'message' => 'success',
     ]);
   }
 
-  public function edit(Request $request, $id) {
+  public function edit(Request $request, $id)
+  {
     $track = Track::where('id', $id)->firstOrFail();
     $track->title = $request->title;
     $track->description = $request->description;
@@ -55,19 +61,22 @@ class TrackController extends Controller
     ]);
   }
 
-  public function get(Request $request, $id=null) {
+  public function get(Request $request, $id = null)
+  {
     if (isset($id)) {
       return Track::where('id', $id)->firstOrFail();
     }
     return Track::orderBy('id', 'desc')->get();
   }
 
-  public function get_column_info (Request $request) {
-    $columns = DB::select( DB::raw('SHOW COLUMNS FROM tracks'));
+  public function get_column_info(Request $request)
+  {
+    $columns = DB::select(DB::raw('SHOW COLUMNS FROM tracks'));
     return $columns;
   }
 
-  public function start_track (Request $request, $id, $startTime, $performance_id=null) {
+  public function start_track(Request $request, $id, $startTime, $performance_id = null)
+  {
     $clients = null;
     if (isset($performance_id)) {
       $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request, $performance_id);
@@ -93,13 +102,13 @@ class TrackController extends Controller
       } else {
         // If overlap is set, duplicate partials $partial_overlap times
         for ($i = 1; $i < $partial_overlap; $i++) {
-          $partials = array_merge($partials, $unique_partials); 
-        } 
+          $partials = array_merge($partials, $unique_partials);
+        }
       }
 
       // Array of chunk arrays, same length as registered clients array.
       $chunks = array_fill(0, count($clients), []);
-  
+
       // Distribute partials between chunks.
       // In conjuction with partial duplication above, this guarantees that all partials are played equally often.
       // Not all clients get the same amount of partials though.
@@ -111,8 +120,8 @@ class TrackController extends Controller
           $counter = 0;
         }
       }
-  
-      foreach($clients as $i=>$value) {
+
+      foreach ($clients as $i => $value) {
         $client = Client::where('id', $value->id)->firstOrFail();
         $client->partials = $this->arrange_partials($chunks[$i]);
         $client->start_time = $startTime;
@@ -121,10 +130,9 @@ class TrackController extends Controller
         $client->waveform = $waveform;
         $client->save();
       }
-    }
-    else {
+    } else {
       // Choir mode
-      foreach($clients as $i=>$value) {
+      foreach ($clients as $i => $value) {
         $client = Client::where('id', $value->id)->firstOrFail();
         $client->partials = array(0 => $partials[$value->partial_id]);
         $client->start_time = $startTime;
@@ -140,7 +148,8 @@ class TrackController extends Controller
   }
 
   // Used for sending all partials to all clients
-  public function start_track_all_partials (Request $request, $id, $startTime, $performance_id=null) {
+  public function start_track_all_partials(Request $request, $id, $startTime, $performance_id = null)
+  {
     $clients = null;
     if (isset($performance_id)) {
       $clients = app('App\Http\Controllers\ClientController')->get_active_clients_delete_others($request, $performance_id);
@@ -153,7 +162,7 @@ class TrackController extends Controller
     $tts_language = $request->query->get('tts_language');
     $waveform = $request->query->get('waveform');
 
-    foreach($clients as $i=>$value) {
+    foreach ($clients as $i => $value) {
       $client = Client::where('id', $value->id)->firstOrFail();
       // $client->partials = $chunks[$i]; // Commented for debugging
       $client->partials = $partials;
@@ -167,11 +176,11 @@ class TrackController extends Controller
     return Response::json(['data' => $partials]);
   }
 
-  public function start_track_real (Request $request) {
+  public function start_track_real(Request $request)
+  {
     $data = "TestData";
 
     event(new TrackStarted($data));
-
   }
 
   /**
@@ -182,16 +191,17 @@ class TrackController extends Controller
    * @link http://www.php.net/manual/en/function.array-chunk.php#75022
    * https://stackoverflow.com/a/15723262/16725862 is where I got this from
    */
-  function partition(Array $list, $p) {
+  function partition(array $list, $p)
+  {
     $listlen = count($list);
     $partlen = floor($listlen / $p);
     $partrem = $listlen % $p;
     $partition = array();
     $mark = 0;
-    for($px = 0; $px < $p; $px ++) {
-        $incr = ($px < $partrem) ? $partlen + 1 : $partlen;
-        $partition[$px] = array_slice($list, $mark, $incr);
-        $mark += $incr;
+    for ($px = 0; $px < $p; $px++) {
+      $incr = ($px < $partrem) ? $partlen + 1 : $partlen;
+      $partition[$px] = array_slice($list, $mark, $incr);
+      $mark += $incr;
     }
     return $partition;
   }
@@ -201,7 +211,7 @@ class TrackController extends Controller
     $partials = [];
     // Parse file line by line
     $partial =  [];
-    foreach(preg_split("/((\r?\n)|(\r\n?))/", $sourcefile) as $i=>$line){
+    foreach (preg_split("/((\r?\n)|(\r\n?))/", $sourcefile) as $i => $line) {
       if ($i < 4 || empty($line)) {
         continue;
       }

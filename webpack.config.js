@@ -6,6 +6,9 @@ module.exports = {
             '@': path.resolve('resources/js'),
         },
     },
+    output:{
+        publicPath: "/api"
+    },
     stats: {
       children: true
     },
