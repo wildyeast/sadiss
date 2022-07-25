@@ -7759,6 +7759,9 @@ select {
 .grid-cols-1 {
   grid-template-columns: repeat(1, minmax(0, 1fr));
 }
+.flex-row {
+  flex-direction: row;
+}
 .flex-col {
   flex-direction: column;
 }
@@ -7767,6 +7770,9 @@ select {
 }
 .items-center {
   align-items: center;
+}
+.justify-start {
+  justify-content: flex-start;
 }
 .justify-end {
   justify-content: flex-end;
@@ -7911,6 +7917,9 @@ select {
 .p-2 {
   padding: 0.5rem;
 }
+.p-1 {
+  padding: 0.25rem;
+}
 .px-4 {
   padding-left: 1rem;
   padding-right: 1rem;
@@ -7957,6 +7966,9 @@ select {
 }
 .pt-8 {
   padding-top: 2rem;
+}
+.pr-1 {
+  padding-right: 0.25rem;
 }
 .pt-1 {
   padding-top: 0.25rem;

@@ -90,6 +90,13 @@ class TrackController extends Controller
     $choir_mode = $request->query->get('choir_mode');
     $waveform = $request->query->get('waveform');
     $partial_overlap = $request->query->get('partial_overlap');
+    $number_of_simultaneous_voices = $request->query->get('number_of_simultaneous_voices');
+
+    /*
+    if ($number_of_simultaneous_voices) {
+      $partials = $this->arrange_partials($partials, $number_of_simultaneous_voices);
+    }
+    */
 
     if ($choir_mode == "false") {
       $unique_partials = $partials;
@@ -123,7 +130,11 @@ class TrackController extends Controller
 
       foreach ($clients as $i => $value) {
         $client = Client::where('id', $value->id)->firstOrFail();
-        $client->partials = $this->arrange_partials($chunks[$i]);
+        if ($number_of_simultaneous_voices) {
+          $client->partials = $this->arrange_partials($chunks[$i], $number_of_simultaneous_voices);
+        } else {
+          $client->partials = $chunks[$i];
+        }
         $client->start_time = $startTime;
         $client->tts_instructions = $tts_instructions;
         $client->tts_language = $tts_language;
@@ -240,22 +251,21 @@ class TrackController extends Controller
     return json_encode($partials);
   }
 
-  public function arrange_partials()
+  public function arrange_partials($partials, $max_oscillators)
   {
     $log = [];
 
-    $MAX_OSCILLATORS = 64;
-    $t = Track::where('id', 2)->first();
-    $partials = json_decode($t->partials);
+    //$t = Track::where('id', 2)->first();
+    //$partials = json_decode($t->partials);
 
     // Only arrange if partial number is larger than max oscillators
-    if (count($partials) <= $MAX_OSCILLATORS) {
+    if (count($partials) <= $max_oscillators) {
       return $partials;
     }
 
     // Initialize oscillators
     $oscillators = [];
-    for ($i = 0; $i < $MAX_OSCILLATORS; $i++) {
+    for ($i = 0; $i < $max_oscillators; $i++) {
       array_push($oscillators, [
         'index' => $i,
         'breakpoints' => []
@@ -267,30 +277,26 @@ class TrackController extends Controller
     foreach ($partials as $p) {
       if (empty($oscillators[$oscillator_index]['breakpoints'])) {
         $oscillators[$oscillator_index]['breakpoints'] = $p->breakpoints;
+        $oscillators[$oscillator_index]['startTime'] = $p->breakpoints[0]->time;
         array_push($log, 'init osc ' . $oscillator_index);
       } else {
         $breaktime = $p->breakpoints[0]->time;
         array_push($log, 'breaktime ' . $breaktime);
-        //dd($break_time);
-        // find oscillator 
         $new_breakpoints = [];
         foreach ($oscillators[$oscillator_index]['breakpoints'] as $bp) {
           if ($bp->time < $breaktime) {
             array_push($new_breakpoints, $bp);
           } else {
-          //dd($bp->time, $breaktime, $bp->time > $breaktime);
             array_push($new_breakpoints, ...$p->breakpoints);
             array_push($log, $new_breakpoints);
-            //dd($p->breakpoints);
             continue;
           }
         }
+        $oscillators[$oscillator_index]['endTime'] = end($p->breakpoints)->time;
         $oscillators[$oscillator_index]['breakpoints'] = $new_breakpoints;
-        // dd($oscillators[$oscillator_index]['breakpoints']);
       }
-      $oscillator_index = ($oscillator_index + 1) % $MAX_OSCILLATORS;
+      $oscillator_index = ($oscillator_index + 1) % $max_oscillators;
     }
-    dd($log);
     return $oscillators;
   }
 }
