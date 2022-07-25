@@ -25,6 +25,7 @@ const ttsLanguages = computed(() => {
 })
 const waveform = ref('sine')
 const partialOverlap = ref()
+const numberOfSimultaniousVoices = ref()
 const calibrating = ref(false)
 let beepIntervalId = null;
 
@@ -89,7 +90,8 @@ async function startTrack () {
         tts_language: ttsLanguage.value,
         choir_mode: choirMode.value,
         waveform: waveform.value,
-        partial_overlap: partialOverlap.value
+        partial_overlap: partialOverlap.value,
+        number_of_simultanious_voices: numberOfSimultaniousVoices.value
       }
     }
   )
@@ -209,6 +211,8 @@ function startCalibration () {
       <input type="text"
              placeholder="Overlap"
              v-model="partialOverlap">
+      <input type="number"
+             v-model="numberOfSimultaniousVoices">
       <div class="flex flex-col ">
         <div>
           <button @click="getRegisteredClients"
