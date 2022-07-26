@@ -83,9 +83,7 @@ async function startTrack () {
 
   console.log("Calculated starting position: ", calculatedStartingPosition)
   console.log('Choir mode:', choirMode.value)
-  console.log('nu', numberOfSimultaneousVoices.value, 'ispo', isPoliphonyLimited.value)
   const number_of_simultaneous_voices = isPoliphonyLimited.value ? numberOfSimultaneousVoices.value : 0
-  console.log('NSV', number_of_simultaneous_voices)
   const response = await axios.post(
     route,
     null,
