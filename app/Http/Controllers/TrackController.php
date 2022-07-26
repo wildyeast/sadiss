@@ -69,6 +69,26 @@ class TrackController extends Controller
     return Track::orderBy('id', 'desc')->get();
   }
 
+  private function format_for_list($t) {
+    return [
+      'id' => $t->id,
+      'created_at' => $t->created_at,
+      'title' => $t->title,
+      'description' => $t->description,
+      'partials' => isset($t->partials),
+      'tts_instructions' => isset($t->tts_instructions)
+    ];
+  }
+
+  public function getForList(Request $request, $id = null)
+  {
+    if (isset($id)) {
+      return $this->format_for_list(Track::where('id', $id)->firstOrFail());
+    }
+    return Track::orderBy('id', 'desc')->get()->map(fn($t) => $this->format_for_list($t));
+  }
+
+
   public function get_column_info(Request $request)
   {
     $columns = DB::select(DB::raw('SHOW COLUMNS FROM tracks'));

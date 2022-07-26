@@ -61,7 +61,18 @@ class PerformanceController extends Controller
 
     public function get_tracks (Request $request) {
       $performance = Performance::find($request->id);
-      $tracks = $performance->tracks()->get();
+      $tracks = $performance->tracks()->get()->map(fn($t) => $this->format_track_for_list($t));
       return $tracks;
+    }
+
+    private function format_track_for_list($t) {
+      return [
+        'id' => $t->id,
+        'created_at' => $t->created_at,
+        'title' => $t->title,
+        'description' => $t->description,
+        'partials' => isset($t->partials),
+        'tts_instructions' => isset($t->tts_instructions)
+      ];
     }
 }
