@@ -78,4 +78,6 @@ Route::group(['excluded_middleware' => 'throttle:api'], function () {
   Route::get('/client/{token}', [ClientController::class, 'get_by_token'])
     ->name('client.get_by_token');
   Route::get('/client', [ClientController::class, 'get']);
+
+  Route::get('/arrange', [TrackController::class, 'arrange_partials']);
 });

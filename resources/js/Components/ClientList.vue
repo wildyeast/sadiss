@@ -25,6 +25,8 @@ const ttsLanguages = computed(() => {
 })
 const waveform = ref('sine')
 const partialOverlap = ref()
+const isPoliphonyLimited = ref(true)
+const numberOfSimultaneousVoices = ref(8)
 const calibrating = ref(false)
 let beepIntervalId = null;
 
@@ -81,6 +83,9 @@ async function startTrack () {
 
   console.log("Calculated starting position: ", calculatedStartingPosition)
   console.log('Choir mode:', choirMode.value)
+  console.log('nu', numberOfSimultaneousVoices.value, 'ispo', isPoliphonyLimited.value)
+  const number_of_simultaneous_voices = isPoliphonyLimited.value ? numberOfSimultaneousVoices.value : 0
+  console.log('NSV', number_of_simultaneous_voices)
   const response = await axios.post(
     route,
     null,
@@ -89,7 +94,8 @@ async function startTrack () {
         tts_language: ttsLanguage.value,
         choir_mode: choirMode.value,
         waveform: waveform.value,
-        partial_overlap: partialOverlap.value
+        partial_overlap: partialOverlap.value,
+        number_of_simultaneous_voices
       }
     }
   )
@@ -209,7 +215,6 @@ function startCalibration () {
       <input type="text"
              placeholder="Overlap"
              v-model="partialOverlap">
-      <div class="flex flex-col ">
         <div>
           <button @click="getRegisteredClients"
                   class="border p-2"
@@ -226,6 +231,18 @@ function startCalibration () {
                 class="border p-2">
           Remove all registered clients
         </button>
+      </div>
+      <div class="py-2 h-16 flex flex-row items-center justify-start">
+        <input id="limit" type="checkbox" v-model="isPoliphonyLimited"> 
+        <label for="limit" class="p-1 ml-1">
+          Limit polyphony
+        </label>
+        <label v-if="isPoliphonyLimited" for="maxVoices" class="pr-1">
+          to max. simultaneous voices:
+        </label>
+        <input id="maxVoices" v-if="isPoliphonyLimited" type="number"
+              v-model="numberOfSimultaneousVoices">
+        <div class="flex flex-col ">
       </div>
     </div>
     <button @click="startCalibration">{{ calibrating ? 'Stop' : 'Start' }} calibration beep</button>

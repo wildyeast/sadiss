@@ -90,6 +90,13 @@ class TrackController extends Controller
     $choir_mode = $request->query->get('choir_mode');
     $waveform = $request->query->get('waveform');
     $partial_overlap = $request->query->get('partial_overlap');
+    $number_of_simultaneous_voices = $request->query->get('number_of_simultaneous_voices');
+
+    /*
+    if ($number_of_simultaneous_voices) {
+      $partials = $this->arrange_partials($partials, $number_of_simultaneous_voices);
+    }
+    */
 
     if ($choir_mode == "false") {
       $unique_partials = $partials;
@@ -123,7 +130,11 @@ class TrackController extends Controller
 
       foreach ($clients as $i => $value) {
         $client = Client::where('id', $value->id)->firstOrFail();
-        $client->partials = $chunks[$i];
+        if ($number_of_simultaneous_voices) {
+          $client->partials = $this->arrange_partials($chunks[$i], $number_of_simultaneous_voices);
+        } else {
+          $client->partials = $chunks[$i];
+        }
         $client->start_time = $startTime;
         $client->tts_instructions = $tts_instructions;
         $client->tts_language = $tts_language;
@@ -238,5 +249,60 @@ class TrackController extends Controller
       $partial = [];
     }
     return json_encode($partials);
+  }
+
+  public function arrange_partials($partials=false, $max_oscillators=4)
+  {
+
+    // This is useful for debugging, you can use the /arrange route :)
+    /*
+    if (!$partials) {
+      $t = Track::where('id', 8)->first();
+      $partials = json_decode($t->partials);
+    }
+    */
+
+    // Only arrange if partial number is larger than max oscillators
+    if (count($partials) <= $max_oscillators) {
+      return $partials;
+    }
+
+    // Initialize oscillators
+    $oscillators = [];
+    for ($i = 0; $i < $max_oscillators; $i++) {
+      array_push($oscillators, [
+        'index' => $i,
+        'breakpoints' => []
+      ]);
+    }
+
+    // Sort partials by start time
+    usort($partials, function($a, $b) {
+      return $a->startTime > $b->startTime;
+    });
+
+    // Arrange oscillators 
+    $oscillator_index = 0;
+    foreach ($partials as $p) {
+      if (empty($oscillators[$oscillator_index]['breakpoints'])) {
+        $oscillators[$oscillator_index]['breakpoints'] = $p->breakpoints;
+        $oscillators[$oscillator_index]['startTime'] = $p->breakpoints[0]->time;
+      } else {
+        $breaktime = $p->breakpoints[0]->time;
+        $new_breakpoints = [];
+        foreach ($oscillators[$oscillator_index]['breakpoints'] as $bp) {
+          if ($bp->time < $breaktime) {
+            array_push($new_breakpoints, $bp);
+          } else {
+            break;
+          }
+        }
+        array_push($new_breakpoints, ...$p->breakpoints);
+        $oscillators[$oscillator_index]['endTime'] = end($p->breakpoints)->time;
+        $oscillators[$oscillator_index]['breakpoints'] = $new_breakpoints;
+      }
+      $oscillator_index = ($oscillator_index + 1) % $max_oscillators;
+    }
+    return $oscillators;
   }
 }
