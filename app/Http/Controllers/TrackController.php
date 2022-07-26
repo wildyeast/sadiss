@@ -251,17 +251,16 @@ class TrackController extends Controller
     return json_encode($partials);
   }
 
-  public function arrange_partials($partials=false, $max_oscillators=1)
+  public function arrange_partials($partials=false, $max_oscillators=4)
   {
-    $log = [];
-      
 
-
+    // This is useful for debugging, you can use the /arrange route :)
+    /*
     if (!$partials) {
-      $t = Track::where('id', 7)->first();
-      $p = json_decode($t->partials);
+      $t = Track::where('id', 8)->first();
+      $partials = json_decode($t->partials);
     }
-
+    */
 
     // Only arrange if partial number is larger than max oscillators
     if (count($partials) <= $max_oscillators) {
@@ -282,27 +281,23 @@ class TrackController extends Controller
       return $a->startTime > $b->startTime;
     });
 
-
-    // Fake polyphony limit
+    // Arrange oscillators 
     $oscillator_index = 0;
     foreach ($partials as $p) {
       if (empty($oscillators[$oscillator_index]['breakpoints'])) {
         $oscillators[$oscillator_index]['breakpoints'] = $p->breakpoints;
         $oscillators[$oscillator_index]['startTime'] = $p->breakpoints[0]->time;
-        array_push($log, 'init osc ' . $oscillator_index);
       } else {
         $breaktime = $p->breakpoints[0]->time;
-        array_push($log, 'breaktime ' . $breaktime);
         $new_breakpoints = [];
         foreach ($oscillators[$oscillator_index]['breakpoints'] as $bp) {
           if ($bp->time < $breaktime) {
             array_push($new_breakpoints, $bp);
           } else {
-            array_push($new_breakpoints, ...$p->breakpoints);
-            array_push($log, $new_breakpoints);
             break;
           }
         }
+        array_push($new_breakpoints, ...$p->breakpoints);
         $oscillators[$oscillator_index]['endTime'] = end($p->breakpoints)->time;
         $oscillators[$oscillator_index]['breakpoints'] = $new_breakpoints;
       }
