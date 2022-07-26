@@ -13,7 +13,7 @@ const selectedTrack = ref()
 const loading = ref(true)
 
 onMounted(async () => {
-  const trackResponse = await axios.get(`${process.env.MIX_API_SLUG}/trackForList`)
+  const trackResponse = await axios.get(`${process.env.MIX_API_SLUG}/tracklist`)
   tracks.value = trackResponse.data
 
   const performanceTrackResponse = await axios.get(`${process.env.MIX_API_SLUG}/performance/get_tracks/${props.performance.id}`)
