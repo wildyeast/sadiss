@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('tracks', function (Blueprint $table) {
-            $table->string('tts_instuction_file_name');
+            $table->string('tts_instuctions_file_name');
             $table->string('partials_file_name');
             $table->boolean('is_choir')->default(false);
         });
@@ -28,7 +28,7 @@ return new class extends Migration
     public function down()
     {
         Schema::table('tracks', function (Blueprint $table) {
-            $table->dropColumn('tts_instructions');
+            $table->dropColumn('tts_instuctions_file_name');
             $table->dropColumn('partials_file_name');
             $table->dropColumn('is_choir');
         });
