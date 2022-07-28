@@ -137,6 +137,7 @@ const checkForStart = async (token: string) => {
 
   const clientData = await response.json()
   if (clientData.client["start_time"]) {
+    console.log('Client data: ', clientData)
     window.clearInterval(intervalId)
     const startTimeFromServer = Number(clientData.client["start_time"])
     ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
