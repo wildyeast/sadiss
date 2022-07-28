@@ -26,9 +26,12 @@ class TrackController extends Controller
     $track = new Track;
     $track->title = $request->title;
     $track->description = $request->description;
+    $track->partials_file_name = $request->partials_file_name;
+    $track->is_choir = $request->is_choir;
     if ($request->hasFile('tts_instructions')) {
       $tts_instructions = file_get_contents($request->file('tts_instructions')->getRealPath());
       $track->tts_instructions = $tts_instructions;
+      $track->tts_instructions_file_name = $request->tts_instructions_file_name;
     }
     $track->partials = $converted;
     $track->save();
@@ -69,7 +72,8 @@ class TrackController extends Controller
     return Track::orderBy('id', 'desc')->get();
   }
 
-  private function format_list($t) {
+  private function format_list($t)
+  {
     return [
       'id' => $t->id,
       'created_at' => $t->created_at,
@@ -85,7 +89,7 @@ class TrackController extends Controller
     if (isset($id)) {
       return $this->format_for_list(Track::where('id', $id)->firstOrFail());
     }
-    return Track::orderBy('id', 'desc')->get()->map(fn($t) => $this->format_list($t));
+    return Track::orderBy('id', 'desc')->get()->map(fn ($t) => $this->format_list($t));
   }
 
 
@@ -271,7 +275,7 @@ class TrackController extends Controller
     return json_encode($partials);
   }
 
-  public function arrange_partials($partials=false, $max_oscillators=4)
+  public function arrange_partials($partials = false, $max_oscillators = 4)
   {
 
     // This is useful for debugging, you can use the /arrange route :)
@@ -297,7 +301,7 @@ class TrackController extends Controller
     }
 
     // Sort partials by start time
-    usort($partials, function($a, $b) {
+    usort($partials, function ($a, $b) {
       return $a->startTime > $b->startTime;
     });
 

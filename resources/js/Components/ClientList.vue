@@ -17,6 +17,7 @@ let motion;
 const ttsLanguage = ref()
 const choirMode = ref(false)
 const ttsLanguages = computed(() => {
+  console.log('TTS instructions: ', props.ttsInstructions)
   if (choirMode.value) {
     return props.ttsInstructions ? Object.keys(props.ttsInstructions[0][0]) : null
   } else {
@@ -213,34 +214,41 @@ function startCalibration () {
       <input type="text"
              placeholder="Overlap"
              v-model="partialOverlap">
-        <div>
-          <button @click="getRegisteredClients"
-                  class="border p-2"
-                  :class="autoGetRegisteredClientsInterval ? 'border-b-green-400 border-l-green-400 border-t-green-400' : 'border'">
-            Refresh list
-          </button>
-          <button @click="autoGetRegisteredClients"
-                  class="border-b border-t border-r p-2"
-                  :class="autoGetRegisteredClientsInterval ? 'border-green-400' : 'border-b border-t border-r'">
-            Auto
-          </button>
-        </div>
-        <button @click="removeClients"
-                class="border p-2">
-          Remove all registered clients
+      <div>
+        <button @click="getRegisteredClients"
+                class="border p-2"
+                :class="autoGetRegisteredClientsInterval ? 'border-b-green-400 border-l-green-400 border-t-green-400' : 'border'">
+          Refresh list
+        </button>
+        <button @click="autoGetRegisteredClients"
+                class="border-b border-t border-r p-2"
+                :class="autoGetRegisteredClientsInterval ? 'border-green-400' : 'border-b border-t border-r'">
+          Auto
         </button>
       </div>
-      <div class="py-2 h-16 flex flex-row items-center justify-start">
-        <input id="limit" type="checkbox" v-model="isPoliphonyLimited"> 
-        <label for="limit" class="p-1 ml-1">
-          Limit polyphony
-        </label>
-        <label v-if="isPoliphonyLimited" for="maxVoices" class="pr-1">
-          to max. simultaneous voices:
-        </label>
-        <input id="maxVoices" v-if="isPoliphonyLimited" type="number"
-              v-model="numberOfSimultaneousVoices">
-        <div class="flex flex-col ">
+      <button @click="removeClients"
+              class="border p-2">
+        Remove all registered clients
+      </button>
+    </div>
+    <div class="py-2 h-16 flex flex-row items-center justify-start">
+      <input id="limit"
+             type="checkbox"
+             v-model="isPoliphonyLimited">
+      <label for="limit"
+             class="p-1 ml-1">
+        Limit polyphony
+      </label>
+      <label v-if="isPoliphonyLimited"
+             for="maxVoices"
+             class="pr-1">
+        to max. simultaneous voices:
+      </label>
+      <input id="maxVoices"
+             v-if="isPoliphonyLimited"
+             type="number"
+             v-model="numberOfSimultaneousVoices">
+      <div class="flex flex-col ">
       </div>
     </div>
     <button @click="startCalibration">{{ calibrating ? 'Stop' : 'Start' }} calibration beep</button>

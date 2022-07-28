@@ -7,13 +7,13 @@
               rounded-bulma-input-border-radius
               border-bulma-input-border
               hover:border-bulma-input-border-hover">
-    <label class="pb-6" for="sourcefile">
-        Upload a SPEAR partials file
+    <label class="pb-6"
+           for="sourcefile">
+      Upload a SPEAR partials file
     </label>
-        <input
-        type="file"
-        accept=".txt"
-        @input="this.$emit('fileInput', $event.target.files[0])" />
+    <input type="file"
+           accept=".txt"
+           @input="this.$emit('fileInput', $event.target)" />
   </div>
 </template>
 

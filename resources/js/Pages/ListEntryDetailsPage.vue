@@ -107,11 +107,6 @@ const generatePartialQRCodes = () => {
                 <Player :partialData="data['partials']" />
               </div>
             </div>
-            <!-- Below -->
-            <div>
-              <ClientList :trackId="id"
-                          :ttsInstructions="JSON.parse(data['tts_instructions'])" />
-            </div>
           </template>
           <!-- Composer -->
           <template v-if="path.name === 'composers'">

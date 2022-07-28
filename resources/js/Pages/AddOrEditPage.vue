@@ -42,7 +42,7 @@
                 </label>
                 <input type="file"
                        accept=".json"
-                       @input="onTtsInstructionsFileInput($event.target.files[0])" />
+                       @input="onTtsInstructionsFileInput($event.target)" />
               </div>
               <div v-else-if="fields[field].type === 'datetime'">
                 <o-datetimepicker placeholder="Click to select..."
@@ -176,11 +176,13 @@ export default {
       return new Date(d[2], d[1], d[0], d[3], d[4])
     }
 
-    function onPartialsFileInput (value) {
-      form['sourcefile'] = value
+    function onPartialsFileInput (eventTarget) {
+      form['partials_file_name'] = eventTarget.value.split('\\').reverse()[0]
+      form['sourcefile'] = eventTarget.files[0]
     }
-    function onTtsInstructionsFileInput (value) {
-      form['tts_instructions'] = value
+    function onTtsInstructionsFileInput (eventTarget) {
+      form['tts_instructions_file_name'] = eventTarget.value.split('\\').reverse()[0]
+      form['tts_instructions'] = eventTarget.files[0]
     }
 
     function submit () {
