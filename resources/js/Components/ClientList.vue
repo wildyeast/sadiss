@@ -4,7 +4,7 @@ import { computed, onMounted, reactive, ref } from "vue"
 import Button from "./Button.vue"
 import Player from "../Player.js"
 
-const props = defineProps(['trackId', 'ttsInstructions', 'performanceId'])
+const props = defineProps(['trackId', 'ttsInstructions', 'performanceId', 'choirMode'])
 
 const registeredClients = reactive([]);
 const autoGetRegisteredClientsInterval = ref(null);
@@ -15,7 +15,7 @@ let allPartialsAllDevices = ref(false);
 let motion;
 // const ttsLanguages = ref([])
 // const ttsLanguage = ref()
-const choirMode = ref(false)
+const choirMode = computed(() => props.choirMode)
 // const ttsLanguages = computed(() => {
 //   console.log('TTS instructions: ', props.ttsInstructions)
 //   if (choirMode.value) {
@@ -82,8 +82,6 @@ async function startTrack () {
     route = `${process.env.MIX_API_SLUG}/track/${props.trackId}/start/${calculatedStartingPosition}/${props.performanceId}`
   }
 
-  console.log("Calculated starting position: ", calculatedStartingPosition)
-  console.log('Choir mode:', choirMode.value)
   const number_of_simultaneous_voices = isPoliphonyLimited.value ? numberOfSimultaneousVoices.value : 0
   const response = await axios.post(
     route,
@@ -173,7 +171,8 @@ function startCalibration () {
       <label class="mr-5">All partials to all devices</label>
       <input class="mr-2"
              type="checkbox"
-             v-model="choirMode" />
+             v-model="choirMode"
+             disabled />
       <label>Choir mode</label>
     </div>
     <div class="flex justify-between items-center">

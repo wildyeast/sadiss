@@ -60,13 +60,17 @@ const save = () => {
       <div class="w-1/2 min-h-10 cursor-pointer">
         <div v-for="track of performanceTracks"
              @click="performanceTracks.splice(performanceTracks.indexOf(track), 1)">
-          {{ track.title }}
+          <strong>{{ track.title }}</strong>
+          <span v-if="track.tts_instructions"> | TTS</span>
+          <span v-if="track.is_choir"> | Choir</span>
         </div>
       </div>
       <div class="w-1/2 cursor-pointer">
         <div v-for="track of tracks"
              @click="performanceTracks.push(track)">
-          {{ track.title }}
+          <strong>{{ track.title }}</strong>
+          <span v-if="track.tts_instructions"> | TTS</span>
+          <span v-if="track.is_choir"> | Choir</span>
         </div>
       </div>
     </div>
@@ -75,7 +79,9 @@ const save = () => {
            @click="trackSelected(track)"
            :class="selectedTrack === track ? 'bg-[#EEE]' : 'bg-transparent'"
            class="cursor-pointer">
-        {{ track.title }}
+        <strong>{{ track.title }}</strong>
+        <span v-if="track.tts_instructions"> | TTS</span>
+        <span v-if="track.is_choir"> | Choir</span>
       </div>
     </div>
     <button v-if="mode === 'edit'"

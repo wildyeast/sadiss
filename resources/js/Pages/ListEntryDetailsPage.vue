@@ -180,7 +180,8 @@ const generatePartialQRCodes = () => {
               <ClientList v-if="selectedTrack"
                           :trackId="selectedTrack.id"
                           :performanceId="id"
-                          :ttsInstructions="JSON.parse(selectedTrack.tts_instructions)" />
+                          :ttsInstructions="JSON.parse(selectedTrack.tts_instructions)"
+                          :choirMode="selectedTrack.is_choir" />
             </div>
           </template>
         </div>

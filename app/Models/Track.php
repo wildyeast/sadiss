@@ -12,16 +12,14 @@ class Track extends Model
      *
      * @var array<int, string>
      */
-    protected $fillable = [
-    ];
+    protected $fillable = [];
 
     /**
      * The attributes that should be hidden for serialization.
      *
      * @var array<int, string>
      */
-    protected $hidden = [
-    ];
+    protected $hidden = [];
 
     /**
      * The attributes that should be cast.
@@ -32,6 +30,7 @@ class Track extends Model
         'is_active' => 'boolean',
         'created_at' => 'datetime:d.m.Y H:m',
         'updated_at' => 'datetime:d.m.Y H:m',
+        'is_choir' => 'boolean'
     ];
 
     public function performances()

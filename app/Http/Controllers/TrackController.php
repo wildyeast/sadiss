@@ -80,14 +80,15 @@ class TrackController extends Controller
       'title' => $t->title,
       'description' => $t->description,
       'partials' => isset($t->partials),
-      'tts_instructions' => isset($t->tts_instructions)
+      'tts_instructions' => isset($t->tts_instructions),
+      'is_choir' => $t->is_choir
     ];
   }
 
   public function get_list(Request $request, $id = null)
   {
     if (isset($id)) {
-      return $this->format_for_list(Track::where('id', $id)->firstOrFail());
+      return $this->format_list(Track::where('id', $id)->firstOrFail());
     }
     return Track::orderBy('id', 'desc')->get()->map(fn ($t) => $this->format_list($t));
   }
