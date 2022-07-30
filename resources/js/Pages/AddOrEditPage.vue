@@ -53,10 +53,11 @@
                           rounded-bulma-input-border-radius
                           border-bulma-input-border
                           hover:border-bulma-input-border-hover">
-                <label class="pb-6">
+                <label class="pb-2">
                   Choose allowed TTS languages
                 </label>
-                <div v-for="lang of Object.keys(allowedTtsLanguages)">
+                <div v-for="lang of Object.keys(allowedTtsLanguages)"
+                     class="flex items-center gap-2">
                   <input v-model="allowedTtsLanguages[lang]"
                          type="checkbox" />
                   <label>{{ lang }}</label>
@@ -100,6 +101,7 @@ import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
 import { Head, useForm } from '@inertiajs/inertia-vue3'
 import { computed, onMounted, reactive, ref, inject } from 'vue'
 import PartialsUpload from '@/Components/PartialsUpload'
+import { validateTtsInstructions } from '@/TtsInstructionsJsonValidation'
 
 export default {
   components: {
@@ -198,9 +200,14 @@ export default {
       form['partials_file_name'] = eventTarget.value.split('\\').reverse()[0]
       form['sourcefile'] = eventTarget.files[0]
     }
-    function onTtsInstructionsFileInput (eventTarget) {
+
+    async function onTtsInstructionsFileInput (eventTarget) {
+      const file = eventTarget.files[0]
+
+      await validateTtsInstructions(file)
+
       form['tts_instructions_file_name'] = eventTarget.value.split('\\').reverse()[0]
-      form['tts_instructions'] = eventTarget.files[0]
+      form['tts_instructions'] = file
     }
 
     const allowedTtsLanguages = ref({
