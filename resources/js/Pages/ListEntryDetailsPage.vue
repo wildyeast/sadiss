@@ -40,7 +40,6 @@ onMounted(async () => {
 
 const trackSelected = (track) => {
   selectedTrack.value = track
-  console.log("Selected track: ", track)
 }
 
 const generatePartialQRCodes = () => {
