@@ -27,7 +27,7 @@ class TrackController extends Controller
     $track->title = $request->title;
     $track->description = $request->description;
     $track->partials_file_name = $request->partials_file_name;
-    $track->is_choir = $request->is_choir;
+    $track->is_choir = $request->is_choir ? $request->is_choir : false;
     if ($request->hasFile('tts_instructions')) {
       $tts_instructions = file_get_contents($request->file('tts_instructions')->getRealPath());
       $track->tts_instructions = $tts_instructions;

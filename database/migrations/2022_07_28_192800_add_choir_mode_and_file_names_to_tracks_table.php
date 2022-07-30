@@ -14,7 +14,7 @@ return new class extends Migration
     public function up()
     {
         Schema::table('tracks', function (Blueprint $table) {
-            $table->string('tts_instructions_file_name');
+            $table->string('tts_instructions_file_name')->nullable();
             $table->string('partials_file_name');
             $table->boolean('is_choir')->default(false);
         });
