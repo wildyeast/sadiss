@@ -9,8 +9,8 @@
           <h2 class="uppercase font-semibold font-mono text-xl text-white leading-tight">
             {{ title }}
           </h2>
-          <Link 
-                :href="route(`${pathname}.add`)" class="text-white font-mono uppercase hover:underline">Add</Link>
+          <Link :href="route(`${pathname}.add`)"
+                class="text-white font-mono uppercase hover:underline">Add</Link>
         </div>
       </template>
       <!-- Below is adapted from Example 4 from here https://larainfo.com/blogs/tailwind-css-simple-table-example -->
@@ -120,7 +120,7 @@ export default {
       }
       addAdditionColumns()
 
-      await addData()
+      await getData()
     })
 
     console.log(process.env.MIX_API_SLUG)
@@ -132,11 +132,14 @@ export default {
       columnNames.value.push('Details')
     }
 
-    async function addData () {
+    async function getData () {
       const response = await axios.get(`${process.env.MIX_API_SLUG}/${routeCategory}`)
       for (const entry of response.data) {
         if (entry['description'] && entry['description'].length > 50) {
           entry['description'] = entry['description'].substring(0, 50) + '...'
+        }
+        if (entry['tts_languages']) {
+          entry['tts_languages'] = entry['tts_languages'].join(', ')
         }
         columnData.value.push(entry)
       }

@@ -22,6 +22,7 @@ class Performance extends Model
         'end_time' => 'datetime:d.m.Y H:m',
         'created_at' => 'datetime:d.m.Y H:m',
         'updated_at' => 'datetime:d.m.Y H:m',
+        'tts_languages' => 'array'
     ];
 
     public function tracks()
@@ -31,7 +32,6 @@ class Performance extends Model
 
     public function clients()
     {
-      return $this->hasMany(Client::class);
+        return $this->hasMany(Client::class);
     }
-
 }

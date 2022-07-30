@@ -14,7 +14,8 @@ class PerformanceController extends Controller
     $performance->location = $request->location;
     $performance->start_time = $request->start_time;
     $performance->end_time = $request->end_time;
-    $performance->is_active = $request->is_active ? true : false;;
+    $performance->is_active = $request->is_active ? true : false;
+    $performance->tts_languages = $request->ttsLanguages;
     $performance->save();
     return back()->with('flash', [
       'message' => 'success',
@@ -80,7 +81,7 @@ class PerformanceController extends Controller
       'description' => $t->description,
       'partials' => isset($t->partials),
       'tts_instructions' => isset($t->tts_instructions),
-      'is_choir' => $t->is_choir
+      'is_choir' => $t->is_choir,
     ];
   }
 }

@@ -30,19 +30,37 @@
               </div>
               <div v-else-if="field === 'tts_instructions'"
                    class="flex
-                            flex-col
-                            bg-white
-                            p-6
-                            border-1
-                            rounded-bulma-input-border-radius
-                            border-bulma-input-border
-                            hover:border-bulma-input-border-hover">
+                          flex-col
+                          bg-white
+                          p-6
+                          border-1
+                          rounded-bulma-input-border-radius
+                          border-bulma-input-border
+                          hover:border-bulma-input-border-hover">
                 <label class="pb-6">
                   Upload a Text-To-Speech instructions file
                 </label>
                 <input type="file"
                        accept=".json"
                        @input="onTtsInstructionsFileInput($event.target)" />
+              </div>
+              <div v-else-if="field === 'tts_languages'"
+                   class="flex
+                          flex-col
+                          bg-white
+                          p-6
+                          border-1
+                          rounded-bulma-input-border-radius
+                          border-bulma-input-border
+                          hover:border-bulma-input-border-hover">
+                <label class="pb-6">
+                  Choose allowed TTS languages
+                </label>
+                <div v-for="lang of Object.keys(allowedTtsLanguages)">
+                  <input v-model="allowedTtsLanguages[lang]"
+                         type="checkbox" />
+                  <label>{{ lang }}</label>
+                </div>
               </div>
               <div v-else-if="fields[field].type === 'datetime'">
                 <o-datetimepicker placeholder="Click to select..."
@@ -185,6 +203,11 @@ export default {
       form['tts_instructions'] = eventTarget.files[0]
     }
 
+    const allowedTtsLanguages = ref({
+      'en-US': false,
+      'de-DE': false
+    })
+
     function submit () {
       // TODO: Do formatting somewhere else (during v-model?)
       // Oruga datetimepicker has a datetimeFormatter prop, maybe this helps https://oruga.io/components/datetimepicker.html
@@ -197,6 +220,11 @@ export default {
           formattedForm[field] = form[field]
         }
       }
+
+      // Create array of allowed languages from allowedTtsLanguages
+      const ttsLanguages = Object.keys(allowedTtsLanguages.value).filter(lang => allowedTtsLanguages.value[lang])
+      formattedForm['ttsLanguages'] = ttsLanguages
+
       if (path.type === 'add') {
         useForm(formattedForm).post(`${process.env.MIX_API_SLUG}/${routeCategory}/create`)
       } else if (path.type === 'edit') {
@@ -230,6 +258,7 @@ export default {
       isEditable,
       loadingFinished,
       title,
+      allowedTtsLanguages,
       onPartialsFileInput,
       onTtsInstructionsFileInput,
       path,
