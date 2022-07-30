@@ -14,12 +14,10 @@ const validateFileContent = fileContent => {
 }
 
 const convertJsonToObject = json => {
-    let parsedJson
     try {
-        parsedJson = JSON.parse(json)
+        return JSON.parse(json)
     } catch (ex) {
         alert(`Not a valid JSON file: ${ex.message}`)
         return
     }
-    return parsedJson
 }
