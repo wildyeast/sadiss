@@ -141,6 +141,22 @@ export default {
         if (entry['tts_languages']) {
           entry['tts_languages'] = entry['tts_languages'].join(', ')
         }
+        if (entry['tts_instructions']) {
+          const ttsInstructions = JSON.parse(entry['tts_instructions'])
+
+          let partialIds
+          let availableTtsLanguages
+          if (entry['is_choir']) {
+            const ttsInstructionsFirstEntry = Object.values(ttsInstructions[0])
+            partialIds = Object.keys(ttsInstructionsFirstEntry)
+            availableTtsLanguages = Object.keys(Object.values(ttsInstructionsFirstEntry)[0])
+            entry['tts_instructions'] = `Voices: ${partialIds.length}\nTTS languages: ${availableTtsLanguages.join(', ')}`
+          } else {
+            availableTtsLanguages = Object.keys(ttsInstructions[0])
+            entry['tts_instructions'] = `TTS languages: ${availableTtsLanguages.join(', ')}`
+          }
+        }
+
         columnData.value.push(entry)
       }
     }
