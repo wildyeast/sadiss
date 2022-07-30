@@ -14,16 +14,16 @@ let timingSrcConnected = ref(false);
 let allPartialsAllDevices = ref(false);
 let motion;
 // const ttsLanguages = ref([])
-const ttsLanguage = ref()
+// const ttsLanguage = ref()
 const choirMode = ref(false)
-const ttsLanguages = computed(() => {
-  console.log('TTS instructions: ', props.ttsInstructions)
-  if (choirMode.value) {
-    return props.ttsInstructions ? Object.keys(props.ttsInstructions[0][0]) : null
-  } else {
-    return props.ttsInstructions ? Object.keys(props.ttsInstructions[0]) : null
-  }
-})
+// const ttsLanguages = computed(() => {
+//   console.log('TTS instructions: ', props.ttsInstructions)
+//   if (choirMode.value) {
+//     return props.ttsInstructions ? Object.keys(props.ttsInstructions[0][0]) : null
+//   } else {
+//     return props.ttsInstructions ? Object.keys(props.ttsInstructions[0]) : null
+//   }
+// })
 const waveform = ref('sine')
 const partialOverlap = ref()
 const isPoliphonyLimited = ref(true)
@@ -90,7 +90,7 @@ async function startTrack () {
     null,
     {
       params: {
-        tts_language: ttsLanguage.value,
+        // tts_language: ttsLanguage.value,
         choir_mode: choirMode.value,
         waveform: waveform.value,
         partial_overlap: partialOverlap.value,
@@ -193,14 +193,14 @@ function startCalibration () {
           {{ synchronizing ? timingSrcPosition : "0.0" }}
         </div>
       </div>
-      <div v-if="ttsLanguages && ttsLanguages.length">
+      <!-- <div v-if="ttsLanguages && ttsLanguages.length">
         <label class="mr-2">Select TTS language</label>
         <select v-model="ttsLanguage">
           <option value=''
                   selected>No TTS</option>
           <option v-for="lang of ttsLanguages">{{ lang }}</option>
         </select>
-      </div>
+      </div> -->
       <div>
         <select v-model="waveform">
           <option value="sine"
