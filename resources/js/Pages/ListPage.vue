@@ -6,11 +6,11 @@
     <BreezeAuthenticatedLayout>
       <template #header>
         <div class="flex justify-between">
-          <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+          <h2 class="uppercase font-semibold font-mono text-xl text-white leading-tight">
             {{ title }}
           </h2>
-          <Link class="hover:underline"
-                :href="route(`${pathname}.add`)">Add</Link>
+          <Link 
+                :href="route(`${pathname}.add`)" class="text-white font-mono uppercase hover:underline">Add</Link>
         </div>
       </template>
       <!-- Below is adapted from Example 4 from here https://larainfo.com/blogs/tailwind-css-simple-table-example -->

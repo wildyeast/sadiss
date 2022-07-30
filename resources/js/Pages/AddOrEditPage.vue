@@ -6,7 +6,7 @@
     <BreezeAuthenticatedLayout>
       <template #header>
         <div class="flex justify-between">
-          <h2 class="font-semibold text-xl text-gray-800 leading-tight">
+          <h2 class="uppercase font-semibold font-mono text-xl text-white leading-tight">
             {{ title }}
           </h2>
         </div>

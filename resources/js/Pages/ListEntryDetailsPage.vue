@@ -67,8 +67,9 @@ const generatePartialQRCodes = () => {
 
     <BreezeAuthenticatedLayout>
       <template #header>
-        <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-          Details
+        <h2 class="uppercase font-semibold font-mono text-xl text-white leading-tight">
+          <template v-if="path.name === 'tracks'">Track details</template>
+          <template v-if="path.name === 'performances'">Perform</template>
         </h2>
       </template>
 
