@@ -21,7 +21,7 @@ use App\Http\Controllers\ClientController;
 */
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
+  return $request->user();
 });
 
 Route::get('/track/columns', [TrackController::class, 'get_column_info']);
@@ -31,9 +31,10 @@ Route::post('/track/delete/{id}', [TrackController::class, 'delete'])
   ->name('track.delete');
 Route::post('/track/edit/{id}', [TrackController::class, 'edit'])
   ->name('track.edit');
+Route::get('/track/{id}/partials', [TrackController::class, 'get_partials']);
 Route::post('/track/{id}/start/{startTime}/{performance_id}', [TrackController::class, 'start_track'])
   ->name('track.start');
-  Route::post('/track/{id}/start_all/{startTime}/{performance_id}', [TrackController::class, 'start_track_all_partials'])
+Route::post('/track/{id}/start_all/{startTime}/{performance_id}', [TrackController::class, 'start_track_all_partials'])
   ->name('track.startall');
 Route::get('/track', [TrackController::class, 'get']);
 Route::get('/tracklist', [TrackController::class, 'get_list']);

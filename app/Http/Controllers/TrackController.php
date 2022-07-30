@@ -100,6 +100,11 @@ class TrackController extends Controller
     return $columns;
   }
 
+  public function get_partials(Request $request, $id)
+  {
+    return Track::where('id', $id)->pluck('partials')->firstOrFail();
+  }
+
   public function start_track(Request $request, $id, $startTime, $performance_id = null)
   {
     $clients = null;

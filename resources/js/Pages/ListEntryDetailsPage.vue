@@ -6,6 +6,7 @@ import QrcodeVue from 'qrcode.vue'
 import Player from '@/Components/Player.vue'
 import ClientList from '@/Components/ClientList.vue'
 import TrackList from '@/Components/TrackList.vue'
+import axios from 'axios'
 
 const path = {
   name: '',
@@ -42,8 +43,9 @@ const trackSelected = (track) => {
   selectedTrack.value = track
 }
 
-const generatePartialQRCodes = () => {
-  if (showPartialQRCodes.value === true) {
+const partials = ref()
+const generatePartialQRCodes = async () => {
+  if (showPartialQRCodes.value) {
     showPartialQRCodes.value = false
     return
   }
@@ -51,8 +53,10 @@ const generatePartialQRCodes = () => {
     alert('Select a track.')
     return
   }
-  const partials = JSON.parse(selectedTrack.value.partials)
-  if (confirm(`This track has ${partials.length} partials. Depending on your system, displaying a QR code for each of these partials could take a long time and/or crash your machine. Do you want to display the QR codes?`)) {
+
+  const response = await axios.get(`${process.env.MIX_API_SLUG}/track/${selectedTrack.value.id}/partials`)
+  partials.value = response.data
+  if (confirm(`This track has ${partials.value.length} partials. Depending on your system, displaying a QR code for each of these partials could take a long time and/or crash your machine. Do you want to display the QR codes?`)) {
     showPartialQRCodes.value = true
   }
 }
@@ -157,7 +161,7 @@ const generatePartialQRCodes = () => {
                           level="H" />
               <div v-if="showPartialQRCodes"
                    class="flex flex-wrap gap-2">
-                <div v-for="partial of JSON.parse(selectedTrack.partials)">
+                <div v-for="partial of partials">
                   <p>Index: {{ partial.index }}</p>
                   <qrcode-vue :value="`http://sadiss.net/client?id=${id}&partial_id=${partial.index}`"
                               :size="200"
