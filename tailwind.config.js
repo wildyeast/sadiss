@@ -16,6 +16,7 @@ module.exports = {
             colors: {
                 'bulma-input-border': '#dbdbdb',
                 'bulma-input-border-hover': '#b5b5b5',
+                'primary': '#3e5b53'
             },
             fontFamily: {
                 sans: ['Nunito', ...defaultTheme.fontFamily.sans],

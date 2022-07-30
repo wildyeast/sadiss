@@ -29,7 +29,6 @@ Route::get('/', function () {
 Route::middleware(['auth', 'verified'])->group(function () {
   Route::inertia('dashboard', 'Dashboard')
     ->name('dashboard');
-  
   Route::inertia('/tracks', 'ListPage')
     ->name('tracks');
   Route::inertia('/composers', 'ListPage')
