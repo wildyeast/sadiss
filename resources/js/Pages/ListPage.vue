@@ -53,7 +53,9 @@
                     <Player v-if="field === 'partials'"
                             :partialData="entry[field]" />
                     <div v-else
-                         class="text-sm leading-5 text-gray-500"> {{ entry[field] }} </div>
+                         class="text-sm leading-5 text-gray-500"
+                         :class="field === 'title' ? 'w-20' : ''">
+                      {{ entry[field] }}</div>
                   </td>
 
                   <!-- Edit, Delete, Details -->
