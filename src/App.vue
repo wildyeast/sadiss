@@ -25,7 +25,7 @@ let print = ''
 let timingSrcPosition: Ref<number> = ref(-1)
 let trackId = ref(1)
 let ttsInstructions: null
-let ttsLanguage: string
+const ttsLanguage = ref('en-US')
 
 onMounted(async () => {
   // Get performances to later check against performanceId URL paramater (if present) to make sure performance exists
@@ -141,7 +141,6 @@ const checkForStart = async (token: string) => {
     window.clearInterval(intervalId)
     const startTimeFromServer = Number(clientData.client["start_time"])
     ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
-    ttsLanguage = clientData.client["tts_language"]
 
     const wf = clientData.client["waveform"]
     if (wf) {
@@ -195,7 +194,7 @@ const start = async () => {
   isRegistered.value = false
 
   /* TEXT TO SPEECH */
-  if (ttsInstructions && ttsLanguage) {
+  if (ttsInstructions && ttsLanguage.value) {
     const ttsTimestamps = Object.keys(ttsInstructions).map(timestamp => Number(timestamp))
 
     let nextTimestamp = ttsTimestamps.shift()
@@ -206,9 +205,9 @@ const start = async () => {
     let nextUtterance: SpeechSynthesisUtterance | null
 
     if (typeof partialIdToRegisterWith === 'number') {
-      nextUtterance = createChoirUtterance(ttsInstructions, nextTimestamp, ttsLanguage, partialIdToRegisterWith)
+      nextUtterance = createChoirUtterance(ttsInstructions, nextTimestamp, ttsLanguage.value, partialIdToRegisterWith)
     } else {
-      nextUtterance = createSequencerUtterance(ttsInstructions, nextTimestamp, ttsLanguage)
+      nextUtterance = createSequencerUtterance(ttsInstructions, nextTimestamp, ttsLanguage.value)
     }
 
     const speechIntervalId = window.setInterval(() => {
@@ -221,9 +220,9 @@ const start = async () => {
           nextTimestamp = Number(ttsTimestamps.shift())
           if (!nextTimestamp) return
           if (typeof partialIdToRegisterWith === 'number') {
-            nextUtterance = createChoirUtterance(ttsInstructions, nextTimestamp, ttsLanguage, partialIdToRegisterWith)
+            nextUtterance = createChoirUtterance(ttsInstructions, nextTimestamp, ttsLanguage.value, partialIdToRegisterWith)
           } else {
-            nextUtterance = createSequencerUtterance(ttsInstructions, nextTimestamp, ttsLanguage)
+            nextUtterance = createSequencerUtterance(ttsInstructions, nextTimestamp, ttsLanguage.value)
           }
         } else {
           window.clearInterval(speechIntervalId)
@@ -328,6 +327,10 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
       </div>
 
       <!-- Center -->
+      <select v-model="ttsLanguage">
+        <option value="en-US">en-US</option>
+        <option value="de-DE">de-DE</option>
+      </select>
       <button @click="register"
               id="registerBtn"
               class="border-2 p-2 mt-4 rounded-full h-28 w-28 transition-all duration-300">
