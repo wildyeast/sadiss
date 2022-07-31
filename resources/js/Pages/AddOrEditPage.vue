@@ -48,7 +48,7 @@
                   {{ detectedLanguages.join(', ') }}
                 </div>
               </div>
-              <div v-else-if="field === 'tts_languages'"
+              <div v-else-if="category === 'performances' && field === 'tts_languages'"
                    class="flex
                           flex-col
                           bg-white
@@ -67,6 +67,7 @@
                   <label>{{ lang }}</label>
                 </div>
               </div>
+              <span v-else-if="field === 'tts_languages'"></span>
               <div v-else-if="field === 'is_choir'">
                 <o-switch v-model="form[field]"
                           disabled />
@@ -133,14 +134,14 @@ export default {
     path.name = pathSplit[pathSplit.length - 2]
     path.type = pathSplit[pathSplit.length - 1]
 
-    const category = path.name
+    const category = ref(path.name)
     let title = formatPageTitle(path)
     const fields = reactive({})
     const form = reactive({})
     let routeCategory = ''
 
     onMounted(async () => {
-      switch (category) {
+      switch (category.value) {
         case 'tracks':
           routeCategory = 'track'
           break
@@ -246,9 +247,13 @@ export default {
         }
       }
 
-      // Create array of allowed languages from allowedTtsLanguages
-      const ttsLanguages = Object.keys(allowedTtsLanguages.value).filter(lang => allowedTtsLanguages.value[lang])
-      formattedForm['ttsLanguages'] = ttsLanguages
+      if (category.value === 'performances') {
+        // Create array of allowed languages from allowedTtsLanguages
+        const ttsLanguages = Object.keys(allowedTtsLanguages.value).filter(lang => allowedTtsLanguages.value[lang])
+        formattedForm['ttsLanguages'] = ttsLanguages
+      } else if (category.value === 'tracks') {
+        formattedForm['ttsLanguages'] = detectedLanguages.value
+      }
 
       if (path.type === 'add') {
         useForm(formattedForm).post(`${process.env.MIX_API_SLUG}/${routeCategory}/create`)
@@ -275,6 +280,7 @@ export default {
     }
 
     return {
+      category,
       detectedLanguages,
       fields,
       form,

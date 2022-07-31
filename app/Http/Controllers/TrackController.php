@@ -32,6 +32,7 @@ class TrackController extends Controller
       $tts_instructions = file_get_contents($request->file('tts_instructions')->getRealPath());
       $track->tts_instructions = $tts_instructions;
       $track->tts_instructions_file_name = $request->tts_instructions_file_name;
+      $track->tts_languages = $request->ttsLanguages;
     }
     $track->partials = $converted;
     $track->save();
@@ -58,6 +59,13 @@ class TrackController extends Controller
       $converted = $this->convert_source_file($sourcefile);
       $track->partials = $converted;
     }
+    if ($request->hasFile('tts_instructions')) {
+      $tts_instructions = file_get_contents($request->file('tts_instructions')->getRealPath());
+      $track->tts_instructions = $tts_instructions;
+      $track->tts_instructions_file_name = $request->tts_instructions_file_name;
+      $track->tts_languages = $request->ttsLanguages;
+    }
+    $track->is_choir = $request->is_choir ? $request->is_choir : false;
     $track->save();
     return back()->with('flash', [
       'message' => 'success',
@@ -81,6 +89,7 @@ class TrackController extends Controller
       'description' => $t->description,
       'partials' => isset($t->partials),
       'tts_instructions' => isset($t->tts_instructions),
+      'tts_languages' => $t->tts_languages,
       'is_choir' => $t->is_choir
     ];
   }

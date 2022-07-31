@@ -30,7 +30,8 @@ class Track extends Model
         'is_active' => 'boolean',
         'created_at' => 'datetime:d.m.Y H:m',
         'updated_at' => 'datetime:d.m.Y H:m',
-        'is_choir' => 'boolean'
+        'is_choir' => 'boolean',
+        'tts_languages' => 'array'
     ];
 
     public function performances()
