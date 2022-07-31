@@ -43,6 +43,10 @@
                 <input type="file"
                        accept=".json"
                        @input="onTtsInstructionsFileInput($event.target)" />
+                <div v-if="detectedLanguages">
+                  Detected languages:<br>
+                  {{ detectedLanguages.join(', ') }}
+                </div>
               </div>
               <div v-else-if="field === 'tts_languages'"
                    class="flex
@@ -62,6 +66,10 @@
                          type="checkbox" />
                   <label>{{ lang }}</label>
                 </div>
+              </div>
+              <div v-else-if="field === 'is_choir'">
+                <o-switch v-model="form[field]"
+                          disabled />
               </div>
               <div v-else-if="fields[field].type === 'datetime'">
                 <o-datetimepicker placeholder="Click to select..."
@@ -101,7 +109,7 @@ import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
 import { Head, useForm } from '@inertiajs/inertia-vue3'
 import { computed, onMounted, reactive, ref, inject } from 'vue'
 import PartialsUpload from '@/Components/PartialsUpload'
-import { validateTtsInstructions } from '@/TtsInstructionsJsonValidation'
+import { validateTtsInstructions, validationResult } from '@/TtsInstructionsJsonValidation'
 
 export default {
   components: {
@@ -201,10 +209,20 @@ export default {
       form['sourcefile'] = eventTarget.files[0]
     }
 
+    const detectedLanguages = ref()
     async function onTtsInstructionsFileInput (eventTarget) {
+      detectedLanguages.value = null
+
       const file = eventTarget.files[0]
 
-      await validateTtsInstructions(file)
+      const validationResult = await validateTtsInstructions(file)
+      if (typeof validationResult === 'string') {
+        alert(validationResult)
+        return
+      } else {
+        form['is_choir'] = validationResult.isChoir
+        detectedLanguages.value = validationResult.detectedLanguages
+      }
 
       form['tts_instructions_file_name'] = eventTarget.value.split('\\').reverse()[0]
       form['tts_instructions'] = file
@@ -257,6 +275,7 @@ export default {
     }
 
     return {
+      detectedLanguages,
       fields,
       form,
       formatLabel,
