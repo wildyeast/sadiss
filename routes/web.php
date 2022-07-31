@@ -17,13 +17,13 @@ use App\Http\Controllers\TrackController;
 */
 
 Route::get('/', function () {
-    return Inertia::render('Welcome', [
-        'canLogin' => Route::has('login'),
-        'canRegister' => Route::has('register'),
-        'laravelVersion' => Application::VERSION,
-        'phpVersion' => PHP_VERSION,
-    ]);
-    return redirect()->route('tracks');
+  return Inertia::render('Welcome', [
+    'canLogin' => Route::has('login'),
+    'canRegister' => Route::has('register'),
+    'laravelVersion' => Application::VERSION,
+    'phpVersion' => PHP_VERSION,
+  ]);
+  return redirect()->route('tracks');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
@@ -35,23 +35,23 @@ Route::middleware(['auth', 'verified'])->group(function () {
     ->name('composers');
   Route::inertia('/performances', 'ListPage')
     ->name('performances');
-  
+
   // Routes to 'add'
-  Route::inertia('/tracks/add', 'AddOrEditPage')
+  Route::inertia('/tracks/add', 'AddOrEditTrackPage')
     ->name('tracks.add');
   Route::inertia('/composers/add', 'AddOrEditPage')
     ->name('composers.add');
   Route::inertia('/performances/add', 'AddOrEditPage')
     ->name('performances.add');
-  
+
   // Routes to 'edit'
-  Route::inertia('/tracks/edit', 'AddOrEditPage')
+  Route::inertia('/tracks/edit', 'AddOrEditTrackPage')
     ->name('tracks.edit');
   Route::inertia('/composers/edit', 'AddOrEditPage')
     ->name('composers.edit');
   Route::inertia('/performances/edit', 'AddOrEditPage')
     ->name('performances.edit');
-  
+
   // Routes to DetailsPage
   Route::inertia('/tracks/{id}', 'ListEntryDetailsPage')
     ->name('tracks.show');
@@ -62,4 +62,4 @@ Route::middleware(['auth', 'verified'])->group(function () {
 });
 
 
-require __DIR__.'/auth.php';
+require __DIR__ . '/auth.php';
