@@ -23,9 +23,21 @@ onMounted(async () => {
 
 })
 
-const trackSelected = (track) => {
+const trackSelected = track => {
   emits('trackSelected', track)
   selectedTrack.value = track
+}
+
+const addTrackToPerformance = track => {
+  if (track['tts_languages']) {
+    for (const lang of track['tts_languages']) {
+      if (!props.performance['tts_languages'].includes(lang)) {
+        alert("TTS languages of track and performance don't match.")
+        return
+      }
+    }
+  }
+  performanceTracks.value.push(track)
 }
 
 const save = () => {
@@ -67,7 +79,7 @@ const save = () => {
       </div>
       <div class="w-1/2 cursor-pointer">
         <div v-for="track of tracks"
-             @click="performanceTracks.push(track)">
+             @click="addTrackToPerformance(track)">
           <strong>{{ track.title }}</strong>
           <span v-if="track.tts_instructions"> | TTS</span>
           <span v-if="track.is_choir"> | Choir</span>
