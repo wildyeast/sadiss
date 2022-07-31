@@ -1,7 +1,7 @@
 <script setup>
 import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
 import { Head, useForm } from '@inertiajs/inertia-vue3'
-import { computed, onMounted, reactive, ref, inject } from 'vue'
+import { onMounted, reactive, ref, inject } from 'vue'
 import PartialsUpload from '@/Components/PartialsUpload'
 import { validateTtsInstructions } from '@/TtsInstructionsJsonValidation'
 
@@ -11,13 +11,11 @@ const id = window.location.toString().split('=')[1] // TODO: $route is undefined
 const loadingFinished = ref(false)
 
 const path = reactive({
-  name: '',
   type: '' // Types are 'add' and 'edit'
 })
 
 const pathSplit = window.location.pathname.split('/')
 
-path.name = 'tracks'
 path.type = pathSplit[pathSplit.length - 1]
 
 const title = ref(path.type === 'add' ? 'Add Track' : 'Edit Track')
@@ -36,24 +34,18 @@ const form = ref({
   is_choir: null
 })
 
-const routeCategory = 'track'
-
 onMounted(async () => {
   if (path.type == 'edit') {
-    await getData(routeCategory)
+    await getData()
   }
   loadingFinished.value = true
 })
 
 
-async function getData (routeCategory) {
-  const response = await axios.get(`${process.env.MIX_API_SLUG}/${routeCategory}/${id}`)
+async function getData () {
+  const response = await axios.get(`${process.env.MIX_API_SLUG}/tracks/${id}`)
   for (const field of Object.keys(response.data)) {
-    if (field === 'start_time' || field == 'end_time') {
-      form.value[field] = formatDateForDatetimePicker(response.data[field])
-    } else {
-      form.value[field] = response.data[field]
-    }
+    form.value[field] = response.data[field]
   }
 }
 
@@ -86,20 +78,15 @@ function submit () {
   // Oruga datetimepicker has a datetimeFormatter prop, maybe this helps https://oruga.io/components/datetimepicker.html
   const formattedForm = {}
   for (const field of Object.keys(form.value)) {
-    if (field === 'start_time' || field == 'end_time') {
-      const d = form.value[field]
-      formattedForm[field] = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
-    } else {
-      formattedForm[field] = form.value[field]
-    }
+    formattedForm[field] = form.value[field]
   }
 
   formattedForm['ttsLanguages'] = detectedLanguages.value
 
   if (path.type === 'add') {
-    useForm(formattedForm).post(`${process.env.MIX_API_SLUG}/${routeCategory}/create`)
+    useForm(formattedForm).post(`${process.env.MIX_API_SLUG}/tracks/create`)
   } else if (path.type === 'edit') {
-    useForm(formattedForm).post(`${process.env.MIX_API_SLUG}/${routeCategory}/edit/${id}`)
+    useForm(formattedForm).post(`${process.env.MIX_API_SLUG}/tracks/edit/${id}`)
   }
   oruga.notification.open({
     message: 'Success!',
@@ -168,9 +155,9 @@ function submit () {
               <input type="file"
                      accept=".json"
                      @input="onTtsInstructionsFileInput($event.target)" />
-              <div v-if="detectedLanguages">
-                Detected languages:<br>
-                {{ detectedLanguages.join(', ') }}<br>
+              <div v-if="detectedLanguages"
+                   class="mt-4">
+                Detected languages: {{ detectedLanguages.join(', ') }}<br>
                 Type: {{ form['is_choir'] ? 'Choir' : 'Non-choir' }}
               </div>
             </div>
