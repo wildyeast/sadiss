@@ -15,7 +15,7 @@ let allPartialsAllDevices = ref(false);
 let motion;
 // const ttsLanguages = ref([])
 // const ttsLanguage = ref()
-const choirMode = computed(() => props.choirMode)
+// const choirMode = computed(() => props.choirMode)
 // const ttsLanguages = computed(() => {
 //   console.log('TTS instructions: ', props.ttsInstructions)
 //   if (choirMode.value) {
@@ -39,6 +39,7 @@ onMounted(async () => {
   mCorpApp.run = () => {
     motion = mCorpApp.motions['shared']
     timingSrcConnected.value = true;
+    synchronizeTimingSrcPosition()
   }
   mCorpApp.init()
 })
@@ -210,7 +211,8 @@ function startCalibration () {
           <!-- <option value="">Custom</option> -->
         </select>
       </div>
-      <input type="text"
+      <input v-if="!choirMode"
+             type="text"
              placeholder="Overlap"
              v-model="partialOverlap">
       <div>
