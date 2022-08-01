@@ -50,6 +50,7 @@ Route::post('/performance/delete/{id}', [PerformanceController::class, 'delete']
   ->name('performance.delete');
 Route::post('/performance/edit/{id}', [PerformanceController::class, 'edit'])
   ->name('performance.edit');
+Route::get('/performance/{id}/partial_ids', [PerformanceController::class, 'get_partial_indices_of_track_with_most_partials']);
 Route::get('/performance', [PerformanceController::class, 'get']);
 Route::get('/performance/{id}', [PerformanceController::class, 'get']);
 

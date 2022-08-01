@@ -2,9 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Track;
+use App\Models\Performance;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use App\Models\Performance;
 
 class PerformanceController extends Controller
 {
@@ -70,6 +71,14 @@ class PerformanceController extends Controller
     $performance = Performance::find($request->id);
     $tracks = $performance->tracks()->get()->map(fn ($t) => $this->format_list($t));
     return $tracks;
+  }
+
+  public function get_partial_indices_of_track_with_most_partials(Request $request)
+  {
+    $partials_of_all_tracks = Performance::find($request->id)->tracks()->pluck('partials')->toArray();
+    $partials_of_track_with_most_partials = max(array_map(fn ($partial) => json_decode($partial), $partials_of_all_tracks));
+    $partial_ids = array_map(fn ($partial) => $partial->index, $partials_of_track_with_most_partials);
+    return $partial_ids;
   }
 
   private function format_list($t)

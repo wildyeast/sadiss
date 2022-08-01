@@ -25,7 +25,6 @@ const showPerformanceQRCode = ref(false)
 const showPartialQRCodes = ref(false)
 
 onMounted(async () => {
-  // TODO: This switch is identical to the one in ListPage.vue. Find a smart way to handle this.
   if (path.name === 'tracks') {
     category = 'track'
   } else if (path.name === 'composers') {
@@ -64,8 +63,10 @@ const generatePartialQRCodes = async () => {
 
 // Download QR codes
 // Adapted from https://stackoverflow.com/a/38019175/16725862
+const working = ref(false)
 const performanceQrCodeContainer = ref()
 const downloadPerformanceQrCode = async () => {
+  working.value = true
   showPerformanceQRCode.value = true
   await nextTick()
   const svgData = performanceQrCodeContainer.value.innerHTML
@@ -78,17 +79,22 @@ const downloadPerformanceQrCode = async () => {
   downloadLink.click()
   document.body.removeChild(downloadLink)
   showPerformanceQRCode.value = false
+  working.value = false
 }
 
-const partialQrCodeContainers = ref([])
+const partialQrCodeContainers = ref()
+const partialIds = ref()
 const downloadPartialQrCodes = async () => {
-  if (!selectedTrack.value) {
-    alert('Select a track.')
+
+  if (!confirm('This downloads QR codes (in a zipped folder) for each partial of the track in this performance with the most partials. Depending on the amount of partials, the downloaded zip could be quite large. Do you wish to proceed?')) {
     return
   }
 
-  const response = await axios.get(`${process.env.MIX_API_SLUG}/track/${selectedTrack.value.id}/partials`)
-  partials.value = response.data
+  working.value = true
+
+  const response = await axios.get(`${process.env.MIX_API_SLUG}/performance/${path.id}/partial_ids`)
+  const responseData = await response.data
+  partialIds.value = Object.values(responseData)
 
   showPartialQRCodes.value = true
   await nextTick()
@@ -113,6 +119,7 @@ const downloadPartialQrCodes = async () => {
   link.remove()
 
   showPartialQRCodes.value = false
+  working.value = false
 }
 
 </script>
@@ -206,8 +213,8 @@ const downloadPartialQrCodes = async () => {
                    class="text-rose-500">Inactive</p>
               </div>
               <div class="flex flex-col">
-                <button @click="showPerformanceQRCode = !showPerformanceQRCode">Generate QR-Code for this
-                  performance</button>
+                <!-- <button @click="showPerformanceQRCode = !showPerformanceQRCode">Generate QR-Code for this
+                  performance</button> -->
                 <button @click="downloadPerformanceQrCode">Download QR-Code for this performance</button>
                 <!-- <button @click="generatePartialQRCodes">Generate QR-Code for each partial of the selected track</button> -->
                 <button @click="downloadPartialQrCodes">Download QR-Codes of voices of this performance</button>
@@ -225,7 +232,7 @@ const downloadPartialQrCodes = async () => {
               <div v-if="showPartialQRCodes"
                    class="flex flex-wrap gap-2"
                    style="display: none;">
-                <div v-for="partial of partials">
+                <div v-for="partial of partialIds">
                   <p>Index: {{ partial.index }}</p>
                   <div ref="partialQrCodeContainers">
                     <qrcode-vue :value="`http://sadiss.net/client?id=${id}&partial_id=${partial.index}`"
@@ -253,9 +260,45 @@ const downloadPartialQrCodes = async () => {
                           :ttsInstructions="JSON.parse(selectedTrack.tts_instructions)"
                           :choirMode="selectedTrack.is_choir" />
             </div>
+            <div v-if="working"
+                 class="absolute top-0 left-0 flex justify-center items-center w-screen h-screen">
+              <div class="absolute top-0 left-0 w-full h-full bg-slate-600 opacity-50" />
+              <div class="lds-dual-ring" />
+            </div>
           </template>
         </div>
       </div>
     </BreezeAuthenticatedLayout>
   </div>
 </template>
+
+<style>
+/* https://loading.io/css/ */
+.lds-dual-ring {
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+}
+
+.lds-dual-ring:after {
+  content: " ";
+  display: block;
+  width: 64px;
+  height: 64px;
+  margin: 8px;
+  border-radius: 50%;
+  border: 6px solid #fff;
+  border-color: #EEE transparent #EEE transparent;
+  animation: lds-dual-ring 1.2s linear infinite;
+}
+
+@keyframes lds-dual-ring {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
+}
+</style>
