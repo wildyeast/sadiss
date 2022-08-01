@@ -94,7 +94,8 @@ const generatePartialQRCodes = async () => {
             </div>
             <Link v-if="category"
                   :href="route(`${category}.edit`, { id: id })">
-            <span class="material-icons mi-edit text-blue-500" />
+		<!-- <span class="material-icons mi-edit text-blue-500" /> -->
+		✏️
             </Link>
           </div>
           <!-- Track -->
