@@ -232,10 +232,9 @@ const downloadPartialQrCodes = async () => {
               <div v-if="showPartialQRCodes"
                    class="flex flex-wrap gap-2"
                    style="display: none;">
-                <div v-for="partial of partialIds">
-                  <p>Index: {{ partial.index }}</p>
+                <div v-for="partialId of partialIds">
                   <div ref="partialQrCodeContainers">
-                    <qrcode-vue :value="`http://sadiss.net/client?id=${id}&partial_id=${partial.index}`"
+                    <qrcode-vue :value="`http://sadiss.net/client?id=${id}&partial_id=${partialId}`"
                                 :size="200"
                                 :render-as="'svg'"
                                 level="H" />
