@@ -1,7 +1,7 @@
 <script setup>
 import BreezeAuthenticatedLayout from '@/Layouts/Authenticated.vue'
 import { Head, useForm, Link } from '@inertiajs/inertia-vue3'
-import { onMounted, reactive, toRefs, ref } from 'vue'
+import { onMounted, reactive, toRefs, ref, nextTick } from 'vue'
 import QrcodeVue from 'qrcode.vue'
 import Player from '@/Components/Player.vue'
 import ClientList from '@/Components/ClientList.vue'
@@ -61,6 +61,24 @@ const generatePartialQRCodes = async () => {
   }
 }
 
+// Download QR codes
+// Adapted from https://stackoverflow.com/a/38019175/16725862
+const performanceQrCode = ref()
+const downloadPerformanceQrCode = async () => {
+  showPerformanceQRCode.value = true
+  await nextTick()
+  const svgData = performanceQrCode.value.innerHTML;
+  const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
+  const svgUrl = URL.createObjectURL(svgBlob);
+  const downloadLink = document.createElement("a");
+  downloadLink.href = svgUrl;
+  downloadLink.download = "newesttree.svg";
+  document.body.appendChild(downloadLink);
+  downloadLink.click();
+  document.body.removeChild(downloadLink);
+  showPerformanceQRCode.value = false
+}
+
 </script>
 
 <template>
@@ -94,8 +112,8 @@ const generatePartialQRCodes = async () => {
             </div>
             <Link v-if="category"
                   :href="route(`${category}.edit`, { id: id })">
-		<!-- <span class="material-icons mi-edit text-blue-500" /> -->
-		✏️
+            <!-- <span class="material-icons mi-edit text-blue-500" /> -->
+            ✏️
             </Link>
           </div>
           <!-- Track -->
@@ -154,12 +172,16 @@ const generatePartialQRCodes = async () => {
               <div class="flex flex-col">
                 <button @click="showPerformanceQRCode = !showPerformanceQRCode">Generate QR-Code for this
                   performance</button>
+                <button @click="downloadPerformanceQrCode">Download QR-Code for this performance</button>
                 <button @click="generatePartialQRCodes">Generate QR-Code for each partial of the selected track</button>
               </div>
-              <qrcode-vue v-if="showPerformanceQRCode"
-                          :value="`http://sadiss.net/client?id=${id}`"
-                          :size="300"
-                          level="H" />
+              <div ref="performanceQrCode">
+                <qrcode-vue v-if="showPerformanceQRCode"
+                            :value="`http://sadiss.net/client?id=${id}`"
+                            :size="300"
+                            :render-as="'svg'"
+                            level="H" />
+              </div>
               <div v-if="showPartialQRCodes"
                    class="flex flex-wrap gap-2">
                 <div v-for="partial of partials">
