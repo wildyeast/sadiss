@@ -61,16 +61,19 @@
                   <!-- Edit, Delete, Details -->
                   <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 align-middle">
                     <Link :href="route(`${pathname}.edit`, { id: entry.id })">
-                    <span class="material-icons mi-edit text-blue-500" />
+                    <!-- <span class="material-icons mi-edit text-blue-500" /> -->
+		    ✏️
                     </Link>
                   </td>
                   <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 align-middle">
-                    <span class="material-icons mi-delete text-rose-500 cursor-pointer"
-                          @click="deleteRow(entry.id)" />
+		    <span style="cursor: pointer;" @click="deleteRow(entry.id)">🗑️</span>
+                    <!-- <span class="material-icons mi-delete text-rose-500 cursor-pointer"
+                          @click="deleteRow(entry.id)" />-->
                   </td>
                   <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 align-middle">
                     <Link :href="route(`${pathname}.show`, { id: entry.id })">
-                    <span class="material-icons mi-arrow-forward-ios text-gray-500" />
+                    <!--<span class="material-icons mi-arrow-forward-ios text-gray-500" />-->
+		    ➡️
                     </Link>
                   </td>
                 </tr>
