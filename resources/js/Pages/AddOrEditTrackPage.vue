@@ -43,7 +43,7 @@ onMounted(async () => {
 
 
 async function getData () {
-  const response = await axios.get(`${process.env.MIX_API_SLUG}/tracks/${id}`)
+  const response = await axios.get(`${process.env.MIX_API_SLUG}/track/${id}`)
   for (const field of Object.keys(response.data)) {
     form.value[field] = response.data[field]
   }
@@ -84,9 +84,9 @@ function submit () {
   formattedForm['ttsLanguages'] = detectedLanguages.value
 
   if (path.type === 'add') {
-    useForm(formattedForm).post(`${process.env.MIX_API_SLUG}/tracks/create`)
+    useForm(formattedForm).post(`${process.env.MIX_API_SLUG}/track/create`)
   } else if (path.type === 'edit') {
-    useForm(formattedForm).post(`${process.env.MIX_API_SLUG}/tracks/edit/${id}`)
+    useForm(formattedForm).post(`${process.env.MIX_API_SLUG}/track/edit/${id}`)
   }
   oruga.notification.open({
     message: 'Success!',
