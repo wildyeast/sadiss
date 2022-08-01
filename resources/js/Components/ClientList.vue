@@ -77,7 +77,7 @@ async function startTrack () {
   const calculatedStartingPosition = motion.pos + 5
   let route;
 
-  if (!choirMode.value && allPartialsAllDevices.value) {
+  if (!props.choirMode && allPartialsAllDevices.value) {
     route = `${process.env.MIX_API_SLUG}/track/${props.trackId}/start_all/${calculatedStartingPosition}/${props.performanceId}`
   } else {
     route = `${process.env.MIX_API_SLUG}/track/${props.trackId}/start/${calculatedStartingPosition}/${props.performanceId}`
@@ -90,7 +90,7 @@ async function startTrack () {
     {
       params: {
         // tts_language: ttsLanguage.value,
-        choir_mode: choirMode.value,
+        choir_mode: props.choirMode,
         waveform: waveform.value,
         partial_overlap: partialOverlap.value,
         number_of_simultaneous_voices
@@ -211,7 +211,7 @@ function startCalibration () {
           <!-- <option value="">Custom</option> -->
         </select>
       </div>
-      <input v-if="!choirMode"
+      <input v-if="!props.choirMode"
              type="text"
              placeholder="Overlap"
              v-model="partialOverlap">
