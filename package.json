@@ -29,6 +29,7 @@
     "dependencies": {
         "@oruga-ui/oruga-next": "^0.5.3",
         "@oruga-ui/theme-bulma": "^0.2.1",
+        "client-zip": "^2.2.2",
         "material-icons": "^1.10.6",
         "qrcode.vue": "^3.3.3",
         "timing-object": "^3.1.43",

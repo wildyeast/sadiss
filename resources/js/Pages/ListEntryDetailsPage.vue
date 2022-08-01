@@ -7,6 +7,7 @@ import Player from '@/Components/Player.vue'
 import ClientList from '@/Components/ClientList.vue'
 import TrackList from '@/Components/TrackList.vue'
 import axios from 'axios'
+import { downloadZip } from 'client-zip'
 
 const path = {
   name: '',
@@ -63,20 +64,55 @@ const generatePartialQRCodes = async () => {
 
 // Download QR codes
 // Adapted from https://stackoverflow.com/a/38019175/16725862
-const performanceQrCode = ref()
+const performanceQrCodeContainer = ref()
 const downloadPerformanceQrCode = async () => {
   showPerformanceQRCode.value = true
   await nextTick()
-  const svgData = performanceQrCode.value.innerHTML;
-  const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
-  const svgUrl = URL.createObjectURL(svgBlob);
-  const downloadLink = document.createElement("a");
-  downloadLink.href = svgUrl;
-  downloadLink.download = "newesttree.svg";
-  document.body.appendChild(downloadLink);
-  downloadLink.click();
-  document.body.removeChild(downloadLink);
+  const svgData = performanceQrCodeContainer.value.innerHTML
+  const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" })
+  const svgUrl = URL.createObjectURL(svgBlob)
+  const downloadLink = document.createElement("a")
+  downloadLink.href = svgUrl
+  downloadLink.download = `${data['location'].replace(/ /g, '-')}_QR-Code.svg`
+  document.body.appendChild(downloadLink)
+  downloadLink.click()
+  document.body.removeChild(downloadLink)
   showPerformanceQRCode.value = false
+}
+
+const partialQrCodeContainers = ref([])
+const downloadPartialQrCodes = async () => {
+  if (!selectedTrack.value) {
+    alert('Select a track.')
+    return
+  }
+
+  const response = await axios.get(`${process.env.MIX_API_SLUG}/track/${selectedTrack.value.id}/partials`)
+  partials.value = response.data
+
+  showPartialQRCodes.value = true
+  await nextTick()
+
+  const svgBlobs = []
+
+  for (const container of partialQrCodeContainers.value) {
+    const svgData = container.innerHTML
+    const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" })
+    svgBlobs.push({
+      name: `${data['location'].replace(/ /g, '-')}_Voice-${partialQrCodeContainers.value.indexOf(container)}.svg`,
+      input: svgBlob
+    })
+  }
+
+  const blob = await downloadZip([...svgBlobs]).blob()
+
+  const link = document.createElement("a")
+  link.href = URL.createObjectURL(blob)
+  link.download = `${data['location'].replace(/ /g, '-')}_Voices_QR-Codes`
+  link.click()
+  link.remove()
+
+  showPartialQRCodes.value = false
 }
 
 </script>
@@ -173,22 +209,30 @@ const downloadPerformanceQrCode = async () => {
                 <button @click="showPerformanceQRCode = !showPerformanceQRCode">Generate QR-Code for this
                   performance</button>
                 <button @click="downloadPerformanceQrCode">Download QR-Code for this performance</button>
-                <button @click="generatePartialQRCodes">Generate QR-Code for each partial of the selected track</button>
+                <!-- <button @click="generatePartialQRCodes">Generate QR-Code for each partial of the selected track</button> -->
+                <button @click="downloadPartialQrCodes">Download QR-Codes of voices of this performance</button>
               </div>
-              <div ref="performanceQrCode">
+              <div ref="performanceQrCodeContainer">
                 <qrcode-vue v-if="showPerformanceQRCode"
                             :value="`http://sadiss.net/client?id=${id}`"
                             :size="300"
                             :render-as="'svg'"
                             level="H" />
               </div>
+              <!-- Currently display: none, since otherwise it flashes when downloading voice qr codes
+              If you want to show them in the browser, uncomment generatePartialQrCode button above
+              and devise a method so it doesn't flash on download. -->
               <div v-if="showPartialQRCodes"
-                   class="flex flex-wrap gap-2">
+                   class="flex flex-wrap gap-2"
+                   style="display: none;">
                 <div v-for="partial of partials">
                   <p>Index: {{ partial.index }}</p>
-                  <qrcode-vue :value="`http://sadiss.net/client?id=${id}&partial_id=${partial.index}`"
-                              :size="200"
-                              level="H" />
+                  <div ref="partialQrCodeContainers">
+                    <qrcode-vue :value="`http://sadiss.net/client?id=${id}&partial_id=${partial.index}`"
+                                :size="200"
+                                :render-as="'svg'"
+                                level="H" />
+                  </div>
                 </div>
               </div>
               <div class="flex">
