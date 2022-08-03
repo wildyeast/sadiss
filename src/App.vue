@@ -19,7 +19,7 @@ let outputLatencyFromLocalStorage: number
 let partialData: []
 let partialIdToRegisterWith: number | null
 let performanceId = 1
-let performances: { id: number }[]
+let performances = ref()
 const player: Ref<Player> = ref(new Player())
 let print = ''
 let timingSrcPosition: Ref<number> = ref(-1)
@@ -30,11 +30,11 @@ const ttsLanguage = ref('en-US')
 onMounted(async () => {
   // Get performances to later check against performanceId URL paramater (if present) to make sure performance exists
   const performanceResponse = await fetch(hostUrl + '/performance')
-  performances = await performanceResponse.json()
+  performances.value = await performanceResponse.json()
 
   // Get URL parameters and set performanceId and partialId if present
   const params = new URLSearchParams(window.location.search)
-  if (performances.map(p => p.id).includes(Number(params.get('id')))) {
+  if (performances.value.map(p => p.id).includes(Number(params.get('id')))) {
     performanceId = Number(params.get('id'))
   }
   if (params.get('partial_id')) {
