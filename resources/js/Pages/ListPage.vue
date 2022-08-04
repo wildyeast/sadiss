@@ -18,7 +18,7 @@
         <div class="py-2 -my-2 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
           <div
                class="inline-block min-w-full overflow-hidden align-middle border-b border-gray-200 shadow sm:rounded-lg">
-            <table class="min-w-full text-center">
+            <table class="min-w-full text-center overflox-x-scroll">
               <thead>
                 <tr>
                   <th class="px-2 py-3 text-xs font-medium leading-4 tracking-wider text-gray-500 uppercase border-b border-gray-200 bg-gray-50"
@@ -30,8 +30,7 @@
               </thead>
 
               <tbody class="bg-white">
-                <tr v-for="entry in columnData"
-                    :key="entry.id">
+                <tr v-for="entry in columnData">
                   <!-- <td class="px-6 py-4 whitespace-no-wrap border-b border-gray-200">
                                         <div class="flex items-center">
                                             <div class="flex-shrink-0 w-10 h-10">
@@ -48,13 +47,11 @@
                                     </td> -->
 
                   <td class="px-2 py-4 whitespace-no-wrap border-b border-gray-200 max-w-min center align-middle"
-                      v-for="(field, idx) in Object.keys(entry)"
-                      :key="idx">
+                      v-for="(field, idx) in Object.keys(entry)">
                     <Player v-if="field === 'partials'"
                             :partialData="entry[field]" />
                     <div v-else
-                         class="text-sm leading-5 text-gray-500"
-                         :class="field === 'title' ? 'w-20' : ''">
+                         class="text-sm leading-5 text-gray-500">
                       {{ entry[field] }}</div>
                   </td>
 
@@ -62,18 +59,19 @@
                   <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 align-middle">
                     <Link :href="route(`${pathname}.edit`, { id: entry.id })">
                     <!-- <span class="material-icons mi-edit text-blue-500" /> -->
-		    ✏️
+                    ✏️
                     </Link>
                   </td>
                   <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 align-middle">
-		    <span style="cursor: pointer;" @click="deleteRow(entry.id)">🗑️</span>
+                    <span style="cursor: pointer;"
+                          @click="deleteRow(entry.id)">🗑️</span>
                     <!-- <span class="material-icons mi-delete text-rose-500 cursor-pointer"
                           @click="deleteRow(entry.id)" />-->
                   </td>
                   <td class="px-2 py-4 text-sm leading-5 whitespace-no-wrap border-b border-gray-200 align-middle">
                     <Link :href="route(`${pathname}.show`, { id: entry.id })">
                     <!--<span class="material-icons mi-arrow-forward-ios text-gray-500" />-->
-		    ➡️
+                    ➡️
                     </Link>
                   </td>
                 </tr>
@@ -121,9 +119,17 @@ export default {
 
       const response = await axios.get(`${process.env.MIX_API_SLUG}/${routeCategory}/columns`);
       for (const column of response.data) {
-        columnNames.value.push(column.Field)
+
+        if (routeCategory === 'track') {
+          if (trackColumnsToShow.includes(column.Field)) {
+            columnNames.value.push(column.Field)
+          }
+        }
+        else {
+          columnNames.value.push(column.Field)
+        }
       }
-      addAdditionColumns()
+      addAdditionalColumns()
 
       await getData()
     })
@@ -131,7 +137,7 @@ export default {
     console.log(process.env.MIX_API_SLUG)
 
     // Adds columns that are not present in the database
-    function addAdditionColumns () {
+    function addAdditionalColumns () {
       columnNames.value.push('Edit')
       columnNames.value.push('Delete')
       columnNames.value.push('Details')
@@ -162,9 +168,21 @@ export default {
           }
         }
 
-        columnData.value.push(entry)
+        if (routeCategory === 'track') {
+          // Column data to show
+          const entryToShow = {}
+          for (const col of trackColumnsToShow) {
+            entryToShow[col] = entry[col]
+          }
+          columnData.value.push(entryToShow)
+        } else {
+          columnData.value.push(entry)
+        }
+
       }
     }
+
+    const trackColumnsToShow = ['id', 'updated_at', 'title', 'tts_instructions', 'is_choir']
 
     async function deleteRow (id) {
       if (confirm(`Do you really want to delete this ${routeCategory}? This cannot be reversed.`)) {
