@@ -62,11 +62,13 @@ async function onTtsInstructionsFileInput (eventTarget) {
 
   const validationResult = await validateTtsInstructions(file)
   if (typeof validationResult === 'string') {
+    // This means there was an error.
     alert(validationResult)
     return
   } else {
     form.value['is_choir'] = validationResult.isChoir
     detectedLanguages.value = validationResult.detectedLanguages
+    console.log(form.value)
   }
 
   form.value['tts_instructions_file_name'] = eventTarget.value.split('\\').reverse()[0]
@@ -158,9 +160,14 @@ function submit () {
               <div v-if="detectedLanguages"
                    class="mt-4">
                 Detected languages: {{ detectedLanguages.join(', ') }}<br>
-                Type: {{ form['is_choir'] ? 'Choir' : 'Non-choir' }}
+                <!-- Type: {{ form['is_choir'] ? 'Choir' : 'Non-choir' }} -->
               </div>
             </div>
+          </div>
+          <div class="flex items-center mt-2">
+            <o-switch type="switch"
+                      v-model="form.is_choir" />
+            <label>Is choir</label>
           </div>
 
           <div class="flex justify-center mt-2">
