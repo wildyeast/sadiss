@@ -336,6 +336,11 @@ class TrackController extends Controller
             break;
           }
         }
+        if (!empty($new_breakpoints)) {
+          $last_bp = end($p->breakpoints);
+          $first_new_bp = $new_breakpoints[0];
+          dd($last_bp, $first_new_bp);
+        }
         array_push($new_breakpoints, ...$p->breakpoints);
         $oscillators[$oscillator_index]['endTime'] = end($p->breakpoints)->time;
         $oscillators[$oscillator_index]['breakpoints'] = $new_breakpoints;
