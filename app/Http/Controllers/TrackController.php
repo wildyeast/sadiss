@@ -292,6 +292,7 @@ class TrackController extends Controller
 
   public function arrange_partials($partials = false, $max_oscillators = 4)
   {
+    $INTERPOLATION_TIME = 0.01; // in seconds
 
     // This is useful for debugging, you can use the /arrange route :)
     /*
@@ -324,6 +325,7 @@ class TrackController extends Controller
     $oscillator_index = 0;
     foreach ($partials as $p) {
       if (empty($oscillators[$oscillator_index]['breakpoints'])) {
+        // init
         $oscillators[$oscillator_index]['breakpoints'] = $p->breakpoints;
         $oscillators[$oscillator_index]['startTime'] = $p->breakpoints[0]->time;
       } else {
@@ -337,8 +339,36 @@ class TrackController extends Controller
           }
         }
         if (!empty($new_breakpoints)) {
-          $last_bp = end($p->breakpoints);
-          $first_new_bp = $new_breakpoints[0];
+          $last_bp = end($new_breakpoints);
+          $first_new_bp = $p->breakpoints[0];
+          if ($last_bp && $first_new_bp) {
+            // If breakpoint distance > 20ms
+            $distance = $first_new_bp->time - $last_bp->time;
+            if ($distance > $INTERPOLATION_TIME * 2) {
+              // Fade out and back in
+              $fade_out = (object) [
+                'time' => $last_bp->time + $INTERPOLATION_TIME,
+                'freq' => $last_bp->freq,
+                'amp' => 0
+              ];
+              $fade_in = (object) [
+                'time' => $first_new_bp->time - $INTERPOLATION_TIME,
+                'freq' => $first_new_bp->freq,
+                'amp' => 0
+              ];
+              array_push($new_breakpoints, $fade_out); 
+              array_push($new_breakpoints, $fade_in); 
+              //dd($last_bp, $fade_out, $fade_in, $first_new_bp);
+            } else {
+              // Add breakpoint in between
+              $in_between = (object) [ 
+                'time' => $last_bp->time + ($distance / 2),
+                'freq' => ($last_bp->freq + $first_new_bp->freq) / 2 ,
+                'amp' => ($last_bp->amp + $first_new_bp->amp) / 2 ,
+              ];
+              array_push($new_breakpoints, $in_between);
+            }
+          }
         }
         array_push($new_breakpoints, ...$p->breakpoints);
         $oscillators[$oscillator_index]['endTime'] = end($p->breakpoints)->time;
