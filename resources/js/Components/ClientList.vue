@@ -232,7 +232,7 @@ function startCalibration () {
         Remove all registered clients
       </button>
     </div>
-    <div class="py-2 h-16 flex flex-row items-center justify-start" v-if='!props.choirMode">
+    <div class="py-2 h-16 flex flex-row items-center justify-start" v-if="!props.choirMode">
       <input id="limit"
              type="checkbox"
              v-model="isPoliphonyLimited">
