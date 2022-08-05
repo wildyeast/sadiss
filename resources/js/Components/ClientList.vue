@@ -27,7 +27,7 @@ let motion;
 const waveform = ref('sine')
 const partialOverlap = ref()
 const isPoliphonyLimited = ref(true)
-const numberOfSimultaneousVoices = ref(8)
+const numberOfSimultaneousVoices = ref(64)
 const calibrating = ref(false)
 let beepIntervalId = null;
 
