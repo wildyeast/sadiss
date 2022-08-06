@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import NoSleep from 'nosleep.js';
 import Player from "./Player"
 import OutputLatencyCalibration from './components/OutputLatencyCalibration.vue'
 import { onMounted, Ref, ref } from "vue"
@@ -26,20 +27,21 @@ let timingSrcPosition: Ref<number> = ref(-1)
 let trackId = ref(1)
 let ttsInstructions: null
 const ttsLanguage = ref('en-US')
+let noSleepEnabled = false
 
 onMounted(async () => {
 
   // If client loses focus (lock screen, tab switch, etc), stop playback.
   // Especially necessary for iOS. There, script execution gets suspended on screen lock,
   // and resumed on unlock, leading to desync between devices.
-  document.addEventListener('visibilitychange', () => {
-    if (document['hidden']) {
-      if (player.value.playing) {
-        player.value.audioContext.close()
-        player.value.playing = false
-      }
-    }
-  }, false)
+  // document.addEventListener('visibilitychange', () => {
+  //   if (document['hidden']) {
+  //     if (player.value.playing) {
+  //       player.value.stop()
+  //       player.value.playing = false
+  //     }
+  //   }
+  // }, false)
 
   // Get performances to later check against performanceId URL paramater (if present) to make sure performance exists
   const performanceResponse = await fetch(hostUrl + '/performance')
@@ -92,6 +94,13 @@ const register = async () => {
     return
   }
 
+  if (!noSleepEnabled) {
+    const noSleep = new NoSleep()
+    noSleep.enable();
+    noSleepEnabled = true
+  }
+
+
   // Resume audioCtx for iOS
   player.value.audioContext.resume()
 
@@ -107,14 +116,16 @@ const register = async () => {
   // Pass over register function from this file to player
   player.value.register = register
 
-  const audioCtx = window.AudioContext || window.webkitAudioContext
-  // Start audio context.
-  player.value.audioContext = new audioCtx({
-    latencyHint: 0,
-    // sampleRate: 31000,
-  })
-  // This is necessary to make the audio context work on iOS.
-  player.value.audioContext.resume()
+  if (!player.value.audioContext) {
+    const audioCtx = window.AudioContext || window.webkitAudioContext
+    // Start audio context.
+    player.value.audioContext = new audioCtx({
+      latencyHint: 0,
+      // sampleRate: 31000,
+    })
+    // This is necessary to make the audio context work on iOS.
+    player.value.audioContext.resume()
+  }
 
   const response = await fetch(hostUrl + '/client/create', {
     method: "POST",

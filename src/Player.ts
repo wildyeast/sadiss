@@ -29,6 +29,8 @@ export default class Player {
     this.partialData = partialData
     const timeToAddToStart = now + outputLatency + startInSec
 
+    console.log('now: ', now)
+
     // Initialize oscillators
     for (const partial of partialData) {
       this.oscillators.push(this.createOscillatorAndGainNodes(partial, timeToAddToStart))
@@ -47,6 +49,8 @@ export default class Player {
     if (!this.audioContext) {
       throw new Error('Player.audioContext not set.')
     }
+
+    console.log('Creating Nodes.')
 
     const oscNode = this.audioContext.createOscillator()
     oscNode.type = this.waveform
@@ -77,6 +81,7 @@ export default class Player {
   stop () {
     if (!this.oscillators) return
     for (const oscObj of this.oscillators) {
+      console.log('Stopping oscillator: ', oscObj)
       oscObj.oscNode.stop()
     }
     this.reset()
