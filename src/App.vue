@@ -28,6 +28,19 @@ let ttsInstructions: null
 const ttsLanguage = ref('en-US')
 
 onMounted(async () => {
+
+  // If client loses focus (lock screen, tab switch, etc), stop playback.
+  // Especially necessary for iOS. There, script execution gets suspended on screen lock,
+  // and resumed on unlock, leading to desync between devices.
+  document.addEventListener('visibilitychange', () => {
+    if (document['hidden']) {
+      if (player.value.playing) {
+        player.value.audioContext.close()
+        player.value.playing = false
+      }
+    }
+  }, false)
+
   // Get performances to later check against performanceId URL paramater (if present) to make sure performance exists
   const performanceResponse = await fetch(hostUrl + '/performance')
   performances.value = await performanceResponse.json()
@@ -94,16 +107,14 @@ const register = async () => {
   // Pass over register function from this file to player
   player.value.register = register
 
-  if (!player.value.audioContext) {
-    const audioCtx = window.AudioContext || window.webkitAudioContext
-    // Start audio context.
-    player.value.audioContext = new audioCtx({
-      latencyHint: 0,
-      // sampleRate: 31000,
-    })
-    // This is necessary to make the audio context work on iOS.
-    player.value.audioContext.resume()
-  }
+  const audioCtx = window.AudioContext || window.webkitAudioContext
+  // Start audio context.
+  player.value.audioContext = new audioCtx({
+    latencyHint: 0,
+    // sampleRate: 31000,
+  })
+  // This is necessary to make the audio context work on iOS.
+  player.value.audioContext.resume()
 
   const response = await fetch(hostUrl + '/client/create', {
     method: "POST",
