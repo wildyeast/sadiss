@@ -66,7 +66,6 @@ const initializeMCorp = async () => {
 }
 
 const register = async () => {
-  console.log('Registering')
   if (isRegistered.value) {
     window.clearInterval(intervalId)
     isRegistered.value = false
@@ -75,7 +74,7 @@ const register = async () => {
 
   if (!player.value) return
 
-  if (!performanceId) {
+  if (!performanceId.value) {
     alert("Select a performance id.")
     return
   }
@@ -112,7 +111,7 @@ const register = async () => {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ performance_id: performanceId, partial_id: partialIdToRegisterWith }),
+    body: JSON.stringify({ performance_id: performanceId.value, partial_id: partialIdToRegisterWith }),
   })
   const data = await response.json()
   deviceRegistrationId.value = data.id // Only used in UI.
