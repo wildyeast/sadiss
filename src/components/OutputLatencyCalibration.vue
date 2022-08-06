@@ -12,7 +12,7 @@ const calibrating = ref(false)
 const calibratedLatency = ref(0.00)
 const userHoldingButton = ref(false)
 
-const startCalibration = () => {
+const startCalibration = async () => {
   const outputLatencyFromCalibration = localStorage.getItem("outputLatency");
   if (outputLatencyFromCalibration) {
     calibratedLatency.value = Number(outputLatencyFromCalibration)
@@ -24,7 +24,7 @@ const startCalibration = () => {
   // Start audio context.
   player.audioContext = new audioCtx({ latencyHint: 0 })
   // This is necessary to make the audio context work on iOS.
-  player.audioContext.resume()
+  await player.audioContext.resume()
 
   calibrating.value = true
 

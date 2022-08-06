@@ -4,6 +4,7 @@ import Player from "./Player"
 import OutputLatencyCalibration from './components/OutputLatencyCalibration.vue'
 import { onMounted, Ref, ref } from "vue"
 import { ChoirTtsInstructions, SequencerTtsInstructions } from "./types";
+import nosleep from 'nosleep.js';
 
 const availableTracks: Ref<{ id: number, title: string }[]> = ref([])
 const countdownTime = ref(-1)
@@ -27,6 +28,7 @@ let timingSrcPosition: Ref<number> = ref(-1)
 let trackId = ref(1)
 let ttsInstructions: null
 const ttsLanguage = ref('en-US')
+const noSleep = new NoSleep()
 let noSleepEnabled = false
 
 onMounted(async () => {
@@ -81,6 +83,11 @@ const initializeMCorp = async () => {
 }
 
 const register = async () => {
+  // if (noSleepEnabled) {
+  //   noSleep.disable()
+  //   noSleepEnabled = false
+  // }
+
   if (isRegistered.value) {
     window.clearInterval(intervalId)
     isRegistered.value = false
@@ -94,15 +101,9 @@ const register = async () => {
     return
   }
 
-  if (!noSleepEnabled) {
-    const noSleep = new NoSleep()
-    noSleep.enable();
-    noSleepEnabled = true
-  }
-
 
   // Resume audioCtx for iOS
-  player.value.audioContext.resume()
+  await player.value.audioContext.resume()
 
   // Synthesize voice (with volume set to 0) on registration to make TTS work on iOS
   const initialUtterance = new SpeechSynthesisUtterance('You are currentGlobalTimeInCtxTime registered.')
@@ -125,6 +126,12 @@ const register = async () => {
     })
     // This is necessary to make the audio context work on iOS.
     player.value.audioContext.resume()
+  }
+
+  if (!noSleepEnabled) {
+    const noSleep2 = new NoSleep()
+    noSleep2.enable();
+    noSleepEnabled = true
   }
 
   const response = await fetch(hostUrl + '/client/create', {
