@@ -117,6 +117,6 @@ export default class Player {
     gainNode.connect(this.audioContext.destination)
 
     oscNode.start(now)
-    oscNode.stop(now + 0.01)
+    oscNode.stop(now + 0.02)
   }
 }
