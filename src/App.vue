@@ -18,7 +18,7 @@ const motionConnected = ref(false)
 let outputLatencyFromLocalStorage: number
 let partialData: []
 let partialIdToRegisterWith: number | null
-let performanceId = 1
+let performanceId = ref(1)
 let performances = ref()
 const player: Ref<Player> = ref(new Player())
 let print = ''
@@ -34,8 +34,8 @@ onMounted(async () => {
 
   // Get URL parameters and set performanceId and partialId if present
   const params = new URLSearchParams(window.location.search)
-  if (performances.value.map(p => p.id).includes(Number(params.get('id')))) {
-    performanceId = Number(params.get('id'))
+  if (performances.value.map((p: any) => p.id).includes(Number(params.get('id')))) {
+    performanceId.value = Number(params.get('id'))
   }
   if (params.get('partial_id')) {
     partialIdToRegisterWith = Number(params.get('partial_id'))
@@ -66,6 +66,7 @@ const initializeMCorp = async () => {
 }
 
 const register = async () => {
+  console.log('Registering')
   if (isRegistered.value) {
     window.clearInterval(intervalId)
     isRegistered.value = false
