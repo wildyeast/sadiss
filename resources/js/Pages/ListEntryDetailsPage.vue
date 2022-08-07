@@ -6,6 +6,8 @@ import QrcodeVue from 'qrcode.vue'
 import Player from '@/Components/Player.vue'
 import ClientList from '@/Components/ClientList.vue'
 import TrackList from '@/Components/TrackList.vue'
+import InfoBox from "@/Components/InfoBox.vue"
+import InfoTuple from "@/Components/InfoTuple.vue"
 import axios from 'axios'
 import { downloadZip } from 'client-zip'
 
@@ -21,8 +23,10 @@ let category = ''
 const id = path.id
 const data = reactive({})
 const selectedTrack = ref()
+const playingTrack = ref()
 const showPerformanceQRCode = ref(false)
 const showPartialQRCodes = ref(false)
+
 
 onMounted(async () => {
   if (path.name === 'tracks') {
@@ -136,11 +140,10 @@ const downloadPartialQrCodes = async () => {
           <template v-if="path.name === 'performances'">Perform</template>
         </h2>
       </template>
-
       <div v-if="Object.keys(data).length > 0"
            class="w-100 mt-2 py-8 bg-white border border-gray-200 shadow md:px-6 md:justify-center">
         <div class="flex flex-col max-w-7xl mx-auto px-4">
-          <div class="flex justify-between">
+          <div class="flex justify-between" v-if="path.name !== 'performances'">
             <div class="flex mb-4 text-slate-400 text-xs">
               <div class="flex flex-col mr-4">
                 <span>Id: </span>
@@ -203,21 +206,38 @@ const downloadPartialQrCodes = async () => {
             </div>
           </template>
           <!-- Performance -->
-          <template v-if="path.name === 'performances'">
-            <div class="w-full">
-              <div class="flex justify-between items-center mb-4">
-                <p class="text-2xl">{{ data['location'] }}</p>
+          <div v-if="path.name === 'performances'" class="flex flex-row">
+            <InfoBox title="performance" class="w-2/3 mr-1">
+              <InfoTuple name="id / location">
+                {{ data['id'] }} / {{ data['location'] }}
+              </InfoTuple>
+              <InfoTuple name="status">
                 <p v-if="data['is_active']"
-                   class="text-green-700">Active</p>
+                   class="text-green-700">active</p>
                 <p v-else
-                   class="text-rose-500">Inactive</p>
-              </div>
-              <div class="flex flex-col">
-                <!-- <button @click="showPerformanceQRCode = !showPerformanceQRCode">Generate QR-Code for this
-                  performance</button> -->
-                <button @click="downloadPerformanceQrCode">Download QR-Code for this performance</button>
-                <!-- <button @click="generatePartialQRCodes">Generate QR-Code for each partial of the selected track</button> -->
-                <button @click="downloadPartialQrCodes">Download QR-Codes of voices of this performance</button>
+                   class="text-rose-500">inactive</p>
+              </InfoTuple>
+              <InfoTuple name="start time">
+                  {{ data['start_time'] }}
+              </InfoTuple>
+              <InfoTuple name="end time">
+                  {{ data['end_time'] }}
+              </InfoTuple>
+              <InfoTuple name="download qr codes">
+                <button class="border h-8 p-1 uppercase" @click="downloadPerformanceQrCode">performance</button>
+                <button class="border h-8 p-1 uppercase" @click="downloadPartialQrCodes">partials</button>
+              </InfoTuple>
+            </InfoBox>
+            <InfoBox title="playing track" class="w-1/3" bgcolor="tertiary">
+              <InfoTuple name="name" v-if="playingTrack">
+                {{ playingTrack.title }}
+                <span v-if="playingTrack.tts_instructions"> | TTS</span>
+                <span v-if="playingTrack.is_choir"> | Choir</span>
+              </InfoTuple>
+              <div class="p-1 text-sm" v-else>No track playing</div>
+            </InfoBox>
+
+              <div class="flex flex-row justify-end">
               </div>
               <div ref="performanceQrCodeContainer">
                 <qrcode-vue v-if="showPerformanceQRCode"
@@ -241,30 +261,26 @@ const downloadPartialQrCodes = async () => {
                   </div>
                 </div>
               </div>
-              <div class="flex">
-                <div class="mr-4">
-                  <p>Start time:</p>
-                  <p>End time:</p>
-                </div>
-                <div>
-                  <p>{{ data['start_time'] }}</p>
-                  <p>{{ data['end_time'] }}</p>
-                </div>
-              </div>
+          </div>
+            <ClientList 
+                        :trackId="selectedTrack ? selectedTrack.id : null"
+                        :track="selectedTrack"
+                        :performanceId="id"
+                        :playingTrack="playingTrack"
+                        @setPlayingTrack="playingTrack = selectedTrack"
+                        :ttsInstructions="selectedTrack ? JSON.parse(selectedTrack.tts_instructions) : null"
+                        :choirMode="selectedTrack ? selectedTrack.is_choir : null" />
+          <div>
               <TrackList :performance="data"
+                         :playingTrack="playingTrack"
                          @trackSelected="trackSelected" />
-              <ClientList v-if="selectedTrack"
-                          :trackId="selectedTrack.id"
-                          :performanceId="id"
-                          :ttsInstructions="JSON.parse(selectedTrack.tts_instructions)"
-                          :choirMode="selectedTrack.is_choir" />
-            </div>
+                         
             <div v-if="working"
                  class="absolute top-0 left-0 flex justify-center items-center w-screen h-screen">
               <div class="absolute top-0 left-0 w-full h-full bg-slate-600 opacity-50" />
               <div class="lds-dual-ring" />
             </div>
-          </template>
+          </div>
         </div>
       </div>
     </BreezeAuthenticatedLayout>

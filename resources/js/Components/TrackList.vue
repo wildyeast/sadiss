@@ -1,16 +1,27 @@
 <script setup>
+import InfoBox from "./InfoBox.vue"
+import InfoTuple from "./InfoTuple.vue"
+import TracksPopup from "./TracksPopup.vue"
 import axios from 'axios';
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, computed } from 'vue';
 
-const props = defineProps(['performance'])
+const props = defineProps(['performance', 'playingTrack'])
 
 const emits = defineEmits(['trackSelected'])
 
 const performanceTracks = ref([])
-const tracks = ref()
+
+const tracks = ref([])
 const mode = ref('perform')
 const selectedTrack = ref()
+const isTracksPopupVisible = ref(false)
 const loading = ref(true)
+
+const tracksNotInPerformance = computed(() => {
+  const x =  tracks.value.filter(t => !performanceTracks.value.find(pt => pt.id === t.id))
+  console.log('t', x)
+  return x
+})
 
 onMounted(async () => {
   const trackResponse = await axios.get(`${process.env.MIX_API_SLUG}/tracklist`)
@@ -28,6 +39,25 @@ const trackSelected = track => {
   selectedTrack.value = track
 }
 
+const remove = track => {
+  performanceTracks.value.splice(performanceTracks.value.indexOf(track), 1)
+  save()
+}
+
+const moveUp = track => {
+  const i = performanceTracks.value.indexOf(track)
+  performanceTracks.value[i] = performanceTracks.value[i - 1]
+  performanceTracks.value[i - 1] = track
+  save()
+}
+
+const moveDown = track => {
+  const i = performanceTracks.value.indexOf(track)
+  performanceTracks.value[i] = performanceTracks.value[i + 1]
+  performanceTracks.value[i + 1] = track
+  save()
+}
+
 const addTrackToPerformance = track => {
   if (track['tts_languages']) {
     for (const lang of track['tts_languages']) {
@@ -38,6 +68,7 @@ const addTrackToPerformance = track => {
     }
   }
   performanceTracks.value.push(track)
+  save()
 }
 
 const save = () => {
@@ -52,52 +83,34 @@ const save = () => {
 </script>
 
 <template>
-  <div v-if="loading"
-       class="flex justify-center">
-    <div class="lds-dual-ring" />
-  </div>
-  <div v-else
-       class="w-full px-4 border flex flex-col justify-center">
-    <div class="flex justify-center gap-2 mt-2">
-      <button @click="mode = 'perform'"
-              class="border p-2"
-              :class="mode === 'perform' ? 'bg-[#EEE]' : 'bg-transparent'">Perform</button>
-      <button @click="mode = 'edit'"
-              class="border p-2"
-              :class="mode === 'edit' ? 'bg-[#EEE]' : 'bg-transparent'">Edit
-        Tracklist</button>
+  <TracksPopup v-if="isTracksPopupVisible"
+    :tracks="tracksNotInPerformance"
+    @addTrack="addTrackToPerformance" 
+    @close="isTracksPopupVisible = false" />
+  <InfoBox title="playlist" class="mt-1 relative">
+    <button @click="isTracksPopupVisible = true" class="text-lg px-2 absolute text-white top-0 right-0">+</button>
+    <div v-if="loading"
+        class="flex justify-center">
+      <div class="lds-dual-ring" />
     </div>
-    <div v-if="mode === 'edit'"
-         class="flex w-full">
-      <div class="w-1/2 min-h-10 cursor-pointer">
-        <div v-for="track of performanceTracks"
-             @click="performanceTracks.splice(performanceTracks.indexOf(track), 1)">
-          <strong>{{ track.title }}</strong>
-          <span v-if="track.tts_instructions"> | TTS</span>
-          <span v-if="track.is_choir"> | Choir</span>
-        </div>
-      </div>
-      <div class="w-1/2 cursor-pointer">
-        <div v-for="track of tracks"
-             @click="addTrackToPerformance(track)">
-          <strong>{{ track.title }}</strong>
-          <span v-if="track.tts_instructions"> | TTS</span>
-          <span v-if="track.is_choir"> | Choir</span>
-        </div>
-      </div>
-    </div>
-    <div v-if="mode === 'perform'">
-      <div v-for="track of performanceTracks"
-           @click="trackSelected(track)"
-           :class="selectedTrack === track ? 'bg-[#EEE]' : 'bg-transparent'"
-           class="cursor-pointer">
-        <strong>{{ track.title }}</strong>
+    <div v-for="track of performanceTracks" :key="track.id"
+      :class="['px-1', 'flex', 'flex-row',
+      'justify-between', 'border-b-1',
+      playingTrack && playingTrack.id === track.id &&
+        selectedTrack && selectedTrack.id === track.id ? 'bg-gradient-to-l from-secondary to-tertiary text-white' :
+          selectedTrack && selectedTrack.id === track.id ? 'bg-secondary text-white' :
+            playingTrack && playingTrack.id === track.id ? 'bg-tertiary text-white' : 'odd:bg-grey']">
+      <div class="cursor-pointer" @click="trackSelected(track)">
+        #{{ performanceTracks.indexOf(track) }} {{ track.title }}
         <span v-if="track.tts_instructions"> | TTS</span>
         <span v-if="track.is_choir"> | Choir</span>
       </div>
+      <div>
+        <button v-if="performanceTracks.indexOf(track) !== 0" @click="moveUp(track)" class="ml-2">⬆️</button>
+        <button v-if="performanceTracks.indexOf(track) !== performanceTracks.length - 1" @click="moveDown(track)" class="ml-2">⬇️</button>
+        <button v-else class="w-6" />
+        <button @click="remove(track)" class="ml-2">🗑</button>
+      </div>
     </div>
-    <button v-if="mode === 'edit'"
-            @click="save"
-            class="border p-2 mb-2">Save</button>
-  </div>
+  </InfoBox>
 </template>

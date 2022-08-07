@@ -2,13 +2,20 @@
 import { useForm } from "@inertiajs/inertia-vue3"
 import { computed, onMounted, reactive, ref } from "vue"
 import Button from "./Button.vue"
+import InfoBox from "./InfoBox.vue"
+import InfoTuple from "./InfoTuple.vue"
 import Player from "../Player.js"
+import { track } from "@vue/reactivity";
 
-const props = defineProps(['trackId', 'ttsInstructions', 'performanceId', 'choirMode'])
+const props = defineProps(['track', 'ttsInstructions', 'performanceId', 'playingTrack'])
+const emits = defineEmits(['setPlayingTrack'])
 
 const registeredClients = reactive([]);
 const autoGetRegisteredClientsInterval = ref(null);
+let maxRegisteredClients = ref(0);
+let firstRegisteredClients = ref(0);
 let synchronizing = ref(false);
+let trackStarted = ref(false);
 let timingSrcPosition = ref();
 let timingSrcConnected = ref(false);
 let allPartialsAllDevices = ref(false);
@@ -30,6 +37,7 @@ const isPoliphonyLimited = ref(true)
 const numberOfSimultaneousVoices = ref(64)
 const calibrating = ref(false)
 let beepIntervalId = null;
+const firstStartTime = ref()
 
 onMounted(async () => {
   // getRegisteredClients();
@@ -77,26 +85,29 @@ async function startTrack () {
   const calculatedStartingPosition = motion.pos + 5
   let route;
 
-  if (!props.choirMode && allPartialsAllDevices.value) {
-    route = `${process.env.MIX_API_SLUG}/track/${props.trackId}/start_all/${calculatedStartingPosition}/${props.performanceId}`
+  if (props.track && !props.track.is_choir && allPartialsAllDevices.value) {
+    route = `${process.env.MIX_API_SLUG}/track/${props.track.id}/start_all/${calculatedStartingPosition}/${props.performanceId}`
   } else {
-    route = `${process.env.MIX_API_SLUG}/track/${props.trackId}/start/${calculatedStartingPosition}/${props.performanceId}`
+    route = `${process.env.MIX_API_SLUG}/track/${props.track.id}/start/${calculatedStartingPosition}/${props.performanceId}`
   }
 
   const number_of_simultaneous_voices = isPoliphonyLimited.value ? numberOfSimultaneousVoices.value : 0
+  trackStarted.value = true
   const response = await axios.post(
     route,
     null,
     {
       params: {
         // tts_language: ttsLanguage.value,
-        choir_mode: props.choirMode,
+        choir_mode: props.track.is_choir,
         waveform: waveform.value,
         partial_overlap: partialOverlap.value,
         number_of_simultaneous_voices
       }
     }
   )
+  firstStartTime.value = Date.now()
+  emits('setPlayingTrack')
 }
 
 async function getRegisteredClients () {
@@ -104,6 +115,10 @@ async function getRegisteredClients () {
   registeredClients.splice(0)
   for (const client of response.data) {
     registeredClients.push(client)
+  }
+  const length = registeredClients.length
+  if (length > maxRegisteredClients.value) {
+    maxRegisteredClients.value = length
   }
 }
 
@@ -164,35 +179,88 @@ function startCalibration () {
 
 </script>
 <template>
-  <div>
-    <div class="flex items-center mb-4">
-      <input class="mr-2"
-             type="checkbox"
-             v-model="allPartialsAllDevices" />
-      <label class="mr-5">All partials to all devices</label>
-      <input class="mr-2"
-             type="checkbox"
-             v-model="choirMode"
-             disabled />
-      <label>Choir mode</label>
-    </div>
-    <div class="flex justify-between items-center">
-      <button @click="startTrack"
-              class="border p-2"
-              :class="synchronizing ? 'border-green-400' : 'border-red-400'"
-              :disabled="!synchronizing">
-        Start track
-      </button>
-      <div class="flex">
-        <button @click="synchronizeTimingSrcPosition"
-                class="border p-2"
-                :disabled="!timingSrcConnected">
-          Sync
-        </button>
-        <div class="border-b border-t border-r p-2">
-          {{ synchronizing ? timingSrcPosition : "0.0" }}
+  <div class="">
+    <div class="flex flex-row mt-1">
+      <InfoBox bgcolor="secondary" title="selected track" class="mr-1 w-1/3">
+        <div v-if="props.track" class="">
+          <InfoTuple name="title">{{ props.track.title }}</InfoTuple>
+          <InfoTuple name="mode">{{ props.track.is_choir ? 'choir' : 'sound system'}}</InfoTuple>
+          <div class="w-full justify-center items-center flex mt-4">
+            <button v-if="props.track" @click="startTrack"
+                    class="border-4 border-tertiary p-2 px-4 uppercase hover:bg-tertiary hover:text-white"
+                    :class="synchronizing ? '' : 'hidden'">
+              start
+            </button>
+            <div v-if="trackStarted && !playingTrack"
+                class="flex justify-center">
+              <div class="lds-dual-ring" />
+            </div>
+            <div class="text-sm" v-if="!synchronizing">Time is not running.</div>
+          </div>
         </div>
-      </div>
+        <div v-else class="p-1 text-sm">No track loaded</div>
+      </InfoBox>
+      <InfoBox title="clients" class="mr-1 w-1/3">
+          <InfoTuple name="online">{{ registeredClients.length }}</InfoTuple>
+          <InfoTuple name="max">{{ maxRegisteredClients }}</InfoTuple>
+          <InfoTuple name="at start">{{ firstRegisteredClients}}</InfoTuple>
+          <InfoTuple name="IDs">
+            <span v-for="client of registeredClients"
+                :key="client.id">
+              {{ client.id }} <span v-if="client.partial_id">(Partial-Id: {{ client.partial_id }})</span>
+            </span>
+          </InfoTuple>
+          <button @click="removeClients"
+                  class="border h-8 p-1 uppercase">
+            Drop all 
+          </button>
+      </InfoBox>
+      <InfoBox title="distribution" class="w-1/3">
+        <InfoTuple name="All partials to all devices">
+          <input class="mr-2"
+                type="checkbox"
+                v-model="allPartialsAllDevices" />
+        </InfoTuple>
+        <InfoTuple name="Time">
+            {{ synchronizing ? timingSrcPosition : "0.0" }}
+          <button @click="synchronizeTimingSrcPosition"
+                  class="w-6 h-6"
+                  :disabled="!timingSrcConnected">
+            {{ synchronizing ? '■' : '▶' }}
+          </button>
+        </InfoTuple>
+        <InfoTuple name="waveform">
+          <button :class="['mr-2', { 'bg-primary text-white': waveform === 'sine' }]" @click="waveform = 'sine'">
+            SIN
+          </button>
+          <button :class="['mr-2', { 'bg-primary text-white': waveform === 'square' }]" @click="waveform = 'square'">
+            SQR
+          </button>
+          <button :class="['mr-2', { 'bg-primary text-white': waveform === 'sawtooth' }]" @click="waveform = 'sawtooth'">
+            SAW
+          </button>
+          <button :class="['mr-2', { 'bg-primary text-white': waveform === 'triangle' }]" @click="waveform = 'triangle'">
+            TRI
+          </button>
+        </InfoTuple>
+        <InfoTuple name="overlap">
+          <input 
+                v-if="!props.track || !props.track.is_choir"
+                class="h-6"
+                type="number"
+                placeholder="none"
+                v-model="partialOverlap">
+        </InfoTuple>
+        <InfoTuple name="polyphony limit">
+          <input 
+                v-if="!props.track || !props.track.is_choir"
+                class="h-6"
+                type="number"
+                placeholder="unlimited"
+                v-model="numberOfSimultaneousVoices">
+        </InfoTuple>
+      </InfoBox>
+    </div>
       <!-- <div v-if="ttsLanguages && ttsLanguages.length">
         <label class="mr-2">Select TTS language</label>
         <select v-model="ttsLanguage">
@@ -201,20 +269,7 @@ function startCalibration () {
           <option v-for="lang of ttsLanguages">{{ lang }}</option>
         </select>
       </div> -->
-      <div>
-        <select v-model="waveform">
-          <option value="sine"
-                  selected>Sine</option>
-          <option value="square">Square</option>
-          <option value="sawtooth">Saw</option>
-          <option value="triangle">Triangle</option>
-          <!-- <option value="">Custom</option> -->
-        </select>
-      </div>
-      <input v-if="!props.choirMode"
-             type="text"
-             placeholder="Overlap"
-             v-model="partialOverlap">
+      <!--
       <div>
         <button @click="getRegisteredClients"
                 class="border p-2"
@@ -227,36 +282,7 @@ function startCalibration () {
           Auto
         </button>
       </div>
-      <button @click="removeClients"
-              class="border p-2">
-        Remove all registered clients
-      </button>
-    </div>
-    <div class="py-2 h-16 flex flex-row items-center justify-start" v-if="!props.choirMode">
-      <input id="limit"
-             type="checkbox"
-             v-model="isPoliphonyLimited">
-      <label for="limit"
-             class="p-1 ml-1">
-        Limit polyphony
-      </label>
-      <label v-if="isPoliphonyLimited"
-             for="maxVoices"
-             class="pr-1">
-        to max. simultaneous voices:
-      </label>
-      <input id="maxVoices"
-             v-if="isPoliphonyLimited"
-             type="number"
-             v-model="numberOfSimultaneousVoices">
-      <div class="flex flex-col ">
-      </div>
-    </div>
     <button @click="startCalibration">{{ calibrating ? 'Stop' : 'Start' }} calibration beep</button>
-    <p>IDs of registered clients (Total: {{ registeredClients.length }})</p>
-    <div v-for="client of registeredClients"
-         :key="client.id">
-      {{ client.id }} <span v-if="client.partial_id">(Partial-Id: {{ client.partial_id }})</span>
-    </div>
+      -->
   </div>
 </template>

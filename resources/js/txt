@@ -1,0 +1,1685 @@
+commit 1930c0bb970cbe58dd2fd33696e0578e0c8fdf50
+Author: wildyeast <lbin@protonmail.ch>
+Date:   Sat Jul 30 14:59:20 2022 +0200
+
+    Update design
+
+commit 16a24ec56297287d25d87bab014a54000bf1416c
+Author: wildyeast <lbin@protonmail.ch>
+Date:   Sat Jul 30 14:45:19 2022 +0200
+
+    Update design
+
+commit 32af1645d9f9ae4d6489d00b6ce5927fae0d5370
+Author: Mathias <mbind@protonmail.com>
+Date:   Thu Jul 28 20:01:28 2022 +0200
+
+    Add is choir checkbox, partial file name, tts instructions file name to Add Track form and save values to DB
+
+commit 24d241c2e6f6b541a6859c145f8c0f9158e29da4
+Author: M <a@b.c>
+Date:   Thu Jul 28 19:52:31 2022 +0200
+
+    FIx another typo in previous commit
+
+commit 2f5064cafdc75bf9964cb8cbe23ee6d41b5130aa
+Author: M <a@b.c>
+Date:   Thu Jul 28 19:39:26 2022 +0200
+
+    Fix typo in previous commit
+
+commit 7ece1ea33e61ccdf7beefcfc2a9d77a778fbca8a
+Author: M <a@b.c>
+Date:   Thu Jul 28 19:33:52 2022 +0200
+
+    Migration: Add is_choir, tts instruction file name, partials file name to DB
+
+commit 65ea93cf76ff71813f969c8b145d6c4efd9ee740
+Author: Lukas <lbin@protonmail.com>
+Date:   Tue Jul 26 15:34:12 2022 +0000
+
+    Fix api routes
+
+commit c64a4ea5eed70dd008fd1139d1ac8d7f83372a01
+Author: wildyeast <lbin@protonmail.ch>
+Date:   Tue Jul 26 17:23:02 2022 +0200
+
+    Add trackForList to decrease loading time
+
+commit 5e33306fa9d4c2d7a9284684850158395d20c81d
+Author: wildyeast <lbin@protonmail.ch>
+Date:   Tue Jul 26 10:38:20 2022 +0200
+
+    Remove logs
+
+commit d9a7daf7d16c4f46480a46011773c69f792b220e
+Merge: 3fe1ef5 a28f59d
+Author: wildyeast <lbin@protonmail.ch>
+Date:   Tue Jul 26 10:30:33 2022 +0200
+
+    Fix conflicts
+
+commit a28f59d76cb12058ca1bf37c124497e7667c7ea5
+Author: wildyeast <lbin@protonmail.ch>
+Date:   Tue Jul 26 10:29:34 2022 +0200
+
+    Improve arrange algorithm
+
+commit 8af663482e5dcf2b5e56001b50d19396d86a02d2
+Author: wildyeast <lbin@protonmail.ch>
+Date:   Mon Jul 25 16:42:52 2022 +0200
+
+    Improve arrange algorithm
+
+commit 4a42ce699b2cf8c5b379b346e6d1e2c458165dbd
+Author: wildyeast <lbin@protonmail.ch>
+Date:   Mon Jul 25 15:41:43 2022 +0200
+
+    Integrate arrange function
+
+commit f27d3da08ee6c5d7723e0caae500203dbee37327
+Author: wildyeast <lbin@protonmail.ch>
+Date:   Mon Jul 25 11:37:05 2022 +0200
+
+    Add arrange algorithm
+
+commit 3fe1ef551abff8ea3b0f2ada2019a9cc9f277246
+Author: Lukas <lbin@protonmail.com>
+Date:   Sun Jul 24 19:52:10 2022 +0000
+
+    Add public/mix-manifest.json to .gitignore
+
+commit 42e936d05f0461424192db5cb6bb24282ba8c669
+Author: M <a@b.c>
+Date:   Sun Jul 24 21:46:03 2022 +0200
+
+    Add public/js and public/css to .gitignore
+
+commit 9d070ecd7fd423ca7f494b7b19b8a6a9937f136d
+Author: M <a@b.c>
+Date:   Sun Jul 24 21:39:04 2022 +0200
+
+    Show partial_id of client (if set) in client list
+
+commit 48bbd15663b986ef99f6f0bc07da8a30b2ef4ba6
+Author: M <a@b.c>
+Date:   Sun Jul 24 16:44:04 2022 +0200
+
+    Fix: Check if tts file was uploaded returns wrong results
+
+commit e6ac091f03979223d72f3da88975219ef0036bd0
+Merge: 9015efd 346c1ac
+Author: wildyeast <lbin@protonmail.ch>
+Date:   Sun Jul 24 10:59:43 2022 +0200
+
+    Merge branch 'master' into developWithArrangedPartials
+
+commit 346c1ac9ced4617a883b09a4f71ed1170839cef2
+Author: M <a@b.c>
+Date:   Sun Jul 24 10:58:18 2022 +0200
+
+    Remove /public from .gitignore
+
+commit ea54de152b5954f8a65b88968355119873eb6e40
+Author: M <a@b.c>
+Date:   Sun Jul 24 10:57:19 2022 +0200
+
+    Revert "Remove public folder from git"
+    
+    This reverts commit bb3e35b37ae9278faafbabc636d9c6f231eee2a3.
+
+commit 9015efd6caab23105988b100142106cf6eac306f
+Merge: c52c2ad bb3e35b
+Author: wildyeast <lbin@protonmail.ch>
+Date:   Sun Jul 24 10:24:16 2022 +0200
+
+    Merge remote-tracking branch 'origin/master' into developWithArrangedPartials
+
+commit c52c2ad0e17c7bf26b3b36a2b15216124e362ba9
+Author: wildyeast <lbin@protonmail.ch>
+Date:   Sun Jul 24 10:24:14 2022 +0200
+
+    Add arrange function
+
+commit bb3e35b37ae9278faafbabc636d9c6f231eee2a3
+Author: Lukas <lbin@protonmail.com>
+Date:   Thu Jul 21 12:45:15 2022 +0000
+
+    Remove public folder from git
+
+commit 5a5952561d8b660bfbb5ad63502923f7449346c1
+Author: M <a@b.c>
+Date:   Thu Jul 21 13:45:00 2022 +0200
+
+    Fix: Adding/editing not working
+
+commit 01e111290824e33e397b6ab33d52821d8baa276e
+Author: M <a@b.c>
+Date:   Thu Jul 21 13:00:05 2022 +0200
+
+    Fix more route related bugs
+
+commit 1ebf70de25c92d1ca5c238f61faffd2c239225d0
+Author: M <a@b.c>
+Date:   Thu Jul 21 12:10:58 2022 +0200
+
+    Repace harcoded slug with env variable
+
+commit 8d9b9c560026a18fdcba8ea03bce899bc4572ac6
+Author: M <a@b.c>
+Date:   Thu Jul 21 12:06:14 2022 +0200
+
+    Replace hardcoded route with env variable
+
+commit 0e994dd5644db45521ff40837220c8c4816658a4
+Author: M <a@b.c>
+Date:   Thu Jul 21 11:59:46 2022 +0200
+
+    Use env variable for api slug; Related changes
+
+commit a0c413d5f95cd0bde5a82134927be44ff0a13a43
+Author: M <a@b.c>
+Date:   Thu Jul 21 11:58:46 2022 +0200
+
+    Fix: Adding track not possible if no tts file uploaded
+
+commit 5276d83f75b6da7cbf35a4f88a6177d3d07fd6f8
+Author: M <a@b.c>
+Date:   Mon Jul 18 20:03:30 2022 +0200
+
+    Add v1 to cors.php; Fix indentation in some files
+
+commit 740b21aae52ab6bfbea706a012f1935fe1f614fc
+Author: Lukas <lbin@protonmail.com>
+Date:   Mon Jul 18 15:27:45 2022 +0000
+
+    Fix some api urls
+
+commit 7687dc0e61ad8105f9ec006b94a90b9b65c48cd6
+Author: Lukas <lbin@protonmail.com>
+Date:   Mon Jul 18 12:41:19 2022 +0000
+
+    change route prefix
+
+commit 04e8153bab8bc9f46930960109e1ababe931b193
+Author: M <a@b.c>
+Date:   Sat Jul 16 13:26:18 2022 +0200
+
+    Add anon: true to MCorp app initialization; Commit built files
+
+commit 631e98c2dedfc964e780c0616cdc45ac04ca76e3
+Merge: ee5a1b4 f9ae5ea
+Author: M <a@b.c>
+Date:   Fri Jul 15 19:35:45 2022 +0200
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+    
+    # Conflicts:
+    #       public/css/app.css
+    #       public/js/app.js
+
+commit ee5a1b41da98fe00550e75a5db19bb79fa44dca6
+Author: M <a@b.c>
+Date:   Fri Jul 15 19:32:00 2022 +0200
+
+    Commit built files
+
+commit f9ae5ea342784576d8065d0675e73c5ba7c2bcc6
+Author: wildyeast <lbin@protonmail.ch>
+Date:   Wed Jul 13 11:45:33 2022 +0200
+
+    Landing page
+
+commit c7f6ab1285684a22598c8cbc6791b7b2bc797ee7
+Author: M <a@b.c>
+Date:   Wed Jul 6 11:45:17 2022 +0200
+
+    Change calibration beep to sine
+
+commit 033ee121b1a1742cdcee2e1daaf04fcd058a1af0
+Author: M <a@b.c>
+Date:   Tue Jul 5 10:09:14 2022 +0200
+
+    Make different levels of deepness in tts instruction file work
+
+commit f05bf7b621c549774f6b520ea6b39e45abf7eaac
+Author: M <a@b.c>
+Date:   Sun Jul 3 19:22:41 2022 +0200
+
+    Simplify code
+
+commit ee714f6cfce66813062454e130676f27a9790513
+Author: M <a@b.c>
+Date:   Sun Jul 3 12:45:47 2022 +0200
+
+    Prevent calibration start if no motion connected
+
+commit 6e0343a4dbae29ae88353194f94a3cb7ee2cdc5b
+Author: M <a@b.c>
+Date:   Sun Jul 3 12:39:31 2022 +0200
+
+    build
+
+commit 07aca574db720e50ceee09a786319a699a4cde6f
+Author: M <a@b.c>
+Date:   Sun Jul 3 12:37:05 2022 +0200
+
+    Calibration beep improvemnts
+
+commit 242f06d4f66ac7dece3f1b1ac1c37376c939d4d5
+Author: M <a@b.c>
+Date:   Sun Jul 3 12:18:37 2022 +0200
+
+    Add updated Player.js; Add calibration beeping to dClientList
+
+commit 69957fadba1cd0d1ce240886c5d94b65b288ddf9
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Jun 20 11:29:05 2022 +0200
+
+    Add loading spinner to TrackList.vue
+
+commit 38c02aad35daadee8c3c5857d07b86bbf418c11b
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Fri Jun 3 13:52:30 2022 +0200
+
+    UI and usability improvements
+
+commit 02be847b2b2935c59cd30a691d71fab18a35b59c
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Thu Jun 2 09:29:32 2022 +0200
+
+    Implement possibility to choose partial overlap
+
+commit e0b320d4e3f417a0480fd4bdb8564c14aa5064e4
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 21:10:42 2022 +0200
+
+    Remove debug line
+
+commit 17a6b875fe4f938545190f068de95fccb9e58bff
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 21:00:22 2022 +0200
+
+    Change saw to sawtooth in ClientList.vue
+
+commit d9e5af791c27ed34b72e8b0df8bb060caf305bdd
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 20:56:28 2022 +0200
+
+    Add waveform selection to ClientList.vue; Save it to client on track start
+
+commit 400cdd0fd13010c81d5f6098a2cb62c855012ff4
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 20:39:18 2022 +0200
+
+    Migration: Add waveform to clients table
+
+commit 925cb1c88ef7b40788a4909fff1d049baaad2c1f
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 17:38:45 2022 +0200
+
+    If choir mode selected, only send partial corresponding to client's partial_id to client
+
+commit f28687f871511d1314b83dddccc2d5b74fe7590f
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 16:58:42 2022 +0200
+
+    Save client partial_id to DB
+
+commit 059101edf93d0274e533a9c803e51a2c00ca3acd
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 16:57:38 2022 +0200
+
+    Migration: Add partial_id to clients table
+
+commit 0d36574daf210e07c1793a4995dca2382224573a
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 16:42:14 2022 +0200
+
+    Implement generation of QR code for each partial of a track
+
+commit b3f25dbaead70f427feedcbf3ee13930a46a7334
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 15:47:15 2022 +0200
+
+    Create and display QR for performance
+
+commit 87ff9e041f00fea1f54876888884d988cd6b15fe
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 14:13:38 2022 +0200
+
+    Fix TTS lang selection display
+
+commit 2515180a5492a91e930060b863ee254b533484c4
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 13:41:36 2022 +0200
+
+    Only get clients registered for specific Performance
+
+commit 9c5adf14585f9c5f69fc1ae42f4f42dc296c912d
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 13:31:31 2022 +0200
+
+    ClientList cleanup
+
+commit 2b428c412e86a9040605b98df7318b4ae0b623a4
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 13:30:05 2022 +0200
+
+    Fix bug in ClientList.vue
+
+commit 03fdb5e1b7d83f471a2c37c10517df0af87e8c5d
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 13:27:32 2022 +0200
+
+    Use script setup in ClientList.vue
+
+commit fb2c8ca0b7310440ce919e5cebc950e3e7a4de0e
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 11:26:08 2022 +0200
+
+    Minor layout improvement
+
+commit e68f9396c1615ffc0599353323a80a902d168e2c
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 11:13:50 2022 +0200
+
+    Add ClientList to Performance; Implement playing of selected track from performance view
+
+commit d6ee2c4e28e3f729f8fe05f745ae1b69a22e9ad4
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 09:20:03 2022 +0200
+
+    Get tracks belonging to performance; Display them in list
+
+commit e23025f3eec14f951dc9f279099bc064fe25a747
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 09:09:11 2022 +0200
+
+    Create TrackList.vue; Implement basic adding of tracks to performances
+
+commit a90b068d200f5c6d2b45041c6c04631b03f7bea0
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Jun 1 08:23:52 2022 +0200
+
+    Vertically center Sadiss logo in top bar
+
+commit 8758e63ac4cfc4ec23295e3f13824319f4432f4e
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon May 30 10:52:32 2022 +0200
+
+    Fix prop type; Remove console log
+
+commit 72469ca8d995cd19731ff385b1f6a87ad9a377c6
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon May 30 10:22:18 2022 +0200
+
+    Display '0.0' when not synchronizing (not real position of motion, just visual)
+
+commit 9ad24221b8e0afc72cfdfa5746b5c65a64c4dd0c
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon May 30 09:47:36 2022 +0200
+
+    Improve styling of tts upload
+
+commit bcb3482bdb18171d1723e9179d3b2436c88f2ea2
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sun May 29 09:47:36 2022 +0200
+
+    Fix another bug in TrackController.php
+
+commit 8c402305e0629be6503c0e241341821d780d2e8c
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sun May 29 09:44:05 2022 +0200
+
+    Fix wrong syntax in TrackController.php
+
+commit 00e9eb5ea3dcc88b8399cf8eb98b39c2e2ea6961
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sat May 28 18:53:36 2022 +0200
+
+    Make TTS optional
+
+commit 37774e0936245d9ab9881c6f039397d9e8fcde2d
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sat May 28 18:37:03 2022 +0200
+
+    Implement setting of tts_language when starting track
+
+commit 623f74518f461f2dcc8ddb01eafd8392f469bd1d
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sat May 28 18:30:29 2022 +0200
+
+    Fix migration
+
+commit 3f61b7e1a54c6ab97aa19e41c7195204adf99936
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sat May 28 17:52:21 2022 +0200
+
+    Migration: Add tts_language to clients table
+
+commit ecb27d0a0fc20da3a30532bf47215f0a151647df
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sat May 28 14:08:37 2022 +0200
+
+    Send tts instructions to client
+
+commit a1b54f8cfeabd8a510b810a2c293d31ba3da85e9
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sat May 28 13:31:30 2022 +0200
+
+    Enable tts instruction JSON file upload and save contents to db
+
+commit 1128ec2daaa1a063c52fa4f8c9b03a595dae30c3
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sat May 28 13:31:00 2022 +0200
+
+    Migration: Add tts_instructions to clients table
+
+commit d33fbeaffb7d4cac838b484efadc14e8cab0332e
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sat May 28 13:06:30 2022 +0200
+
+    Add tts json instruction file upload to Add Track page
+
+commit 60f52dfa36feb45788bdbf8ef75e14ee00565e02
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sat May 28 13:06:08 2022 +0200
+
+    Update migration of previous commit to be of type json instead of longtext
+
+commit ee57d942aaf3307ac33bb74f5ff51c2c66bd8544
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sat May 28 12:53:30 2022 +0200
+
+    Migration: Add tts_instructions to tracks table
+
+commit 0b62e8c60169239fc5aaff5f9575762b46c428bc
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed May 25 20:44:36 2022 +0200
+
+    Add console logs
+
+commit 75346ad92e54466712a1db794a297967a8d6dce8
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed May 25 20:37:46 2022 +0200
+
+    Minor changes
+
+commit dbf25b8f653d878c24116a2c896dd13115b4356a
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed May 25 18:52:37 2022 +0200
+
+    Add mCorp init command
+
+commit 8ee2084eba7216ceea235edf8886a516b043a803
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Tue May 24 10:39:18 2022 +0200
+
+    se request-unlocked mocorp app
+
+commit 3e8b4fbfbf17218e2f246b1a7125e5b797631dcc
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Tue May 24 08:46:18 2022 +0200
+
+    change http to https
+
+commit eb39d23ae21323a7858aeeac17a084cbf1928a59
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Tue May 24 08:27:39 2022 +0200
+
+    Add MotionCorp
+
+commit 7faa10080254b20aa5b9b378678830c362667bbd
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Apr 11 15:55:27 2022 +0200
+
+    fix more merge conflicts
+
+commit 8ec41b822d0dd3e47e272812e651fb72478859fe
+Merge: 81728f9 6c9d6b4
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Apr 11 15:54:20 2022 +0200
+
+    fix merge conflicts
+
+commit 6c9d6b48437cab8bd7b8ce2fbee3acd05d4e1997
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Apr 11 15:52:44 2022 +0200
+
+    remove console.log
+
+commit dbe0d3bc112bc69d05057b5879090602053ad8bc
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Apr 11 14:05:37 2022 +0200
+
+    use route depending on checkbox value
+
+commit 3905e7a3bf539791ba8ee078786bc72707de0fde
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Apr 11 13:55:23 2022 +0200
+
+    debugging start track
+
+commit 53de8b043200b8b79993b49b1a89d004fb7b8085
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Apr 11 12:48:30 2022 +0200
+
+    add ability for user to choose sending all partials to all devices for testing
+
+commit e61f9c227d0acd8bc30494c3b3b544dad9c6740f
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sun Apr 10 15:52:55 2022 +0200
+
+    fix autorefresh of clients list
+
+commit 664e1e78e027fc169094fdefc26a6a4d55266a85
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Fri Apr 8 22:56:55 2022 +0200
+
+    improve synchronizing in ClientList.vue
+
+commit 961131258636ea33fb58cf1cd755dc1c7771d2d9
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Fri Apr 8 12:13:12 2022 +0200
+
+    fix bug in previous commit
+
+commit 5726faed775a47efa75e705769b3f8ade0ad0790
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Fri Apr 8 12:12:00 2022 +0200
+
+    debug: all partials to all clients
+
+commit f607ac7058c3aee4b0901fe1cf223dd814aafdaf
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Thu Apr 7 19:53:28 2022 +0200
+
+    disable sync button if connection to timing server is not yet established
+
+commit a803b6967b197fa7e861917ad6fe9257d6295bbd
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Thu Apr 7 19:42:18 2022 +0200
+
+    Improve timingsrc connectivity
+
+commit 494bbf551387076bdf2dd0bfbc25f4aaaefbd57b
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 15:15:34 2022 +0200
+
+    print time
+
+commit fe57c965fc9a8cef3678aeb1d31d2e317821ad2a
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 15:09:49 2022 +0200
+
+    change ws to wss
+
+commit 74920ce9d734c6b8308160dacd799b12862d5ea2
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 15:08:52 2022 +0200
+
+    change url to zeitquelle
+
+commit 2272346a71012127a0d7bdc43962493e877e2038
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 14:17:18 2022 +0200
+
+    add ref
+
+commit e015427742d9fa4ecc8d075243af7e4ad6d7f987
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 14:16:23 2022 +0200
+
+    add accidentaly removed function from return obj
+
+commit a4e10179626631c8c0008caefc6df347f6d26e47
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 14:15:05 2022 +0200
+
+    Remove realtime pos update from sync button
+
+commit 0efa1878a16c960d8e56c92c621d728b135fc156
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 12:25:21 2022 +0200
+
+    minor
+
+commit 9c8af76eff2dca7028d2f7975fb98684b3108f45
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 12:21:29 2022 +0200
+
+    remove unecessary setting of position
+
+commit f72c28cb9813f1d1b44de180cd80e48d42a6e847
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 12:18:38 2022 +0200
+
+    wss to ws
+
+commit fa997837a1d0538ecd20304f5af82e9558e61d76
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 12:18:08 2022 +0200
+
+    use localhost timing server for testing
+
+commit 5cbf14fbcfdce1aab5ea6bfce477c4be1c95b0d4
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 12:11:36 2022 +0200
+
+    wss instead of ws
+
+commit cfd9296b9e653203d2e6246260f4171986472a1d
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 12:07:17 2022 +0200
+
+    use 8hz different port
+
+commit 9347790abe8f9753d2ee21f50d0177aab4dffaec
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 12:04:04 2022 +0200
+
+    8hz timing provider
+
+commit 66277c29a501792fae4bde862d709bb97adaba62
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 11:58:19 2022 +0200
+
+    use localhost
+
+commit 920481506c4e133b1bd2964acb8085407b98b314
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 11:57:46 2022 +0200
+
+    use url
+
+commit ea45156dbb6089805c0e3377106cbefd20c1fc45
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 11:53:42 2022 +0200
+
+    use server ip instead of url
+
+commit d0b17a52eb1761f443cd4af0c50a0b24095d9567
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 11:51:00 2022 +0200
+
+    change timing provider url
+
+commit a33457f20172703fd25db7c3c0079a1bd5ab60b0
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 11:47:17 2022 +0200
+
+    git push
+
+commit 9b62b10fd31fbd6ebd081557f3f869e41a348e1b
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 11:45:48 2022 +0200
+
+    add ref
+
+commit 9e406ac2c959784ca5e30c231d9edf01f6658941
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 11:44:46 2022 +0200
+
+    remove unneeded ref
+
+commit f567f41fb752a378171d72a4ffad9a3df822bcdf
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 11:33:58 2022 +0200
+
+    syncing tests
+
+commit ddc6f932c4eef5c165afac0d74dff44deceda80c
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 11:12:46 2022 +0200
+
+    minor
+
+commit 6bd5798f201909d0227746e2166b6be775363870
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 11:11:28 2022 +0200
+
+    minor
+
+commit 5d2746d60f75442f7c68e4d38fa3559989123dc6
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 11:10:46 2022 +0200
+
+    minor
+
+commit 599beba5088e9cc79fdc081a4f962f6f74623ca0
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 11:10:17 2022 +0200
+
+    minor
+
+commit 0e15e7a3fcd82829f112d9c2bb6474c6210dd56e
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 11:09:09 2022 +0200
+
+    minor
+
+commit 95bebd857bee9d8ee3a966464402f2d5836b02a5
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 11:07:52 2022 +0200
+
+    minor
+
+commit d11d242a8a2f4da04e71980b5cb210e4ab5b2219
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 11:02:29 2022 +0200
+
+    add sync button and functionality to ClientList.vue
+
+commit 0623002cc72cd5217586f24757ef718489fc2d22
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 10:37:19 2022 +0200
+
+    remove Carbon start time
+
+commit 7e5c393641691d21b58468c55b2b005717373b3e
+Merge: 98629a4 f790ea9
+Author: Lukas <lbin@protonmail.com>
+Date:   Wed Apr 6 08:06:02 2022 +0000
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+
+commit f790ea9cba088abc14827feeabe5f713dfd02459
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 10:05:49 2022 +0200
+
+    more possible bugfixing
+
+commit 98629a4980c160f8bae294b9c5028eb1e137aa72
+Merge: 5c8379a 2611cbc
+Author: Lukas <lbin@protonmail.com>
+Date:   Wed Apr 6 07:59:22 2022 +0000
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+
+commit 2611cbca49b37e1e52f8a4446f0b2457f6448fef
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 09:59:09 2022 +0200
+
+    more possible bugfixing
+
+commit 5c8379a4377ff911c6fea68e7f9a67c3a0df7cbb
+Merge: 0d87182 ce5ea87
+Author: Lukas <lbin@protonmail.com>
+Date:   Wed Apr 6 07:58:02 2022 +0000
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+
+commit ce5ea87ea0af31bd893cabc9dee67ab397cb8844
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 09:57:45 2022 +0200
+
+    more possible bugfixing
+
+commit 0d8718225e5a6328eff2838f93e9b5ba2a8d399a
+Merge: 1a447f5 a785714
+Author: Lukas <lbin@protonmail.com>
+Date:   Wed Apr 6 07:57:01 2022 +0000
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+
+commit a785714c9d3fd6589b00b30b3aeaa71f15802b37
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 09:56:48 2022 +0200
+
+    more possible bugfixing
+
+commit 1a447f5665df4575d2404e1b8aa06ad5a437b20e
+Merge: cd07042 9cf44ac
+Author: Lukas <lbin@protonmail.com>
+Date:   Wed Apr 6 07:56:17 2022 +0000
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+
+commit 9cf44ac1f3a2fd3868b6650a1cf92c2f8b8d306d
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 09:56:04 2022 +0200
+
+    more possible bugfixing
+
+commit cd0704222c017b8ca913da13446b3a3a63b90049
+Merge: a9c07b3 a249abd
+Author: Lukas <lbin@protonmail.com>
+Date:   Wed Apr 6 07:51:26 2022 +0000
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+
+commit a249abd831f0bb5c55e7d409e52e6813cc3bd755
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 09:51:13 2022 +0200
+
+    more possible bugfixing
+
+commit a9c07b30dd392b797d5f07df59b94bc7f27b6175
+Merge: 0507ce1 a1beda2
+Author: Lukas <lbin@protonmail.com>
+Date:   Wed Apr 6 07:33:48 2022 +0000
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+
+commit a1beda2185404059d52b8fc6731207d5b689c8b3
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 09:33:36 2022 +0200
+
+    more debugging console logs
+
+commit 0507ce198d473c148fffd6ad7698ca478fdf598a
+Merge: 59c33d7 d1a1b6f
+Author: Lukas <lbin@protonmail.com>
+Date:   Wed Apr 6 07:32:43 2022 +0000
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+
+commit d1a1b6f7be10b490ac90b16f5bbb061d0390a7e1
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 09:32:30 2022 +0200
+
+    possible bug fix
+
+commit 59c33d743ff9f89fec10554420cf8d51aff0b958
+Merge: 53b394d 2db1ea7
+Author: Lukas <lbin@protonmail.com>
+Date:   Wed Apr 6 07:29:49 2022 +0000
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+
+commit 2db1ea767cb316a7c76bb4328f98d30c63fe7df6
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 09:29:37 2022 +0200
+
+    more debugging logs
+
+commit 53b394d24fd4234a4511fb627cf0f52d33b6657e
+Merge: 25a1c94 21892a4
+Author: Lukas <lbin@protonmail.com>
+Date:   Wed Apr 6 07:28:39 2022 +0000
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+
+commit 21892a4f6292f3d9619ac01e8c95c66656dc012b
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 09:28:27 2022 +0200
+
+    more debugging logs
+
+commit 25a1c94599aa27e9094f6fb1adbc4ec2451a1e3f
+Merge: cfbf672 699b25b
+Author: Lukas <lbin@protonmail.com>
+Date:   Wed Apr 6 07:27:47 2022 +0000
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+
+commit 699b25be3086fefd794ac9c2f88ec2aae3debd2f
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 09:27:35 2022 +0200
+
+    more debugging logs
+
+commit cfbf67298b5cddf6566e391e033af7623326371e
+Merge: 3eaf00c 9c9e08a
+Author: Lukas <lbin@protonmail.com>
+Date:   Wed Apr 6 07:26:44 2022 +0000
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+
+commit 9c9e08a6647212bf31b875461ebcf8cb569301cf
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 09:26:32 2022 +0200
+
+    remove this in two places; add comments for debugging
+
+commit 3eaf00cdfe387bb0c8ef8b8d9d71b3d113f2e099
+Merge: f631f6e d8d46ce
+Author: Lukas <lbin@protonmail.com>
+Date:   Wed Apr 6 07:21:50 2022 +0000
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+
+commit d8d46ceaea106492eddd0273ed5a4a1bd65819e9
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 09:21:38 2022 +0200
+
+    change timingSrc velocity to 1 on Track Start
+
+commit f631f6e7b73d87165888db87a27247c732f400c4
+Merge: 7eeb8e1 f6b2a75
+Author: Lukas <lbin@protonmail.com>
+Date:   Wed Apr 6 07:16:02 2022 +0000
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+
+commit f6b2a75fb88494d0c0296fd88e66aa131680c635
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 09:15:50 2022 +0200
+
+    restore wrongly deleted file
+
+commit 7eeb8e160fddeb6259550e5e145398503f152e75
+Merge: 6601d8a 18ddb0f
+Author: Lukas <lbin@protonmail.com>
+Date:   Wed Apr 6 07:12:23 2022 +0000
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+
+commit 18ddb0f23cc80d8d375013c23c53514284cbc345
+Merge: 3189221 c18ad14
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 09:12:10 2022 +0200
+
+    merge addTimingSrc into master
+
+commit 6601d8a24899e57227fca05a9dd3f28543c5014c
+Merge: 0cf0903 3189221
+Author: Lukas <lbin@protonmail.com>
+Date:   Wed Apr 6 07:04:07 2022 +0000
+
+    Merge branch 'master' of github.com:wildyeast/sadiss
+
+commit 3189221321ce24f240b320414465d8d6d9ac7268
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 09:03:54 2022 +0200
+
+    add autogenerated app.js
+
+commit c18ad149854612b043ff6d947d6e035bd99d3268
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Apr 6 09:03:10 2022 +0200
+
+    add timingsrc to ClientList.vue; change startTime in client model to float; add start time from server client to db on Start Track
+
+commit 0cf09039a61be8664262826b0eea66eb064b248b
+Author: Lukas <lbin@protonmail.com>
+Date:   Sun Apr 3 19:53:12 2022 +0000
+
+    Use Carbon for time response
+
+commit 81728f986ef84f200d3a52ed8d3578d54d60a4d1
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sun Apr 3 19:58:13 2022 +0200
+
+    websockets WIP
+
+commit 5f5e0656ace08a9a6ca98135151f411cd53f301e
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sun Apr 3 18:45:14 2022 +0200
+
+    working on websockeets
+
+commit aa89e35e529d259b0b73a809b444278eb29a8e56
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sun Apr 3 16:52:31 2022 +0200
+
+    begin adding websocket functionality
+
+commit 918359ea63d5f9b9f502824d316a11ef18e93873
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sat Apr 2 15:50:05 2022 +0200
+
+    change track order to desc
+
+commit fc65ea3fe6b13edb73ab0d82306bddb81edbc1bf
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Fri Apr 1 16:30:48 2022 +0200
+
+    copy over player.js from sadiss_client
+
+commit b095fa20d0f99dc0a40303ba91e0a972f963be53
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Fri Apr 1 14:30:33 2022 +0200
+
+    fix: auto registration on startup not working
+
+commit 7bbab28dc7d338678c0a37d64af62657743f0e09
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Fri Apr 1 14:23:38 2022 +0200
+
+    set auto reload client list to true
+
+commit 8809e56dbb1058a4af2b19167f3f90126e1e1568
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Fri Apr 1 14:13:48 2022 +0200
+
+    add total count to clientlist
+
+commit b54a8ac2cc57c20a035e7387f9e34b049d64ff0b
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Fri Apr 1 11:47:03 2022 +0200
+
+    disable registration
+
+commit f43f8d385cad60befe34018662d608b59940d7d1
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Mar 30 17:02:59 2022 +0200
+
+    redirect to tracks from landing page
+
+commit df555ea227d3c3e8630bcb708c0da1b219dbbd29
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Mar 30 17:00:58 2022 +0200
+
+    set home to /tracks
+
+commit 22c0c3cc5357a93812591cdc9fc5f956bd23bb67
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Mar 30 16:59:45 2022 +0200
+
+    remove spear partials upload from dashboard; enable registration
+
+commit fea90a8bf0362c60fc78d071836f0b8677e8ebbf
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Mar 28 13:17:23 2022 +0200
+
+    fix: wrong route name; minor layout updates
+
+commit dc05244188e6d27d112338fbf8a14972dea3a90b
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Mar 28 12:18:44 2022 +0200
+
+    uncomment postcss stuff in webpack.mix.js
+
+commit eae31b2f666fc2f6a86076c8368f14863874ad9c
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Mar 28 12:08:02 2022 +0200
+
+    add functionality for deleting inactive clients; minor layout updates
+
+commit 0b007c729796705743c8bbc03ffd1ae75083891b
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Mar 23 13:47:04 2022 +0100
+
+    add last_listening_time (date) to clients table
+
+commit b9e8c41d4b299baa73f4c92d905c809d79bfdb86
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Mar 21 22:51:05 2022 +0100
+
+    add comment to 'no throttling' route group
+
+commit a1d0335797e66726e507ba0c4acd1a13f13fb9c1
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Mar 21 22:50:48 2022 +0100
+
+    disable registration
+
+commit a85587597616cbb46c1c80eb85aa48120ad53242
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sun Mar 20 19:26:18 2022 +0100
+
+    add updated player from sadiss-client to sadiss; adapt code in Player.vue
+
+commit 5b3a3a18e6c04db0fc67bed963e5c7f5702909b9
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sun Mar 20 19:19:14 2022 +0100
+
+    add refresh list button to ClientList.vue
+
+commit 515f32003185c3a6def67253bb5cc71e8dd83224
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sun Mar 20 18:13:10 2022 +0100
+
+    increase time before track start to 15s (from 5s)
+
+commit e111bf482e6ea712ba36ed56afd5b7e51e2f85d7
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sun Mar 20 17:04:42 2022 +0100
+
+    don't throttle client get requests (danger of 429 while listening for track start)
+
+commit 98a1cba0f207889115358bbdf6849fa7f3b483cc
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Sun Mar 20 16:57:01 2022 +0100
+
+    respond with token and id on client creation
+
+commit 8806c77dd0233d151474a0fc43c420eb9b87efc8
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Mar 16 23:17:53 2022 +0100
+
+    change get_by_token endpoint to respond with current server time
+
+commit 628cf000409adacfc7b5d5665f48578076d27e33
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Mar 16 19:43:11 2022 +0100
+
+    fix Player.js
+
+commit 0eda7943cead81eb5f8c5056b4664ffbaf365490
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Mar 16 19:00:57 2022 +0100
+
+    belongs to previous commit
+
+commit ab3c5be8ca5fc2d10105609dd787e8c074a6783c
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Mar 16 19:00:50 2022 +0100
+
+    copy over Player.js from sadiss-client
+
+commit 49ff260cbfd628bab48cb952312e0eccb0b98373
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Mar 16 18:24:01 2022 +0100
+
+    add Carbon; set up route to return current server time
+
+commit 11c7ff029fa64af595bf5cd4a4b708ba826b2983
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Mar 16 13:10:53 2022 +0100
+
+    increase time until track starts from 5 to 15 seconds
+
+commit bf7256299e901e1a49a0aa4db95ce929b722ed3a
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Mar 16 12:24:32 2022 +0100
+
+    improve partial to client distribution
+
+commit f7660c06829038c018925df17a13cbb92b2e87f4
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Mar 14 21:13:44 2022 +0100
+
+    style improvements for more clarity in ClientList.vue
+
+commit 59abbf37d28e7864b5ab6420b7e2bb7a6b7416cf
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Mar 14 19:16:22 2022 +0100
+
+    adapt console log
+
+commit 358bc6b2ddb885667a40ce10c07fd285eab5f406
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Mar 14 19:12:07 2022 +0100
+
+    add function to delete all registered clients
+
+commit 60d5958c22fd2bda7427a7181ab550a262a55528
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Mar 14 16:32:36 2022 +0100
+
+    split partials into chunks and distribute to all listening clients (not fully tested)
+
+commit d2f0e29cc0a460db242d0dce881e7bccd12e7d73
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Mar 14 13:41:16 2022 +0100
+
+    create function to get client by token and set up route to it
+
+commit 290e9722cd79d2361ee8301ef1c0326b109d82da
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Mar 14 13:40:17 2022 +0100
+
+    make partials and start_time nullable in clients table
+
+commit 1fee2bff3d93a2a02be2c7345909e569eb01490a
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Mar 14 13:30:01 2022 +0100
+
+    add partials and start time columns to client table
+
+commit 9da5c6c6c80991994d3338692b9ffc0454e975cd
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Mar 14 13:17:02 2022 +0100
+
+    return token on client create and some minor things
+
+commit da725dcd2d4856f358f6da6c26ab462780fca828
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Mon Mar 14 11:38:37 2022 +0100
+
+    create client routes, update controller, create ClientList.vue component
+
+commit e7c57aac3cd428bcc4e110f5a31e6703b48d91e4
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Fri Mar 11 18:26:06 2022 +0100
+
+    display Player instead of partials string in track ListEntryDetailsPage.vue
+
+commit ffec2ac707cd8854a20fdcd3ecee42b4efdece27
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Fri Mar 11 18:19:10 2022 +0100
+
+    remove unneeded line
+
+commit c17939176e98c6fb161a36d4011f1ac54fd99b4d
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Fri Mar 11 18:18:11 2022 +0100
+
+    fix: description not displayer correctly in ListPage.vue
+
+commit 12cd5ade5f17178d717c99ac3a5a7aee18c15702
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Thu Mar 10 13:17:08 2022 +0100
+
+    cleanup
+
+commit 9b80e3c048111ee943f3ccd4d608dec416374492
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Thu Mar 10 13:11:18 2022 +0100
+
+    cleanup
+
+commit 3fa4eff2ff8bfb2d5200403e6bff56eb38ab38fc
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Mar 9 16:49:11 2022 +0100
+
+    cleanup
+
+commit 8c2dc7d428e6d482931e7cf37322ed118aefb79a
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Mar 9 16:48:21 2022 +0100
+
+    fix: can't play again if all oscs have ended naturally
+
+commit 7308e18e3230cabab8177c29c55e7722cc5ccdb3
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Mar 9 16:45:18 2022 +0100
+
+    reset play/pause icon when all oscs have ended
+
+commit c108a3f74bd2cbba3ab95100b8e3f17fcfd01f05
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Mar 9 16:35:35 2022 +0100
+
+    make stopping and restarting possible
+
+commit 70bfefde22489551de0d5a0c1cef8281a804f95a
+Author: Mathias Bindeus <mbind@protonmail.com>
+Date:   Wed Mar 9 16:03:41 2022 +0100
+
+    add player class, play partial on button click
+
+commit 6023f370b7f7789653196d12d6a640da87793bc6
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Mar 9 14:26:17 2022 +0100
+
+    create Player component WIP
+
+commit 7b8b192df80b6e747994ad4dbfd683ae1265e70b
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Tue Mar 8 17:49:53 2022 +0100
+
+    change partial colum type to longText
+
+commit f3fe51ffd9484a4be9e9cc8617158b1d35358bb9
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Fri Feb 25 15:33:32 2022 +0100
+
+    fix convert_source_file
+
+commit 14754511ef7f3fe6ff42d767d30f9b70d1812c4a
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 23 19:43:51 2022 +0100
+
+    do not display full description for composers in ListPage.vue
+
+commit ac615ed05b73566fdf9074ecd5ce4abdb253ad53
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 23 19:18:34 2022 +0100
+
+    fix: is_active null if checkbox left on default
+
+commit 13765ce54760413038fe71816b18f3f2c83c5109
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 16 19:15:13 2022 +0100
+
+    display is_active on details page; add backnavigation on successful edit
+
+commit 55bf988bdd92f3212a1a821e7700cf7285222dff
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 16 18:59:54 2022 +0100
+
+    add link to edit page in details page
+
+commit 185a2b55fc1d50d7db41a125eb89d927c82871d7
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 16 14:22:27 2022 +0100
+
+    fix layout in AddOrEditPage.vue
+
+commit 7b600abc204551225937812a71a467f7d7d71d08
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 16 14:13:01 2022 +0100
+
+    add create and delete functions to ClientController (untested as of yet)
+
+commit 0fdb5bbb0106ea945206f622248f755d92a47366
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 16 14:06:24 2022 +0100
+
+    create Client model
+
+commit 1cef2355de1c82e6a1ab1a85b70b1c9b38014ab3
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 16 13:07:09 2022 +0100
+
+    create track and performance detail page templates
+
+commit de7a6984513b7a8e30b8780ba3e8713fb516d082
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 16 12:22:52 2022 +0100
+
+    create composer details page template
+
+commit f00edaf59a2ca40e16b688fc782c701e1d2fd984
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 16 11:15:55 2022 +0100
+
+    add comments to web.php
+
+commit db5fb34ba137201c7e16542e92acf4425a5af356
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 16 11:14:32 2022 +0100
+
+    refactor web.php
+
+commit 72beb037ad6f9b87584d595e2f33d813a0ca7eab
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 16 11:06:28 2022 +0100
+
+    fix: AddOrEditPage not rendering due to mistake in route ordering
+
+commit f998fdf83d3c40dc62c7ccb3af87305d101792a0
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 16 10:51:09 2022 +0100
+
+    minor
+
+commit 9b376f0412b61509f7025060a1cd3527a124510f
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Feb 14 17:02:32 2022 +0100
+
+    create ListEntryDetailsPage layout WIP
+
+commit dde5046d72afbfaa8238b5b9a6609203fb10b61c
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Feb 14 16:05:17 2022 +0100
+
+    remove code from ListEntryDetailsPage.vue to create blank slate
+
+commit 5e753b356cff05a4df6690a2c35361ababf22992
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Feb 14 16:03:03 2022 +0100
+
+    create ListEntryDetailsPage.vue; add link to details to ListPage.vue; create necessary routes
+
+commit 74e02e6671a98b06f7757c271fc664184ad00e4d
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Feb 14 14:48:05 2022 +0100
+
+    add style to form container in AddOrEditPage.vue
+
+commit 9c5ae501af7bc52da44ba247c0316917a3b63404
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Feb 14 14:39:13 2022 +0100
+
+    add notification to deletion of list item in ListPage.vue
+
+commit 665ca883dc0ffc04e8f71a69d776e3ec50f9eaca
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Feb 14 14:11:37 2022 +0100
+
+    add cursor pointer to delete icon in ListPage.vue
+
+commit 77799e1488c43bac267ff4b76e36543284c7660c
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Feb 14 13:57:15 2022 +0100
+
+    improve layout in Listpage.vue
+
+commit d1501ea6ac11ea4f083c4b950e5fe89b35ead98f
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Feb 14 13:19:13 2022 +0100
+
+    use less horizontal padding on table cells to make it fit screen if many columns present in ListPage.vue
+
+commit 2722368c044b3edcf461a831a1fd28f54071b3cc
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Feb 14 13:14:44 2022 +0100
+
+    remove superfluous tailwind classes
+
+commit aef12a75411c0f863178b39f60624180312f470f
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Feb 14 13:12:36 2022 +0100
+
+    replace edit and delete svgs with material icons in ListPage.vue
+
+commit 916c34547183cbc1962bf9575c3fbd647f8fa02b
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Feb 14 12:56:06 2022 +0100
+
+    add material-icons npm package; begin implementing them
+
+commit aaa1e5c8d7b79f9b5081678ba840c9dd09a5b827
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Feb 14 11:43:33 2022 +0100
+
+    more layout improvements
+
+commit 6f620b499dc8118b04a5422f5127019903fb223f
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Feb 14 11:18:00 2022 +0100
+
+    improve layout of AddOrEditPage
+
+commit 57e94151a9741b6956574397bb048b4a2b1170da
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Feb 14 09:51:17 2022 +0100
+
+    begin adding oruga/bulma input fields
+
+commit e20148c6d97d74f2526329bec13c094d3e5c1d45
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Feb 14 09:17:12 2022 +0100
+
+    add bulma plugin for oruga
+
+commit a6773ead34b0a687f3d81103798476808293471f
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Tue Feb 8 15:07:01 2022 +0100
+
+    inject oruga; start adding toast WIP
+
+commit 7ba585cafd325476f570c25c9b2ffd563f70baa9
+Merge: 869293a 58d23b9
+Author: wildyeast <32699708+wildyeast@users.noreply.github.com>
+Date:   Mon Feb 7 16:08:31 2022 +0100
+
+    Noise merge
+
+commit 869293a53a15fe11f2d2a6bc7ff750d585ff4740
+Author: wildyeast <32699708+wildyeast@users.noreply.github.com>
+Date:   Mon Feb 7 16:07:34 2022 +0100
+
+    Css changes
+
+commit 58d23b992b6404d7b92279d49faa610d95835073
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Sun Feb 6 18:05:23 2022 +0100
+
+    cleanup
+
+commit 357065dab1c9376611aa6841bf52c74daeadb0e8
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Sun Feb 6 18:03:20 2022 +0100
+
+    remove row from list if deleted from server
+
+commit 530b95fae72c7bf64a783e389695bda65eb27ff9
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Sun Feb 6 17:55:16 2022 +0100
+
+    fix: wrong year after formatting for db
+
+commit cb9f7b499c0712b2271dd6ec468929d14ed92a3f
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Sun Feb 6 17:47:28 2022 +0100
+
+    rename AddOrEditComponent to AddOrEditPage
+
+commit a4734b4049294b511f72d1ce48c662c9a99acc5e
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Sun Feb 6 15:36:24 2022 +0100
+
+    add Oruga pkg; implement o-datetimepicker
+
+commit 0d7f2af464220746084223ada119105f55f46b8c
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Thu Feb 3 17:52:06 2022 +0100
+
+    move datetime formatting for display from vue page to models; add datetime formatting for html datetimepicker to AddOrEditComponent.vue
+
+commit 39df93a81cf2945c2f192a724c28d1a6d929091e
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 2 15:34:25 2022 +0100
+
+    minor
+
+commit 92dfe28a4b3c00abe5c5a8fecaa3f87980ed2416
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 2 15:33:01 2022 +0100
+
+    remove console.log
+
+commit add7b4d4e26cd21e90380f0e1c2847dccef44b31
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 2 15:32:44 2022 +0100
+
+    add editing and deleting for tracks, performances and composers
+
+commit 6024b53ae116d999a5f335f8b1f52c2df6bb97c9
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Wed Feb 2 14:45:56 2022 +0100
+
+    add deleting functionality; fix bug where app crashes if no entries in database
+
+commit 5f33f02f52b47d72b59172ffcfa411c971636573
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Tue Feb 1 16:22:39 2022 +0100
+
+    add create function to Composer and Performance controllers; set post route depending on category in AddOrEditComponent
+
+commit 031d0084e29a8ed7ca74690da1882d2c59fa679c
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Tue Feb 1 16:02:10 2022 +0100
+
+    add datetime to datetime-local conversion
+
+commit 8662f0ba4796a49390f2834b7ec4e7739f8e5610
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Tue Feb 1 15:59:30 2022 +0100
+
+    add tinyint to checkbox conversion
+
+commit 1fcdda5122014fe2cf4fde9c3564df4792c78400
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Tue Feb 1 15:49:34 2022 +0100
+
+    refactor AddOrEditComponent
+
+commit 36058f18916d75ee6ee3c54668996acb532ab00e
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Tue Feb 1 11:46:06 2022 +0100
+
+    rename things for more clarity; cleanup
+
+commit 3cd76501777ae3d60f71d3521c8f1acef52cdc34
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Jan 31 19:50:32 2022 +0100
+
+    rename function to more apt name
+
+commit 4bf0a3c3ea41e5c0a91ca00324ce1ebfa837da69
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Jan 31 19:07:03 2022 +0100
+
+    make fields that are not supposed to be edited not editable
+
+commit 19eb3d6b7ab1d1677543ee107dafbb0d103cca1e
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Jan 31 18:27:23 2022 +0100
+
+    fix display of fields for composers and performances
+
+commit 361469ca3ce5eafa6aec2664f375503da8b9ede6
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Jan 31 18:09:20 2022 +0100
+
+    hardcode forms
+
+commit 9ca89b67a5ae4cc78ce0b3af80642ff7f735b2b8
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Fri Jan 28 19:47:49 2022 +0100
+
+    add composer table; hook up composer and performance list page to db
+
+commit f8d37e41c46423e6c993cac5e565c2253a7a3c9a
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Tue Jan 25 14:23:16 2022 +0100
+
+    move partial upload to own component, work on posting track to db from browser
+
+commit c2e000e9789cc95c3ea2f40e982706b84c2b194e
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Tue Jan 25 12:46:34 2022 +0100
+
+    minor fixes
+
+commit 9b73294194075ae9f0b675fe47029a89ea84ffc3
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Tue Jan 25 12:37:44 2022 +0100
+
+    hook up tracks ListPage to database
+
+commit ff49ef359bff43687c25e95a9400f69974ffa538
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Tue Jan 25 12:00:32 2022 +0100
+
+    hook up AddOrEditComponent to database
+
+commit 389cce10cad2c2040050cf35e0e111517c5ebf08
+Author: viruslight <61878631+viruslight@users.noreply.github.com>
+Date:   Mon Jan 24 13:08:18 2022 +0100
+
+    add ListPage, add AddOrEditComponent
+
+commit a5b7899d644aa0a81904697d95f31c4ae58b792f
+Author: wildyeast <32699708+wildyeast@users.noreply.github.com>
+Date:   Wed Jan 19 13:56:30 2022 +0100
+
+    Remove unix_socket value from db config
+
+commit bc7c7126db264f34c14adc20b244dfc26c4ebbe2
+Author: wildyeast <32699708+wildyeast@users.noreply.github.com>
+Date:   Wed Jan 19 13:08:54 2022 +0100
+
+    Commit vendor folder
+
+commit ff5c9ca1b21aae7c77c50e9ba3a8d7ee79a25d94
+Author: wildyeast <32699708+wildyeast@users.noreply.github.com>
+Date:   Mon Jan 17 13:32:51 2022 +0100
+
+    Add performance and track models
+
+commit 46edb896b137b8d927347d76b22e61efca602de0
+Merge: 9d7d968 7b0cf11
+Author: wildyeast <32699708+wildyeast@users.noreply.github.com>
+Date:   Tue Jan 11 11:37:11 2022 +0100
+
+    Fix README
+
+commit 7b0cf119cbd214b5ba8e5710ad120506d26a41d4
+Author: Lukas Bin <32699708+wildyeast@users.noreply.github.com>
+Date:   Tue Jan 11 11:33:03 2022 +0100
+
+    Initial commit
+
+commit 9d7d9686035f2f72b9feb8c4280f6b1bcbb81b13
+Author: wildyeast <32699708+wildyeast@users.noreply.github.com>
+Date:   Tue Jan 11 11:31:34 2022 +0100
+
+    Initial commit
