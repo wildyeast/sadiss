@@ -13,7 +13,7 @@ const emits = defineEmits(['setPlayingTrack'])
 const registeredClients = reactive([]);
 const autoGetRegisteredClientsInterval = ref(null);
 let maxRegisteredClients = ref(0);
-let firstRegisteredClients = ref(0);
+let clientsRegisteredAtStart = ref(0);
 let synchronizing = ref(false);
 let trackStarted = ref(false);
 let timingSrcPosition = ref();
@@ -107,6 +107,9 @@ async function startTrack () {
     }
   )
   firstStartTime.value = Date.now()
+  if (!clientsRegisteredAtStart.value) {
+    clientsRegisteredAtStart.value = registeredClients.length
+  }
   emits('setPlayingTrack')
 }
 
@@ -198,12 +201,12 @@ function startCalibration () {
             <div class="text-sm" v-if="!synchronizing">Time is not running.</div>
           </div>
         </div>
-        <div v-else class="p-1 text-sm">No track loaded</div>
+        <div v-else class="p-1 text-sm">No track selected</div>
       </InfoBox>
       <InfoBox title="clients" class="mr-1 w-1/3">
           <InfoTuple name="online">{{ registeredClients.length }}</InfoTuple>
           <InfoTuple name="max">{{ maxRegisteredClients }}</InfoTuple>
-          <InfoTuple name="at start">{{ firstRegisteredClients}}</InfoTuple>
+          <InfoTuple name="at start">{{ clientsRegisteredAtStart }}</InfoTuple>
           <InfoTuple name="IDs">
             <span v-for="client of registeredClients"
                 :key="client.id">
