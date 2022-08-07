@@ -4,7 +4,6 @@ import Player from "./Player"
 import OutputLatencyCalibration from './components/OutputLatencyCalibration.vue'
 import { onMounted, Ref, ref } from "vue"
 import { ChoirTtsInstructions, SequencerTtsInstructions } from "./types";
-import nosleep from 'nosleep.js';
 
 const availableTracks: Ref<{ id: number, title: string }[]> = ref([])
 const countdownTime = ref(-1)
@@ -28,7 +27,7 @@ let timingSrcPosition: Ref<number> = ref(-1)
 let trackId = ref(1)
 let ttsInstructions: null
 const ttsLanguage = ref('en-US')
-const noSleep = new NoSleep()
+let noSleep: NoSleep
 let noSleepEnabled = false
 
 onMounted(async () => {
@@ -129,8 +128,8 @@ const register = async () => {
   }
 
   if (!noSleepEnabled) {
-    const noSleep2 = new NoSleep()
-    noSleep2.enable();
+    noSleep = new NoSleep()
+    await noSleep.enable()
     noSleepEnabled = true
   }
 
