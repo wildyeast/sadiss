@@ -39,6 +39,7 @@ Route::post('/track/{id}/start_all/{startTime}/{performance_id}', [TrackControll
 Route::get('/track', [TrackController::class, 'get']);
 Route::get('/tracklist', [TrackController::class, 'get_list']);
 Route::get('/track/{id}', [TrackController::class, 'get']);
+Route::get('/track/{id}/duration', [TrackController::class, 'get_duration']);
 Route::get('/tracklist/{id}', [TrackController::class, 'get_list']);
 
 Route::post('/performance/add_tracks/{id}', [PerformanceController::class, 'attach_tracks_to_performance']);

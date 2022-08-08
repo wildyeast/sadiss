@@ -187,6 +187,7 @@ function startCalibration () {
       <InfoBox bgcolor="secondary" title="selected track" class="mr-1 w-1/3">
         <div v-if="props.track" class="">
           <InfoTuple name="title">{{ props.track.title }}</InfoTuple>
+          <InfoTuple name="duration">{{ Math.round(props.track.duration) }}s</InfoTuple>
           <InfoTuple name="mode">{{ props.track.is_choir ? 'choir' : 'sound system'}}</InfoTuple>
           <div class="w-full justify-center items-center flex mt-4">
             <button v-if="props.track" @click="startTrack"
@@ -194,10 +195,6 @@ function startCalibration () {
                     :class="synchronizing ? '' : 'hidden'">
               start
             </button>
-            <div v-if="trackStarted && !playingTrack"
-                class="flex justify-center">
-              <div class="lds-dual-ring" />
-            </div>
             <div class="text-sm" v-if="!synchronizing">Time is not running.</div>
           </div>
         </div>

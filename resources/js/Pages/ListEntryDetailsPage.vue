@@ -126,6 +126,20 @@ const downloadPartialQrCodes = async () => {
   working.value = false
 }
 
+const timeRemaining = ref()
+const TIME_BEFORE_START = 14
+const setPlayingTrack = track => {
+  playingTrack.value = selectedTrack.value
+  timeRemaining.value = playingTrack.value.duration + TIME_BEFORE_START
+  const counter = setInterval(() => {
+    timeRemaining.value -= 1
+    if (timeRemaining.value <= 1) {
+      clearInterval(counter)
+      playingTrack.value = null
+    };
+  }, 1000)
+}
+
 </script>
 
 <template>
@@ -234,6 +248,9 @@ const downloadPartialQrCodes = async () => {
                 <span v-if="playingTrack.tts_instructions"> | TTS</span>
                 <span v-if="playingTrack.is_choir"> | Choir</span>
               </InfoTuple>
+              <InfoTuple name="playback ends in" v-if="playingTrack">
+                {{ Math.round(timeRemaining) }}s
+              </InfoTuple>
               <div class="p-1 text-sm" v-else>No track playing</div>
             </InfoBox>
 
@@ -267,7 +284,7 @@ const downloadPartialQrCodes = async () => {
                         :track="selectedTrack"
                         :performanceId="id"
                         :playingTrack="playingTrack"
-                        @setPlayingTrack="playingTrack = selectedTrack"
+                        @setPlayingTrack="setPlayingTrack"
                         :ttsInstructions="selectedTrack ? JSON.parse(selectedTrack.tts_instructions) : null"
                         :choirMode="selectedTrack ? selectedTrack.is_choir : null" />
           <div>

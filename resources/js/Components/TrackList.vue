@@ -34,8 +34,10 @@ onMounted(async () => {
 
 })
 
-const trackSelected = track => {
+const trackSelected = async (track) => {
   emits('trackSelected', track)
+  const res = await axios.get(`${process.env.MIX_API_SLUG}/track/${track.id}/duration`)
+  track.duration = res.data
   selectedTrack.value = track
 }
 

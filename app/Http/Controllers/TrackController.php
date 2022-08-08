@@ -80,6 +80,19 @@ class TrackController extends Controller
     return Track::orderBy('id', 'desc')->get();
   }
 
+  public function get_duration(Request $request, $id = null)
+  {
+    $t = Track::where('id', $id)->firstOrFail();
+    $partials = json_decode($t->partials);
+    $latest_end_time = 0;
+    foreach($partials as $p) {
+      if ($p->endTime > $latest_end_time) {
+        $latest_end_time = $p->endTime;
+      }
+    }
+    return $latest_end_time;
+  }
+
   private function format_list($t)
   {
     return [
