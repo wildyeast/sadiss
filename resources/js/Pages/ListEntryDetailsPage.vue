@@ -293,23 +293,23 @@ const setPlayingTrack = track => {
                 </div>
               </div>
             </div>
-          </div>
-          <ClientList :trackId="selectedTrack ? selectedTrack.id : null"
-                      :track="selectedTrack"
-                      :performanceId="id"
-                      :playingTrack="playingTrack"
-                      @setPlayingTrack="setPlayingTrack"
-                      :ttsInstructions="selectedTrack ? JSON.parse(selectedTrack.tts_instructions) : null"
-                      :choirMode="selectedTrack ? selectedTrack.is_choir : null" />
-          <div>
-            <TrackList :performance="data"
-                       :playingTrack="playingTrack"
-                       @trackSelected="trackSelected" />
+            <ClientList :trackId="selectedTrack ? selectedTrack.id : null"
+                        :track="selectedTrack"
+                        :performanceId="id"
+                        :playingTrack="playingTrack"
+                        @setPlayingTrack="setPlayingTrack"
+                        :ttsInstructions="selectedTrack ? JSON.parse(selectedTrack.tts_instructions) : null"
+                        :choirMode="selectedTrack ? selectedTrack.is_choir : null" />
+            <div>
+              <TrackList :performance="data"
+                         :playingTrack="playingTrack"
+                         @trackSelected="trackSelected" />
 
-            <div v-if="working"
-                 class="absolute top-0 left-0 flex justify-center items-center w-screen h-screen">
-              <div class="absolute top-0 left-0 w-full h-full bg-slate-600 opacity-50" />
-              <div class="lds-dual-ring" />
+              <div v-if="working"
+                   class="absolute top-0 left-0 flex justify-center items-center w-screen h-screen">
+                <div class="absolute top-0 left-0 w-full h-full bg-slate-600 opacity-50" />
+                <div class="lds-dual-ring" />
+              </div>
             </div>
           </div>
         </div>
