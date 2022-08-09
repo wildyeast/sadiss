@@ -82,7 +82,7 @@ async function startTrack () {
     return
   }
 
-  const calculatedStartingPosition = motion.pos + 5
+  const calculatedStartingPosition = motion.pos + 1
   let route;
 
   if (props.track && !props.track.is_choir && allPartialsAllDevices.value) {
@@ -184,45 +184,53 @@ function startCalibration () {
 <template>
   <div class="">
     <div class="flex flex-row mt-1">
-      <InfoBox bgcolor="secondary" title="selected track" class="mr-1 w-1/3">
-        <div v-if="props.track" class="">
+      <InfoBox bgcolor="secondary"
+               title="selected track"
+               class="mr-1 w-1/3">
+        <div v-if="props.track"
+             class="">
           <InfoTuple name="title">{{ props.track.title }}</InfoTuple>
           <InfoTuple name="duration">{{ Math.round(props.track.duration) }}s</InfoTuple>
-          <InfoTuple name="mode">{{ props.track.is_choir ? 'choir' : 'sound system'}}</InfoTuple>
+          <InfoTuple name="mode">{{ props.track.is_choir ? 'choir' : 'sound system' }}</InfoTuple>
           <div class="w-full justify-center items-center flex mt-4">
-            <button v-if="props.track" @click="startTrack"
+            <button v-if="props.track"
+                    @click="startTrack"
                     class="border-4 border-tertiary p-2 px-4 uppercase hover:bg-tertiary hover:text-white"
                     :class="synchronizing ? '' : 'hidden'">
               start
             </button>
-            <div class="text-sm" v-if="!synchronizing">Time is not running.</div>
+            <div class="text-sm"
+                 v-if="!synchronizing">Time is not running.</div>
           </div>
         </div>
-        <div v-else class="p-1 text-sm">No track selected</div>
+        <div v-else
+             class="p-1 text-sm">No track selected</div>
       </InfoBox>
-      <InfoBox title="clients" class="mr-1 w-1/3">
-          <InfoTuple name="online">{{ registeredClients.length }}</InfoTuple>
-          <InfoTuple name="max">{{ maxRegisteredClients }}</InfoTuple>
-          <InfoTuple name="at start">{{ clientsRegisteredAtStart }}</InfoTuple>
-          <InfoTuple name="IDs">
-            <span v-for="client of registeredClients"
+      <InfoBox title="clients"
+               class="mr-1 w-1/3">
+        <InfoTuple name="online">{{ registeredClients.length }}</InfoTuple>
+        <InfoTuple name="max">{{ maxRegisteredClients }}</InfoTuple>
+        <InfoTuple name="at start">{{ clientsRegisteredAtStart }}</InfoTuple>
+        <InfoTuple name="IDs">
+          <span v-for="client of registeredClients"
                 :key="client.id">
-              {{ client.id }} <span v-if="client.partial_id">(Partial-Id: {{ client.partial_id }})</span>
-            </span>
-          </InfoTuple>
-          <button @click="removeClients"
-                  class="border h-8 p-1 uppercase">
-            Drop all 
-          </button>
+            {{ client.id }} <span v-if="client.partial_id">(Partial-Id: {{ client.partial_id }})</span>
+          </span>
+        </InfoTuple>
+        <button @click="removeClients"
+                class="border h-8 p-1 uppercase">
+          Drop all
+        </button>
       </InfoBox>
-      <InfoBox title="distribution" class="w-1/3">
+      <InfoBox title="distribution"
+               class="w-1/3">
         <InfoTuple name="All partials to all devices">
           <input class="mr-2"
-                type="checkbox"
-                v-model="allPartialsAllDevices" />
+                 type="checkbox"
+                 v-model="allPartialsAllDevices" />
         </InfoTuple>
         <InfoTuple name="Time">
-            {{ synchronizing ? timingSrcPosition : "0.0" }}
+          {{ synchronizing ? timingSrcPosition : "0.0" }}
           <button @click="synchronizeTimingSrcPosition"
                   class="w-6 h-6"
                   :disabled="!timingSrcConnected">
@@ -230,38 +238,40 @@ function startCalibration () {
           </button>
         </InfoTuple>
         <InfoTuple name="waveform">
-          <button :class="['mr-2', { 'bg-primary text-white': waveform === 'sine' }]" @click="waveform = 'sine'">
+          <button :class="['mr-2', { 'bg-primary text-white': waveform === 'sine' }]"
+                  @click="waveform = 'sine'">
             SIN
           </button>
-          <button :class="['mr-2', { 'bg-primary text-white': waveform === 'square' }]" @click="waveform = 'square'">
+          <button :class="['mr-2', { 'bg-primary text-white': waveform === 'square' }]"
+                  @click="waveform = 'square'">
             SQR
           </button>
-          <button :class="['mr-2', { 'bg-primary text-white': waveform === 'sawtooth' }]" @click="waveform = 'sawtooth'">
+          <button :class="['mr-2', { 'bg-primary text-white': waveform === 'sawtooth' }]"
+                  @click="waveform = 'sawtooth'">
             SAW
           </button>
-          <button :class="['mr-2', { 'bg-primary text-white': waveform === 'triangle' }]" @click="waveform = 'triangle'">
+          <button :class="['mr-2', { 'bg-primary text-white': waveform === 'triangle' }]"
+                  @click="waveform = 'triangle'">
             TRI
           </button>
         </InfoTuple>
         <InfoTuple name="overlap">
-          <input 
-                v-if="!props.track || !props.track.is_choir"
-                class="h-6"
-                type="number"
-                placeholder="none"
-                v-model="partialOverlap">
+          <input v-if="!props.track || !props.track.is_choir"
+                 class="h-6"
+                 type="number"
+                 placeholder="none"
+                 v-model="partialOverlap">
         </InfoTuple>
         <InfoTuple name="polyphony limit">
-          <input 
-                v-if="!props.track || !props.track.is_choir"
-                class="h-6"
-                type="number"
-                placeholder="unlimited"
-                v-model="numberOfSimultaneousVoices">
+          <input v-if="!props.track || !props.track.is_choir"
+                 class="h-6"
+                 type="number"
+                 placeholder="unlimited"
+                 v-model="numberOfSimultaneousVoices">
         </InfoTuple>
       </InfoBox>
     </div>
-      <!-- <div v-if="ttsLanguages && ttsLanguages.length">
+    <!-- <div v-if="ttsLanguages && ttsLanguages.length">
         <label class="mr-2">Select TTS language</label>
         <select v-model="ttsLanguage">
           <option value=''
@@ -269,7 +279,7 @@ function startCalibration () {
           <option v-for="lang of ttsLanguages">{{ lang }}</option>
         </select>
       </div> -->
-      <!--
+    <!--
       <div>
         <button @click="getRegisteredClients"
                 class="border p-2"
