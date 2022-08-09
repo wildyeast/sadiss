@@ -108,10 +108,10 @@ const generatePartialQRCodes = () => {
               </div>
             </div>
             <!-- Below -->
-            <div>
+            <!-- <div>
               <ClientList :trackId="id"
                           :ttsInstructions="JSON.parse(data['tts_instructions'])" />
-            </div>
+            </div> -->
           </template>
           <!-- Composer -->
           <template v-if="path.name === 'composers'">
