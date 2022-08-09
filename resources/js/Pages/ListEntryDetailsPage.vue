@@ -127,7 +127,7 @@ const downloadPartialQrCodes = async () => {
 }
 
 const timeRemaining = ref()
-const TIME_BEFORE_START = 14
+const TIME_BEFORE_START = 10
 const setPlayingTrack = track => {
   playingTrack.value = selectedTrack.value
   timeRemaining.value = playingTrack.value.duration + TIME_BEFORE_START
