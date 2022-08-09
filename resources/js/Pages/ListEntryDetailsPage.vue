@@ -157,7 +157,8 @@ const setPlayingTrack = track => {
       <div v-if="Object.keys(data).length > 0"
            class="w-100 mt-2 py-8 bg-white border border-gray-200 shadow md:px-6 md:justify-center">
         <div class="flex flex-col max-w-7xl mx-auto px-4">
-          <div class="flex justify-between" v-if="path.name !== 'performances'">
+          <div class="flex justify-between"
+               v-if="path.name !== 'performances'">
             <div class="flex mb-4 text-slate-400 text-xs">
               <div class="flex flex-col mr-4">
                 <span>Id: </span>
@@ -190,6 +191,11 @@ const setPlayingTrack = track => {
                 <Player :partialData="data['partials']" />
               </div>
             </div>
+            <!-- Below -->
+            <!-- <div>
+              <ClientList :trackId="id"
+                          :ttsInstructions="JSON.parse(data['tts_instructions'])" />
+            </div> -->
           </template>
           <!-- Composer -->
           <template v-if="path.name === 'composers'">
@@ -220,8 +226,10 @@ const setPlayingTrack = track => {
             </div>
           </template>
           <!-- Performance -->
-          <div v-if="path.name === 'performances'" class="flex flex-row">
-            <InfoBox title="performance" class="w-2/3 mr-1">
+          <div v-if="path.name === 'performances'"
+               class="flex flex-row">
+            <InfoBox title="performance"
+                     class="w-2/3 mr-1">
               <InfoTuple name="id / location">
                 {{ data['id'] }} / {{ data['location'] }}
               </InfoTuple>
@@ -232,66 +240,72 @@ const setPlayingTrack = track => {
                    class="text-rose-500">inactive</p>
               </InfoTuple>
               <InfoTuple name="start time">
-                  {{ data['start_time'] }}
+                {{ data['start_time'] }}
               </InfoTuple>
               <InfoTuple name="end time">
-                  {{ data['end_time'] }}
+                {{ data['end_time'] }}
               </InfoTuple>
               <InfoTuple name="download qr codes">
-                <button class="border h-8 p-1 uppercase" @click="downloadPerformanceQrCode">performance</button>
-                <button class="border h-8 p-1 uppercase" @click="downloadPartialQrCodes">partials</button>
+                <button class="border h-8 p-1 uppercase"
+                        @click="downloadPerformanceQrCode">performance</button>
+                <button class="border h-8 p-1 uppercase"
+                        @click="downloadPartialQrCodes">partials</button>
               </InfoTuple>
             </InfoBox>
-            <InfoBox title="playing track" class="w-1/3" bgcolor="tertiary">
-              <InfoTuple name="name" v-if="playingTrack">
+            <InfoBox title="playing track"
+                     class="w-1/3"
+                     bgcolor="tertiary">
+              <InfoTuple name="name"
+                         v-if="playingTrack">
                 {{ playingTrack.title }}
                 <span v-if="playingTrack.tts_instructions"> | TTS</span>
                 <span v-if="playingTrack.is_choir"> | Choir</span>
               </InfoTuple>
-              <InfoTuple name="playback ends in" v-if="playingTrack">
+              <InfoTuple name="playback ends in"
+                         v-if="playingTrack">
                 {{ Math.round(timeRemaining) }}s
               </InfoTuple>
-              <div class="p-1 text-sm" v-else>No track playing</div>
+              <div class="p-1 text-sm"
+                   v-else>No track playing</div>
             </InfoBox>
 
-              <div class="flex flex-row justify-end">
-              </div>
-              <div ref="performanceQrCodeContainer">
-                <qrcode-vue v-if="showPerformanceQRCode"
-                            :value="`http://sadiss.net/client?id=${id}`"
-                            :size="300"
-                            :render-as="'svg'"
-                            level="H" />
-              </div>
-              <!-- Currently display: none, since otherwise it flashes when downloading voice qr codes
+            <div class="flex flex-row justify-end">
+            </div>
+            <div ref="performanceQrCodeContainer">
+              <qrcode-vue v-if="showPerformanceQRCode"
+                          :value="`http://sadiss.net/client?id=${id}`"
+                          :size="300"
+                          :render-as="'svg'"
+                          level="H" />
+            </div>
+            <!-- Currently display: none, since otherwise it flashes when downloading voice qr codes
               If you want to show them in the browser, uncomment generatePartialQrCode button above
               and devise a method so it doesn't flash on download. -->
-              <div v-if="showPartialQRCodes"
-                   class="flex flex-wrap gap-2"
-                   style="display: none;">
-                <div v-for="partialId of partialIds">
-                  <div ref="partialQrCodeContainers">
-                    <qrcode-vue :value="`http://sadiss.net/client?id=${id}&partial_id=${partialId}`"
-                                :size="200"
-                                :render-as="'svg'"
-                                level="H" />
-                  </div>
+            <div v-if="showPartialQRCodes"
+                 class="flex flex-wrap gap-2"
+                 style="display: none;">
+              <div v-for="partialId of partialIds">
+                <div ref="partialQrCodeContainers">
+                  <qrcode-vue :value="`http://sadiss.net/client?id=${id}&partial_id=${partialId}`"
+                              :size="200"
+                              :render-as="'svg'"
+                              level="H" />
                 </div>
               </div>
+            </div>
           </div>
-            <ClientList 
-                        :trackId="selectedTrack ? selectedTrack.id : null"
-                        :track="selectedTrack"
-                        :performanceId="id"
-                        :playingTrack="playingTrack"
-                        @setPlayingTrack="setPlayingTrack"
-                        :ttsInstructions="selectedTrack ? JSON.parse(selectedTrack.tts_instructions) : null"
-                        :choirMode="selectedTrack ? selectedTrack.is_choir : null" />
+          <ClientList :trackId="selectedTrack ? selectedTrack.id : null"
+                      :track="selectedTrack"
+                      :performanceId="id"
+                      :playingTrack="playingTrack"
+                      @setPlayingTrack="setPlayingTrack"
+                      :ttsInstructions="selectedTrack ? JSON.parse(selectedTrack.tts_instructions) : null"
+                      :choirMode="selectedTrack ? selectedTrack.is_choir : null" />
           <div>
-              <TrackList :performance="data"
-                         :playingTrack="playingTrack"
-                         @trackSelected="trackSelected" />
-                         
+            <TrackList :performance="data"
+                       :playingTrack="playingTrack"
+                       @trackSelected="trackSelected" />
+
             <div v-if="working"
                  class="absolute top-0 left-0 flex justify-center items-center w-screen h-screen">
               <div class="absolute top-0 left-0 w-full h-full bg-slate-600 opacity-50" />
