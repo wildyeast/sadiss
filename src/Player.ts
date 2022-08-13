@@ -25,13 +25,12 @@ export default class Player {
     this.audioContext.resume()
   }
 
-  setup (partialData: SpearPartial[], startInSec: number, motion: any, outputLatency: number) {
+  setup (partialData: SpearPartial[], startInSec: number, now: number, outputLatency: number) {
     this.partialData = partialData
+    const timeToAddToStart = now + outputLatency + startInSec
 
     // Initialize oscillators
     for (const partial of partialData) {
-      const timeToAddToStart = motion.pos - this.offset + outputLatency + startInSec
-      console.log(timeToAddToStart, partial)
       this.oscillators.push(this.createOscillatorAndGainNodes(partial, timeToAddToStart))
     }
     this.playing = true;

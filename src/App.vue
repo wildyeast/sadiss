@@ -10,7 +10,7 @@ const countdownTime = ref(-1)
 const deviceRegistrationId = ref(-1) // Only used in UI
 const hasCalibratedThisSession = ref(false)
 // const hostUrl = "http://sadiss.test/v1"
-const hostUrl = "https://sadiss.net/api/v1"
+const hostUrl = "https://sadiss.org/api/v1"
 let intervalId: number
 let initialTimingSrcIntervalId: number
 const isRegistered = ref(false)
@@ -210,12 +210,12 @@ const checkForStart = async (token: string) => {
 
 const start = async () => {
   const startInSec = 5
-  // const currentGlobalTimeInCtxTime = motion.value.pos - player.value.offset // Do not change!
+  const currentGlobalTimeInCtxTime = motion.value.pos - player.value.offset // Do not change!
 
   player.value.setup(
     partialData,
     startInSec,
-    motion.value,
+    currentGlobalTimeInCtxTime,
     outputLatencyFromLocalStorage
   )
 
@@ -239,7 +239,7 @@ const start = async () => {
     }
 
     const speechIntervalId = window.setInterval(() => {
-      if (motion.value.pos - player.value.offset >= motion.value.pos - player.value.offset + Number(nextTimestamp) + startInSec) {
+      if (motion.value.pos - player.value.offset >= currentGlobalTimeInCtxTime + Number(nextTimestamp) + startInSec) {
         if (nextUtterance) {
           speechSynthesis.speak(nextUtterance)
           nextUtterance = null
