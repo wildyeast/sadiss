@@ -75,7 +75,7 @@ class PerformanceController extends Controller
 
   public function get_partial_indices_of_track_with_most_partials(Request $request)
   {
-    $partials_of_all_tracks = Performance::find($request->id)->tracks()->pluck('partials')->toArray();
+    $partials_of_all_tracks = Performance::find($request->id)->tracks()->where('is_choir', true)->pluck('partials')->toArray();
     $partials_of_track_with_most_partials = max(array_map(fn ($partial) => json_decode($partial), $partials_of_all_tracks));
     $partial_ids = array_map(fn ($partial) => $partial->index, $partials_of_track_with_most_partials);
     return $partial_ids;
