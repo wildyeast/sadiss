@@ -13,13 +13,15 @@ const hasCalibratedThisSession = ref(false)
 const hostUrl = "https://sadiss.org/api/v1"
 let intervalId: number
 let initialTimingSrcIntervalId: number
+const attemptingToRegister = ref(false)
+
 const isRegistered = ref(false)
 const motion: Ref<{ pos: number }> = ref({ pos: 0 })
 const motionConnected = ref(false)
 let outputLatencyFromLocalStorage: number
 let partialData: []
 let partialIdToRegisterWith: number | null
-let performanceId = ref(1)
+let performanceId = ref(-1)
 let performances = ref()
 const player: Ref<Player> = ref(new Player())
 let print = ''
@@ -95,11 +97,12 @@ const register = async () => {
 
   if (!player.value) return
 
-  if (!performanceId.value) {
+  if (performanceId.value < 0) {
     alert("Select a performance id.")
     return
   }
 
+  attemptingToRegister.value = true
 
   // Resume audioCtx for iOS
   await player.value.audioContext.resume()
@@ -150,6 +153,7 @@ const register = async () => {
     await checkForStart(data.token)
   }, 1000)
 
+  attemptingToRegister.value = false
   isRegistered.value = true
   blink()
 }
@@ -362,8 +366,13 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
       <button @click="register"
               id="registerBtn"
               class="border-2 p-2 mt-4 rounded-full h-28 w-28 transition-all duration-300">
-        <span v-if="!isRegistered">Register</span>
+        <div v-if="attemptingToRegister"
+             class="flex justify-center items-center">
+          <div class="lds-dual-ring lds-dual-ring-colored" />
+        </div>
+        <span v-else-if="!isRegistered">Register</span>
         <span v-else>{{ deviceRegistrationId }}</span>
+
       </button>
     </div>
 
@@ -443,6 +452,9 @@ body {
   animation: lds-dual-ring 1.2s linear infinite
 }
 
+.lds-dual-ring-colored:after {
+  border-color: #FF6700 transparent #FF6700 transparent;
+}
 @keyframes lds-dual-ring {
   0% {
     transform: rotate(0deg)
