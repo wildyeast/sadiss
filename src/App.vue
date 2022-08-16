@@ -14,7 +14,6 @@ const hostUrl = "https://sadiss.org/api/v1"
 let intervalId: number
 let initialTimingSrcIntervalId: number
 const attemptingToRegister = ref(false)
-
 const isRegistered = ref(false)
 const motion: Ref<{ pos: number }> = ref({ pos: 0 })
 const motionConnected = ref(false)
@@ -62,8 +61,8 @@ onMounted(async () => {
   initializeMCorp()
 
   // Fetch tracks
-  const res = await fetch(hostUrl + '/track')
-  availableTracks.value = await res.json()
+  // const res = await fetch(hostUrl + '/track')
+  // availableTracks.value = await res.json()
 
 
   // Try to get previously set output latency from local storage
@@ -220,7 +219,7 @@ const start = async () => {
     partialData,
     startInSec,
     currentGlobalTimeInCtxTime,
-    outputLatencyFromLocalStorage
+    outputLatencyFromLocalStorage ? outputLatencyFromLocalStorage : 0
   )
 
   isRegistered.value = false
