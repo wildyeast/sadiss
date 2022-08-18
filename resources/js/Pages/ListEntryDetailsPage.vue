@@ -126,14 +126,14 @@ const downloadPartialQrCodes = async () => {
   working.value = false
 }
 
-const timeRemaining = ref()
-const TIME_BEFORE_START = 10
+const timer = ref()
+const TIME_BEFORE_START = 8
 const setPlayingTrack = track => {
   playingTrack.value = selectedTrack.value
-  timeRemaining.value = playingTrack.value.duration + TIME_BEFORE_START
+  timer.value = TIME_BEFORE_START * -1
   const counter = setInterval(() => {
-    timeRemaining.value -= 1
-    if (timeRemaining.value <= 1) {
+    timer.value += 1
+    if (timer.value >= playingTrack.value.duration) {
       clearInterval(counter)
       playingTrack.value = null
     };
@@ -261,9 +261,10 @@ const setPlayingTrack = track => {
                 <span v-if="playingTrack.tts_instructions"> | TTS</span>
                 <span v-if="playingTrack.is_choir"> | Choir</span>
               </InfoTuple>
-              <InfoTuple name="playback ends in"
+              <InfoTuple name="time"
                          v-if="playingTrack">
-                {{ Math.round(timeRemaining) }}s
+                {{ Math.round(timer) }}s
+                <span v-if="timer >= 0">/ {{ Math.round(playingTrack.duration) }}s ({{ Math.round((timer / playingTrack.duration)*100) }}%)</span>
               </InfoTuple>
               <div class="p-1 text-sm"
                    v-else>No track playing</div>
