@@ -28,20 +28,23 @@ let trackId = ref(1)
 let ttsInstructions: null
 const ttsLanguage = ref('en-US')
 let ttsRate = 1
+let speaking = false
 
 onMounted(async () => {
 
   // If client loses focus (lock screen, tab switch, etc), stop playback.
   // Especially necessary for iOS. There, script execution gets suspended on screen lock,
   // and resumed on unlock, leading to desync between devices.
-  // document.addEventListener('visibilitychange', () => {
-  //   if (document['hidden']) {
-  //     if (player.value.playing) {
-  //       player.value.stop()
-  //       player.value.playing = false
-  //     }
-  //   }
-  // }, false)
+  document.addEventListener('visibilitychange', async () => {
+    if (document['hidden']) {
+      if (player.value.playing) {
+        player.value.stop()
+        player.value.playing = false
+        speaking = false
+        await register()
+      }
+    }
+  }, false)
 
   // Get performances to later check against performanceId URL paramater (if present) to make sure performance exists
   const performanceResponse = await fetch(hostUrl + '/performance')
@@ -227,6 +230,8 @@ const start = async () => {
     // === undefined needed since it can be 0
     if (!(typeof nextTimestamp === 'number')) return
 
+    speaking = true
+
     let nextUtterance: SpeechSynthesisUtterance | null
 
     if (typeof partialIdToRegisterWith === 'number') {
@@ -239,6 +244,7 @@ const start = async () => {
       if (motion.value.pos - player.value.offset >= currentGlobalTimeInCtxTime + Number(nextTimestamp) + startInSec) {
         if (nextUtterance) {
           nextUtterance.rate = ttsRate
+          if (!speaking) return
           speechSynthesis.speak(nextUtterance)
           nextUtterance = null
         }
@@ -253,6 +259,8 @@ const start = async () => {
         } else {
           window.clearInterval(speechIntervalId)
         }
+      } else {
+        speaking = false
       }
     }, 50)
   }
