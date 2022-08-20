@@ -7,7 +7,7 @@
               rounded-bulma-input-border-radius
               border-bulma-input-border
               hover:border-bulma-input-border-hover">
-    <label class="pb-6"
+    <label class="mb-3"
            for="sourcefile">
       Upload a SPEAR partials file
     </label>

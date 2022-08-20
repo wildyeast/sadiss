@@ -39,6 +39,7 @@ const validateFileContent = fileContent => {
     if (objectDepth === 2) {
         isChoir = false
         for (const timestamp of timestamps) {
+            if (timestamp === '_config') continue
             if (timestamp != Number(timestamp)) {
                 return `"${timestamp}" is not a valid timestamp.`
             }
