@@ -9,8 +9,8 @@ const availableTracks: Ref<{ id: number, title: string }[]> = ref([])
 const countdownTime = ref(-1)
 const deviceRegistrationId = ref(-1) // Only used in UI
 const hasCalibratedThisSession = ref(false)
-// const hostUrl = "http://sadiss.test/v1"
-const hostUrl = "https://sadiss.org/api/v1"
+const hostUrl = "http://sadiss.test/v1"
+// const hostUrl = "https://sadiss.org/api/v1"
 let intervalId: number
 let initialTimingSrcIntervalId: number
 const attemptingToRegister = ref(false)
@@ -28,6 +28,7 @@ let timingSrcPosition: Ref<number> = ref(-1)
 let trackId = ref(1)
 let ttsInstructions: null
 const ttsLanguage = ref('en-US')
+let ttsRate = 1
 let noSleep: NoSleep
 let noSleepEnabled = false
 
@@ -173,6 +174,13 @@ const checkForStart = async (token: string) => {
     const startTimeFromServer = Number(clientData.client["start_time"])
     ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
 
+    if (ttsInstructions && ttsInstructions['_config'] && ttsInstructions['_config']['rate']) {
+      const rate = ttsInstructions['_config']['rate']
+      if (rate) {
+        ttsRate = rate < 0.05 ? 0.05 : rate > 2 ? 2 : rate
+      }
+    }
+
     const wf = clientData.client["waveform"]
     if (wf) {
       if (['sine', 'sawtooth', 'square', 'triangle'].includes(wf)) {
@@ -244,6 +252,7 @@ const start = async () => {
     const speechIntervalId = window.setInterval(() => {
       if (motion.value.pos - player.value.offset >= currentGlobalTimeInCtxTime + Number(nextTimestamp) + startInSec) {
         if (nextUtterance) {
+          nextUtterance.rate = ttsRate
           speechSynthesis.speak(nextUtterance)
           nextUtterance = null
         }

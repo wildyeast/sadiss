@@ -10,6 +10,9 @@ export interface SequencerTtsInstructions {
 }
 
 export interface ChoirTtsInstructions {
+  _config?: {
+    rate?: number
+  },
   [timestamp: number]: {
     [partialId: number]: {
       [languageCode: string]: string
