@@ -34,14 +34,6 @@ export default class Player {
       this.oscillators.push(this.createOscillatorAndGainNodes(partial, timeToAddToStart))
     }
     this.playing = true;
-
-    // Necessary for iOS (at least for Safari), without this the track after re-registering does not play.
-    // If not using NoSleep this can be removed.
-    // In theory this call should be awaited, but it seems to work anyway. TODO: Refactor so resume() is awaited.
-    // Why does playing after re-register not work when using NoSleep? No idea.
-    if (this.audioContext.state !== 'running') {
-      this.audioContext.resume()
-    }
   }
 
   /** 

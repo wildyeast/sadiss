@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import NoSleep from 'nosleep.js';
 import Player from "./Player"
 import OutputLatencyCalibration from './components/OutputLatencyCalibration.vue'
 import { onMounted, Ref, ref } from "vue"
@@ -29,8 +28,6 @@ let trackId = ref(1)
 let ttsInstructions: null
 const ttsLanguage = ref('en-US')
 let ttsRate = 1
-let noSleep: NoSleep
-let noSleepEnabled = false
 
 onMounted(async () => {
 
@@ -84,11 +81,6 @@ const initializeMCorp = async () => {
 }
 
 const register = async () => {
-  // if (noSleepEnabled) {
-  //   noSleep.disable()
-  //   noSleepEnabled = false
-  // }
-
   if (isRegistered.value) {
     window.clearInterval(intervalId)
     isRegistered.value = false
@@ -128,12 +120,6 @@ const register = async () => {
     })
     // This is necessary to make the audio context work on iOS.
     player.value.audioContext.resume()
-  }
-
-  if (!noSleepEnabled) {
-    noSleep = new NoSleep()
-    await noSleep.enable()
-    noSleepEnabled = true
   }
 
   const response = await fetch(hostUrl + '/client/create', {
