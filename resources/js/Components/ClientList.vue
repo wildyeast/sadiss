@@ -255,13 +255,13 @@ function startCalibration () {
             TRI
           </button>
         </InfoTuple>
-        <InfoTuple name="overlap">
+        <!-- <InfoTuple name="overlap">
           <input v-if="!props.track || !props.track.is_choir"
                  class="h-6"
                  type="number"
                  placeholder="none"
                  v-model="partialOverlap">
-        </InfoTuple>
+        </InfoTuple> -->
         <InfoTuple name="polyphony limit">
           <input v-if="!props.track || !props.track.is_choir"
                  class="h-6"
