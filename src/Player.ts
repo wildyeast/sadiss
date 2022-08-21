@@ -77,7 +77,9 @@ export default class Player {
   stop () {
     if (!this.oscillators) return
     for (const oscObj of this.oscillators) {
-      oscObj.oscNode.stop()
+      // oscObj.oscNode.stop()
+      oscObj.oscNode.onended = null
+      oscObj.gainNode.disconnect()
     }
     this.reset()
   }
@@ -94,7 +96,7 @@ export default class Player {
   }
 
   /** 
-  * Sets this.oscillators = [] and this.player = false.
+  * Sets this.oscillators = [] and this.playing = false.
   * If register is set (meaning we are not playing locally), re-register.
   */
   reset (): void {

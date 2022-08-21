@@ -8,8 +8,8 @@ const availableTracks: Ref<{ id: number, title: string }[]> = ref([])
 const countdownTime = ref(-1)
 const deviceRegistrationId = ref(-1) // Only used in UI
 const hasCalibratedThisSession = ref(false)
-const hostUrl = "http://sadiss.test/v1"
-// const hostUrl = "https://sadiss.org/api/v1"
+// const hostUrl = "http://sadiss.test/v1"
+const hostUrl = "https://sadiss.org/api/v1"
 let intervalId: number
 let initialTimingSrcIntervalId: number
 const attemptingToRegister = ref(false)
@@ -28,24 +28,23 @@ let trackId = ref(1)
 let ttsInstructions: null
 const ttsLanguage = ref('en-US')
 let ttsRate = 1
+let speechIntervalId = -1
 let speaking = false
 
-onMounted(async () => {
-
-  // If client loses focus (lock screen, tab switch, etc), stop playback.
-  // Especially necessary for iOS. There, script execution gets suspended on screen lock,
-  // and resumed on unlock, leading to desync between devices.
-  document.addEventListener('visibilitychange', async () => {
+// If client loses focus (lock screen, tab switch, etc), stop playback.
+// Especially necessary for iOS. There, script execution gets suspended on screen lock,
+// and resumed on unlock, leading to desync between devices.
+document.addEventListener('visibilitychange', () => {
     if (document['hidden']) {
       if (player.value.playing) {
         player.value.stop()
-        player.value.playing = false
+        window.clearInterval(speechIntervalId)
         speaking = false
-        await register()
       }
     }
   }, false)
 
+onMounted(async () => {
   // Get performances to later check against performanceId URL paramater (if present) to make sure performance exists
   const performanceResponse = await fetch(hostUrl + '/performance')
   performances.value = await performanceResponse.json()
@@ -158,7 +157,7 @@ const checkForStart = async (token: string) => {
 
   const clientData = await response.json()
   if (clientData.client["start_time"]) {
-    console.log('Client data: ', clientData)
+    // console.log('Client data: ', clientData)
     window.clearInterval(intervalId)
     const startTimeFromServer = Number(clientData.client["start_time"])
     ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
@@ -193,7 +192,6 @@ const checkForStart = async (token: string) => {
       timingSrcPosition.value = motion.value.pos
       if (timingSrcPosition.value >= startTimeFromServer + 3) {
         print += timingSrcPosition.value + '\n'
-        console.log(timingSrcPosition)
         player.value.offset =
           timingSrcPosition.value - player.value.audioContext.currentTime // Do not change!
         // Prevent multiple calls of prepare()
@@ -240,7 +238,7 @@ const start = async () => {
       nextUtterance = createSequencerUtterance(ttsInstructions, nextTimestamp, ttsLanguage.value)
     }
 
-    const speechIntervalId = window.setInterval(() => {
+    speechIntervalId = window.setInterval(() => {
       if (motion.value.pos - player.value.offset >= currentGlobalTimeInCtxTime + Number(nextTimestamp) + startInSec) {
         if (nextUtterance) {
           nextUtterance.rate = ttsRate
@@ -258,9 +256,8 @@ const start = async () => {
           }
         } else {
           window.clearInterval(speechIntervalId)
+          speaking = false
         }
-      } else {
-        speaking = false
       }
     }, 50)
   }
