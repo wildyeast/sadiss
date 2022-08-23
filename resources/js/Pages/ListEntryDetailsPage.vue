@@ -182,14 +182,25 @@ const setPlayingTrack = track => {
             <div class="flex mb-4">
               <!-- Left hand side -->
               <div class="flex-1">
-                <p class="mb-4 text-2xl">{{ data['title'] }}</p>
-                <p class="text-justify">{{ data['description'] }}</p>
+                <p class="mb-4 text-2xl">{{ data['title'] }}
+                  <span v-if="data['tts_instructions']"
+                        class="text-sm">TTS</span>
+                  <span v-if="data['is_choir']"
+                        class="text-sm"> | Choir</span>
+                </p>
+                <p class="text-justify mb-4">{{ data['description'] }}</p>
+                <p v-if="data['partials_file_name']"><strong>Partials file name:</strong> {{ data['partials_file_name']
+                  }}</p>
+                <p v-if="data['tts_instructions_file_name']"><strong>TTS file name:</strong> {{
+                  data['tts_instructions_file_name'] }}</p>
+                <p v-if="data['tts_languages']"><strong>TTS languages:</strong> {{ data['tts_languages'] }}</p>
+                <div></div>
               </div>
               <!-- Right hand side -->
-              <div class="flex-1 flex flex-col items-center">
+              <!-- <div class="flex-1 flex flex-col items-center">
                 <p>Play track on this device</p>
                 <Player :partialData="data['partials']" />
-              </div>
+              </div> -->
             </div>
             <!-- Below -->
             <!-- <div>
@@ -264,7 +275,8 @@ const setPlayingTrack = track => {
               <InfoTuple name="time"
                          v-if="playingTrack">
                 {{ Math.round(timer) }}s
-                <span v-if="timer >= 0">/ {{ Math.round(playingTrack.duration) }}s ({{ Math.round((timer / playingTrack.duration)*100) }}%)</span>
+                <span v-if="timer >= 0">/ {{ Math.round(playingTrack.duration) }}s ({{ Math.round((timer /
+                  playingTrack.duration)*100) }}%)</span>
               </InfoTuple>
               <div class="p-1 text-sm"
                    v-else>No track playing</div>
@@ -280,8 +292,8 @@ const setPlayingTrack = track => {
                           level="H" />
             </div>
             <!-- Currently display: none, since otherwise it flashes when downloading voice qr codes
-              If you want to show them in the browser, uncomment generatePartialQrCode button above
-              and devise a method so it doesn't flash on download. -->
+            If you want to show them in the browser, uncomment generatePartialQrCode button above
+            and devise a method so it doesn't flash on download. -->
             <div v-if="showPartialQRCodes"
                  class="flex flex-wrap gap-2"
                  style="display: none;">
@@ -295,15 +307,17 @@ const setPlayingTrack = track => {
               </div>
             </div>
           </div>
-          <ClientList :trackId="selectedTrack ? selectedTrack.id : null"
+          <ClientList v-if="path.name === 'performances'"
+                      :trackId="selectedTrack ? selectedTrack.id : null"
                       :track="selectedTrack"
                       :performanceId="id"
                       :playingTrack="playingTrack"
                       @setPlayingTrack="setPlayingTrack"
                       :ttsInstructions="selectedTrack ? JSON.parse(selectedTrack.tts_instructions) : null"
                       :choirMode="selectedTrack ? selectedTrack.is_choir : null" />
-          <div>
-            <TrackList :performance="data"
+          <div v-if="path.name==='performances'">
+            <TrackList :performance="
+               data"
                        :playingTrack="playingTrack"
                        @trackSelected="trackSelected" />
 
