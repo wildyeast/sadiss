@@ -59,6 +59,7 @@ const validateFileContent = fileContent => {
     } else if (objectDepth === 3) {
         isChoir = true
         for (const timestamp of timestamps) {
+            if (timestamp === '_config') continue
             const ids = Object.keys(ttsInstructionsObject[timestamp])
             partialIds.push(...ids)
             for (const partialId of ids) {
