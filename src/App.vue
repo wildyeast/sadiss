@@ -28,6 +28,7 @@ let trackId = ref(1)
 let ttsInstructions: null
 const ttsLanguage = ref('en-US')
 let ttsRate = 1
+const ttsVoiceToUse = ref()
 let speechIntervalId = -1
 let speaking = false
 
@@ -220,6 +221,11 @@ const start = async () => {
   if (ttsInstructions && ttsLanguage.value) {
     const ttsTimestamps = Object.keys(ttsInstructions).map(timestamp => Number(timestamp))
 
+    if (ttsLanguage.value === 'en-US') {
+      const voices = speechSynthesis.getVoices()
+      ttsVoiceToUse.value = voices.filter(voice => voice.lang === ttsLanguage.value)[3]
+    }
+
     let nextTimestamp = ttsTimestamps.shift()
 
     // === undefined needed since it can be 0
@@ -268,9 +274,14 @@ const createSequencerUtterance = (ttsInstructions: SequencerTtsInstructions, nex
     console.log('Creating sequencer utterance.')
     utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
     utterance.lang = ttsLanguage
+    if (ttsVoiceToUse.value) {
+      utterance.lang = ''
+      utterance.voice = ttsVoiceToUse.value
+    }
     console.log('Utterance created.')
     console.log('Saying: ', ttsInstructions[nextTimestamp][ttsLanguage])
     console.log('in language: ', utterance.lang)
+    console.log('with voice named: ', utterance.voice?.name)
   }
   return utterance
 }
@@ -279,13 +290,17 @@ const createChoirUtterance = (ttsInstructions: ChoirTtsInstructions, nextTimesta
   let utterance: SpeechSynthesisUtterance | null = null;
   if (ttsInstructions[nextTimestamp][partialIdToRegisterWith]
     && ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage]) {
-    utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
     console.log('Creating choir utterance.')
     utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
     utterance.lang = ttsLanguage
+    if (ttsVoiceToUse.value) {
+      utterance.lang = ''
+      utterance.voice = ttsVoiceToUse.value
+    }
     console.log('Utterance created.')
     console.log('Saying: ', ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
     console.log('in language: ', utterance.lang)
+    console.log('with voice: ', utterance.voice)
   }
   return utterance
 }
