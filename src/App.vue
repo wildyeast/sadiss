@@ -45,7 +45,7 @@ document.addEventListener('visibilitychange', () => {
   }, false)
 
 onMounted(async () => {
-  // Get performances to later check against performanceId URL paramater (if present) to make sure performance exists
+  // Get performances to later check against performanceId URL parameter (if present) to make sure performance exists
   const performanceResponse = await fetch(hostUrl + '/performance')
   performances.value = await performanceResponse.json()
 
@@ -77,9 +77,6 @@ const initializeMCorp = async () => {
     motionConnected.value = true
   }
   mCorpApp.init()
-  while (!motion) {
-    await new Promise(r => setTimeout(r, 500))
-  }
 }
 
 const register = async () => {
