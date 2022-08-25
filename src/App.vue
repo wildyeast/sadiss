@@ -263,22 +263,29 @@ const start = async () => {
 }
 
 const createSequencerUtterance = (ttsInstructions: SequencerTtsInstructions, nextTimestamp: number, ttsLanguage: string): SpeechSynthesisUtterance | null => {
-  console.log('Creating sequencer utterance.')
   let utterance: SpeechSynthesisUtterance | null = null;
   if (ttsInstructions[nextTimestamp][ttsLanguage]) {
+    console.log('Creating sequencer utterance.')
     utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
     utterance.lang = ttsLanguage
+    console.log('Utterance created.')
+    console.log('Saying: ', ttsInstructions[nextTimestamp][ttsLanguage])
+    console.log('in language: ', utterance.lang)
   }
   return utterance
 }
 
 const createChoirUtterance = (ttsInstructions: ChoirTtsInstructions, nextTimestamp: number, ttsLanguage: string, partialIdToRegisterWith: number): SpeechSynthesisUtterance | null => {
-  console.log('Creating choir utterance.')
   let utterance: SpeechSynthesisUtterance | null = null;
   if (ttsInstructions[nextTimestamp][partialIdToRegisterWith]
     && ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage]) {
     utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
+    console.log('Creating choir utterance.')
+    utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialId][ttsLanguage])
     utterance.lang = ttsLanguage
+    console.log('Utterance created.')
+    console.log('Saying: ', ttsInstructions[nextTimestamp][partialId][ttsLanguage])
+    console.log('in language: ', utterance.lang)
   }
   return utterance
 }
