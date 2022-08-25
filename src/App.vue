@@ -281,10 +281,10 @@ const createChoirUtterance = (ttsInstructions: ChoirTtsInstructions, nextTimesta
     && ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage]) {
     utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
     console.log('Creating choir utterance.')
-    utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialId][ttsLanguage])
+    utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
     utterance.lang = ttsLanguage
     console.log('Utterance created.')
-    console.log('Saying: ', ttsInstructions[nextTimestamp][partialId][ttsLanguage])
+    console.log('Saying: ', ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
     console.log('in language: ', utterance.lang)
   }
   return utterance
