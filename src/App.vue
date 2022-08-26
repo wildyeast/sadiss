@@ -30,7 +30,7 @@ const ttsLanguage = ref('en-US')
 let ttsRate = 1
 const ttsVoiceToUse = ref()
 let speechIntervalId = -1
-let speaking = false
+// let speaking = false
 
 // If client loses focus (lock screen, tab switch, etc), stop playback.
 // Especially necessary for iOS. There, script execution gets suspended on screen lock,
@@ -40,7 +40,7 @@ document.addEventListener('visibilitychange', () => {
       if (player.value.playing) {
         player.value.stop()
         window.clearInterval(speechIntervalId)
-        speaking = false
+        // speaking = false
       }
     }
   }, false)
@@ -231,7 +231,7 @@ const start = async () => {
     // === undefined needed since it can be 0
     if (!(typeof nextTimestamp === 'number')) return
 
-    speaking = true
+    // speaking = true
 
     let nextUtterance: SpeechSynthesisUtterance | null
 
@@ -245,7 +245,7 @@ const start = async () => {
       if (motion.value.pos - player.value.offset >= currentGlobalTimeInCtxTime + Number(nextTimestamp) + startInSec) {
         if (nextUtterance) {
           nextUtterance.rate = ttsRate
-          if (!speaking) return
+          // if (!speaking) return
           speechSynthesis.speak(nextUtterance)
           nextUtterance = null
         }
@@ -259,7 +259,7 @@ const start = async () => {
           }
         } else {
           window.clearInterval(speechIntervalId)
-          speaking = false
+          // speaking = false
         }
       }
     }, 50)
