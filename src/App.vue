@@ -246,7 +246,11 @@ const start = async () => {
         if (nextUtterance) {
           nextUtterance.rate = ttsRate
           // if (!speaking) return
-          speechSynthesis.speak(nextUtterance)
+          try {
+            speechSynthesis.speak(nextUtterance)
+          } catch (error) {
+            console.log('Error when trying to speak: ', error)
+          }
           nextUtterance = null
         }
         if (ttsInstructions && ttsTimestamps.length) {
