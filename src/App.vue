@@ -308,9 +308,8 @@ const createChoirUtterance = (ttsInstructions: ChoirTtsInstructions, nextTimesta
 
 const calibrationFinished = (calibratedLatency: number) => {
   outputLatencyFromLocalStorage = Number(calibratedLatency)
-  const registerDiv = document.getElementById("register")
-  registerDiv?.scrollIntoView({ behavior: 'smooth' })
   hasCalibratedThisSession.value = true
+  currentPage.value = 'register'
 }
 
 const blink = () => {
@@ -405,6 +404,10 @@ const helpEndReached = () => {
                               @calibrationFinished="calibrationFinished"
                               :motion="motion" />
 
+    <div v-else-if="currentPage === 'register'">
+
+    </div>
+
     <!-- Footer -->
     <div class="flex flex-col items-center text-lg h-1/5">
       <object :data="IconSadissLogo"
@@ -422,8 +425,7 @@ const helpEndReached = () => {
                                 :motion="motion" />
 
       <!-- Register -->
-      <div id="register"
-           class="md:w-1/2 w-11/12 p-4 flex flex-col justify-center items-center h-screen">
+      <div class="md:w-1/2 w-11/12 p-4 flex flex-col justify-center items-center h-screen">
 
         <!-- Top -->
         <!-- Performance Id dropdown -->

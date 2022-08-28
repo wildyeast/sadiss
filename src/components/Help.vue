@@ -10,23 +10,23 @@ import GraphicSwitchOffStandbyMode from '../assets/icons/GraphicSwitchOffStandby
 import GraphicKeepOnPhone from '../assets/icons/GraphicKeepOnPhone.svg'
 
 defineProps({
-    isChoirPerformance: {
-        type: Boolean,
-        default: false
-    }
+  isChoirPerformance: {
+    type: Boolean,
+    default: false
+  }
 })
 
 const emit = defineEmits(['endReached'])
 
-const currentStep = ref(3)
+const currentStep = ref(0)
 const totalSteps = ref(4)
 
 const navigateForward = () => {
-    if (currentStep.value >= totalSteps.value) {
-        emit('endReached')
-    } else {
-        currentStep.value += 1
-    }
+  if (currentStep.value >= totalSteps.value) {
+    emit('endReached')
+  } else {
+    currentStep.value += 1
+  }
 }
 </script>
 
