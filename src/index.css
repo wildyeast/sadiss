@@ -1,11 +1,20 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities;
 
-a {
-    @apply underline text-blue-600 hover:text-blue-800 visited:text-purple-600
+@font-face {
+    font-family: 'Verdana';
+    src: local('VerdanaRegular'), url(./assets/fonts/VerdanaRegular.ttf);
+    font-style: normal;
 }
 
-select {
-    @apply bg-black
+@font-face {
+    font-family: 'Verdana';
+    src: local('VerdanaBold'), url(./assets/fonts/VerdanaBold.ttf);
+    font-style: bold;
+}
+
+@tailwind utilities;
+
+h1 {
+    @apply text-2xl;
 }

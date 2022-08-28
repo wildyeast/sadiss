@@ -3,6 +3,13 @@ import Player from "./Player"
 import OutputLatencyCalibration from './components/OutputLatencyCalibration.vue'
 import { onMounted, Ref, ref } from "vue"
 import { ChoirTtsInstructions, SequencerTtsInstructions } from "./types";
+import IconSadiss from './assets/icons/IconSadiss.svg'
+import IconSadissLogo from './assets/icons/IconSadissLogo.svg'
+import IconSoundsystem from './assets/icons/IconSoundsystem.svg'
+import IconGlobe from './assets/icons/IconGlobe.png'
+import IconHelp from './assets/icons/IconHelp.png'
+import IconSettings from './assets/icons/IconSettings.png'
+import IconFooter from './assets/icons/IconFooter.svg'
 
 const availableTracks: Ref<{ id: number, title: string }[]> = ref([])
 const countdownTime = ref(-1)
@@ -20,7 +27,8 @@ let outputLatencyFromLocalStorage: number
 let partialData: []
 let partialIdToRegisterWith: number | null
 let performanceId = ref(-1)
-let performances = ref()
+const performances = ref()
+const selectedPerformance = ref()
 const player: Ref<Player> = ref(new Player())
 let print = ''
 let timingSrcPosition: Ref<number> = ref(-1)
@@ -57,6 +65,10 @@ onMounted(async () => {
   }
   if (params.get('partial_id')) {
     partialIdToRegisterWith = Number(params.get('partial_id'))
+  }
+
+  if (performanceId.value >= 0) {
+    selectedPerformance.value = performances.value.find((p: { id: number }) => p.id === performanceId.value)
   }
 
   initializeMCorp()
@@ -332,85 +344,136 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
 </script>
 
 <template>
-  <div class="app"
+  <div class="h-screen flex flex-col justify-between gap-y-4"
        v-if="motionConnected">
-    <!-- Only show if never registered this session and not currently registered -->
-    <OutputLatencyCalibration v-if="player && !hasCalibratedThisSession && !isRegistered"
-                              @calibrationFinished="calibrationFinished"
-                              :motion="motion" />
+    <div class="flex flex-col items-center justify-between h-4/5">
+      <object :data="IconSadiss"
+              class="my-8"
+              width="120"
+              height="120" />
+      <h1 v-if="selectedPerformance">{{ selectedPerformance.title }}</h1>
+      <h1 v-else>No performance selected</h1>
 
-    <!-- Register -->
-    <div id="register"
-         class="md:w-1/2 w-11/12 p-4 flex flex-col justify-center items-center h-screen">
-
-      <!-- Top -->
-      <!-- Performance Id dropdown -->
-      <select v-if="!isRegistered && !player.playing"
-              v-model="performanceId"
-              class="border p-2 rounded-full h-10 w-10 fixed top-5 right-5">
-        <option v-for="performance of performances">{{ performance.id }}</option>
-      </select>
-      <!-- Current global time and other information -->
-      <div class="fixed top-5 right-5">
-        <p v-if="isRegistered">{{ timingSrcPosition }}</p>
-        <p v-if="countdownTime > 0"
-           style="display: flex justify-content: center font-size: 50px">
-          {{ countdownTime }}
-        </p>
-        <p v-else-if="player && player.playing">Track currently playing.</p>
-        <!-- <p v-else>Device not registered.</p> -->
-        <div v-html="print"
-             style="margin-top: 1rem" />
+      <div class="flex flex-col items-center mt-8 text-lg">
+        <object :data="IconSoundsystem"
+                width="50"
+                height="50" />
+        <p>Soundsystem</p>
       </div>
 
-      <!-- Center -->
-      <select v-model="ttsLanguage">
-        <option value="en-US">en-US</option>
-        <option value="de-DE">de-DE</option>
-      </select>
-      <button @click="register"
-              id="registerBtn"
-              class="border-2 p-2 mt-4 rounded-full h-28 w-28 transition-all duration-300">
-        <div v-if="attemptingToRegister"
-             class="flex justify-center items-center">
-          <div class="lds-dual-ring lds-dual-ring-colored" />
-        </div>
-        <span v-else-if="!isRegistered">Register</span>
-        <span v-else>{{ deviceRegistrationId }}</span>
+      <div class="flex flex-col items-center mt-8 text-lg">
+        <object :data="IconGlobe"
+                width="50"
+                height="50" />
+        <select class="bg-primary"
+                v-model="ttsLanguage">
+          <option value="en-US">English</option>
+          <option value="de-DE">Deutsch</option>
+        </select>
 
-      </button>
+        <div class="flex gap-4">
+          <div class="flex flex-col items-center mt-8 text-lg">
+            <object :data="IconHelp"
+                    width="50"
+                    height="50" />
+          </div>
+          <div class="flex flex-col items-center mt-8 text-lg">
+            <object :data="IconSettings"
+                    width="50"
+                    height="50" />
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col items-center text-lg h-1/5">
+      <object :data="IconSadissLogo"
+              width="150"
+              height="150" />
+      <object :data="IconFooter"
+              class="w-full max-h-full" />
     </div>
 
-    <!-- Play track locally -->
-    <!-- Currently hidden - display: none -->
-    <div style="display: flex; flex-direction: column; justify-content: center; display:none;"
-         class="md:w-1/2 w-11/12 border b-white p-4">
-      <p>
-        Select a track ID from the dropdown below and press Play to prepare the
-        selected track. All partials will be played on this device. The ID
-        corresponds to the tracks's ID in the database (check the
-        <a :href="hostUrl + 'tracks'">Admin Interface</a> for a list of
-        available tracks). If the dropdown is empty, add a track to the database
-        via the Admin Interface and afterwards refresh this page.
-      </p>
-      <div class="flex flex-row justify-between items-center py-4">
-        <label>Select a track ID</label>
-        <select v-model="trackId">
-          <option v-for="track of availableTracks"
-                  :key="track.id">
-            {{ track.id }} - {{ track.title }}
-          </option>
+
+    <div class="hidden">
+
+      <!-- Only show if never registered this session and not currently registered -->
+      <OutputLatencyCalibration v-if="player && !hasCalibratedThisSession && !isRegistered"
+                                @calibrationFinished="calibrationFinished"
+                                :motion="motion" />
+
+      <!-- Register -->
+      <div id="register"
+           class="md:w-1/2 w-11/12 p-4 flex flex-col justify-center items-center h-screen">
+
+        <!-- Top -->
+        <!-- Performance Id dropdown -->
+        <select v-if="!isRegistered && !player.playing"
+                v-model="performanceId"
+                class="border p-2 rounded-full h-10 w-10 fixed top-5 right-5">
+          <option v-for="performance of performances">{{ performance.id }}</option>
         </select>
-        <button v-if="player && !player.playing"
-                @click="playLocally"
-                class="border b-white p-2">
-          Play
+        <!-- Current global time and other information -->
+        <div class="fixed top-5 right-5">
+          <p v-if="isRegistered">{{ timingSrcPosition }}</p>
+          <p v-if="countdownTime > 0"
+             style="display: flex justify-content: center font-size: 50px">
+            {{ countdownTime }}
+          </p>
+          <p v-else-if="player && player.playing">Track currently playing.</p>
+          <!-- <p v-else>Device not registered.</p> -->
+          <div v-html="print"
+               style="margin-top: 1rem" />
+        </div>
+
+        <!-- Center -->
+        <select v-model="ttsLanguage">
+          <option value="en-US">en-US</option>
+          <option value="de-DE">de-DE</option>
+        </select>
+        <button @click="register"
+                id="registerBtn"
+                class="border-2 p-2 mt-4 rounded-full h-28 w-28 transition-all duration-300">
+          <div v-if="attemptingToRegister"
+               class="flex justify-center items-center">
+            <div class="lds-dual-ring lds-dual-ring-colored" />
+          </div>
+          <span v-else-if="!isRegistered">Register</span>
+          <span v-else>{{ deviceRegistrationId }}</span>
+
         </button>
-        <button v-else
-                @click="player?.stop"
-                class="border b-white p-2">
-          Stop
-        </button>
+      </div>
+
+      <!-- Play track locally -->
+      <!-- Currently hidden - display: none -->
+      <div style="display: flex; flex-direction: column; justify-content: center; display:none;"
+           class="md:w-1/2 w-11/12 border b-white p-4">
+        <p>
+          Select a track ID from the dropdown below and press Play to prepare the
+          selected track. All partials will be played on this device. The ID
+          corresponds to the tracks's ID in the database (check the
+          <a :href="hostUrl + 'tracks'">Admin Interface</a> for a list of
+          available tracks). If the dropdown is empty, add a track to the database
+          via the Admin Interface and afterwards refresh this page.
+        </p>
+        <div class="flex flex-row justify-between items-center py-4">
+          <label>Select a track ID</label>
+          <select v-model="trackId">
+            <option v-for="track of availableTracks"
+                    :key="track.id">
+              {{ track.id }} - {{ track.title }}
+            </option>
+          </select>
+          <button v-if="player && !player.playing"
+                  @click="playLocally"
+                  class="border b-white p-2">
+            Play
+          </button>
+          <button v-else
+                  @click="player?.stop"
+                  class="border b-white p-2">
+            Stop
+          </button>
+        </div>
       </div>
     </div>
   </div>
@@ -424,17 +487,7 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
 <style>
 html,
 body {
-  background-color: black
-}
-
-.app {
-  font-family: monospace;
-  font-size: 1.1em;
-  display: flex;
-  flex-flow: column;
-  align-items: center;
-  overflow: hidden;
-  color: white;
+  @apply bg-primary text-secondary;
 }
 
 /* Large loading spinner */
