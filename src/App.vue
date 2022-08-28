@@ -40,7 +40,7 @@ let ttsRate = 1
 const ttsVoiceToUse = ref()
 let speechIntervalId = -1
 let speaking = false
-const currentPage = ref('help')
+const currentPage = ref('outputLatencyCalibration')
 
 // If client loses focus (lock screen, tab switch, etc), stop playback.
 // Especially necessary for iOS. There, script execution gets suspended on screen lock,
@@ -343,6 +343,11 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
   }
   return partials
 }
+
+const helpEndReached = () => {
+  currentPage.value = 'outputLatencyCalibration'
+}
+
 </script>
 
 <template>
@@ -389,10 +394,16 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
         </div>
       </div>
     </div>
+
     <div v-else-if="currentPage === 'help'"
          class="flex flex-col items-center justify-between h-4/5">
-      <Help isChoirPerformance />
+      <Help isChoirPerformance
+            @endReached="helpEndReached" />
     </div>
+
+    <OutputLatencyCalibration v-else-if="currentPage === 'outputLatencyCalibration'"
+                              @calibrationFinished="calibrationFinished"
+                              :motion="motion" />
 
     <!-- Footer -->
     <div class="flex flex-col items-center text-lg h-1/5">

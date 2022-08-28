@@ -16,8 +16,18 @@ defineProps({
     }
 })
 
+const emit = defineEmits(['endReached'])
+
 const currentStep = ref(3)
 const totalSteps = ref(4)
+
+const navigateForward = () => {
+    if (currentStep.value >= totalSteps.value) {
+        emit('endReached')
+    } else {
+        currentStep.value += 1
+    }
+}
 </script>
 
 <template>
@@ -70,7 +80,7 @@ const totalSteps = ref(4)
 
     <!-- Nav + Step indicator -->
     <div class="flex flex-col items-center">
-        <button @click="currentStep += 1">
+        <button @click="navigateForward">
             <object :data="IconArrowRight"
                     height="75"
                     class="py-2" />

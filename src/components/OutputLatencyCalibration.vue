@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import Player from '../Player'
 import { ref } from 'vue';
+import IconStartCalibration from '../assets/icons/IconStartCalibration.svg'
+import IconStopCalibration from '../assets/icons/IconStopCalibration.svg'
+import IconArrowLeft from '../assets/icons/IconArrowLeft.png'
+import IconArrowRight from '../assets/icons/IconArrowRight.png'
 
 const emit = defineEmits(['calibrationFinished'])
 const props = defineProps(['motion'])
@@ -13,6 +17,7 @@ const calibratedLatency = ref(0.00)
 const userHoldingButton = ref(false)
 
 const startCalibration = async () => {
+  console.log('clicked')
   const outputLatencyFromCalibration = localStorage.getItem("outputLatency");
   if (outputLatencyFromCalibration) {
     calibratedLatency.value = Number(outputLatencyFromCalibration)
@@ -64,26 +69,44 @@ const finishCalibration = () => {
 </script>
 
 <template>
-  <div class="h-screen flex flex-col justify-center items-center">
-    <button v-if="!calibrating"
-            @click="startCalibration"
-            data-test="btn--start-calibration">Start calibration</button>
+  <div class="h-screen flex flex-col justify-center items-center px-16 text-secondary">
+    <div class="flex justify-center items-center w-full gap-x-6 mb-10">
+      <button v-if="calibrating"
+              @mousedown="handleMousedown(-0.01)"
+              @mouseup="userHoldingButton = false"
+              data-test="btn--increase-calibratedLatency">
+        <img :src="IconArrowLeft"
+             width="25"
+             height="25"></button>
+      <span class="text-5xl">{{ calibratedLatency.toFixed(2) }}</span>
+      <button v-if="calibrating"
+              @mousedown="handleMousedown(0.01)"
+              @mouseup="userHoldingButton
+              = false"
+              data-test="btn--decrease-calibratedLatency">
+        <img :src="IconArrowRight"
+             width="25"
+             height="25"></button>
+    </div>
+    <div v-if="!calibrating"
+         class="flex flex-col items-center">
+      <button @click="startCalibration"
+              data-test="btn--start-calibration">
+        <img :src="IconStartCalibration"
+             width="50"
+             height="50">
+      </button>
+      <p class="text-tertiary text-lg text-center mt-10">Click the Play button above to start calibrating</p>
+    </div>
     <div v-else
-         class="flex flex-col justify-center items-center">
-      <span class="text-5xl mb-4">{{ calibratedLatency.toFixed(2) }}</span>
-      <div class="flex justify-between w-full">
-        <button class="border h-10 w-10"
-                @mousedown="handleMousedown(-0.01)"
-                @mouseup="userHoldingButton = false"
-                data-test="btn--increase-calibratedLatency">&lt;</button>
-        <button class="border h-10 w-10"
-                @mousedown="handleMousedown(0.01)"
-                @mouseup="userHoldingButton
-                = false"
-                data-test="btn--decrease-calibratedLatency">&gt;</button>
-      </div>
-      <button class="mt-4 border p-4"
-              @click="finishCalibration">Finish calibration</button>
+         class="flex flex-col items-center">
+      <button @click="finishCalibration">
+        <img :src="IconStopCalibration"
+             width="50"
+             height="50">
+      </button>
+      <p class="text-tertiary text-lg text-center mt-10">Calibrate to click sound using the arrow keys press stop when
+        finished</p>
     </div>
   </div>
 </template>
