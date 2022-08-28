@@ -69,8 +69,8 @@ const finishCalibration = () => {
 </script>
 
 <template>
-  <div class="h-screen flex flex-col justify-center items-center px-16 text-secondary">
-    <div class="flex justify-center items-center w-full gap-x-6 mb-10">
+  <div class="h-screen flex flex-col px-16 text-secondary mt-60">
+    <div class="flex justify-center w-full gap-x-6 mb-10">
       <button v-if="calibrating"
               @mousedown="handleMousedown(-0.01)"
               @mouseup="userHoldingButton = false"
