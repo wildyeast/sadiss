@@ -30,7 +30,7 @@ const ttsLanguage = ref('en-US')
 let ttsRate = 1
 const ttsVoiceToUse = ref()
 let speechIntervalId = -1
-// let speaking = false
+let speaking = false
 
 // If client loses focus (lock screen, tab switch, etc), stop playback.
 // Especially necessary for iOS. There, script execution gets suspended on screen lock,
@@ -40,7 +40,7 @@ document.addEventListener('visibilitychange', () => {
       if (player.value.playing) {
         player.value.stop()
         window.clearInterval(speechIntervalId)
-        // speaking = false
+        speaking = false
       }
     }
   }, false)
@@ -155,7 +155,6 @@ const checkForStart = async (token: string) => {
 
   const clientData = await response.json()
   if (clientData.client["start_time"]) {
-    // console.log('Client data: ', clientData)
     window.clearInterval(intervalId)
     const startTimeFromServer = Number(clientData.client["start_time"])
     ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
@@ -221,17 +220,15 @@ const start = async () => {
   if (ttsInstructions && ttsLanguage.value) {
     const ttsTimestamps = Object.keys(ttsInstructions).map(timestamp => Number(timestamp))
 
-    if (ttsLanguage.value === 'en-US') {
-      const voices = speechSynthesis.getVoices()
-      ttsVoiceToUse.value = voices.filter(voice => voice.lang === ttsLanguage.value)[3]
-    }
+    const voices = speechSynthesis.getVoices()
+    ttsVoiceToUse.value = voices.filter(voice => voice.lang === ttsLanguage.value)[0]
 
     let nextTimestamp = ttsTimestamps.shift()
 
     // === undefined needed since it can be 0
     if (!(typeof nextTimestamp === 'number')) return
 
-    // speaking = true
+    speaking = true
 
     let nextUtterance: SpeechSynthesisUtterance | null
 
@@ -245,12 +242,8 @@ const start = async () => {
       if (motion.value.pos - player.value.offset >= currentGlobalTimeInCtxTime + Number(nextTimestamp) + startInSec) {
         if (nextUtterance) {
           nextUtterance.rate = ttsRate
-          // if (!speaking) return
-          try {
-            speechSynthesis.speak(nextUtterance)
-          } catch (error) {
-            console.log('Error when trying to speak: ', error)
-          }
+          if (!speaking) return
+          speechSynthesis.speak(nextUtterance)
           nextUtterance = null
         }
         if (ttsInstructions && ttsTimestamps.length) {
@@ -263,7 +256,7 @@ const start = async () => {
           }
         } else {
           window.clearInterval(speechIntervalId)
-          // speaking = false
+          speaking = false
         }
       }
     }, 50)
@@ -275,17 +268,12 @@ const start = async () => {
 const createSequencerUtterance = (ttsInstructions: SequencerTtsInstructions, nextTimestamp: number, ttsLanguage: string): SpeechSynthesisUtterance | null => {
   let utterance: SpeechSynthesisUtterance | null = null;
   if (ttsInstructions[nextTimestamp][ttsLanguage]) {
-    console.log('Creating sequencer utterance.')
     utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
     utterance.lang = ttsLanguage
     if (ttsVoiceToUse.value) {
       utterance.lang = ''
       utterance.voice = ttsVoiceToUse.value
     }
-    console.log('Utterance created.')
-    console.log('Saying: ', ttsInstructions[nextTimestamp][ttsLanguage])
-    console.log('in language: ', utterance.lang)
-    console.log('with voice named: ', utterance.voice?.name)
   }
   return utterance
 }
@@ -294,17 +282,12 @@ const createChoirUtterance = (ttsInstructions: ChoirTtsInstructions, nextTimesta
   let utterance: SpeechSynthesisUtterance | null = null;
   if (ttsInstructions[nextTimestamp][partialIdToRegisterWith]
     && ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage]) {
-    console.log('Creating choir utterance.')
     utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
     utterance.lang = ttsLanguage
     if (ttsVoiceToUse.value) {
       utterance.lang = ''
       utterance.voice = ttsVoiceToUse.value
     }
-    console.log('Utterance created.')
-    console.log('Saying: ', ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
-    console.log('in language: ', utterance.lang)
-    console.log('with voice: ', utterance.voice)
   }
   return utterance
 }
