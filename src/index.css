@@ -7,11 +7,11 @@
     font-style: normal;
 }
 
-@font-face {
+/* @font-face {
     font-family: 'Verdana';
     src: local('VerdanaBold'), url(./assets/fonts/VerdanaBold.ttf);
     font-style: bold;
-}
+} */
 
 @tailwind utilities;
 

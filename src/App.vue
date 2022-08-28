@@ -3,6 +3,7 @@ import Player from "./Player"
 import OutputLatencyCalibration from './components/OutputLatencyCalibration.vue'
 import { onMounted, Ref, ref } from "vue"
 import { ChoirTtsInstructions, SequencerTtsInstructions } from "./types";
+import Help from './components/Help.vue'
 import IconSadiss from './assets/icons/IconSadiss.svg'
 import IconSadissLogo from './assets/icons/IconSadissLogo.svg'
 import IconSoundsystem from './assets/icons/IconSoundsystem.svg'
@@ -39,6 +40,7 @@ let ttsRate = 1
 const ttsVoiceToUse = ref()
 let speechIntervalId = -1
 let speaking = false
+const currentPage = ref('help')
 
 // If client loses focus (lock screen, tab switch, etc), stop playback.
 // Especially necessary for iOS. There, script execution gets suspended on screen lock,
@@ -346,12 +348,13 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
 <template>
   <div class="h-screen flex flex-col justify-between gap-y-4"
        v-if="motionConnected">
-    <div class="flex flex-col items-center justify-between h-4/5">
+    <div v-if="currentPage === 'start'"
+         class="flex flex-col items-center justify-between h-4/5">
       <object :data="IconSadiss"
               class="my-8"
               width="120"
               height="120" />
-      <h1 v-if="selectedPerformance">{{ selectedPerformance.title }}</h1>
+      <h1 v-if="selectedPerformance">{{ selectedPerformance.location }}</h1>
       <h1 v-else>No performance selected</h1>
 
       <div class="flex flex-col items-center mt-8 text-lg">
@@ -372,11 +375,12 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
         </select>
 
         <div class="flex gap-4">
-          <div class="flex flex-col items-center mt-8 text-lg">
+          <button @click="currentPage = 'help'"
+                  class="flex flex-col items-center mt-8 text-lg">
             <object :data="IconHelp"
                     width="50"
                     height="50" />
-          </div>
+          </button>
           <div class="flex flex-col items-center mt-8 text-lg">
             <object :data="IconSettings"
                     width="50"
@@ -385,6 +389,12 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
         </div>
       </div>
     </div>
+    <div v-else-if="currentPage === 'help'"
+         class="flex flex-col items-center justify-between h-4/5">
+      <Help isChoirPerformance />
+    </div>
+
+    <!-- Footer -->
     <div class="flex flex-col items-center text-lg h-1/5">
       <object :data="IconSadissLogo"
               width="150"
@@ -395,7 +405,6 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
 
 
     <div class="hidden">
-
       <!-- Only show if never registered this session and not currently registered -->
       <OutputLatencyCalibration v-if="player && !hasCalibratedThisSession && !isRegistered"
                                 @calibrationFinished="calibrationFinished"
@@ -487,7 +496,7 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
 <style>
 html,
 body {
-  @apply bg-primary text-secondary;
+  @apply bg-primary;
 }
 
 /* Large loading spinner */
