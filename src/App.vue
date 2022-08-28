@@ -317,7 +317,8 @@ const calibrationFinished = (calibratedLatency: number) => {
 const blink = () => {
   const btn = document.getElementById('registerBtn')
   if (btn && (isRegistered.value || btn?.style.borderColor !== 'white')) {
-    btn.style.borderColor = btn.style.borderColor !== 'white' ? 'white' : '#FF6700'
+    // btn.style.borderColor = btn.style.borderColor !== 'white' ? 'white' : '#FF6700'
+    btn.style.backgroundColor = btn.style.backgroundColor === 'transparent' ? '#79EA04' : 'transparent'
     window.setTimeout(() => {
       blink()
     }, 1000)
