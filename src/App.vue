@@ -11,6 +11,8 @@ import IconGlobe from './assets/icons/IconGlobe.png'
 import IconHelp from './assets/icons/IconHelp.png'
 import IconSettings from './assets/icons/IconSettings.png'
 import IconFooter from './assets/icons/IconFooter.svg'
+import IconJoinPerformance from './assets/icons/IconJoinPerformance.svg'
+import IconArrowLeft from './assets/icons/IconArrowLeft.png'
 
 const availableTracks: Ref<{ id: number, title: string }[]> = ref([])
 const countdownTime = ref(-1)
@@ -40,7 +42,7 @@ let ttsRate = 1
 const ttsVoiceToUse = ref()
 let speechIntervalId = -1
 let speaking = false
-const currentPage = ref('outputLatencyCalibration')
+const currentPage = ref('register')
 
 // If client loses focus (lock screen, tab switch, etc), stop playback.
 // Especially necessary for iOS. There, script execution gets suspended on screen lock,
@@ -404,8 +406,42 @@ const helpEndReached = () => {
                               @calibrationFinished="calibrationFinished"
                               :motion="motion" />
 
-    <div v-else-if="currentPage === 'register'">
-
+    <div v-else-if="currentPage === 'register'"
+         class="h-full">
+      <div class="flex flex-col items-center justify-between h-full pt-40 text-secondary">
+        <div v-if="attemptingToRegister"
+             class="flex justify-center items-center w-[200px] h-[200px]">
+          <div class="lds-dual-ring" />
+        </div>
+        <button v-else-if="!isRegistered"
+                @click="register"
+                class="flex flex-col items-center">
+          <img :src="IconJoinPerformance"
+               width="200"
+               height="200" />
+          <p class="text-tertiary text-2xl mt-6">Join</p>
+        </button>
+        <div v-else-if="isRegistered"
+             class="flex flex-col items-center">
+          <button id="registerBtn"
+                  class="w-[200px] h-[200px] border-8 rounded-full border-secondary" />
+          <p class="text-tertiary text-2xl mt-6">Joined</p>
+        </div>
+        <div class="flex flex-col items-center mt-8 text-lg">
+          <div>
+            <img :src="IconSoundsystem"
+                 width="50"
+                 height="50" />
+          </div>
+          <p class="text-sm mt-1">{{ selectedPerformance.location }}</p>
+          <button @click="!isRegistered ? currentPage = 'start' : register"
+                  class="mt-6">
+            <img :src="IconArrowLeft"
+                 width="30"
+                 height="30" />
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Footer -->
