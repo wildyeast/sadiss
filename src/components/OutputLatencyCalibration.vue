@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import Player from '../Player'
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import IconStartCalibration from '../assets/icons/IconStartCalibration.svg'
 import IconStopCalibration from '../assets/icons/IconStopCalibration.svg'
-import IconArrowLeft from '../assets/icons/IconArrowLeft.png'
-import IconArrowRight from '../assets/icons/IconArrowRight.png'
+import IconArrowLeft from '../assets/icons/IconArrowLeft.svg'
+import IconArrowRight from '../assets/icons/IconArrowRight.svg'
 
 const emit = defineEmits(['calibrationFinished'])
 const props = defineProps(['motion'])
@@ -17,12 +17,6 @@ const calibratedLatency = ref(0.00)
 const userHoldingButton = ref(false)
 
 const startCalibration = async () => {
-  console.log('clicked')
-  const outputLatencyFromCalibration = localStorage.getItem("outputLatency");
-  if (outputLatencyFromCalibration) {
-    calibratedLatency.value = Number(outputLatencyFromCalibration)
-  }
-
   player = new Player();
 
   const audioCtx = window.AudioContext || window.webkitAudioContext;
@@ -66,6 +60,13 @@ const finishCalibration = () => {
   window.clearInterval(beepIntervalId)
   emit('calibrationFinished', calibratedLatency.value)
 }
+
+onMounted(() => {
+  const outputLatencyFromCalibration = localStorage.getItem("outputLatency")
+  if (outputLatencyFromCalibration) {
+    calibratedLatency.value = Number(outputLatencyFromCalibration)
+  }
+})
 </script>
 
 <template>
@@ -77,7 +78,8 @@ const finishCalibration = () => {
               data-test="btn--increase-calibratedLatency">
         <img :src="IconArrowLeft"
              width="25"
-             height="25"></button>
+             height="25">
+      </button>
       <span class="text-5xl">{{ calibratedLatency.toFixed(2) }}</span>
       <button v-if="calibrating"
               @mousedown="handleMousedown(0.01)"
@@ -86,7 +88,8 @@ const finishCalibration = () => {
               data-test="btn--decrease-calibratedLatency">
         <img :src="IconArrowRight"
              width="25"
-             height="25"></button>
+             height="25">
+      </button>
     </div>
     <div v-if="!calibrating"
          class="flex flex-col items-center">

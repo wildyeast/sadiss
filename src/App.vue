@@ -7,12 +7,12 @@ import Help from './components/Help.vue'
 import IconSadiss from './assets/icons/IconSadiss.svg'
 import IconSadissLogo from './assets/icons/IconSadissLogo.svg'
 import IconSoundsystem from './assets/icons/IconSoundsystem.svg'
-import IconGlobe from './assets/icons/IconGlobe.png'
-import IconHelp from './assets/icons/IconHelp.png'
-import IconSettings from './assets/icons/IconSettings.png'
+import IconGlobe from './assets/icons/IconGlobe.svg'
+import IconHelp from './assets/icons/IconHelp.svg'
+import IconSettings from './assets/icons/IconSettings.svg'
 import IconFooter from './assets/icons/IconFooter.svg'
 import IconJoinPerformance from './assets/icons/IconJoinPerformance.svg'
-import IconArrowLeft from './assets/icons/IconArrowLeft.png'
+import IconArrowLeft from './assets/icons/IconArrowLeft.svg'
 
 const availableTracks: Ref<{ id: number, title: string }[]> = ref([])
 const countdownTime = ref(-1)
@@ -42,7 +42,7 @@ let ttsRate = 1
 const ttsVoiceToUse = ref()
 let speechIntervalId = -1
 let speaking = false
-const currentPage = ref('register')
+const currentPage = ref('help')
 
 // If client loses focus (lock screen, tab switch, etc), stop playback.
 // Especially necessary for iOS. There, script execution gets suspended on screen lock,
@@ -356,42 +356,42 @@ const helpEndReached = () => {
   <div class="h-screen flex flex-col justify-between gap-y-4"
        v-if="motionConnected">
     <div v-if="currentPage === 'start'"
-         class="flex flex-col items-center justify-between h-4/5">
-      <object :data="IconSadiss"
-              class="my-8"
-              width="120"
-              height="120" />
+         class="flex flex-col items-center justify-around h-4/5 text-secondary">
+      <img :src="IconSadiss"
+           class="my-8"
+           width="120"
+           height="120" />
       <h1 v-if="selectedPerformance">{{ selectedPerformance.location }}</h1>
       <h1 v-else>No performance selected</h1>
 
       <div class="flex flex-col items-center mt-8 text-lg">
-        <object :data="IconSoundsystem"
-                width="50"
-                height="50" />
+        <img :src="IconSoundsystem"
+             width="50"
+             height="50" />
         <p>Soundsystem</p>
       </div>
 
       <div class="flex flex-col items-center mt-8 text-lg">
-        <object :data="IconGlobe"
-                width="50"
-                height="50" />
+        <img :src="IconGlobe"
+             width="50"
+             height="50" />
         <select class="bg-primary"
                 v-model="ttsLanguage">
           <option value="en-US">English</option>
           <option value="de-DE">Deutsch</option>
         </select>
 
-        <div class="flex gap-4">
+        <div class="flex gap-12 mt-8">
           <button @click="currentPage = 'help'"
                   class="flex flex-col items-center mt-8 text-lg">
-            <object :data="IconHelp"
-                    width="50"
-                    height="50" />
+            <img :src="IconHelp"
+                 width="50"
+                 height="50" />
           </button>
           <div class="flex flex-col items-center mt-8 text-lg">
-            <object :data="IconSettings"
-                    width="50"
-                    height="50" />
+            <img :src="IconSettings"
+                 width="50"
+                 height="50" />
           </div>
         </div>
       </div>
