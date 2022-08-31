@@ -428,7 +428,10 @@ const helpEndReached = () => {
     <div v-else-if="currentPage === 'register'"
          class="h-full">
       <div class="flex flex-col items-center justify-between h-full pt-40 text-secondary">
-        <div v-if="attemptingToRegister"
+        <div v-if="player.playing">
+          Track is running
+        </div>
+        <div v-else-if="attemptingToRegister"
              class="flex justify-center items-center w-[200px] h-[200px]">
           <div class="lds-dual-ring" />
         </div>
