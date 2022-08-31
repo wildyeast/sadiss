@@ -371,7 +371,9 @@ const helpEndReached = () => {
            class="my-8"
            width="120"
            height="120" />
-      <h1 v-if="selectedPerformance">{{ selectedPerformance.location }}</h1>
+      <h1 v-if="selectedPerformance">
+        {{ selectedPerformance.display_title ? selectedPerformance.display_title : selectedPerformance.title}}
+      </h1>
       <h1 v-else>No performance selected</h1>
 
       <div class="flex flex-col items-center mt-8 text-lg">
