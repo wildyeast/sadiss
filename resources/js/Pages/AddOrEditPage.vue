@@ -72,6 +72,24 @@
                 <o-switch v-model="form[field]"
                           disabled />
               </div>
+              <div v-else-if="field === 'output_device'"
+                   class="flex
+                          justify-around
+                          bg-white
+                          p-6
+                          border-1
+                          rounded-bulma-input-border-radius
+                          border-bulma-input-border
+                          hover:border-bulma-input-border-hover">
+                <div v-for="(device, idx) of ['Speakers', 'Headphones', 'Both']"
+                     class="flex items-center gap-2">
+                  <input type="radio"
+                         name="output_devices"
+                         :value="idx"
+                         v-model="form[field]">
+                  <label>{{ device }}</label>
+                </div>
+              </div>
               <div v-else-if="fields[field].type === 'datetime'">
                 <o-datetimepicker placeholder="Click to select..."
                                   locale="en-GB"
@@ -235,19 +253,19 @@ export default {
     })
 
     function submit () {
-      // TODO: Do formatting somewhere else (during v-model?)
-      // Oruga datetimepicker has a datetimeFormatter prop, maybe this helps https://oruga.io/components/datetimepicker.html
       const formattedForm = {}
       for (const field of Object.keys(form)) {
-        if (field === 'start_time' || field == 'end_time') {
-          const d = form[field]
-          formattedForm[field] = `${d.getFullYear()}-${d.getMonth()}-${d.getDate()} ${d.getHours()}:${d.getMinutes()}:${d.getSeconds()}`
-        } else {
-          formattedForm[field] = form[field]
-        }
+        formattedForm[field] = form[field]
       }
 
       if (category.value === 'performances') {
+        if (!formattedForm['title']) {
+          alert('Enter a title.')
+          return
+        } else if (!formattedForm['output_device']) {
+          alert('Select an output device.')
+          return
+        }
         // Create array of allowed languages from allowedTtsLanguages
         const ttsLanguages = Object.keys(allowedTtsLanguages.value).filter(lang => allowedTtsLanguages.value[lang])
         formattedForm['ttsLanguages'] = ttsLanguages
@@ -272,7 +290,7 @@ export default {
 
     // Helper functions
     function formatLabel (labelText) {
-      return `${labelText[0].toUpperCase()}${labelText.slice(1)}`.replace('_', ' ')
+      return `${labelText[0].toUpperCase()}${labelText.slice(1)}`.replace(/_/g, ' ')
     }
 
     function formatPageTitle () {

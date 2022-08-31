@@ -12,11 +12,12 @@ class PerformanceController extends Controller
   public function create(Request $request)
   {
     $performance = new Performance;
-    $performance->location = $request->location;
-    $performance->start_time = $request->start_time;
-    $performance->end_time = $request->end_time;
+    $performance->title = $request->title;
+    $performance->display_title = $request->display_title;
     $performance->is_active = $request->is_active ? true : false;
     $performance->tts_languages = $request->ttsLanguages;
+    $performance->output_device = $request->output_device;
+    $performance->calibrate_output_latency = $request->calibrate_output_latency ? true : false;
     $performance->save();
     return back()->with('flash', [
       'message' => 'success',
@@ -34,10 +35,12 @@ class PerformanceController extends Controller
   public function edit(Request $request, $id)
   {
     $performance = Performance::where('id', $id)->firstOrFail();
-    $performance->location = $request->location;
-    $performance->start_time = $request->start_time;
-    $performance->end_time = $request->end_time;
+    $performance->title = $request->title;
+    $performance->display_title = $request->display_title;
     $performance->is_active = $request->is_active ? true : false;
+    $performance->tts_languages = $request->ttsLanguages;
+    $performance->output_device = $request->output_device;
+    $performance->calibrate_output_latency = $request->calibrate_output_latency ? true : false;
     $performance->save();
     return back()->with('flash', [
       'message' => 'success',
