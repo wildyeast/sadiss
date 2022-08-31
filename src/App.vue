@@ -42,7 +42,7 @@ let ttsRate = 1
 const ttsVoiceToUse = ref()
 let speechIntervalId = -1
 let speaking = false
-const currentPage = ref('help')
+const currentPage = ref('start')
 
 // If client loses focus (lock screen, tab switch, etc), stop playback.
 // Especially necessary for iOS. There, script execution gets suspended on screen lock,
@@ -388,11 +388,12 @@ const helpEndReached = () => {
                  width="50"
                  height="50" />
           </button>
-          <div class="flex flex-col items-center mt-8 text-lg">
+          <button @click="currentPage = 'outputLatencyCalibration'"
+                  class="flex flex-col items-center mt-8 text-lg">
             <img :src="IconSettings"
                  width="50"
                  height="50" />
-          </div>
+          </button>
         </div>
       </div>
     </div>
