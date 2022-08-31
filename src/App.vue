@@ -358,7 +358,11 @@ const convertPartialsIfNeeded = (partialData: string | object) => {
 }
 
 const helpEndReached = () => {
-  currentPage.value = 'outputLatencyCalibration'
+  if (selectedPerformance.value['calibrate_output_latency']) {
+    currentPage.value = 'outputLatencyCalibration'
+  } else {
+    currentPage.value = 'register'
+  }
 }
 
 </script>
@@ -401,7 +405,7 @@ const helpEndReached = () => {
                  width="50"
                  height="50" />
           </button>
-          <button @click="currentPage = 'outputLatencyCalibration'"
+          <button @click="currentPage = selectedPerformance['calibrate_output_latency'] ? 'outputLatencyCalibration' : 'register'"
                   class="flex flex-col items-center mt-8 text-lg">
             <img :src="IconSettings"
                  width="50"
