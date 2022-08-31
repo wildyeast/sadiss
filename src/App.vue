@@ -19,8 +19,8 @@ const availableTracks: Ref<{ id: number, title: string }[]> = ref([])
 const countdownTime = ref(-1)
 const deviceRegistrationId = ref(-1) // Only used in UI
 const hasCalibratedThisSession = ref(false)
-// const hostUrl = "http://sadiss.test/v1"
-const hostUrl = "https://sadiss.org/api/v1"
+const hostUrl = "http://sadiss.test/v1"
+// const hostUrl = "https://sadiss.org/api/v1"
 let intervalId: number
 let initialTimingSrcIntervalId: number
 const attemptingToRegister = ref(false)
@@ -69,7 +69,8 @@ onMounted(async () => {
   if (performances.value.map((p: any) => p.id).includes(Number(params.get('id')))) {
     performanceId.value = Number(params.get('id'))
   }
-  if (params.get('partial_id')) {
+
+  if (typeof params.get('partial_id') === 'string') {
     partialIdToRegisterWith = Number(params.get('partial_id'))
   }
 
@@ -173,7 +174,7 @@ const checkForStart = async (token: string) => {
 
   const clientData = await response.json()
   if (clientData.client["start_time"]) {
-    // console.log('Client data: ', clientData)
+    console.log('Client data: ', clientData)
     window.clearInterval(intervalId)
     const startTimeFromServer = Number(clientData.client["start_time"])
     ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
@@ -438,7 +439,9 @@ const helpEndReached = () => {
         <div v-else-if="isRegistered"
              class="flex flex-col items-center">
           <button id="registerBtn"
-                  class="w-[200px] h-[200px] border-8 rounded-full border-secondary" />
+                  class="w-[200px] h-[200px] border-8 rounded-full border-secondary">
+            <span class="text-tertiary">{{deviceRegistrationId}}</span>
+          </button>
           <p class="text-tertiary text-2xl mt-6">Joined</p>
         </div>
         <div class="flex flex-col items-center mt-8 text-lg">
