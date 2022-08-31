@@ -197,7 +197,7 @@ class TrackController extends Controller
       // Choir mode
       foreach ($clients as $i => $value) {
         $client = Client::where('id', $value->id)->firstOrFail();
-        if ($value->partial_id) {
+        if ($value->partial_id !== null) {
           $client->partials = array(0 => $partials[$value->partial_id % count($partials)]);
         } else {
           continue;
