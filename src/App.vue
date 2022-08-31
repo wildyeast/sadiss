@@ -3,6 +3,7 @@ import Player from "./Player"
 import OutputLatencyCalibration from './components/OutputLatencyCalibration.vue'
 import { onMounted, Ref, ref } from "vue"
 import { ChoirTtsInstructions, SequencerTtsInstructions } from "./types";
+import { SpearPartial } from './types/SpearPartial'
 import Help from './components/Help.vue'
 import IconSadiss from './assets/icons/IconSadiss.svg'
 import IconSadissLogo from './assets/icons/IconSadissLogo.svg'
@@ -27,8 +28,9 @@ const isRegistered = ref(false)
 const motion: Ref<{ pos: number }> = ref({ pos: 0 })
 const motionConnected = ref(false)
 let outputLatencyFromLocalStorage: number
-let partialData: []
+let partialData: SpearPartial[]
 let partialIdToRegisterWith: number | null
+let partialIdFromServer = -1
 let performanceId = ref(-1)
 const performances = ref()
 const selectedPerformance = ref()
@@ -48,14 +50,14 @@ const currentPage = ref('start')
 // Especially necessary for iOS. There, script execution gets suspended on screen lock,
 // and resumed on unlock, leading to desync between devices.
 document.addEventListener('visibilitychange', () => {
-    if (document['hidden']) {
-      if (player.value.playing) {
-        player.value.stop()
-        window.clearInterval(speechIntervalId)
-        speaking = false
-      }
+  if (document['hidden']) {
+    if (player.value.playing) {
+      player.value.stop()
+      window.clearInterval(speechIntervalId)
+      speaking = false
     }
-  }, false)
+  }
+}, false)
 
 onMounted(async () => {
   // Get performances to later check against performanceId URL parameter (if present) to make sure performance exists
@@ -116,7 +118,7 @@ const register = async () => {
   await player.value.audioContext.resume()
 
   // Synthesize voice (with volume set to 0) on registration to make TTS work on iOS
-  const initialUtterance = new SpeechSynthesisUtterance('You are currentGlobalTimeInCtxTime registered.')
+  const initialUtterance = new SpeechSynthesisUtterance('You are registered.')
   initialUtterance.volume = 0
   speechSynthesis.speak(initialUtterance)
 
@@ -171,6 +173,7 @@ const checkForStart = async (token: string) => {
 
   const clientData = await response.json()
   if (clientData.client["start_time"]) {
+    // console.log('Client data: ', clientData)
     window.clearInterval(intervalId)
     const startTimeFromServer = Number(clientData.client["start_time"])
     ttsInstructions = JSON.parse(clientData.client["tts_instructions"])
@@ -197,6 +200,12 @@ const checkForStart = async (token: string) => {
       clientData.client["partials"]
     )
     player.value.partialData = partialData
+
+    // If array of partials has only one partial we are most likely in choir mode.
+    // Use id of this singular partial for selecting which of the voices in TTS to play.
+    if (partialData.length === 1) {
+      partialIdFromServer = Number(partialData[0].index)
+    }
 
     let prepareStarted = false
 
@@ -249,7 +258,7 @@ const start = async () => {
     let nextUtterance: SpeechSynthesisUtterance | null
 
     if (typeof partialIdToRegisterWith === 'number') {
-      nextUtterance = createChoirUtterance(ttsInstructions, nextTimestamp, ttsLanguage.value, partialIdToRegisterWith)
+      nextUtterance = createChoirUtterance(ttsInstructions, nextTimestamp, ttsLanguage.value, partialIdFromServer)
     } else {
       nextUtterance = createSequencerUtterance(ttsInstructions, nextTimestamp, ttsLanguage.value)
     }
@@ -266,7 +275,7 @@ const start = async () => {
           nextTimestamp = Number(ttsTimestamps.shift())
           if (!nextTimestamp) return
           if (typeof partialIdToRegisterWith === 'number') {
-            nextUtterance = createChoirUtterance(ttsInstructions, nextTimestamp, ttsLanguage.value, partialIdToRegisterWith)
+            nextUtterance = createChoirUtterance(ttsInstructions, nextTimestamp, ttsLanguage.value, partialIdFromServer)
           } else {
             nextUtterance = createSequencerUtterance(ttsInstructions, nextTimestamp, ttsLanguage.value)
           }
@@ -294,11 +303,12 @@ const createSequencerUtterance = (ttsInstructions: SequencerTtsInstructions, nex
   return utterance
 }
 
-const createChoirUtterance = (ttsInstructions: ChoirTtsInstructions, nextTimestamp: number, ttsLanguage: string, partialIdToRegisterWith: number): SpeechSynthesisUtterance | null => {
+const createChoirUtterance = (ttsInstructions: ChoirTtsInstructions, nextTimestamp: number, ttsLanguage: string, partialId: number): SpeechSynthesisUtterance | null => {
   let utterance: SpeechSynthesisUtterance | null = null;
-  if (ttsInstructions[nextTimestamp][partialIdToRegisterWith]
-    && ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage]) {
-    utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialIdToRegisterWith][ttsLanguage])
+  if (ttsInstructions[nextTimestamp][partialId]
+    && ttsInstructions[nextTimestamp][partialId][ttsLanguage]) {
+    console.log('Creating choir utterance.')
+    utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialId][ttsLanguage])
     utterance.lang = ttsLanguage
     if (ttsVoiceToUse.value) {
       utterance.lang = ''
@@ -326,13 +336,13 @@ const blink = () => {
 }
 
 const playLocally = async () => {
-  // Resume audioCtx for iOS
-  player.value.audioContext.resume()
+  // // Resume audioCtx for iOS
+  // player.value.audioContext.resume()
 
-  const partialData = await fetch(`${hostUrl}/track/${trackId.value}`)
-    .then(res => res.json())
-    .then(data => JSON.parse(data.partials))
-  player.value.setup(partialData, 0, 0, outputLatencyFromLocalStorage)
+  // const partialData = await fetch(`${hostUrl}/track/${trackId.value}`)
+  //   .then(res => res.json())
+  //   .then(data => JSON.parse(data.partials))
+  // player.value.setup(partialData, 0, 0, outputLatencyFromLocalStorage)
 }
 
 const convertPartialsIfNeeded = (partialData: string | object) => {
@@ -573,6 +583,7 @@ body {
 .lds-dual-ring-colored:after {
   border-color: #FF6700 transparent #FF6700 transparent;
 }
+
 @keyframes lds-dual-ring {
   0% {
     transform: rotate(0deg)

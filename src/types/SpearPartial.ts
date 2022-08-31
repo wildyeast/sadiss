@@ -1,4 +1,5 @@
 export interface SpearPartial {
+    index: string,
     startTime: number,
     endTime: number,
     breakpoints: [
