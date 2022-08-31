@@ -197,7 +197,11 @@ class TrackController extends Controller
       // Choir mode
       foreach ($clients as $i => $value) {
         $client = Client::where('id', $value->id)->firstOrFail();
-        $client->partials = array(0 => $partials[$value->partial_id % count($partials)]);
+        if ($value->partial_id) {
+          $client->partials = array(0 => $partials[$value->partial_id % count($partials)]);
+        } else {
+          continue;
+        }
         $client->start_time = $startTime;
         $client->tts_instructions = $tts_instructions;
         $client->tts_language = $tts_language;
