@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 69 133" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:1.5;">
+<svg width="100%" height="100%" viewBox="0 0 69 133" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
     <g transform="matrix(1,0,0,1,-5230,-1499)">
         <g id="Start-Soundsystem" serif:id="Start Soundsystem" transform="matrix(1,0,0,1,4710.37,63.9899)">
             <rect x="0" y="0" width="1080" height="1920" style="fill:none;"/>
             <g id="Logo">
             </g>
             <g transform="matrix(0.272635,0,0,0.448835,61.7404,-2159.43)">
-                <path d="M1754.21,8053.75L1857.6,8157.14L1755.99,8258.75" style="fill:none;stroke:rgb(121,234,4);stroke-width:105.03px;"/>
+                <path d="M1693.08,8076.31L1773.91,8157.14C1773.91,8157.14 1694.86,8236.19 1694.86,8236.19C1674.36,8256.69 1685.12,8283.43 1718.86,8295.88C1752.59,8308.33 1796.62,8301.8 1817.12,8281.3L1918.73,8179.69C1932.59,8165.83 1932.59,8148.44 1918.73,8134.58L1815.34,8031.2C1794.85,8010.7 1750.82,8004.17 1717.08,8016.62C1683.34,8029.07 1672.59,8055.81 1693.08,8076.31Z" style="fill:rgb(121,234,4);"/>
             </g>
             <g id="index_dots">
             </g>
