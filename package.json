@@ -15,7 +15,7 @@
         "@inertiajs/progress": "^0.2.6",
         "@tailwindcss/forms": "^0.4.0",
         "@vue/compiler-sfc": "^3.0.5",
-        "autoprefixer": "^10.2.4",
+        "autoprefixer": "10.4.5",
         "axios": "^0.21",
         "laravel-mix": "^6.0.6",
         "lodash": "^4.17.19",
@@ -29,6 +29,7 @@
     "dependencies": {
         "@oruga-ui/oruga-next": "^0.5.3",
         "@oruga-ui/theme-bulma": "^0.2.1",
+        "@vue/composition-api": "^1.7.0",
         "client-zip": "^2.2.2",
         "material-icons": "^1.10.6",
         "qrcode.vue": "^3.3.3",
