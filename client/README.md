@@ -1,7 +1,8 @@
 ![SADISS](https://sadiss.net/api/logo_black.png)
-## Installation
 
-The SADISS client is a Vue.js app.
+# Client
+
+The SADISS client is a Vue.js app. It is supposed to be deployed on a web server and run on mobile phone browsers.
 
 ### Prerequisites
 Make sure that your server has the following software installed:
