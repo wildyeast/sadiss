@@ -1,44 +1,35 @@
 <template>
 
     <Head title="" />
-    <div class="flex flex-col items-center justify-center w-full absolute z-50 top-6 left-0 bg-gray-100 dark:bg-gray-900 text-white">
-        <pre style="background: none" class="text-white">
-   _______   ___  ____________
-  / __/ _ | / _ \/  _/ __/ __/
- _\ \/ __ |/ // // /_\ \_\ \  
-/___/_/ |_/____/___/___/___/  
-        </pre>
-        <div class="p-4">
+    <div class="pt-16 flex flex-col items-center justify-center w-full absolute z-50 top-6 left-0 text-white">
+        <ApplicationLogo />
+        <div class="mt-16 font-mono">
             <p>You've successfully installed SADISS. Congratulations!</p>
 
-            <p>The next step will be to create a new user account. Run
-                <pre>php artisan make:user</pre> in your terminal. Then, you may
-                login at /login.</p>
-
-            You can modify this page at <pre>resources/js/Pages/Welcome.vue</pre>.
+            <p class="mt-4">To create a new user account, run
+                <pre>php artisan make:user</pre> in your terminal.
+            </p>
+            <p class="mt-4">
+                You can modify this page at <pre>resources/js/Pages/Welcome.vue</pre>
+            </p>
         </div>
     </div>
 
     <div
-        class="relative flex items-top justify-center min-h-screen bg-gray-100 dark:bg-gray-900 sm:items-center sm:pt-0">
+        class="relative flex items-top justify-center min-h-screen bg-primary sm:items-center sm:pt-0">
         <div v-if="canLogin" class="hidden fixed top-0 right-0 px-6 py-4 sm:block">
-            <Link v-if="$page.props.auth.user" :href="route('dashboard')" class="text-sm text-gray-700 underline">
-            Dashboard
+            <Link :href="route('login')" class="text-sm text-white underline">
+            Log in
             </Link>
 
-            <template v-else>
-                <Link :href="route('login')" class="text-sm text-gray-700 underline">
-                Log in
-                </Link>
-
-                <Link v-if="canRegister" :href="route('register')" class="ml-4 text-sm text-gray-700 underline">
-                Register
-                </Link>
-            </template>
+            <Link v-if="canRegister" :href="route('register')" class="ml-4 text-sm text-white underline">
+            Register
+            </Link>
         </div>
     </div>
 </template>
 <script setup>
+import ApplicationLogo from '@/Components/ApplicationLogo.vue'
 import { Head, Link } from '@inertiajs/inertia-vue3';
 import { ref } from 'vue'
 
