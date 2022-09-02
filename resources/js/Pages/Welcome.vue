@@ -3,15 +3,10 @@
     <Head title="" />
     <div class="pt-16 flex flex-col items-center justify-center w-full absolute z-50 top-6 left-0 text-white">
         <ApplicationLogo />
-        <div class="mt-16 font-mono">
-            <p>You've successfully installed SADISS. Congratulations!</p>
-
-            <p class="mt-4">To create a new user account, run
-                <pre>php artisan make:user</pre> in your terminal.
-            </p>
-            <p class="mt-4">
-                You can modify this page at <pre>resources/js/Pages/Welcome.vue</pre>
-            </p>
+        <div class="mt-16 p-4 flex flex-col items-center font-mono bg-gray-900">
+            This is the SADISS API.<br>Find more information here:
+            <a class="p-2" target="_blank" href="https://sadiss.net">Web</a>
+            <a class="p-2" target="_blank" href="https://github.com/wildyeast/sadiss">Github</a>
         </div>
     </div>
 
