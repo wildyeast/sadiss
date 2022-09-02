@@ -1,5 +1,5 @@
 <template>
   <div>
-    <img :src="'/api/logo.png'" class="w-32">
+    <img src="/logo.png" class="w-32" >
   </div>
 </template>
