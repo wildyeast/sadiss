@@ -120,8 +120,6 @@ export default {
 
       if (pathname.endsWith('tracks')) {
         routeCategory = 'track'
-      } else if (pathname.endsWith('composers')) {
-        routeCategory = 'composer'
       } else {
         routeCategory = 'performance'
       }

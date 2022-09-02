@@ -6,7 +6,6 @@ use Carbon\Carbon;
 
 use App\Http\Controllers\TrackController;
 use App\Http\Controllers\PerformanceController;
-use App\Http\Controllers\ComposerController;
 use App\Http\Controllers\ClientController;
 
 /*
@@ -54,16 +53,6 @@ Route::post('/performance/edit/{id}', [PerformanceController::class, 'edit'])
 Route::get('/performance/{id}/partial_ids', [PerformanceController::class, 'get_partial_indices_of_track_with_most_partials']);
 Route::get('/performance', [PerformanceController::class, 'get']);
 Route::get('/performance/{id}', [PerformanceController::class, 'get']);
-
-Route::get('/composer/columns', [ComposerController::class, 'get_column_info']);
-Route::post('/composer/create', [ComposerController::class, 'create'])
-  ->name('composer.create');
-Route::post('/composer/delete/{id}', [ComposerController::class, 'delete'])
-  ->name('composer.delete');
-Route::post('/composer/edit/{id}', [ComposerController::class, 'edit'])
-  ->name('composer.edit');
-Route::get('/composer', [ComposerController::class, 'get']);
-Route::get('/composer/{id}', [ComposerController::class, 'get']);
 
 Route::post('/client/create', [ClientController::class, 'create'])
   ->name('client.create');

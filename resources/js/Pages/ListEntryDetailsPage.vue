@@ -31,8 +31,6 @@ const showPartialQRCodes = ref(false)
 onMounted(async () => {
   if (path.name === 'tracks') {
     category = 'track'
-  } else if (path.name === 'composers') {
-    category = 'composer'
   } else {
     category = 'performance'
   }
@@ -207,34 +205,6 @@ const setPlayingTrack = track => {
               <ClientList :trackId="id"
                           :ttsInstructions="JSON.parse(data['tts_instructions'])" />
             </div> -->
-          </template>
-          <!-- Composer -->
-          <template v-if="path.name === 'composers'">
-            <div class="flex">
-              <!-- Left hand side -->
-              <div class="flex-1">
-                <div class="flex justify-between items-center mb-4">
-                  <p class="text-2xl">{{ data['name'] }}</p>
-                  <p v-if="data['is_active']"
-                     class="text-green-700">Active</p>
-                  <p v-else
-                     class="text-rose-500">Inactive</p>
-                </div>
-                <p class="text-justify">{{ data['description'] }}</p>
-              </div>
-              <!-- Right hand side -->
-              <div class="flex-1 flex flex-col items-center">
-                <img :src="data['photo']"
-                     alt="An image of the composer."
-                     class="w-1/2 mb-4">
-                <div
-                     class="flex flex-col items-center w-1/2 border border-bulma-input-border rounded-bulma-input-border-radius">
-                  <p class="py-4 border-b border-bulma-input-border">Website</p>
-                  <a :href="data['website_url']"
-                     class="py-4 text-center">{{ data['website_url'] }}</a>
-                </div>
-              </div>
-            </div>
           </template>
           <!-- Performance -->
           <div v-if="path.name === 'performances'"

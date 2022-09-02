@@ -163,9 +163,6 @@ export default {
         case 'tracks':
           routeCategory = 'track'
           break
-        case 'composers':
-          routeCategory = 'composer'
-          break
         case 'performances':
           routeCategory = 'performance'
           break
