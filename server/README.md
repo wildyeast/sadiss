@@ -1,5 +1,6 @@
 ![SADISS](https://sadiss.net/api/logo_black.png)
-## Installation
+
+# Server
 
 The SADISS server is supposed to be installed on a web server.
 
