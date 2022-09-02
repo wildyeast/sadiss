@@ -1,14 +1,7 @@
 ![SADISS](https://sadiss.net/api/logo_black.png)
-## A socially aggregated distributed sound system.
+## Installation
 
-SADISS is a web application developed in the research project ‘The Choir & the Sound System’ at Anton Bruckner university (Linz, Austria) that bundles smartphones into monumental yet intricate sound systems or choirs.
-
-Unsure what this means? Take a look at [sadiss.net](https://sadiss.net/) to get an idea.
-
-### License
-SADISS is released under the GNU Affero General Public License ([AGPL](https://www.gnu.org/licenses/agpl-3.0.en.html)). It allows anyone to freely download, modify, run and distribute the software. Any distribution must ship its source code to the user. If you run a modified version of SADISS on a server, your server must allow users to download the source code corresponding to the modified version.
-
-## Getting started
+The SADISS server is supposed to be installed on a web server.
 
 ### Prerequisites
 Make sure that your server has the following software installed:
