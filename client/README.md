@@ -1,29 +1,27 @@
-# sadiss_client
+![SADISS](https://sadiss.net/api/logo_black.png)
+## Installation
 
-This template should help get you started developing with Vue 3 in Vite.
+The SADISS client is a Vue.js app.
 
-## Recommended IDE Setup
+### Prerequisites
+Make sure that your server has the following software installed:
+- Node.js >= v16
+- NPM >= v8 or yarn >= v1.22
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=johnsoncodehk.vscode-typescript-vue-plugin).
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
-
-## Project Setup
+### Installation
 
 ```sh
-npm install
+npm install OR yarn
 ```
 
-### Compile and Hot-Reload for Development
+### Compilation for development
 
 ```sh
-npm run dev
+npm run dev OR yarn dev
 ```
 
-### Compile and Minify for Production
+### Compilation for production
 
 ```sh
-npm run build
+npm run build OR yarn build
 ```
