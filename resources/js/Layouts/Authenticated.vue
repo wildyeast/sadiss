@@ -8,7 +8,7 @@
                         <div class="flex">
                             <!-- Logo -->
                             <div class="shrink-0 flex items-center">
-                                <Link :href="route('dashboard')">
+                                <Link :href="route('tracks')">
                                     <BreezeApplicationLogo class="block w-auto" />
                                 </Link>
                             </div>
