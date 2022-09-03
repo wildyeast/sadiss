@@ -369,7 +369,7 @@ const helpEndReached = () => {
 </script>
 
 <template>
-  <div class="h-screen w-screen flex flex-col justify-between"
+  <div class="h-screen w-screen md:w-1/3 md:mx-auto flex flex-col justify-between"
        v-if="motionConnected">
 
     <div v-if="currentPage === 'start'"
@@ -437,8 +437,8 @@ const helpEndReached = () => {
                               :motion="motion" />
 
     <div v-else-if="currentPage === 'register'"
-         class="h-full mb-4">
-      <div class="flex flex-col items-center justify-around gap-4 h-full text-secondary">
+         class="mb-4 my-auto">
+      <div class="flex flex-col items-center justify-around h-full text-secondary">
         <div class="w-full flex flex-col items-center">
           <div v-if="player.playing">
             <div class="h-40 w-40 mx-auto bg-secondary rounded-full">
@@ -456,12 +456,12 @@ const helpEndReached = () => {
                   @click="register"
                   class="flex flex-col items-center">
             <img :src="IconJoinPerformance"
-                 class="w-40 h-40" />
+                 class="h-40" />
             <p class="text-tertiary text-2xl mt-6">Join</p>
           </button>
           <div v-else-if="isRegistered"
                class="flex flex-col items-center">
-            <button class="w-40 h-40 border-8 rounded-full border-secondary">
+            <button class="h-40 w-40 border-8 rounded-full border-secondary">
               <span class="text-tertiary">{{deviceRegistrationId}}</span>
             </button>
             <p class="text-tertiary text-2xl mt-6">Joined</p>
@@ -470,8 +470,8 @@ const helpEndReached = () => {
         <div class="flex flex-col items-center text-lg mb-0">
           <div>
             <img :src="IconSoundsystem"
-                 width="50"
-                 height="50" />
+                 width="40"
+                 height="40" />
           </div>
           <p class="text-sm mt-1 text-center w-full">{{ selectedPerformance.title }}</p>
           <button @click="currentPage = 'start'"
