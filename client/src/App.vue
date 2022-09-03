@@ -8,6 +8,7 @@ import Help from './components/Help.vue'
 import IconSadiss from './assets/icons/IconSadiss.svg'
 import IconSadissLogo from './assets/icons/IconSadissLogo.svg'
 import IconSoundsystem from './assets/icons/IconSoundsystem.svg'
+import IconChoir from './assets/icons/IconChoir.svg'
 import IconGlobe from './assets/icons/IconGlobe.svg'
 import IconHelp from './assets/icons/IconHelp.svg'
 import IconSettings from './assets/icons/IconSettings.svg'
@@ -78,6 +79,7 @@ onMounted(async () => {
 
   if (performanceId.value >= 0) {
     selectedPerformance.value = performances.value.find((p: { id: number }) => p.id === performanceId.value)
+    console.log(selectedPerformance.value)
   }
 
   initializeMCorp()
@@ -382,11 +384,31 @@ const helpEndReached = () => {
       </h1>
       <h1 v-else>No performance selected</h1>
 
-      <div class="flex flex-col items-center text-lg">
+      <div v-if="selectedPerformance.output_device === 0"
+           class="flex flex-col items-center text-lg">
         <img :src="IconSoundsystem"
              width="50"
              height="50" />
         <p>Soundsystem</p>
+      </div>
+      <div v-else-if="selectedPerformance.output_device === 1"
+           class="flex flex-col items-center text-lg">
+        <img :src="IconChoir"
+             width="50"
+             height="50" />
+        <p>Choir</p>
+      </div>
+      <div v-else
+           class="flex flex-col items-center text-lg">
+        <div class="flex">
+          <img :src="IconSoundsystem"
+               width="50"
+               height="50" />
+          <img :src="IconChoir"
+               width="50"
+               height="50" />
+        </div>
+        <p>Soundsystem + Choir</p>
       </div>
 
       <!-- Language select -->
@@ -437,8 +459,8 @@ const helpEndReached = () => {
                               :motion="motion" />
 
     <div v-else-if="currentPage === 'register'"
-         class="mb-4 my-auto">
-      <div class="flex flex-col items-center justify-around h-full text-secondary">
+         class="mb-4 flex-1">
+      <div class="flex flex-col items-center justify-center h-full text-secondary my-auto">
         <div class="w-full flex flex-col items-center">
           <div v-if="player.playing">
             <div class="h-40 w-40 mx-auto bg-secondary rounded-full">
@@ -468,10 +490,28 @@ const helpEndReached = () => {
           </div>
         </div>
         <div class="flex flex-col items-center text-lg mb-0">
-          <div>
+          <div v-if="selectedPerformance.output_device === 0"
+               class="flex flex-col items-center text-lg">
             <img :src="IconSoundsystem"
                  width="40"
                  height="40" />
+          </div>
+          <div v-else-if="selectedPerformance.output_device === 1"
+               class="flex flex-col items-center text-lg">
+            <img :src="IconChoir"
+                 width="40"
+                 height="40" />
+          </div>
+          <div v-else
+               class="flex flex-col items-center text-lg">
+            <div class="flex">
+              <img :src="IconSoundsystem"
+                   width="40"
+                   height="40" />
+              <img :src="IconChoir"
+                   width="40"
+                   height="40" />
+            </div>
           </div>
           <p class="text-sm mt-1 text-center w-full">{{ selectedPerformance.title }}</p>
           <button @click="currentPage = 'start'"
