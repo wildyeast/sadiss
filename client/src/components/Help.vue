@@ -29,7 +29,7 @@ const navigateForward = () => {
 </script>
 
 <template>
-     <div class="h-full flex flex-col justify-center items-center text-tertiary">
+     <div class="h-2/3 my-auto flex flex-col justify-center text-tertiary">
           <div v-if="currentStep === 1"
                class="flex flex-col items-center px-14">
                <h1 class="mb-4">Welcome to SADISS</h1>
@@ -40,28 +40,26 @@ const navigateForward = () => {
                     of the universe</p>
           </div>
           <div v-else-if="currentStep === 2"
-               class="flex flex-col items-center gap-10 px-10">
+               class="flex flex-col items-center px-10">
                <img :src="GraphicSwitchOnAudio"
                     width="250"
                     class="py-2" />
                <p class="leading-8 textlgl">Switch on Audio</p>
           </div>
           <div v-else-if="!isChoirPerformance && currentStep === 3"
-               class="flex flex-col items-center gap-10 px-10">
+               class="flex flex-col h-1/2 px-6">
                <img :src="GraphicHeadphonesOff"
-                    height="300"
-                    class="py-2" />
+                    class="w-1/2 mx-auto" />
                <p class="leading-8 text-lg">Unplug headphones or remove bluetooth earplugs</p>
           </div>
           <div v-else-if="isChoirPerformance && currentStep === 3"
-               class="flex flex-col items-center gap-10 px-10">
+               class="flex flex-col h-1/2 px-6">
                <img :src="GraphicHeadphonesOn"
-                    height="300"
-                    class="py-2" />
+                    class="w-1/2 mx-auto" />
                <p class="leading-8 text-lg">Plug in headphones or activate bluetooth earplugs</p>
           </div>
           <div v-else-if="currentStep === 4"
-               class="flex flex-col items-center gap-10 px-10">
+               class="flex flex-col items-center px-10">
                <img :src="GraphicSwitchOffStandbyMode"
                     height="200"
                     class="py-2" />
