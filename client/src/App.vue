@@ -46,7 +46,7 @@ let ttsRate = 1
 const ttsVoiceToUse = ref()
 let speechIntervalId = -1
 let speaking = false
-const currentPage = ref('help')
+const currentPage = ref('register')
 
 // If client loses focus (lock screen, tab switch, etc), stop playback.
 // Especially necessary for iOS. There, script execution gets suspended on screen lock,
@@ -438,10 +438,10 @@ const helpEndReached = () => {
 
     <div v-else-if="currentPage === 'register'"
          class="h-full mb-4">
-      <div class="flex flex-col items-center justify-end gap-4 h-full text-secondary">
+      <div class="flex flex-col items-center justify-around gap-4 h-full text-secondary">
         <div class="w-full flex flex-col items-center">
           <div v-if="player.playing">
-            <div class="w-2/3 h-[200px] bg-secondary rounded-full">
+            <div class="h-40 w-40 mx-auto bg-secondary rounded-full">
               <img :src="IconPlayingGlow"
                    class="w-full h-full"
                    ref="playingBtn" />
@@ -449,19 +449,19 @@ const helpEndReached = () => {
             <p class="text-tertiary text-2xl mt-6 text-center">Playing</p>
           </div>
           <div v-else-if="attemptingToRegister"
-               class="flex justify-center items-center w-[200px] h-[200px]">
+               class="flex justify-center items-center w-40 h-40">
             <div class="lds-dual-ring" />
           </div>
           <button v-else-if="!isRegistered"
                   @click="register"
-                  class="flex flex-col items-center w-3/5">
+                  class="flex flex-col items-center">
             <img :src="IconJoinPerformance"
-                 class="w-full h-auto" />
+                 class="w-40 h-40" />
             <p class="text-tertiary text-2xl mt-6">Join</p>
           </button>
           <div v-else-if="isRegistered"
                class="flex flex-col items-center">
-            <button class="w-[200px] h-[200px] border-8 rounded-full border-secondary">
+            <button class="w-40 h-40 border-8 rounded-full border-secondary">
               <span class="text-tertiary">{{deviceRegistrationId}}</span>
             </button>
             <p class="text-tertiary text-2xl mt-6">Joined</p>
