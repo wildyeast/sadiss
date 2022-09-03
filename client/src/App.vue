@@ -417,7 +417,7 @@ const helpEndReached = () => {
              class="mb-1"
              width="50"
              height="50" />
-        <select class="bg-primary"
+        <select class="bg-primary appearance-none"
                 v-model="ttsLanguage">
           <option value="en-US">English</option>
           <option value="de-DE">Deutsch</option>
