@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
+<svg width="100%" height="100%" viewBox="0 0 210 211" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linecap:round;stroke-miterlimit:1;">
+    <g transform="matrix(1,0,0,1,-5204,-1356)">
+        <g id="Start-Soundsystem" serif:id="Start Soundsystem" transform="matrix(1,0,0,1,4768.92,57.1464)">
+            <rect x="0" y="0" width="1080" height="1920" style="fill:none;"/>
+            <g transform="matrix(1,0,0,1,2.72848e-12,186.395)">
+                <g transform="matrix(1.24446,0,0,1.25163,1429.19,-12561.1)">
+                    <g transform="matrix(1,0,0,1,-2548.91,4631.15)">
+                        <circle cx="1834.4" cy="6377.88" r="77.285" style="fill:none;stroke:rgb(121,234,4);stroke-width:12px;"/>
+                    </g>
+                    <g transform="matrix(0.207722,0,0,0.341968,-1114.77,8219.85)">
+                        <path d="M1729.38,8062.81L1823.7,8157.14C1823.7,8157.14 1731.15,8249.69 1731.15,8249.69C1722.87,8257.97 1727.28,8268.75 1740.99,8273.75C1754.69,8278.75 1772.54,8276.08 1780.82,8267.81L1882.43,8166.2C1888,8160.62 1888,8153.65 1882.43,8148.08L1779.05,8044.69C1770.77,8036.41 1752.92,8033.75 1739.21,8038.75C1725.5,8043.75 1721.1,8054.53 1729.38,8062.81Z" style="fill:rgb(121,234,4);"/>
+                    </g>
+                    <g transform="matrix(-0.207722,2.54386e-17,-4.18791e-17,-0.341968,-314.454,13798.2)">
+                        <path d="M1729.38,8062.81L1823.7,8157.14C1823.7,8157.14 1731.15,8249.69 1731.15,8249.69C1722.87,8257.97 1727.28,8268.75 1740.99,8273.75C1754.69,8278.75 1772.54,8276.08 1780.82,8267.81L1882.43,8166.2C1888,8160.62 1888,8153.65 1882.43,8148.08L1779.05,8044.69C1770.77,8036.41 1752.92,8033.75 1739.21,8038.75C1725.5,8043.75 1721.1,8054.53 1729.38,8062.81Z" style="fill:rgb(121,234,4);"/>
+                    </g>
+                </g>
+            </g>
+            <g id="Logo">
+            </g>
+        </g>
+    </g>
+</svg>

@@ -14,6 +14,8 @@ import IconSettings from './assets/icons/IconSettings.svg'
 import IconFooter from './assets/icons/IconFooter.svg'
 import IconJoinPerformance from './assets/icons/IconJoinPerformance.svg'
 import IconArrowLeft from './assets/icons/IconArrowLeft.svg'
+import IconJoin from './assets/icons/IconJoin.svg'
+import IconPlayingGlow from './assets/icons/IconPlayingGlow.svg'
 
 const availableTracks: Ref<{ id: number, title: string }[]> = ref([])
 const countdownTime = ref(-1)
@@ -44,7 +46,7 @@ let ttsRate = 1
 const ttsVoiceToUse = ref()
 let speechIntervalId = -1
 let speaking = false
-const currentPage = ref('start')
+const currentPage = ref('register')
 
 // If client loses focus (lock screen, tab switch, etc), stop playback.
 // Especially necessary for iOS. There, script execution gets suspended on screen lock,
@@ -160,7 +162,6 @@ const register = async () => {
 
   attemptingToRegister.value = false
   isRegistered.value = true
-  blink()
 }
 
 const checkForStart = async (token: string) => {
@@ -241,6 +242,7 @@ const start = async () => {
   )
 
   isRegistered.value = false
+  blink()
 
   /* TEXT TO SPEECH */
   if (ttsInstructions && ttsLanguage.value) {
@@ -325,11 +327,10 @@ const calibrationFinished = (calibratedLatency: number) => {
   currentPage.value = 'register'
 }
 
+const playingBtn = ref()
 const blink = () => {
-  const btn = document.getElementById('registerBtn')
-  if (btn && (isRegistered.value || btn?.style.borderColor !== 'white')) {
-    // btn.style.borderColor = btn.style.borderColor !== 'white' ? 'white' : '#FF6700'
-    btn.style.backgroundColor = btn.style.backgroundColor === 'transparent' ? '#79EA04' : 'transparent'
+  if (playingBtn.value) {
+    playingBtn.value.style.display = playingBtn.value.style.display !== 'none' ? 'none' : 'block'
     window.setTimeout(() => {
       blink()
     }, 1000)
@@ -368,28 +369,30 @@ const helpEndReached = () => {
 </script>
 
 <template>
-  <div class="h-screen flex flex-col justify-between gap-y-4"
+  <div class="h-screen w-screen flex flex-col justify-between"
        v-if="motionConnected">
+
     <div v-if="currentPage === 'start'"
-         class="flex flex-col items-center justify-around h-4/5 text-secondary">
+         class="flex flex-col  justify-around text-secondary h-4/5">
       <img :src="IconSadiss"
-           class="my-8"
-           width="120"
-           height="120" />
-      <h1 v-if="selectedPerformance">
+           class="w-1/4 mx-auto" />
+      <h1 v-if="selectedPerformance"
+          class="text-center">
         {{ selectedPerformance.display_title ? selectedPerformance.display_title : selectedPerformance.title}}
       </h1>
       <h1 v-else>No performance selected</h1>
 
-      <div class="flex flex-col items-center mt-8 text-lg">
+      <div class="flex flex-col items-center text-lg">
         <img :src="IconSoundsystem"
              width="50"
              height="50" />
         <p>Soundsystem</p>
       </div>
 
-      <div class="flex flex-col items-center mt-8 text-lg">
+      <!-- Language select -->
+      <div class="flex flex-col items-center text-lg">
         <img :src="IconGlobe"
+             class="mb-1"
              width="50"
              height="50" />
         <select class="bg-primary"
@@ -398,15 +401,23 @@ const helpEndReached = () => {
           <option value="de-DE">Deutsch</option>
         </select>
 
-        <div class="flex gap-12 mt-8">
+        <!-- Bottom buttons -->
+        <div class="flex justify-around items-center mt-4 w-2/3">
           <button @click="currentPage = 'help'"
-                  class="flex flex-col items-center mt-8 text-lg">
+                  class="flex flex-col items-center text-lg">
             <img :src="IconHelp"
                  width="50"
                  height="50" />
           </button>
-          <button @click="currentPage = selectedPerformance['calibrate_output_latency'] ? 'outputLatencyCalibration' : 'register'"
-                  class="flex flex-col items-center mt-8 text-lg">
+          <button @click="currentPage = 'register'"
+                  class="flex flex-col items-center text-lg">
+            <img :src="IconJoin"
+                 :width="selectedPerformance['calibrate_output_latency'] ? 60 : 50"
+                 :height="selectedPerformance['calibrate_output_latency'] ? 60 : 50" />
+          </button>
+          <button v-if="selectedPerformance['calibrate_output_latency']"
+                  @click="currentPage = 'outputLatencyCalibration'"
+                  class="flex flex-col items-center text-lg">
             <img :src="IconSettings"
                  width="50"
                  height="50" />
@@ -426,140 +437,61 @@ const helpEndReached = () => {
                               :motion="motion" />
 
     <div v-else-if="currentPage === 'register'"
-         class="h-full">
-      <div class="flex flex-col items-center justify-between h-full pt-40 text-secondary">
-        <div v-if="player.playing">
-          Track is running
-        </div>
-        <div v-else-if="attemptingToRegister"
-             class="flex justify-center items-center w-[200px] h-[200px]">
-          <div class="lds-dual-ring" />
-        </div>
-        <button v-else-if="!isRegistered"
-                @click="register"
-                class="flex flex-col items-center">
-          <img :src="IconJoinPerformance"
-               width="200"
-               height="200" />
-          <p class="text-tertiary text-2xl mt-6">Join</p>
-        </button>
-        <div v-else-if="isRegistered"
-             class="flex flex-col items-center">
-          <button id="registerBtn"
-                  class="w-[200px] h-[200px] border-8 rounded-full border-secondary">
-            <span class="text-tertiary">{{deviceRegistrationId}}</span>
+         class="h-full mb-4">
+      <div class="flex flex-col items-center justify-end gap-4 h-full text-secondary">
+        <div class="w-full flex flex-col items-center">
+          <div v-if="player.playing">
+            <div class="w-2/3 h-[200px] bg-secondary rounded-full">
+              <img :src="IconPlayingGlow"
+                   class="w-full h-full"
+                   ref="playingBtn" />
+            </div>
+            <p class="text-tertiary text-2xl mt-6 text-center">Playing</p>
+          </div>
+          <div v-else-if="attemptingToRegister"
+               class="flex justify-center items-center w-[200px] h-[200px]">
+            <div class="lds-dual-ring" />
+          </div>
+          <button v-else-if="!isRegistered"
+                  @click="register"
+                  class="flex flex-col items-center w-3/5">
+            <img :src="IconJoinPerformance"
+                 class="w-full h-auto" />
+            <p class="text-tertiary text-2xl mt-6">Join</p>
           </button>
-          <p class="text-tertiary text-2xl mt-6">Joined</p>
+          <div v-else-if="isRegistered"
+               class="flex flex-col items-center">
+            <button class="w-[200px] h-[200px] border-8 rounded-full border-secondary">
+              <span class="text-tertiary">{{deviceRegistrationId}}</span>
+            </button>
+            <p class="text-tertiary text-2xl mt-6">Joined</p>
+          </div>
         </div>
-        <div class="flex flex-col items-center mt-8 text-lg">
+        <div class="flex flex-col items-center text-lg mb-0">
           <div>
             <img :src="IconSoundsystem"
                  width="50"
                  height="50" />
           </div>
-          <p class="text-sm mt-1">{{ selectedPerformance.location }}</p>
-          <button @click="!isRegistered ? currentPage = 'start' : register"
+          <p class="text-sm mt-1 text-center w-full">{{ selectedPerformance.title }}</p>
+          <button @click="currentPage = 'start'"
                   class="mt-6">
             <img :src="IconArrowLeft"
-                 width="30"
-                 height="30" />
+                 width="20"
+                 height="20" />
           </button>
         </div>
       </div>
     </div>
-
     <!-- Footer -->
-    <div class="flex flex-col items-center text-lg h-1/5">
-      <object :data="IconSadissLogo"
-              width="150"
-              height="150" />
-      <object :data="IconFooter"
-              class="w-full max-h-full" />
+    <div class="flex flex-col items-center text-lg">
+      <img :src="IconSadissLogo"
+           class="w-1/4" />
+      <img :src="IconFooter"
+           class="w-full h-auto" />
     </div>
-
-
-    <div class="hidden">
-      <!-- Only show if never registered this session and not currently registered -->
-      <OutputLatencyCalibration v-if="player && !hasCalibratedThisSession && !isRegistered"
-                                @calibrationFinished="calibrationFinished"
-                                :motion="motion" />
-
-      <!-- Register -->
-      <div class="md:w-1/2 w-11/12 p-4 flex flex-col justify-center items-center h-screen">
-
-        <!-- Top -->
-        <!-- Performance Id dropdown -->
-        <select v-if="!isRegistered && !player.playing"
-                v-model="performanceId"
-                class="border p-2 rounded-full h-10 w-10 fixed top-5 right-5">
-          <option v-for="performance of performances">{{ performance.id }}</option>
-        </select>
-        <!-- Current global time and other information -->
-        <div class="fixed top-5 right-5">
-          <p v-if="isRegistered">{{ timingSrcPosition }}</p>
-          <p v-if="countdownTime > 0"
-             style="display: flex justify-content: center font-size: 50px">
-            {{ countdownTime }}
-          </p>
-          <p v-else-if="player && player.playing">Track currently playing.</p>
-          <!-- <p v-else>Device not registered.</p> -->
-          <div v-html="print"
-               style="margin-top: 1rem" />
-        </div>
-
-        <!-- Center -->
-        <select v-model="ttsLanguage">
-          <option value="en-US">en-US</option>
-          <option value="de-DE">de-DE</option>
-        </select>
-        <button @click="register"
-                id="registerBtn"
-                class="border-2 p-2 mt-4 rounded-full h-28 w-28 transition-all duration-300">
-          <div v-if="attemptingToRegister"
-               class="flex justify-center items-center">
-            <div class="lds-dual-ring lds-dual-ring-colored" />
-          </div>
-          <span v-else-if="!isRegistered">Register</span>
-          <span v-else>{{ deviceRegistrationId }}</span>
-
-        </button>
-      </div>
-
-      <!-- Play track locally -->
-      <!-- Currently hidden - display: none -->
-      <div style="display: flex; flex-direction: column; justify-content: center; display:none;"
-           class="md:w-1/2 w-11/12 border b-white p-4">
-        <p>
-          Select a track ID from the dropdown below and press Play to prepare the
-          selected track. All partials will be played on this device. The ID
-          corresponds to the tracks's ID in the database (check the
-          <a :href="hostUrl + 'tracks'">Admin Interface</a> for a list of
-          available tracks). If the dropdown is empty, add a track to the database
-          via the Admin Interface and afterwards refresh this page.
-        </p>
-        <div class="flex flex-row justify-between items-center py-4">
-          <label>Select a track ID</label>
-          <select v-model="trackId">
-            <option v-for="track of availableTracks"
-                    :key="track.id">
-              {{ track.id }} - {{ track.title }}
-            </option>
-          </select>
-          <button v-if="player && !player.playing"
-                  @click="playLocally"
-                  class="border b-white p-2">
-            Play
-          </button>
-          <button v-else
-                  @click="player?.stop"
-                  class="border b-white p-2">
-            Stop
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- Loading Spinner while waiting for motion -->
   </div>
-  <!-- Loading Spinner while waiting for motion -->
   <div v-else
        class="flex justify-center items-center h-screen">
     <div class="lds-dual-ring" />
