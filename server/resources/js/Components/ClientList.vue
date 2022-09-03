@@ -212,10 +212,10 @@ function startCalibration () {
         <InfoTuple name="max">{{ maxRegisteredClients }}</InfoTuple>
         <InfoTuple name="at start">{{ clientsRegisteredAtStart }}</InfoTuple>
         <InfoTuple name="IDs">
-          <span v-for="client of registeredClients"
-                :key="client.id">
+          <p v-for="client of registeredClients"
+             :key="client.id">
             {{ client.id }} <span v-if="client.partial_id">(Partial-Id: {{ client.partial_id }})</span>
-          </span>
+          </p>
         </InfoTuple>
         <button @click="removeClients"
                 class="border h-8 p-1 uppercase">
