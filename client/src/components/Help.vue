@@ -66,10 +66,9 @@ const navigateForward = () => {
                <p class="leading-8 text-lg">Plug in headphones or activate bluetooth earplugs</p>
           </div>
           <div v-else-if="currentStep === 5"
-               class="flex flex-col items-center gap-10 px-10">
+               class="flex flex-col items-center px-10">
                <img :src="GraphicKeepOnPhone"
-                    height="300"
-                    class="py-2" />
+                    class="w-1/2 mx-auto mb-10" />
                <p class="leading-8 text-lg">Do not swich off phone
                     or put phone in standby mode during performance</p>
           </div>
@@ -84,9 +83,9 @@ const navigateForward = () => {
                     class="py-2" />
           </button>
           <!-- Step indicator -->
-          <div class="flex gap-1">
+          <div class="flex">
                <div v-for="(idx, dot) of totalSteps"
-                    class="rounded-full w-4 h-4 border-2 border-secondary"
+                    class="rounded-full w-4 h-4 border-2 border-secondary mx-1"
                     :class="idx <= currentStep ? 'bg-secondary' : ''" />
           </div>
      </div>
