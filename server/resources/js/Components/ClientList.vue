@@ -53,7 +53,6 @@ onMounted(async () => {
 })
 
 async function synchronizeTimingSrcPosition () {
-  alert('Starting/Stopping the time is disabled while we try to figure out if this functionality is causing the time to stop sometimes.')
   if (!synchronizing.value) {
     if (motion.vel != 1) {
       motion.update(null, 1, null)
@@ -68,6 +67,8 @@ async function synchronizeTimingSrcPosition () {
         window.setTimeout(query, 10)
       }
     })();
+  } else {
+    alert('Starting/Stopping the time is disabled while we try to figure out if this functionality is causing the time to stop sometimes.')
   }
   // else {
   //   synchronizing.value = false
