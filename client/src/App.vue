@@ -196,6 +196,7 @@ const checkForStart = async (token: string) => {
 
     // If array of partials has only one partial we are most likely in choir mode.
     // Use id of this singular partial for selecting which of the voices in TTS to play.
+    // TODO: Evaluate if this is needed, as it definitely might cause bugs.
     if (partialData.length === 1) {
       partialIdFromServer = Number(partialData[0].index)
     }
@@ -318,10 +319,11 @@ const calibrationFinished = (calibratedLatency: number) => {
   currentPage.value = 'register'
 }
 
-const playingBtn = ref()
 const blink = () => {
-  if (playingBtn.value) {
-    playingBtn.value.style.display = playingBtn.value.style.display !== 'none' ? 'none' : 'block'
+  const playingBtn = document.getElementById('playingBtn')
+  console.log(playingBtn)
+  if (playingBtn) {
+    playingBtn.style.display = playingBtn.style.display !== 'none' ? 'none' : 'block'
     window.setTimeout(() => {
       blink()
     }, 1000)
@@ -449,13 +451,14 @@ const helpEndReached = () => {
 
     <div v-else-if="currentPage === 'register'"
          class="mb-4 flex-1">
-      <div class="flex flex-col items-center justify-center h-full text-secondary my-auto">
+      <div class="flex flex-col justify-center h-full text-secondary my-auto">
         <div class="w-full flex flex-col items-center">
-          <div v-if="player.playing">
-            <div class="h-40 w-40 mx-auto bg-secondary rounded-full">
+          <div v-if="true">
+            <div class="h-40 w-40 border-8 border-secondary rounded-full flex items-center justify-center">
               <img :src="IconPlayingGlow"
-                   class="w-full h-full"
-                   ref="playingBtn" />
+                   class="w-[160px] h-[160px] rounded-full"
+                   id="playingBtn"
+                   @click="blink" />
             </div>
             <p class="text-tertiary text-2xl mt-6 text-center">Playing</p>
           </div>
