@@ -119,13 +119,13 @@ const register = async () => {
 
   attemptingToRegister.value = true
 
-  // Resume audioCtx for iOS
-  await player.value.audioContext.resume()
-
   // Synthesize voice (with volume set to 0) on registration to make TTS work on iOS
   const initialUtterance = new SpeechSynthesisUtterance('You are registered.')
   initialUtterance.volume = 0
   speechSynthesis.speak(initialUtterance)
+
+  // Resume audioCtx for iOS
+  await player.value.audioContext.resume()
 
   initialTimingSrcIntervalId = window.setInterval(() => {
     timingSrcPosition.value = Number(motion.value.pos.toFixed(1))
