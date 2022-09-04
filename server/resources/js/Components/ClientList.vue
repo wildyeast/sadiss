@@ -54,21 +54,21 @@ onMounted(async () => {
 
 async function synchronizeTimingSrcPosition () {
   alert('Starting/Stopping the time is disabled while we try to figure out if this functionality is causing the time to stop sometimes.')
-  // if (!synchronizing.value) {
-  //   if (motion.vel != 1) {
-  //     motion.update(null, 1, null)
-  //   }
+  if (!synchronizing.value) {
+    if (motion.vel != 1) {
+      motion.update(null, 1, null)
+    }
 
-  //   synchronizing.value = true;
-  //   (function query () {
-  //     if (motion.pos.toFixed(1) - timingSrcPosition.value != 0) {
-  //       timingSrcPosition.value = motion.pos.toFixed(1)
-  //     }
-  //     if (synchronizing.value) {
-  //       window.setTimeout(query, 10)
-  //     }
-  //   })();
-  // }
+    synchronizing.value = true;
+    (function query () {
+      if (motion.pos.toFixed(1) - timingSrcPosition.value != 0) {
+        timingSrcPosition.value = motion.pos.toFixed(1)
+      }
+      if (synchronizing.value) {
+        window.setTimeout(query, 10)
+      }
+    })();
+  }
   // else {
   //   synchronizing.value = false
   //   motion.update(0, 0, null)
