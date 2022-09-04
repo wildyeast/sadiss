@@ -134,17 +134,6 @@ const register = async () => {
   // Pass over register function from this file to player
   player.value.register = register
 
-  if (!player.value.audioContext) {
-    const audioCtx = window.AudioContext || window.webkitAudioContext
-    // Start audio context.
-    player.value.audioContext = new audioCtx({
-      latencyHint: 0,
-      // sampleRate: 31000,
-    })
-    // This is necessary to make the audio context work on iOS.
-    player.value.audioContext.resume()
-  }
-
   const response = await fetch(hostUrl + '/client/create', {
     method: "POST",
     mode: "cors",
