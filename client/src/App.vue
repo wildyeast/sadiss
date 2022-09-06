@@ -79,7 +79,9 @@ onMounted(async () => {
 
   if (performanceId.value >= 0) {
     selectedPerformance.value = performances.value.find((p: { id: number }) => p.id === performanceId.value)
-    console.log(selectedPerformance.value)
+  } else {
+    alert('No performance selected. Aborting.')
+    return
   }
 
   initializeMCorp()
