@@ -371,11 +371,11 @@ const helpEndReached = () => {
 </script>
 
 <template>
-  <div class=" w-screen md:w-1/3 md:mx-auto flex flex-col justify-between"
+  <div class="h-screen w-screen md:w-1/3 md:mx-auto flex flex-col justify-between"
        v-if="motionConnected">
 
     <div v-if="currentPage === 'start'"
-         class="flex flex-col  justify-around text-secondary">
+         class="flex flex-col  justify-around text-secondary h-4/5">
       <img :src="IconSadiss"
            class="w-1/4 mx-auto" />
       <h1 v-if="selectedPerformance"
