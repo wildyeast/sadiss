@@ -61,7 +61,6 @@ async function synchronizeTimingSrcPosition () {
     synchronizing.value = true;
     (function query () {
       if (motion.pos.toFixed(1) - timingSrcPosition.value != 0) {
-        // TODO: Weird calculation, doesn't work with !== for some reason, no time to look into it now
         timingSrcPosition.value = motion.pos.toFixed(1)
       }
       if (synchronizing.value) {
@@ -69,10 +68,13 @@ async function synchronizeTimingSrcPosition () {
       }
     })();
   } else {
-    synchronizing.value = false
-    motion.update(0, 0, null)
-    timingSrcPosition.value = motion.pos
+    alert('Starting/Stopping the time is disabled while we try to figure out if this functionality is causing the time to stop sometimes.')
   }
+  // else {
+  //   synchronizing.value = false
+  //   motion.update(0, 0, null)
+  //   timingSrcPosition.value = motion.pos
+  // }
 }
 
 async function startTrack () {
