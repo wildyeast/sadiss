@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import Player from "./Player"
 import OutputLatencyCalibration from './components/OutputLatencyCalibration.vue'
-import { onMounted, Ref, ref } from "vue"
+import { onMounted, Ref, ref, watch } from "vue"
 import { ChoirTtsInstructions, SequencerTtsInstructions } from "./types";
 import { SpearPartial } from './types/SpearPartial'
 import Help from './components/Help.vue'
@@ -233,7 +233,6 @@ const start = async () => {
   )
 
   isRegistered.value = false
-  blink()
 
   /* TEXT TO SPEECH */
   if (ttsInstructions && ttsLanguage.value) {
@@ -318,15 +317,27 @@ const calibrationFinished = (calibratedLatency: number) => {
   currentPage.value = 'register'
 }
 
-const playingBtn = ref()
+let blinking = false
+const playingIconVisible = ref(true)
 const blink = () => {
-  if (playingBtn.value) {
-    playingBtn.value.style.display = playingBtn.value.style.display !== 'none' ? 'none' : 'block'
-    window.setTimeout(() => {
-      blink()
-    }, 1000)
+  if (!blinking) {
+    playingIconVisible.value = true
+    return
   }
+  playingIconVisible.value = !playingIconVisible.value
+  window.setTimeout(() => {
+    blink()
+  }, 1000)
 }
+
+watch(() => player.value.playing, playing => {
+  if (playing) {
+    blinking = true
+    blink()
+  } else {
+    blinking = false
+  }
+})
 
 const playLocally = async () => {
   // // Resume audioCtx for iOS
@@ -360,11 +371,11 @@ const helpEndReached = () => {
 </script>
 
 <template>
-  <div class="h-screen w-screen md:w-1/3 md:mx-auto flex flex-col justify-between"
+  <div class=" w-screen md:w-1/3 md:mx-auto flex flex-col justify-between"
        v-if="motionConnected">
 
     <div v-if="currentPage === 'start'"
-         class="flex flex-col  justify-around text-secondary h-4/5">
+         class="flex flex-col  justify-around text-secondary">
       <img :src="IconSadiss"
            class="w-1/4 mx-auto" />
       <h1 v-if="selectedPerformance"
@@ -452,16 +463,20 @@ const helpEndReached = () => {
       <div class="flex flex-col items-center justify-center h-full text-secondary my-auto">
         <div class="w-full flex flex-col items-center">
           <div v-if="player.playing">
-            <div class="h-40 w-40 mx-auto bg-secondary rounded-full">
+            <div class="h-40 w-40 mx-auto rounded-full border-8 border-secondary">
               <img :src="IconPlayingGlow"
+                   v-show="playingIconVisible"
+                   @click="blink"
                    class="w-full h-full"
                    ref="playingBtn" />
             </div>
             <p class="text-tertiary text-2xl mt-6 text-center">Playing</p>
           </div>
-          <div v-else-if="attemptingToRegister"
-               class="flex justify-center items-center w-40 h-40">
-            <div class="lds-dual-ring" />
+          <div v-else-if="attemptingToRegister">
+            <div class="h-40 w-40 flex justify-center items-center rounded-full border-8 border-secondary">
+              <div class="lds-dual-ring" />
+            </div>
+            <p class="text-tertiary text-2xl mt-6 text-center">Joining</p>
           </div>
           <button v-else-if="!isRegistered"
                   @click="register"
@@ -549,12 +564,12 @@ body {
   margin: 8px;
   border-radius: 50%;
   border: 6px solid #fff;
-  border-color: #EEE transparent #EEE transparent;
-  animation: lds-dual-ring 1.2s linear infinite
+  border-color: #79EA04 transparent #79EA04 transparent;
+    animation: lds-dual-ring 1.2s linear infinite;
 }
 
 .lds-dual-ring-colored:after {
-  border-color: #FF6700 transparent #FF6700 transparent;
+  border-color: #79EA04 transparent #79EA04 transparent;
 }
 
 @keyframes lds-dual-ring {
