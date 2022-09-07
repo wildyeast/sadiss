@@ -463,7 +463,7 @@ const helpEndReached = () => {
     <div v-else-if="currentPage === 'register'"
          class="mb-4 flex-1">
       <div class="flex flex-col items-center justify-center h-full text-secondary my-auto">
-        <div class="w-full flex flex-col items-center">
+        <div class="w-full flex flex-col items-center mb-2">
           <div v-if="player.playing">
             <div class="h-40 w-40 mx-auto rounded-full border-8 border-secondary">
               <img :src="IconPlayingGlow"
