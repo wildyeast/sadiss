@@ -107,7 +107,7 @@ const downloadPartialQrCodes = async () => {
     const svgData = container.innerHTML
     const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" })
     svgBlobs.push({
-      name: `${data['location'].replace(/ /g, '-')}_Voice-${partialQrCodeContainers.value.indexOf(container)}.svg`,
+      name: `${data['title'].replace(/ /g, '-')}_Voice-${partialQrCodeContainers.value.indexOf(container)}.svg`,
       input: svgBlob
     })
   }
@@ -116,7 +116,7 @@ const downloadPartialQrCodes = async () => {
 
   const link = document.createElement("a")
   link.href = URL.createObjectURL(blob)
-  link.download = `${data['location'].replace(/ /g, '-')}_Voices_QR-Codes`
+  link.download = `${data['title'].replace(/ /g, '-')}_Voices_QR-Codes`
   link.click()
   link.remove()
 
