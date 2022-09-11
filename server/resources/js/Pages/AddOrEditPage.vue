@@ -48,7 +48,7 @@
                   {{ detectedLanguages.join(', ') }}
                 </div>
               </div>
-              <div v-else-if="category === 'performances' && field === 'tts_languages'"
+              <!-- <div v-else-if="category === 'performances' && field === 'tts_languages'"
                    class="flex
                           flex-col
                           bg-white
@@ -66,7 +66,7 @@
                          type="checkbox" />
                   <label>{{ lang }}</label>
                 </div>
-              </div>
+              </div> -->
               <span v-else-if="field === 'tts_languages'"></span>
               <div v-else-if="field === 'is_choir'">
                 <o-switch v-model="form[field]"
@@ -244,10 +244,10 @@ export default {
       form['tts_instructions'] = file
     }
 
-    const allowedTtsLanguages = ref({
-      'en-US': false,
-      'de-DE': false
-    })
+    // const allowedTtsLanguages = ref({
+    //   'en-US': false,
+    //   'de-DE': false
+    // })
 
     function submit () {
       const formattedForm = {}
@@ -264,8 +264,8 @@ export default {
           return
         }
         // Create array of allowed languages from allowedTtsLanguages
-        const ttsLanguages = Object.keys(allowedTtsLanguages.value).filter(lang => allowedTtsLanguages.value[lang])
-        formattedForm['ttsLanguages'] = ttsLanguages
+        // const ttsLanguages = Object.keys(allowedTtsLanguages.value).filter(lang => allowedTtsLanguages.value[lang])
+        // formattedForm['ttsLanguages'] = ttsLanguages
       } else if (category.value === 'tracks') {
         formattedForm['ttsLanguages'] = detectedLanguages.value
       }
@@ -305,7 +305,7 @@ export default {
       isEditable,
       loadingFinished,
       title,
-      allowedTtsLanguages,
+      // allowedTtsLanguages,
       onPartialsFileInput,
       onTtsInstructionsFileInput,
       path,

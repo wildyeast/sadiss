@@ -61,14 +61,14 @@ const moveDown = track => {
 }
 
 const addTrackToPerformance = track => {
-  if (track['tts_languages']) {
-    for (const lang of track['tts_languages']) {
-      if (!props.performance['tts_languages'].includes(lang)) {
-        alert("TTS languages of track and performance don't match.")
-        return
-      }
-    }
-  }
+  // if (track['tts_languages']) {
+  //   for (const lang of track['tts_languages']) {
+  //     if (!props.performance['tts_languages'].includes(lang)) {
+  //       alert("TTS languages of track and performance don't match.")
+  //       return
+  //     }
+  //   }
+  // }
   performanceTracks.value.push(track)
   save()
 }
