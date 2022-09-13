@@ -32,7 +32,7 @@ const motion: Ref<{ pos: number }> = ref({ pos: 0 })
 const motionConnected = ref(false)
 let outputLatencyFromLocalStorage: number
 let partialData: SpearPartial[]
-let partialIdToRegisterWith: number | null
+const partialIdToRegisterWith: Ref<number | null> = ref(null)
 let partialIdFromServer = -1
 let performanceId = ref(-1)
 const performances = ref()
@@ -74,7 +74,7 @@ onMounted(async () => {
   }
 
   if (typeof params.get('partial_id') === 'string') {
-    partialIdToRegisterWith = Number(params.get('partial_id'))
+    partialIdToRegisterWith.value = Number(params.get('partial_id'))
   }
 
   if (performanceId.value >= 0) {
@@ -142,7 +142,7 @@ const register = async () => {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ performance_id: performanceId.value, partial_id: partialIdToRegisterWith }),
+    body: JSON.stringify({ performance_id: performanceId.value, partial_id: partialIdToRegisterWith.value }),
   })
   const data = await response.json()
   deviceRegistrationId.value = data.id // Only used in UI.
@@ -252,7 +252,7 @@ const start = async () => {
 
     let nextUtterance: SpeechSynthesisUtterance | null
 
-    if (typeof partialIdToRegisterWith === 'number') {
+    if (typeof partialIdToRegisterWith.value === 'number') {
       nextUtterance = createChoirUtterance(ttsInstructions, nextTimestamp, ttsLanguage.value, partialIdFromServer)
     } else {
       nextUtterance = createSequencerUtterance(ttsInstructions, nextTimestamp, ttsLanguage.value)
@@ -269,7 +269,7 @@ const start = async () => {
         if (ttsInstructions && ttsTimestamps.length) {
           nextTimestamp = Number(ttsTimestamps.shift())
           if (!nextTimestamp) return
-          if (typeof partialIdToRegisterWith === 'number') {
+          if (typeof partialIdToRegisterWith.value === 'number') {
             nextUtterance = createChoirUtterance(ttsInstructions, nextTimestamp, ttsLanguage.value, partialIdFromServer)
           } else {
             nextUtterance = createSequencerUtterance(ttsInstructions, nextTimestamp, ttsLanguage.value)
@@ -385,6 +385,10 @@ const helpEndReached = () => {
         {{ selectedPerformance.display_title ? selectedPerformance.display_title : selectedPerformance.title}}
       </h1>
       <h1 v-else>No performance selected</h1>
+      <h3 v-if="typeof partialIdToRegisterWith === 'number'"
+          class="mx-auto">
+        Partial-ID {{partialIdToRegisterWith}}
+      </h3>
 
       <div v-if="selectedPerformance.output_device === 0"
            class="flex flex-col items-center text-lg">
@@ -520,6 +524,10 @@ const helpEndReached = () => {
             </div>
           </div>
           <p class="text-sm mt-1 text-center w-full">{{ selectedPerformance.title }}</p>
+          <h3 v-if="typeof partialIdToRegisterWith === 'number'"
+              class="text-sm mx-auto">
+            Partial-ID {{partialIdToRegisterWith}}
+          </h3>
           <button @click="currentPage = 'start'"
                   class="mt-6">
             <img :src="IconArrowLeft"
@@ -567,7 +575,7 @@ body {
   border-radius: 50%;
   border: 6px solid #fff;
   border-color: #79EA04 transparent #79EA04 transparent;
-    animation: lds-dual-ring 1.2s linear infinite;
+  animation: lds-dual-ring 1.2s linear infinite;
 }
 
 .lds-dual-ring-colored:after {
