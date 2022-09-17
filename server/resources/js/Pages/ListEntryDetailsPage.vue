@@ -76,7 +76,7 @@ const downloadPerformanceQrCode = async () => {
   const svgUrl = URL.createObjectURL(svgBlob)
   const downloadLink = document.createElement("a")
   downloadLink.href = svgUrl
-  downloadLink.download = `${data['location'].replace(/ /g, '-')}_QR-Code.svg`
+  downloadLink.download = `${data['title'].replace(/ /g, '-')}_QR-Code.svg`
   document.body.appendChild(downloadLink)
   downloadLink.click()
   document.body.removeChild(downloadLink)
@@ -188,9 +188,9 @@ const setPlayingTrack = track => {
                 </p>
                 <p class="text-justify mb-4">{{ data['description'] }}</p>
                 <p v-if="data['partials_file_name']"><strong>Partials file name:</strong> {{ data['partials_file_name']
-                  }}</p>
+                }}</p>
                 <p v-if="data['tts_instructions_file_name']"><strong>TTS file name:</strong> {{
-                  data['tts_instructions_file_name'] }}</p>
+                data['tts_instructions_file_name'] }}</p>
                 <p v-if="data['tts_languages']"><strong>TTS languages:</strong> {{ data['tts_languages'] }}</p>
                 <div></div>
               </div>
@@ -212,7 +212,7 @@ const setPlayingTrack = track => {
             <InfoBox title="performance"
                      class="w-2/3 mr-1">
               <InfoTuple name="id / location">
-                {{ data['id'] }} / {{ data['location'] }}
+                {{ data['id'] }} / {{ data['title'] }}
               </InfoTuple>
               <InfoTuple name="status">
                 <p v-if="data['is_active']"
@@ -246,7 +246,7 @@ const setPlayingTrack = track => {
                          v-if="playingTrack">
                 {{ Math.round(timer) }}s
                 <span v-if="timer >= 0">/ {{ Math.round(playingTrack.duration) }}s ({{ Math.round((timer /
-                  playingTrack.duration)*100) }}%)</span>
+                playingTrack.duration)*100) }}%)</span>
               </InfoTuple>
               <div class="p-1 text-sm"
                    v-else>No track playing</div>
@@ -287,7 +287,7 @@ const setPlayingTrack = track => {
                       :choirMode="selectedTrack ? selectedTrack.is_choir : null" />
           <div v-if="path.name==='performances'">
             <TrackList :performance="
-               data"
+            data"
                        :playingTrack="playingTrack"
                        @trackSelected="trackSelected" />
 
