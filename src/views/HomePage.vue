@@ -14,7 +14,7 @@
       </ion-header>
 
       <div id="container">
-        <ion-button @click="startTest">Test</ion-button>
+        <ion-button @click="register">Test</ion-button>
         <p>{{ currentTime }}</p>
       </div>
     </ion-content>
@@ -97,6 +97,7 @@ const attemptingToRegister = ref(false)
 let initialTimingSrcIntervalId = -1
 const timingSrcPosition = ref(-1)
 const partialIdToRegisterWith = ref(0)
+
 const register = async () => {
   if (isRegistered.value) {
     window.clearInterval(intervalId)
@@ -114,9 +115,9 @@ const register = async () => {
   attemptingToRegister.value = true
 
   // Synthesize voice (with volume set to 0) on registration to make TTS work on iOS
-  const initialUtterance = new SpeechSynthesisUtterance('You are registered.')
-  initialUtterance.volume = 0
-  speechSynthesis.speak(initialUtterance)
+  // const initialUtterance = new SpeechSynthesisUtterance('You are registered.')
+  // initialUtterance.volume = 0
+  // speechSynthesis.speak(initialUtterance)
 
   // Resume audioCtx for iOS
   await player.value.audioContext.resume()
@@ -245,6 +246,8 @@ const start = async () => {
 
     let nextTimestamp = ttsTimestamps.shift()
 
+    console.log('Next timestamp: ', nextTimestamp)
+
     // === undefined needed since it can be 0
     if (!(typeof nextTimestamp === 'number')) return
 
@@ -269,10 +272,11 @@ const start = async () => {
 
     speechIntervalId = window.setInterval(async () => {
       if (motion.pos - player.value.offset >= currentGlobalTimeInCtxTime + Number(nextTimestamp) + startInSec) {
-        if (!ttsInstructions || !nextTimestamp || !ttsLanguage.value) {
+        if (!ttsInstructions || typeof nextTimestamp !== 'number' || !ttsLanguage.value) {
           return
         }
-        await TextToSpeech.speak({
+        console.log('Trying to speak: ', ttsInstructions[nextTimestamp][ttsLanguage.value])
+        TextToSpeech.speak({
           text: ttsInstructions[nextTimestamp][ttsLanguage.value],
           lang: 'en-US',
           rate: 1.0,
@@ -305,33 +309,33 @@ const start = async () => {
   /* END OF TEXT TO SPEECH */
 }
 
-const createSequencerUtterance = (ttsInstructions: SequencerTtsInstructions, nextTimestamp: number, ttsLanguage: string): SpeechSynthesisUtterance | null => {
-  let utterance: SpeechSynthesisUtterance | null = null;
-  if (ttsInstructions[nextTimestamp][ttsLanguage]) {
-    utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
-    utterance.lang = ttsLanguage
-    // if (ttsVoiceToUse.value) {
-    //   utterance.lang = ''
-    //   utterance.voice = ttsVoiceToUse.value
-    // }
-  }
-  return utterance
-}
+// const createSequencerUtterance = (ttsInstructions: SequencerTtsInstructions, nextTimestamp: number, ttsLanguage: string): SpeechSynthesisUtterance | null => {
+//   let utterance: SpeechSynthesisUtterance | null = null;
+//   if (ttsInstructions[nextTimestamp][ttsLanguage]) {
+//     utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][ttsLanguage])
+//     utterance.lang = ttsLanguage
+//     // if (ttsVoiceToUse.value) {
+//     //   utterance.lang = ''
+//     //   utterance.voice = ttsVoiceToUse.value
+//     // }
+//   }
+//   return utterance
+// }
 
-const createChoirUtterance = (ttsInstructions: ChoirTtsInstructions, nextTimestamp: number, ttsLanguage: string, partialId: number): SpeechSynthesisUtterance | null => {
-  let utterance: SpeechSynthesisUtterance | null = null;
-  if (ttsInstructions[nextTimestamp][partialId]
-    && ttsInstructions[nextTimestamp][partialId][ttsLanguage]) {
-    console.log('Creating choir utterance.')
-    utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialId][ttsLanguage])
-    utterance.lang = ttsLanguage
-    // if (ttsVoiceToUse.value) {
-    //   utterance.lang = ''
-    //   utterance.voice = ttsVoiceToUse.value
-    // }
-  }
-  return utterance
-}
+// const createChoirUtterance = (ttsInstructions: ChoirTtsInstructions, nextTimestamp: number, ttsLanguage: string, partialId: number): SpeechSynthesisUtterance | null => {
+//   let utterance: SpeechSynthesisUtterance | null = null;
+//   if (ttsInstructions[nextTimestamp][partialId]
+//     && ttsInstructions[nextTimestamp][partialId][ttsLanguage]) {
+//     console.log('Creating choir utterance.')
+//     utterance = new SpeechSynthesisUtterance(ttsInstructions[nextTimestamp][partialId][ttsLanguage])
+//     utterance.lang = ttsLanguage
+//     // if (ttsVoiceToUse.value) {
+//     //   utterance.lang = ''
+//     //   utterance.voice = ttsVoiceToUse.value
+//     // }
+//   }
+//   return utterance
+// }
 
 const convertPartialsIfNeeded = (partialData: string | object) => {
   let partials
