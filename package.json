@@ -10,6 +10,8 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "@capacitor-community/text-to-speech": "^2.0.1",
+    "@capacitor/android": "4.2.0",
     "@capacitor/app": "4.0.1",
     "@capacitor/core": "4.2.0",
     "@capacitor/haptics": "4.0.1",
