@@ -427,6 +427,7 @@ const helpEndReached = () => {
                 v-model="ttsLanguage">
           <option value="en-US">English</option>
           <option value="de-DE">Deutsch</option>
+          <option value="es-ES">Español</option>
         </select>
 
         <!-- Bottom buttons -->
