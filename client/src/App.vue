@@ -425,9 +425,9 @@ const helpEndReached = () => {
              height="50" />
         <select class="bg-primary appearance-none"
                 v-model="ttsLanguage">
-          <option value="en-US">English</option>
-          <option value="de-DE">Deutsch</option>
           <option value="es-ES">Español</option>
+          <option value="en-US">English</option>
+          <!-- <option value="de-DE">Deutsch</option> -->
         </select>
 
         <!-- Bottom buttons -->
