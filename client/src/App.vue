@@ -42,7 +42,7 @@ let print = ''
 let timingSrcPosition: Ref<number> = ref(-1)
 let trackId = ref(1)
 let ttsInstructions: null
-const ttsLanguage = ref('en-US')
+const ttsLanguage = ref('es-ES')
 let ttsRate = 1
 const ttsVoiceToUse = ref()
 let speechIntervalId = -1
