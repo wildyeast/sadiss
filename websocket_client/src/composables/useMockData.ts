@@ -13,7 +13,7 @@ export function useMockData (countOfChunksToGenerate: number) {
       })
     }
     chunks.value.push({
-      index: '1',
+      index: 1,
       startTime: i * 1000,
       endTime: 1000 + i * 1000,
       breakpoints: mockedBreakpoints

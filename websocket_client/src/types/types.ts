@@ -1,5 +1,5 @@
 export interface PartialChunk {
-  index: string,
+  index: number,
   startTime: number,
   endTime: number,
   breakpoints: {
