@@ -1,9 +1,9 @@
 import { ref } from "vue"
 import { PartialChunk } from "../types/types"
 
-export function useMockData (countsOfChunksToGenerate: number) {
+export function useMockData (countOfChunksToGenerate: number) {
   const chunks = ref<PartialChunk[]>([])
-  for (let i = 0; i < countsOfChunksToGenerate; i++) {
+  for (let i = 0; i < countOfChunksToGenerate; i++) {
     const mockedBreakpoints = []
     for (let j = 0; j < 100; j++) {
       mockedBreakpoints.push({
