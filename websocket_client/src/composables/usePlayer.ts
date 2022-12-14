@@ -56,7 +56,6 @@ export function usePlayer () {
 
   return {
     initialSetup,
-    setOffset,
     setNextChunks,
     startRequestChunksInterval
   }
