@@ -38,8 +38,17 @@ const sendPartialChunksToServer = () => {
   ws.value?.send(JSON.stringify(clientData))
 }
 
-const startTrack = () => {
-  ws.value?.send(JSON.stringify('start'))
+const startTrack = () => ws.value?.send(JSON.stringify('start'))
+
+const sentPartialDataToServerViaHttp = async () => {
+  const res = await fetch('http://localhost:3000/partialData', {
+    method: 'POST',
+    // mode: 'cors',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ data: mockData })
+  })
 }
 
 const initializeMCorp = async () => {
@@ -53,18 +62,6 @@ const startClock = () => {
   setInterval(() => {
     globalTime.value = motion.value?.pos
   }, 10)
-}
-
-const sentPartialDataToServerViaHttp = async () => {
-  const res = await fetch('http://localhost:3000/partialData', {
-    method: 'POST',
-    // mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ data: mockData })
-  })
-  console.log(res)
 }
 
 onMounted(async () => {
