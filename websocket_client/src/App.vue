@@ -21,7 +21,7 @@ const register = () => {
     const data = JSON.parse(event.data)
     if (data.message === 'start') {
       setOffset(globalTime.value)
-      createOscillators(globalTime.value, data.chunk)
+      createOscillators(data.chunk)
       startRequestChunksInterval(ws)
     } else if (data.message === 'chunkRequest') {
       setNextChunks(data.chunk)

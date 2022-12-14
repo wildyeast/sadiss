@@ -1,4 +1,4 @@
-import { Ref, withScopeId } from "vue"
+import { Ref } from "vue"
 import { PartialChunk } from "../types/types"
 
 export function usePlayer () {
@@ -13,7 +13,7 @@ export function usePlayer () {
     offset = globalTime - ctx.currentTime
   }
 
-  const createOscillators = (globalTime: number, partialChunk: PartialChunk) => {
+  const createOscillators = (partialChunk: PartialChunk) => {
     startTime = ctx.currentTime
 
     currentChunkStartTimeInCtxTime = startTime + partialChunk.startTime / 1000
