@@ -12,7 +12,7 @@ const clientId = ref(1)
 const motion = ref()
 const globalTime = ref(0)
 
-const { initialSetup, setNextChunks, startRequestChunksInterval } = usePlayer()
+const { initialSetup, handleChunkData, startRequestChunksInterval } = usePlayer()
 
 const mockData: PartialChunk[][] = []
 for (let i = 0; i < 3; i++) {
@@ -28,7 +28,7 @@ const register = () => {
       initialSetup(data.chunks)
       startRequestChunksInterval(ws)
     } else if (data.message === 'chunkRequest') {
-      setNextChunks(data.chunks)
+      handleChunkData(data.chunks)
     }
   }
 }

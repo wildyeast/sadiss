@@ -10,28 +10,23 @@ export function usePlayer () {
   const initialSetup = (partialChunks: PartialChunk[]) => {
     ctx = new AudioContext()
     startTime = ctx.currentTime
-    currentChunkStartTimeInCtxTime = startTime + partialChunks[0].startTime / 1000
-    for (const chunk of partialChunks) {
-      createOscillator(chunk)
-    }
+    handleChunkData(partialChunks)
   }
 
-  const createOscillator = (partialChunk: PartialChunk) => {
-    let oscNode = ctx.createOscillator()
-    const gainNode = ctx.createGain()
-    oscNode.connect(gainNode)
-    gainNode.connect(ctx.destination)
-    oscNode = setBreakpoints(oscNode, partialChunk.breakpoints)
-    oscNode.start()
-    oscillators.push({ index: partialChunk.index, oscillator: oscNode })
-  }
-
-  const setNextChunks = (partialChunks: PartialChunk[]) => {
+  const handleChunkData = (partialChunks: PartialChunk[]) => {
     currentChunkStartTimeInCtxTime = startTime + partialChunks[0].startTime / 1000
     for (const chunk of partialChunks) {
       const oscObj = oscillators.find(el => el.index === chunk.index)
       if (oscObj) {
         setBreakpoints(oscObj.oscillator, chunk.breakpoints)
+      } else {
+        let oscNode = ctx.createOscillator()
+        const gainNode = ctx.createGain()
+        oscNode.connect(gainNode)
+        gainNode.connect(ctx.destination)
+        oscNode = setBreakpoints(oscNode, chunk.breakpoints)
+        oscNode.start(currentChunkStartTimeInCtxTime)
+        oscillators.push({ index: chunk.index, oscillator: oscNode })
       }
     }
   }
@@ -53,8 +48,8 @@ export function usePlayer () {
 
   return {
     initialSetup,
-    setNextChunks,
-    startRequestChunksInterval
+    startRequestChunksInterval,
+    handleChunkData
   }
 
 }
