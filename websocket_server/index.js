@@ -1,16 +1,48 @@
-// Code taken from https://www.pubnub.com/blog/nodejs-websocket-programming-examples/
+// Code in part taken from https://www.pubnub.com/blog/nodejs-websocket-programming-examples/
 
-// const express = require('express')
+// HTTP SERVER //
+const express = require('express')
+const cors = require('cors')
+const router = express.Router()
 
-// const server = express()
-//   .use((req, res) => res.sendFile('/index.html', { root: __dirname }))
-//   .listen(3000, () => console.log(`Listening on ${3000}`))
+const whitelist = ['http://localhost:3000', 'http://127.0.0.1:5173' /** other domains if any */]
+const corsOptions = {
+  origin: (origin, callback) => {
+    console.log('Cors options hit: ', origin)
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true) // TODO: Find out what exactly this does. Code is copy/pasted
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
 
+const app = express()
+  .use(express.json())
+  .use(cors(corsOptions))
+  .use(express.urlencoded({ extended: false }))
+
+app.listen(3000, () => console.log(`Http server listening on port ${3000}.`))
+
+
+router.post('/partialData', (req, res) => {
+  // console.log(req.body)
+  console.log(req.body)
+  res.status(200).send()
+})
+
+app.use(router)
+app.use(function (req, res) {
+  res.status(404)
+})
+
+
+// WEBSOCKETS //
 const { Server } = require('ws')
-
 let partialChunks = []
 
 const sockserver = new Server({ port: 443 })
+console.log(`Websocket server listening on port ${443}.`)
 sockserver.on('connection', (ws) => {
   console.log('New client connected!')
   ws.on('close', () => console.log('Client has disconnected!'))

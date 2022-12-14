@@ -51,6 +51,18 @@ const startClock = () => {
   }, 10)
 }
 
+const sentPartialDataToServerViaHttp = async () => {
+  const res = await fetch('http://localhost:3000/partialData', {
+    method: 'POST',
+    // mode: 'cors',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({ chunks: chunks.value })
+  })
+  console.log(res)
+}
+
 onMounted(async () => {
   await initializeMCorp()
   startClock()
@@ -69,6 +81,8 @@ onMounted(async () => {
           @click="sendPartialChunksToServer">Send Chunks To Server</button>
   <button class="btn"
           @click="startTrack">Start</button>
+  <button class="btn"
+          @click="sentPartialDataToServerViaHttp">Send data per http</button>
 
 </template>
 
