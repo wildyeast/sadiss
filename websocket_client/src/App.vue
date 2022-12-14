@@ -25,7 +25,6 @@ const register = () => {
   ws.value.onmessage = (event) => {
     const data = JSON.parse(event.data)
     if (data.message === 'start') {
-      setOffset(globalTime.value)
       initialSetup(data.chunks)
       startRequestChunksInterval(ws)
     } else if (data.message === 'chunkRequest') {

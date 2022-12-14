@@ -3,18 +3,12 @@ import { PartialChunk, OscillatorObject } from "../types/types"
 
 export function usePlayer () {
   let ctx: AudioContext
-  let offset: number
   const oscillators: OscillatorObject[] = []
   let currentChunkStartTimeInCtxTime: number
   let startTime: number
 
-  const setOffset = (globalTime: number) => {
-    ctx = new AudioContext()
-    offset = globalTime - ctx.currentTime
-    console.log('Offset set to: ', offset)
-  }
-
   const initialSetup = (partialChunks: PartialChunk[]) => {
+    ctx = new AudioContext()
     startTime = ctx.currentTime
     currentChunkStartTimeInCtxTime = startTime + partialChunks[0].startTime / 1000
     for (const chunk of partialChunks) {
