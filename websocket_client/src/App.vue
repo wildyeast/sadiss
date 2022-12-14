@@ -12,7 +12,7 @@ const clientId = ref(1)
 const motion = ref()
 const globalTime = ref(0)
 
-const { initialSetup, setOffset, setNextChunks, startRequestChunksInterval } = usePlayer()
+const { initialSetup, setNextChunks, startRequestChunksInterval } = usePlayer()
 
 const mockData: PartialChunk[][] = []
 for (let i = 0; i < 3; i++) {
