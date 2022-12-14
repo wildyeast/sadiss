@@ -51,15 +51,21 @@ sockserver.on('connection', (ws) => {
     console.log('Received message: ', message)
     if (message === 'start') {
       console.log('Start sending individual chunks.')
-      const chunk = partialChunks.shift()
+      const chunks = []
+      for (const chunkArr of partialChunks) {
+        chunks.push(chunkArr.shift())
+      }
       sockserver.clients.forEach((client) => {
-        const data = JSON.stringify({ message, chunk })
+        const data = JSON.stringify({ message, chunks })
         client.send(data)
       })
     } else if (message === 'chunkRequest') {
-      const chunk = partialChunks.shift()
+      const chunks = []
+      for (const chunkArr of partialChunks) {
+        chunks.push(chunkArr.shift())
+      }
       sockserver.clients.forEach((client) => {
-        const data = JSON.stringify({ message, chunk })
+        const data = JSON.stringify({ message, chunks })
         client.send(data)
       })
     } else {

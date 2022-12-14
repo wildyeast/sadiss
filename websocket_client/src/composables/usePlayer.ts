@@ -14,10 +14,13 @@ export function usePlayer () {
     console.log('Offset set to: ', offset)
   }
 
-  const initialSetup = (partialChunk: PartialChunk) => {
+  const initialSetup = (partialChunks: PartialChunk[]) => {
     startTime = ctx.currentTime
-    currentChunkStartTimeInCtxTime = startTime + partialChunk.startTime / 1000
-    createOscillator(partialChunk)
+    currentChunkStartTimeInCtxTime = startTime + partialChunks[0].startTime / 1000
+    for (const chunk of partialChunks) {
+      createOscillator(chunk)
+    }
+    console.log(oscillators)
   }
 
   const createOscillator = (partialChunk: PartialChunk) => {
@@ -30,12 +33,16 @@ export function usePlayer () {
     oscillators.push({ index: partialChunk.index, oscillator: oscNode })
   }
 
-  const setNextChunks = (partialChunk: PartialChunk) => {
-    currentChunkStartTimeInCtxTime = startTime + partialChunk.startTime / 1000
-    const oscObj = oscillators.find(el => el.index === partialChunk.index)
-    if (oscObj) {
-      setBreakpoints(oscObj.oscillator, partialChunk.breakpoints)
+  const setNextChunks = (partialChunks: PartialChunk[]) => {
+    currentChunkStartTimeInCtxTime = startTime + partialChunks[0].startTime / 1000
+    for (const chunk of partialChunks) {
+      console.log('Setting chunk: ', chunk)
+      const oscObj = oscillators.find(el => el.index === chunk.index)
+      if (oscObj) {
+        setBreakpoints(oscObj.oscillator, chunk.breakpoints)
+      }
     }
+    console.log(' ')
   }
 
   const startRequestChunksInterval = (ws: Ref<WebSocket | undefined>) => {

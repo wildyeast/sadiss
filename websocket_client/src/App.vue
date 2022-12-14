@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
-import { useMockData } from './composables/useMockData';
 import { usePlayer } from './composables/usePlayer';
+import { generateMockPartialData } from './helpers/generateMockData';
+import { PartialChunk } from './types/types';
 
 const isRegistered = ref(false)
 const ws = ref<WebSocket>()
@@ -12,7 +13,11 @@ const motion = ref()
 const globalTime = ref(0)
 
 const { initialSetup, setOffset, setNextChunks, startRequestChunksInterval } = usePlayer()
-const { chunks } = useMockData(10)
+
+const mockData: PartialChunk[][] = []
+for (let i = 0; i < 3; i++) {
+  mockData.push(generateMockPartialData(i, 10))
+}
 
 const register = () => {
   ws.value = new WebSocket('ws://localhost:443/');
@@ -21,16 +26,16 @@ const register = () => {
     const data = JSON.parse(event.data)
     if (data.message === 'start') {
       setOffset(globalTime.value)
-      initialSetup(data.chunk)
+      initialSetup(data.chunks)
       startRequestChunksInterval(ws)
     } else if (data.message === 'chunkRequest') {
-      setNextChunks(data.chunk)
+      setNextChunks(data.chunks)
     }
   }
 }
 
 const sendPartialChunksToServer = () => {
-  const clientData = { clientId: clientId.value, partialChunks: chunks.value }
+  const clientData = { clientId: clientId.value, partialChunks: mockData }
   ws.value?.send(JSON.stringify(clientData))
 }
 
@@ -58,7 +63,7 @@ const sentPartialDataToServerViaHttp = async () => {
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify({ chunks: chunks.value })
+    body: JSON.stringify({ data: mockData })
   })
   console.log(res)
 }

@@ -1,8 +1,7 @@
-import { ref } from "vue"
 import { PartialChunk } from "../types/types"
 
-export function useMockData (countOfChunksToGenerate: number) {
-  const chunks = ref<PartialChunk[]>([])
+export function generateMockPartialData (partialIndex: number, countOfChunksToGenerate: number) {
+  const chunks: PartialChunk[] = []
   for (let i = 0; i < countOfChunksToGenerate; i++) {
     const mockedBreakpoints = []
     for (let j = 0; j < 100; j++) {
@@ -12,13 +11,13 @@ export function useMockData (countOfChunksToGenerate: number) {
         amp: 1
       })
     }
-    chunks.value.push({
-      index: 1,
+    chunks.push({
+      index: partialIndex,
       startTime: i * 1000,
       endTime: 1000 + i * 1000,
       breakpoints: mockedBreakpoints
     })
   }
 
-  return { chunks }
+  return chunks
 }
