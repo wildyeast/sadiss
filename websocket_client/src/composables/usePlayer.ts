@@ -1,5 +1,5 @@
 import { Ref } from "vue"
-import { PartialChunk, OscillatorObject } from "../types/types"
+import { PartialChunk, OscillatorObject, Breakpoint } from "../types/types"
 
 export function usePlayer () {
   let ctx: AudioContext
@@ -14,7 +14,6 @@ export function usePlayer () {
     for (const chunk of partialChunks) {
       createOscillator(chunk)
     }
-    console.log(oscillators)
   }
 
   const createOscillator = (partialChunk: PartialChunk) => {
@@ -30,13 +29,11 @@ export function usePlayer () {
   const setNextChunks = (partialChunks: PartialChunk[]) => {
     currentChunkStartTimeInCtxTime = startTime + partialChunks[0].startTime / 1000
     for (const chunk of partialChunks) {
-      console.log('Setting chunk: ', chunk)
       const oscObj = oscillators.find(el => el.index === chunk.index)
       if (oscObj) {
         setBreakpoints(oscObj.oscillator, chunk.breakpoints)
       }
     }
-    console.log(' ')
   }
 
   const startRequestChunksInterval = (ws: Ref<WebSocket | undefined>) => {
@@ -47,7 +44,7 @@ export function usePlayer () {
     }, 100)
   }
 
-  const setBreakpoints = (oscNode: OscillatorNode, breakpoints: { time: number, freq: number, amp: number }[]) => {
+  const setBreakpoints = (oscNode: OscillatorNode, breakpoints: Breakpoint[]) => {
     for (const bp of breakpoints) {
       oscNode.frequency.setValueAtTime(bp.freq, startTime + bp.time / 1000)
     }
