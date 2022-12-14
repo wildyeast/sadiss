@@ -11,7 +11,7 @@ const clientId = ref(1)
 const motion = ref()
 const globalTime = ref(0)
 
-const { createOscillators, setOffset, setNextChunks, startRequestChunksInterval } = usePlayer()
+const { initialSetup, setOffset, setNextChunks, startRequestChunksInterval } = usePlayer()
 const { chunks } = useMockData(10)
 
 const register = () => {
@@ -21,7 +21,7 @@ const register = () => {
     const data = JSON.parse(event.data)
     if (data.message === 'start') {
       setOffset(globalTime.value)
-      createOscillators(data.chunk)
+      initialSetup(data.chunk)
       startRequestChunksInterval(ws)
     } else if (data.message === 'chunkRequest') {
       setNextChunks(data.chunk)

@@ -8,3 +8,8 @@ export interface PartialChunk {
     amp: number
   }[]
 }
+
+export interface OscillatorObject {
+  index: number,
+  oscillator: OscillatorNode
+}
