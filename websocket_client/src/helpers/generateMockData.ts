@@ -21,3 +21,30 @@ export function generateMockPartialData (partialIndex: number, countOfChunksToGe
 
   return chunks
 }
+
+export function generateBeep () {
+  const VOICE_COUNT = 2
+  const BEEP_COUNT = 10
+  const BEEP_LENGTH = 250 // ms
+
+  const track: PartialChunk[][] = []
+  for (let i = 0; i <= VOICE_COUNT; i++) {
+    const voice: PartialChunk[] = []
+    for (let j = 0; j <= BEEP_COUNT; j++) {
+      voice.push({
+        index: i,
+        startTime: i * 1000,
+        endTime: BEEP_LENGTH + i * 1000,
+        breakpoints: [
+          {
+            time: i * 1000,
+            freq: 200 * i,
+            amp: 1
+          }
+        ]
+      })
+      track.push(voice)
+    }
+  }
+  return track
+}
