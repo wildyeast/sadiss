@@ -51,6 +51,7 @@ console.log(`Websocket server listening on port ${443}.`)
 sockserver.on('connection', (ws: WebSocketWithId) => {
   console.log('New client connected!')
   ws.onclose = () => console.log('Client has disconnected!')
+
   ws.onmessage = (event: MessageEvent<string>) => {
     const parsed: { message: string, [key: string]: any } = JSON.parse(event.data)
     console.log('Received message: ', parsed.message)
@@ -72,7 +73,16 @@ sockserver.on('connection', (ws: WebSocketWithId) => {
 })
 
 const sendChunksToClient = () => {
+
+  if (!partialChunks.length) {
+    console.log('No more chunks!')
+    sockserver.clients.forEach((client: WebSocket) => {
+      client.send(JSON.stringify({ partialData: [] }))
+    })
+  }
+
   let chunks: PartialChunk[] = []
+
   for (const partial of partialChunks) {
     const nextChunk = partial.shift()
     if (nextChunk) {
@@ -101,7 +111,7 @@ const sendChunksToClient = () => {
       chunks = [...chunks, ...chunks]
     }
 
-    // TODO: This can probably be refactored for more performance.
+    // TODO: This can probably be refactored for better performance.
     const groupedChunks: PartialChunk[][] = new Array(clientCount).fill([])
 
     for (let i = 0; i < chunks.length; i++) {

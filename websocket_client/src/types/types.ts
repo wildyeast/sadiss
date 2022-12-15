@@ -13,5 +13,6 @@ export interface Breakpoint {
 
 export interface OscillatorObject {
   index: number,
-  oscillator: OscillatorNode
+  oscillator: OscillatorNode,
+  gain: GainNode
 }

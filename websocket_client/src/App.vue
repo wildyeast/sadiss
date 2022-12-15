@@ -1,8 +1,7 @@
 <script setup lang="ts">
-import { monitorEventLoopDelay } from 'perf_hooks';
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { usePlayer } from './composables/usePlayer';
-import { generateMockPartialData } from './helpers/generateMockData';
+import { generateMockPartialData, generateBeep } from './helpers/generateMockData';
 import { PartialChunk } from './types/types';
 
 const isRegistered = ref(false)
@@ -17,14 +16,17 @@ const mode = ref('nonChoir')
 
 let trackRunning = false
 
-const { initialSetup, handleChunkData, startRequestChunksInterval } = usePlayer()
+const { initialSetup, handleChunkData, shouldRequestChunks, chunksRequested, startAudioCtx } = usePlayer()
 
-const mockData: PartialChunk[][] = []
+let mockData: PartialChunk[][] = []
 for (let i = 0; i < 10; i++) {
-  mockData.push(generateMockPartialData(i, 10))
+  // mockData.push(generateMockPartialData(i, 10))
+  mockData = generateBeep()
 }
 
 const establishWebsocketConnection = () => {
+  startAudioCtx()
+
   ws.value = new WebSocket('ws://localhost:443/')
   ws.value.onopen = () => console.log('Connection is open')
   ws.value.onerror = error => console.error(error)
@@ -34,10 +36,7 @@ const establishWebsocketConnection = () => {
   ws.value.onmessage = (event) => {
     const data = JSON.parse(event.data)
 
-    console.log('Data received: ', data)
-
     // Stop track if no more chunks
-    // TODO: Also stop requestChunkInterval
     if (!Object.keys(data.partialData).length) {
       console.log('Received partialData is empty!')
       trackRunning = false
@@ -46,12 +45,22 @@ const establishWebsocketConnection = () => {
 
     if (!trackRunning) {
       initialSetup(data.partialData)
-      startRequestChunksInterval(ws)
+      startRequestChunkInterval()
       trackRunning = true
     } else {
       handleChunkData(data.partialData)
     }
   }
+}
+
+let requestChunkIntervalId: number
+const startRequestChunkInterval = () => {
+  requestChunkIntervalId = window.setInterval(() => {
+    if (shouldRequestChunks()) {
+      ws.value?.send(JSON.stringify({ message: 'chunkRequest' }))
+      chunksRequested()
+    }
+  }, 100)
 }
 
 const sendPartialChunksToServer = () => {
@@ -88,8 +97,8 @@ const startClock = () => {
 }
 
 onMounted(async () => {
-  await initializeMCorp()
-  startClock()
+  // await initializeMCorp()
+  // startClock()
 })
 
 

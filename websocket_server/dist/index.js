@@ -68,6 +68,12 @@ sockserver.on('connection', (ws) => {
     };
 });
 const sendChunksToClient = () => {
+    if (!partialChunks.length) {
+        console.log('No more chunks!');
+        sockserver.clients.forEach((client) => {
+            client.send(JSON.stringify({ partialData: [] }));
+        });
+    }
     let chunks = [];
     for (const partial of partialChunks) {
         const nextChunk = partial.shift();
@@ -94,7 +100,7 @@ const sendChunksToClient = () => {
         while (chunks.length && clientCount > chunks.length) {
             chunks = [...chunks, ...chunks];
         }
-        // TODO: This can probably be refactored for more performance.
+        // TODO: This can probably be refactored for better performance.
         const groupedChunks = new Array(clientCount).fill([]);
         for (let i = 0; i < chunks.length; i++) {
             groupedChunks[i % clientCount].push(chunks[i]);
