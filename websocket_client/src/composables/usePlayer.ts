@@ -46,7 +46,7 @@ export function usePlayer () {
   const startRequestChunksInterval = (ws: Ref<WebSocket | undefined>) => {
     setInterval(() => {
       if (currentChunkStartTimeInCtxTime <= ctx.currentTime && !waitingForChunks) {
-        ws.value?.send(JSON.stringify('chunkRequest'))
+        ws.value?.send(JSON.stringify({ message: 'chunkRequest' }))
         waitingForChunks = true
       }
     }, 10) // TODO: Intervals can probably be longer.

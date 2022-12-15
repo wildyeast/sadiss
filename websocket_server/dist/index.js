@@ -101,7 +101,6 @@ const sendChunksToClient = () => {
         for (let i = 0; i < chunks.length; i++) {
             groupedChunks[i % clientCount].push(chunks[i]);
         }
-        console.log({ groupedChunks });
         for (let i = 0; i < clients.length; i++) {
             clients[i].send(JSON.stringify({ partialData: groupedChunks[i] }));
         }
