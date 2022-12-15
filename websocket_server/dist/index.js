@@ -47,22 +47,22 @@ sockserver.on('connection', (ws) => {
     ws.onclose = () => console.log('Client has disconnected!');
     ws.onmessage = (event) => {
         const parsed = JSON.parse(event.data);
-        console.log('Received message: ', parsed.message);
+        // console.log('Received message: ', parsed.message)
         if (parsed.message === 'start') {
-            console.log('Received start from client.');
+            // console.log('Received start from client.')
             mode = parsed.mode;
             sendChunksToClient();
         }
         else if (parsed.message === 'chunkRequest') {
-            console.log('Received chunkRequest from client.');
+            // console.log('Received chunkRequest from client.')
             sendChunksToClient();
         }
         else if (parsed.message === 'id') {
-            console.log('Received id from client.');
+            // console.log('Received id from client.')
             ws.id = parsed.clientId;
         }
         else {
-            console.log('Received partialChunks from client.');
+            // console.log('Received partialChunks from client.')
             partialChunks = parsed.partialChunks;
         }
     };
@@ -98,14 +98,15 @@ const sendChunksToClient = () => {
         const clientCount = clients.length;
         // Make sure there are always more (or same amount) chunks than clients
         while (chunks.length && clientCount > chunks.length) {
+            console.log('Multiplying partials.');
             chunks = [...chunks, ...chunks];
         }
         // TODO: This can probably be refactored for better performance.
-        const groupedChunks = new Array(clientCount).fill([]);
+        const groupedChunks = Array.from({ length: clientCount }, () => []);
         for (let i = 0; i < chunks.length; i++) {
             groupedChunks[i % clientCount].push(chunks[i]);
         }
-        for (let i = 0; i < clients.length; i++) {
+        for (let i = 0; i < groupedChunks.length; i++) {
             clients[i].send(JSON.stringify({ partialData: groupedChunks[i] }));
         }
         console.log('Sent data to clients');

@@ -46,5 +46,6 @@ export function generateBeep () {
     }
     track.push(voice)
   }
+  console.log('Generated track: ', track)
   return track
 }
