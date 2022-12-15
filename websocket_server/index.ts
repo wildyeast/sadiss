@@ -1,9 +1,8 @@
 // Code in part taken from https://www.pubnub.com/blog/nodejs-websocket-programming-examples/
 
 // HTTP SERVER //
-import express, { Express, Request, Response } from 'express';
+import express from 'express';
 import { PartialChunk, WebSocketWithId } from './types/types'
-// import { client } from 'websocket'
 
 const cors = require('cors')
 const router = express.Router()

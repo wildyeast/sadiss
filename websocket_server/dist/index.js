@@ -6,7 +6,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // HTTP SERVER //
 const express_1 = __importDefault(require("express"));
-// import { client } from 'websocket'
 const cors = require('cors');
 const router = express_1.default.Router();
 const whitelist = ['http://localhost:3000', 'http://127.0.0.1:5173' /** other domains if any */];
