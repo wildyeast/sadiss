@@ -15,6 +15,9 @@ export function usePlayer () {
   }
 
   const handleChunkData = (partialChunks: PartialChunk[]) => {
+
+    console.log('Handling following chunk data: ', partialChunks)
+
     waitingForChunks = false
     currentChunkStartTimeInCtxTime = startTime + partialChunks[0].startTime / 1000
     for (const chunk of partialChunks) {

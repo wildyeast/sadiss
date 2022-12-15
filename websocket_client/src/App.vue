@@ -26,16 +26,19 @@ for (let i = 0; i < 3; i++) {
 
 const establishWebsocketConnection = () => {
   ws.value = new WebSocket('ws://localhost:443/')
-  ws.value.onerror = error => alert(error)
+  ws.value.onerror = error => console.error(error)
 
-  ws.value.send(JSON.stringify({ message: 'id', clientId: clientId.value }))
+  // ws.value.send(JSON.stringify({ message: 'test', clientId: clientId.value }))
 
   ws.value.onmessage = (event) => {
     const data = JSON.parse(event.data)
 
+    console.log('Data received: ', data)
+
     // Stop track if no more chunks
     // TODO: Also stop requestChunkInterval
-    if (!data.chunks.length) {
+    if (!data.partialData) {
+      console.log('Received partialData is empty!')
       trackRunning = false
       return
     }
