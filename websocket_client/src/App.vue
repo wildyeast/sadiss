@@ -21,8 +21,8 @@ const { initialSetup, handleChunkData, shouldRequestChunks, chunksRequested, sta
 let mockData: PartialChunk[][] = []
 for (let i = 0; i < 10; i++) {
   // mockData.push(generateMockPartialData(i, 10))
-  mockData = generateBeep()
 }
+mockData = generateBeep()
 
 const establishWebsocketConnection = () => {
   startAudioCtx()
