@@ -70,7 +70,10 @@ sockserver.on('connection', (ws) => {
 const sendChunksToClient = () => {
     let chunks = [];
     for (const partial of partialChunks) {
-        chunks.push(partial.shift());
+        const nextChunk = partial.shift();
+        if (nextChunk) {
+            chunks.push(nextChunk);
+        }
     }
     if (mode === 'choir') {
         for (const client of sockserver.clients) {
@@ -90,9 +93,17 @@ const sendChunksToClient = () => {
         while (clientCount > chunks.length) {
             chunks = [...chunks, ...chunks];
         }
-        console.log({ clientCount, chunksCount: chunks.length });
+        const groupedChunks = [];
+        for (const client of clients) {
+            const group = [];
+            groupedChunks.push(group);
+        }
         for (let i = 0; i < chunks.length; i++) {
-            clients[i % clientCount].send(JSON.stringify({ partialData: chunks[i] }));
+            groupedChunks[i % clientCount].push(chunks[i]);
+        }
+        console.log({ groupedChunks });
+        for (let i = 0; i < clients.length; i++) {
+            clients[i].send(JSON.stringify({ partialData: groupedChunks[i] }));
         }
     }
 };

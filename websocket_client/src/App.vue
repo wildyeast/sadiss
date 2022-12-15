@@ -20,7 +20,7 @@ let trackRunning = false
 const { initialSetup, handleChunkData, startRequestChunksInterval } = usePlayer()
 
 const mockData: PartialChunk[][] = []
-for (let i = 0; i < 3; i++) {
+for (let i = 0; i < 10; i++) {
   mockData.push(generateMockPartialData(i, 10))
 }
 
