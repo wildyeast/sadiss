@@ -29,7 +29,6 @@ export function generateBeep () {
 
   const track: PartialChunk[][] = []
   for (let i = 1; i <= VOICE_COUNT; i++) {
-    console.log('Generating voice: ', i)
     const voice: PartialChunk[] = []
     for (let j = 0; j < BEEP_COUNT; j++) {
       voice.push({
@@ -47,6 +46,5 @@ export function generateBeep () {
     }
     track.push(voice)
   }
-  console.log('Generated track: ', track)
   return track
 }
