@@ -83,6 +83,7 @@ const sendChunksToClient = () => {
                 client.send(data);
             }
         }
+        console.log('Sent data to clients');
     }
     else {
         // Convert clients Set to arr
@@ -90,7 +91,7 @@ const sendChunksToClient = () => {
         const clients = Array.from(sockserver.clients);
         const clientCount = clients.length;
         // Make sure there are always more (or same amount) chunks than clients
-        while (clientCount > chunks.length) {
+        while (chunks.length && clientCount > chunks.length) {
             chunks = [...chunks, ...chunks];
         }
         // TODO: This can probably be refactored for more performance.
@@ -101,6 +102,7 @@ const sendChunksToClient = () => {
         for (let i = 0; i < clients.length; i++) {
             clients[i].send(JSON.stringify({ partialData: groupedChunks[i] }));
         }
+        console.log('Sent data to clients');
     }
 };
 // setInterval(() => {

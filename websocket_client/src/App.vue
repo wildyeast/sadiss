@@ -38,7 +38,7 @@ const establishWebsocketConnection = () => {
 
     // Stop track if no more chunks
     // TODO: Also stop requestChunkInterval
-    if (!data.partialData) {
+    if (!Object.keys(data.partialData).length) {
       console.log('Received partialData is empty!')
       trackRunning = false
       return
