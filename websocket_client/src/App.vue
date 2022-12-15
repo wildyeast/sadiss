@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { monitorEventLoopDelay } from 'perf_hooks';
 import { onMounted, ref } from 'vue'
 import { usePlayer } from './composables/usePlayer';
 import { generateMockPartialData } from './helpers/generateMockData';
@@ -12,6 +13,10 @@ const clientId = ref(1)
 const motion = ref()
 const globalTime = ref(0)
 
+const mode = ref('nonChoir')
+
+let trackRunning = false
+
 const { initialSetup, handleChunkData, startRequestChunksInterval } = usePlayer()
 
 const mockData: PartialChunk[][] = []
@@ -19,26 +24,38 @@ for (let i = 0; i < 3; i++) {
   mockData.push(generateMockPartialData(i, 10))
 }
 
-const register = () => {
-  ws.value = new WebSocket('ws://localhost:443/');
+const establishWebsocketConnection = () => {
+  ws.value = new WebSocket('ws://localhost:443/')
+  ws.value.onerror = error => alert(error)
+
+  ws.value.send(JSON.stringify({ message: 'id', clientId: clientId.value }))
 
   ws.value.onmessage = (event) => {
     const data = JSON.parse(event.data)
-    if (data.message === 'start') {
-      initialSetup(data.chunks)
+
+    // Stop track if no more chunks
+    // TODO: Also stop requestChunkInterval
+    if (!data.chunks.length) {
+      trackRunning = false
+      return
+    }
+
+    if (!trackRunning) {
+      initialSetup(data.partialData)
       startRequestChunksInterval(ws)
-    } else if (data.message === 'chunkRequest') {
-      handleChunkData(data.chunks)
+      trackRunning = true
+    } else {
+      handleChunkData(data.partialData)
     }
   }
 }
 
 const sendPartialChunksToServer = () => {
-  const clientData = { clientId: clientId.value, partialChunks: mockData }
+  const clientData = { partialChunks: mockData }
   ws.value?.send(JSON.stringify(clientData))
 }
 
-const startTrack = () => ws.value?.send(JSON.stringify('start'))
+const startTrack = () => ws.value?.send(JSON.stringify({ message: 'start', mode: mode.value }))
 
 const sentPartialDataToServerViaHttp = async () => {
   const res = await fetch('http://localhost:3000/partialData', {
@@ -76,10 +93,14 @@ onMounted(async () => {
   <p class="timeDisplay">Current time: {{ globalTime?.toFixed(2) }}</p>
   <p v-if="isRegistered">Currently registered</p>
   <p v-else>Not registered</p>
-  <button @click="register"
+  <button @click="establishWebsocketConnection"
           :disabled="isRegistered">Register</button>
   <button class="btn"
           @click="sendPartialChunksToServer">Send Chunks To Server</button>
+  <select v-model="mode">
+    <option value="nonChoir">Non-Choir</option>
+    <option value="choir">Choir</option>
+  </select>
   <button class="btn"
           @click="startTrack">Start</button>
   <button class="btn"

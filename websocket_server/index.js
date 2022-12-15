@@ -26,7 +26,6 @@ app.listen(3000, () => console.log(`Http server listening on port ${3000}.`))
 
 
 router.post('/partialData', (req, res) => {
-  // console.log(req.body)
   console.log(req.body)
   res.status(200).send()
 })
@@ -40,6 +39,7 @@ app.use(function (req, res) {
 // WEBSOCKETS //
 const { Server } = require('ws')
 let partialChunks = []
+let mode
 
 const sockserver = new Server({ port: 443 })
 console.log(`Websocket server listening on port ${443}.`)
@@ -49,31 +49,50 @@ sockserver.on('connection', (ws) => {
   ws.on('message', message => {
     message = JSON.parse(message)
     console.log('Received message: ', message)
-    if (message === 'start') {
-      console.log('Start sending individual chunks.')
-      const chunks = []
-      for (const chunkArr of partialChunks) {
-        chunks.push(chunkArr.shift())
-      }
-      sockserver.clients.forEach((client) => {
-        const data = JSON.stringify({ message, chunks })
-        client.send(data)
-      })
+    if (message.message === 'start') {
+      console.log('Received start from client.')
+      mode = message.mode
+      sendChunksToClient()
     } else if (message === 'chunkRequest') {
-      const chunks = []
-      for (const chunkArr of partialChunks) {
-        chunks.push(chunkArr.shift())
-      }
-      sockserver.clients.forEach((client) => {
-        const data = JSON.stringify({ message, chunks })
-        client.send(data)
-      })
+      console.log('Received chunkRequest from client.')
+      sendChunksToClient()
+    } else if (message.message === 'id') {
+      console.log('Received id from client.')
+      ws.id = message.clientId
     } else {
       console.log('Received partialChunks from client.')
       partialChunks = message.partialChunks
     }
   })
 })
+
+const sendChunksToClient = () => {
+  const chunks = []
+  for (const partial of partialChunks) {
+    chunks.push(partial.shift())
+  }
+
+  if (mode === 'choir') {
+    for (const client of sockserver.clients) {
+      if (client.id) {
+        const chunk = chunks.find(chunk => chunk.index === client.id)
+        data = JSON.stringify({ partialData: chunk })
+        client.send(data)
+      }
+    }
+  } else {
+    const clientCount = sockserver.clients.length
+
+    // Make sure there are always more (or same amount) chunks than clients
+    while (clientCount > chunks.length) {
+      chunks = [...chunks, ...chunks]
+    }
+
+    for (let i = 0; i < chunks.length; i++) {
+      sockserver.client[i % clientCount].send({ partialData: chunks[i] })
+    }
+  }
+}
 
 // setInterval(() => {
 //   sockserver.clients.forEach((client) => {
