@@ -8,7 +8,7 @@ export function generateMockPartialData (partialIndex: number, countOfChunksToGe
       mockedBreakpoints.push({
         time: j * 10 * i,
         freq: 400 + j,
-        amp: 1
+        amp: 0.1
       })
     }
     chunks.push({
@@ -23,7 +23,7 @@ export function generateMockPartialData (partialIndex: number, countOfChunksToGe
 }
 
 export function generateBeep () {
-  const VOICE_COUNT = 2
+  const VOICE_COUNT = 1
   const BEEP_COUNT = 10
   const BEEP_LENGTH = 250 // ms
 
@@ -33,13 +33,13 @@ export function generateBeep () {
     for (let j = 0; j <= BEEP_COUNT; j++) {
       voice.push({
         index: i,
-        startTime: i * 1000,
-        endTime: BEEP_LENGTH + i * 1000,
+        startTime: j * 1000,
+        endTime: BEEP_LENGTH + j * 1000,
         breakpoints: [
           {
-            time: i * 1000,
+            time: j * 1000,
             freq: 200 * i,
-            amp: 1
+            amp: 0.1
           }
         ]
       })
