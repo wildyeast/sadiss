@@ -93,11 +93,8 @@ const sendChunksToClient = () => {
         while (clientCount > chunks.length) {
             chunks = [...chunks, ...chunks];
         }
-        const groupedChunks = [];
-        for (const client of clients) {
-            const group = [];
-            groupedChunks.push(group);
-        }
+        // TODO: This can probably be refactored for more performance.
+        const groupedChunks = new Array(clientCount).fill([]);
         for (let i = 0; i < chunks.length; i++) {
             groupedChunks[i % clientCount].push(chunks[i]);
         }

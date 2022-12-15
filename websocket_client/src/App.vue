@@ -26,6 +26,7 @@ for (let i = 0; i < 10; i++) {
 
 const establishWebsocketConnection = () => {
   ws.value = new WebSocket('ws://localhost:443/')
+  ws.value.onopen = () => console.log('Connection is open')
   ws.value.onerror = error => console.error(error)
 
   // ws.value.send(JSON.stringify({ message: 'test', clientId: clientId.value }))
@@ -58,7 +59,9 @@ const sendPartialChunksToServer = () => {
   ws.value?.send(JSON.stringify(clientData))
 }
 
-const startTrack = () => ws.value?.send(JSON.stringify({ message: 'start', mode: mode.value }))
+const startTrack = () => {
+  ws.value?.send(JSON.stringify({ message: 'start', mode: mode.value }))
+}
 
 const sentPartialDataToServerViaHttp = async () => {
   const res = await fetch('http://localhost:3000/partialData', {
