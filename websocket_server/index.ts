@@ -54,7 +54,7 @@ sockserver.on('connection', (ws: WebSocketWithId) => {
 
   ws.onmessage = (event: MessageEvent<string>) => {
     const parsed: { message: string, [key: string]: any } = JSON.parse(event.data)
-    // console.log('Received message: ', parsed.message)
+    console.log('Received message: ', parsed.message)
     if (parsed.message === 'start') {
       // console.log('Received start from client.')
       mode = parsed.mode
@@ -62,7 +62,7 @@ sockserver.on('connection', (ws: WebSocketWithId) => {
     } else if (parsed.message === 'chunkRequest') {
       // console.log('Received chunkRequest from client.')
       sendChunksToClient()
-    } else if (parsed.message === 'id') {
+    } else if (parsed.message === 'clientId') {
       // console.log('Received id from client.')
       ws.id = parsed.clientId
     } else {
@@ -91,22 +91,22 @@ const sendChunksToClient = () => {
   }
 
   if (mode === 'choir') {
-    for (const client of sockserver.clients) {
+    sockserver.clients.forEach((client: WebSocketWithId) => {
       if (client.id) {
         const chunk = chunks.find(chunk => chunk?.index === client.id)
-        const data = JSON.stringify({ partialData: chunk })
+        const data = JSON.stringify({ partialData: [chunk] })
+        console.log('Found chunk: ', chunk)
         client.send(data)
       }
-    }
+    })
     console.log('Sent data to clients')
   } else {
     // Convert clients Set to arr
-    // TODO: Remove any
-    const clients: any[] = Array.from(sockserver.clients)
+    const clients: WebSocketWithId[] = Array.from(sockserver.clients)
 
     const clientCount = clients.length
 
-    // Make sure there are always more (or same amount) chunks than clients
+    // Make sure there are always at least as many chunks as there are clients.
     while (chunks.length && clientCount > chunks.length) {
       console.log('Multiplying partials.')
       chunks = [...chunks, ...chunks]

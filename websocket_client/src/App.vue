@@ -12,7 +12,8 @@ const clientId = ref(1)
 const motion = ref()
 const globalTime = ref(0)
 
-const mode = ref('nonChoir')
+// const mode = ref('nonChoir')
+const mode = ref('choir')
 
 let trackRunning = false
 
@@ -22,14 +23,18 @@ let mockData: PartialChunk[][] = []
 // for (let i = 0; i < 10; i++) {
 //   mockData.push(generateMockPartialData(i, 10))
 // }
-mockData = generateBeep()
+// mockData = generateBeep()
+mockData = generateBeep(true)
 // mockData = generateSplitPartial()
 
 const establishWebsocketConnection = () => {
   startAudioCtx()
 
   ws.value = new WebSocket('ws://localhost:443/')
-  ws.value.onopen = () => console.log('Connection is open')
+  ws.value.onopen = (event) => {
+    console.log('Connection is open')
+    ws.value!.send(JSON.stringify({ message: 'clientId', clientId: clientId.value }))
+  }
   ws.value.onerror = error => console.error(error)
 
   // ws.value.send(JSON.stringify({ message: 'test', clientId: clientId.value }))
@@ -41,6 +46,7 @@ const establishWebsocketConnection = () => {
     if (!Object.keys(data.partialData).length) {
       console.log('Received partialData is empty!')
       trackRunning = false
+      window.clearInterval(requestChunkIntervalId)
       return
     }
 
@@ -106,6 +112,8 @@ onMounted(async () => {
 </script>
 
 <template>
+  <input v-model="clientId"
+         placeholder="clientId" />
   <p class="timeDisplay">Current time: {{ globalTime?.toFixed(2) }}</p>
   <p v-if="isRegistered">Currently registered</p>
   <p v-else>Not registered</p>

@@ -5,7 +5,6 @@ export function usePlayer () {
   const ctx = ref<AudioContext>()
   const oscillators: OscillatorObject[] = []
   let currentChunkStartTimeInCtxTime = ref(-1)
-  let currentChunkEndTimeInCtxTime: number
   let startTime: number
   const waitingForChunks = ref(false)
 
@@ -26,16 +25,15 @@ export function usePlayer () {
     console.log('Handling following chunk data: ', partialChunks)
 
     currentChunkStartTimeInCtxTime.value = startTime + partialChunks[0].startTime / 1000
-    currentChunkEndTimeInCtxTime = startTime + partialChunks[0].endTime / 1000
 
     for (const chunk of partialChunks) {
       const oscObj = oscillators.find(el => el.index === chunk.index)
       if (oscObj) {
-        console.log('Found oscObj.')
+        // console.log('Found oscObj.')
         setBreakpoints(oscObj.oscillator, oscObj.gain, chunk.breakpoints)
       } else {
         if (!ctx.value) return
-        console.log('Creating oscObj.')
+        // console.log('Creating oscObj.')
         let oscNode = ctx.value.createOscillator()
         const gainNode = ctx.value.createGain()
         oscNode.connect(gainNode)
@@ -44,12 +42,12 @@ export function usePlayer () {
         oscNode.start(currentChunkStartTimeInCtxTime.value)
         oscNode.stop(startTime + chunk.partialEndTime / 1000)
         oscNode.onended = (event) => {
-          console.log('Osc ended')
+          // console.log('Osc ended')
           const oscObj = oscillators.find(oscObj => oscObj.oscillator === event.target)
           if (oscObj) {
             oscillators.splice(oscillators.indexOf(oscObj), 1)
             if (ctx.value) {
-              console.log('Removed osc.', ctx.value?.currentTime - startTime)
+              // console.log('Removed osc.', ctx.value?.currentTime - startTime)
             }
           }
         }
@@ -57,7 +55,6 @@ export function usePlayer () {
       }
     }
     waitingForChunks.value = false
-    console.log('Osc: ', oscillators.length)
     console.log(' ')
   }
 

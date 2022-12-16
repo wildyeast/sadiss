@@ -24,7 +24,7 @@ export function generateMockPartialData (partialIndex: number, countOfChunksToGe
   return chunks
 }
 
-export function generateBeep () {
+export function generateBeep (allBeepsSamePartialId = false) {
   const VOICE_COUNT = 1
   const BEEP_COUNT = 10
   const BEEP_LENGTH = 100 // ms
@@ -34,7 +34,7 @@ export function generateBeep () {
     const voice: PartialChunk[] = []
     for (let j = 0; j < BEEP_COUNT; j++) {
       voice.push({
-        index: j,
+        index: allBeepsSamePartialId ? i : j,
         startTime: j * 1000,
         endTime: (BEEP_LENGTH + j * 1000) - 1,
         partialEndTime: (BEEP_LENGTH + j * 1000) - 1,
