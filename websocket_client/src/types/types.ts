@@ -2,6 +2,7 @@ export interface PartialChunk {
   index: number,
   startTime: number,
   endTime: number,
+  partialEndTime: number,
   breakpoints: Breakpoint[]
 }
 

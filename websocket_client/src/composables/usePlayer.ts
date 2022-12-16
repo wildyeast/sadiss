@@ -1,4 +1,4 @@
-import { ref, watch } from "vue"
+import { ref } from "vue"
 import { PartialChunk, OscillatorObject, Breakpoint } from "../types/types"
 
 export function usePlayer () {
@@ -21,6 +21,7 @@ export function usePlayer () {
   }
 
   const handleChunkData = (partialChunks: PartialChunk[]) => {
+    if (!ctx.value) return
 
     console.log('Handling following chunk data: ', partialChunks)
 
@@ -41,23 +42,29 @@ export function usePlayer () {
         gainNode.connect(ctx.value.destination)
         oscNode = setBreakpoints(oscNode, gainNode, chunk.breakpoints)
         oscNode.start(currentChunkStartTimeInCtxTime.value)
-        oscNode.stop(currentChunkEndTimeInCtxTime)
+        oscNode.stop(startTime + chunk.partialEndTime / 1000)
         oscNode.onended = (event) => {
+          console.log('Osc ended')
           const oscObj = oscillators.find(oscObj => oscObj.oscillator === event.target)
           if (oscObj) {
             oscillators.splice(oscillators.indexOf(oscObj), 1)
+            if (ctx.value) {
+              console.log('Removed osc.', ctx.value?.currentTime - startTime)
+            }
           }
         }
         oscillators.push({ index: chunk.index, oscillator: oscNode, gain: gainNode })
       }
     }
     waitingForChunks.value = false
+    console.log('Osc: ', oscillators.length)
+    console.log(' ')
   }
 
   const setBreakpoints = (oscNode: OscillatorNode, gainNode: GainNode, breakpoints: Breakpoint[]) => {
     for (const bp of breakpoints) {
-      oscNode.frequency.setValueAtTime(bp.freq, startTime + bp.time / 1000)
-      gainNode.gain.setValueAtTime(bp.amp, startTime + bp.time / 1000)
+      oscNode.frequency.setValueAtTime(bp.freq, currentChunkStartTimeInCtxTime.value)
+      gainNode.gain.setValueAtTime(bp.amp, currentChunkStartTimeInCtxTime.value)
     }
     return oscNode
   }
@@ -71,22 +78,10 @@ export function usePlayer () {
   }
 
   const chunksRequested = () => {
-    console.log('Chunks have been requested!')
+    if (!ctx.value) return
+    console.log('Chunks have been requested!', ctx.value?.currentTime - startTime)
     waitingForChunks.value = true
   }
-
-  watch(() => {
-    ctx.value ? ctx.value.currentTime : 0
-  }, (time) => {
-    console.log(time)
-    console.log('Timewatcher: ', time)
-  })
-
-  // watchEffect(() => {
-  //   if (!ctx.value) return
-  //   console.log('Watcheffect')
-  //   console.log(currentChunkStartTimeInCtxTime.value, ctx.value.currentTime, !waitingForChunks)
-  // })
 
   return {
     initialSetup,

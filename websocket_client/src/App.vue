@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
 import { usePlayer } from './composables/usePlayer';
-import { generateMockPartialData, generateBeep } from './helpers/generateMockData';
+import { generateMockPartialData, generateBeep, generateSplitPartial } from './helpers/generateMockData';
 import { PartialChunk } from './types/types';
 
 const isRegistered = ref(false)
@@ -19,10 +19,11 @@ let trackRunning = false
 const { initialSetup, handleChunkData, shouldRequestChunks, chunksRequested, startAudioCtx } = usePlayer()
 
 let mockData: PartialChunk[][] = []
-for (let i = 0; i < 10; i++) {
-  // mockData.push(generateMockPartialData(i, 10))
-}
+// for (let i = 0; i < 10; i++) {
+//   mockData.push(generateMockPartialData(i, 10))
+// }
 mockData = generateBeep()
+// mockData = generateSplitPartial()
 
 const establishWebsocketConnection = () => {
   startAudioCtx()
