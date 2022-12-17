@@ -93,8 +93,8 @@ const sendChunksToClient = () => {
   if (mode === 'choir') {
     sockserver.clients.forEach((client: WebSocketWithId) => {
       if (client.id) {
-        const chunk = chunks.find(chunk => chunk?.index === client.id)
-        const data = JSON.stringify({ partialData: [chunk] })
+        const chunk = chunks.find(chunk => chunk.index === client.id)
+        const data = JSON.stringify({ partialData: chunk ? [chunk] : [] })
         console.log('Found chunk: ', chunk)
         client.send(data)
       }
