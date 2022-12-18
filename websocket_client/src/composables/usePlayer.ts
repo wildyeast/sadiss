@@ -1,4 +1,4 @@
-import { ref } from "vue"
+import { ref, computed } from "vue"
 import { PartialChunk, OscillatorObject, Breakpoint } from "../types/types"
 
 export function usePlayer () {
@@ -20,6 +20,8 @@ export function usePlayer () {
     offset = globalTime - ctx.value.currentTime
   }
 
+  const startTimeInCtxTime = computed(() => globalStartTime - offset)
+
   const MAXIMUM_CHUNK_LENGTH_MS = 999
   const handleChunkData = (partialChunks: PartialChunk[]) => {
     if (!ctx.value) return
@@ -27,7 +29,7 @@ export function usePlayer () {
     console.log(' ')
     console.log('Handling following chunk data: ', partialChunks)
 
-    currentChunkStartTimeInCtxTime.value = globalStartTime - offset + partialChunks[0].startTime / 1000
+    currentChunkStartTimeInCtxTime.value = startTimeInCtxTime.value + partialChunks[0].startTime / 1000
 
     for (const chunk of partialChunks) {
       if (chunk.endTime === MAXIMUM_CHUNK_LENGTH_MS) {
@@ -48,7 +50,7 @@ export function usePlayer () {
         oscNode = setBreakpoints(oscNode, gainNode, chunk.breakpoints)
         oscNode.start(currentChunkStartTimeInCtxTime.value)
 
-        oscNode.stop(globalStartTime - offset + chunk.endTime / 1000)
+        oscNode.stop(startTimeInCtxTime.value + chunk.endTime / 1000)
 
         oscNode.onended = (event) => {
           const oscObj = oscillators.find(oscObj => oscObj.oscillator === event.target)
@@ -79,7 +81,6 @@ export function usePlayer () {
   const chunksRequested = () => waitingForChunks = true
 
   const setStartTime = (startTime: number) => {
-    // offset = timingSrcPosition.value - player.value.audioContext.currentTime 
     globalStartTime = startTime
   }
 
