@@ -15,7 +15,4 @@ export type WebSocketWithId = {
   id: number
 } & WebSocket
 
-export type Message = {
-  message?: string,
-  [key: string]: any
-}
+export type Message = { [key: string]: any }

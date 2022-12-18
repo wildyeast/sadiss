@@ -69,21 +69,27 @@ let requestChunkIntervalId: number
 const startRequestChunkInterval = () => {
   requestChunkIntervalId = window.setInterval(() => {
     if (shouldRequestChunks()) {
-      ws.value?.send(JSON.stringify({ message: 'chunkRequest' }))
+      send({ message: 'chunkRequest' })
       chunksRequested()
     }
   }, 100)
 }
 
-const sendPartialChunksToServer = () => {
-  const clientData = { partialChunks: mockData }
-  ws.value?.send(JSON.stringify(clientData))
+const sendPartialChunksToServer = () => send({ partialChunks: mockData })
+
+const send = (data: { [key: string]: any }) => {
+  try {
+    ws.value?.send(JSON.stringify(data))
+  }
+  catch (error: any) {
+    throw new Error(error.message)
+  }
 }
 
 const START_IN_SEC = 1
 const startTrack = () => {
   const startTime = globalTime.value + START_IN_SEC
-  ws.value?.send(JSON.stringify({ message: 'start', mode: mode.value, startTime }))
+  send({ message: 'start', mode: mode.value, startTime })
 }
 
 const sentPartialDataToServerViaHttp = async () => {
@@ -121,7 +127,6 @@ const startClock = () => {
 onMounted(async () => {
   await initializeMCorp()
 })
-
 
 </script>
 
