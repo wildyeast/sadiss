@@ -12,20 +12,20 @@ const clientId = ref(1)
 const motion = ref()
 const globalTime = ref(0)
 
-// const mode = ref('nonChoir')
-const mode = ref('choir')
+const mode = ref('nonChoir')
+// const mode = ref('choir')
 
 let trackRunning = false
 
 const { initialSetup, handleChunkData, shouldRequestChunks, chunksRequested, startAudioCtx } = usePlayer()
 
 let mockData: PartialChunk[][] = []
-// for (let i = 0; i < 10; i++) {
+// for (let i = 10; i < 1; i++) {
 //   mockData.push(generateMockPartialData(i, 10))
 // }
 // mockData = generateBeep()
-mockData = generateBeep(true)
-// mockData = generateSplitPartial()
+// mockData = generateBeep(true)
+mockData = generateSplitPartial()
 
 const establishWebsocketConnection = () => {
   startAudioCtx()

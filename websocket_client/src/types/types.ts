@@ -2,7 +2,7 @@ export interface PartialChunk {
   index: number,
   startTime: number,
   endTime: number,
-  partialEndTime: number,
+  partialEndTime: number, // End time of the partial this chunk is from
   breakpoints: Breakpoint[]
 }
 

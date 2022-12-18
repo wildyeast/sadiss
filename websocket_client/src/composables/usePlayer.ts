@@ -19,6 +19,7 @@ export function usePlayer () {
     ctx.value = new AudioContext()
   }
 
+  const MAXIMUM_CHUNK_LENGTH_MS = 999
   const handleChunkData = (partialChunks: PartialChunk[]) => {
     if (!ctx.value) return
 
@@ -28,9 +29,15 @@ export function usePlayer () {
     currentChunkStartTimeInCtxTime.value = startTime + partialChunks[0].startTime / 1000
 
     for (const chunk of partialChunks) {
-      const oscObj = oscillators.find(el => el.index === chunk.index)
-      if (oscObj && chunk.endTime === 999) {
-        setBreakpoints(oscObj.oscillator, oscObj.gain, chunk.breakpoints)
+      if (chunk.endTime === MAXIMUM_CHUNK_LENGTH_MS) {
+        // Only assign new chunk to found oscillator if last breakpoint of chunk ends
+        // MAXIMUM_CHUNK_LENGTH_MS after chunk start, meaning the whole chunk is filled with breakpoints.
+        // In this case we assume this is part of a longer partial and stitch the parts
+        // together seamlessly.
+        const oscObj = oscillators.find(el => el.index === chunk.index)
+        if (oscObj) {
+          setBreakpoints(oscObj.oscillator, oscObj.gain, chunk.breakpoints)
+        }
       } else {
         if (!ctx.value) return
         let oscNode = ctx.value.createOscillator()
@@ -40,7 +47,7 @@ export function usePlayer () {
         oscNode = setBreakpoints(oscNode, gainNode, chunk.breakpoints)
         oscNode.start(currentChunkStartTimeInCtxTime.value)
 
-        oscNode.stop(startTime + chunk.partialEndTime / 1000)
+        oscNode.stop(startTime + chunk.endTime / 1000)
 
         oscNode.onended = (event) => {
           const oscObj = oscillators.find(oscObj => oscObj.oscillator === event.target)
