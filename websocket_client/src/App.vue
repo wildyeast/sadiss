@@ -17,18 +17,18 @@ const mode = ref('nonChoir')
 
 let trackRunning = false
 
-const { initialSetup, handleChunkData, shouldRequestChunks, chunksRequested, startAudioCtx } = usePlayer()
+const { initialSetup, handleChunkData, shouldRequestChunks, chunksRequested, startAudioCtx, setStartTime } = usePlayer()
 
 let mockData: PartialChunk[][] = []
 // for (let i = 10; i < 1; i++) {
 //   mockData.push(generateMockPartialData(i, 10))
 // }
 // mockData = generateBeep()
-// mockData = generateBeep(true)
-mockData = generateSplitPartial()
+mockData = generateBeep(true)
+// mockData = generateSplitPartial()
 
 const establishWebsocketConnection = () => {
-  startAudioCtx()
+  startAudioCtx(globalTime.value)
 
   ws.value = new WebSocket('ws://localhost:443/')
   ws.value.onopen = (event) => {
@@ -41,6 +41,10 @@ const establishWebsocketConnection = () => {
 
   ws.value.onmessage = (event) => {
     const data = JSON.parse(event.data)
+
+    if (data.startTime) {
+      setStartTime(data.startTime)
+    }
 
     // Stop track if no more chunks
     if (!Object.keys(data.partialData).length) {
@@ -75,8 +79,10 @@ const sendPartialChunksToServer = () => {
   ws.value?.send(JSON.stringify(clientData))
 }
 
+const START_IN_SEC = 1
 const startTrack = () => {
-  ws.value?.send(JSON.stringify({ message: 'start', mode: mode.value }))
+  const startTime = globalTime.value + START_IN_SEC
+  ws.value?.send(JSON.stringify({ message: 'start', mode: mode.value, startTime }))
 }
 
 const sentPartialDataToServerViaHttp = async () => {
@@ -104,8 +110,8 @@ const startClock = () => {
 }
 
 onMounted(async () => {
-  // await initializeMCorp()
-  // startClock()
+  await initializeMCorp()
+  startClock()
 })
 
 

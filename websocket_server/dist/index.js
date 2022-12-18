@@ -4,7 +4,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-// HTTP SERVER //
 const express_1 = __importDefault(require("express"));
 const cors = require('cors');
 const router = express_1.default.Router();
@@ -49,9 +48,13 @@ sockserver.on('connection', (ws) => {
         const parsed = JSON.parse(event.data);
         console.log('Received message: ', parsed.message);
         if (parsed.message === 'start') {
-            // console.log('Received start from client.')
+            console.log(parsed.startTime);
+            if (!parsed.startTime) {
+                console.error('Received start but no startTime provided.');
+                return;
+            }
             mode = parsed.mode;
-            sendChunksToClient();
+            sendChunksToClient(parsed.startTime);
         }
         else if (parsed.message === 'chunkRequest') {
             // console.log('Received chunkRequest from client.')
@@ -67,7 +70,7 @@ sockserver.on('connection', (ws) => {
         }
     };
 });
-const sendChunksToClient = () => {
+const sendChunksToClient = (startTime) => {
     if (!partialChunks.length) {
         console.log('No more chunks!');
         sockserver.clients.forEach((client) => {
@@ -85,15 +88,20 @@ const sendChunksToClient = () => {
         sockserver.clients.forEach((client) => {
             if (client.id) {
                 const chunk = chunks.find(chunk => chunk.index === client.id);
-                const data = JSON.stringify({ partialData: chunk ? [chunk] : [] });
                 console.log('Found chunk: ', chunk);
-                client.send(data);
+                const data = {
+                    partialData: chunk ? [chunk] : []
+                };
+                if (startTime) {
+                    data['startTime'] = startTime;
+                }
+                client.send(JSON.stringify(data));
             }
         });
         console.log('Sent data to clients');
     }
     else {
-        // Convert clients Set to arr
+        // Convert clients Set to array
         const clients = Array.from(sockserver.clients);
         const clientCount = clients.length;
         // Make sure there are always at least as many chunks as there are clients.
@@ -107,7 +115,13 @@ const sendChunksToClient = () => {
             groupedChunks[i % clientCount].push(chunks[i]);
         }
         for (let i = 0; i < groupedChunks.length; i++) {
-            clients[i].send(JSON.stringify({ partialData: groupedChunks[i] }));
+            const data = {
+                partialData: groupedChunks[i]
+            };
+            if (startTime) {
+                data['startTime'] = startTime;
+            }
+            clients[i].send(JSON.stringify(data));
         }
         console.log('Sent data to clients');
     }

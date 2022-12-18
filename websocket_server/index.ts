@@ -1,8 +1,9 @@
 // Code in part taken from https://www.pubnub.com/blog/nodejs-websocket-programming-examples/
 
 // HTTP SERVER //
+import { json } from 'body-parser';
 import express from 'express';
-import { PartialChunk, WebSocketWithId } from './types/types'
+import { PartialChunk, WebSocketWithId, Message } from './types/types'
 
 const cors = require('cors')
 const router = express.Router()
@@ -53,12 +54,16 @@ sockserver.on('connection', (ws: WebSocketWithId) => {
   ws.onclose = () => console.log('Client has disconnected!')
 
   ws.onmessage = (event: MessageEvent<string>) => {
-    const parsed: { message: string, [key: string]: any } = JSON.parse(event.data)
+    const parsed: Message = JSON.parse(event.data)
     console.log('Received message: ', parsed.message)
     if (parsed.message === 'start') {
-      // console.log('Received start from client.')
+      console.log(parsed.startTime)
+      if (!parsed.startTime) {
+        console.error('Received start but no startTime provided.')
+        return
+      }
       mode = parsed.mode
-      sendChunksToClient()
+      sendChunksToClient(parsed.startTime)
     } else if (parsed.message === 'chunkRequest') {
       // console.log('Received chunkRequest from client.')
       sendChunksToClient()
@@ -72,7 +77,7 @@ sockserver.on('connection', (ws: WebSocketWithId) => {
   }
 })
 
-const sendChunksToClient = () => {
+const sendChunksToClient = (startTime?: number) => {
 
   if (!partialChunks.length) {
     console.log('No more chunks!')
@@ -94,14 +99,19 @@ const sendChunksToClient = () => {
     sockserver.clients.forEach((client: WebSocketWithId) => {
       if (client.id) {
         const chunk = chunks.find(chunk => chunk.index === client.id)
-        const data = JSON.stringify({ partialData: chunk ? [chunk] : [] })
         console.log('Found chunk: ', chunk)
-        client.send(data)
+        const data: Message = {
+          partialData: chunk ? [chunk] : []
+        }
+        if (startTime) {
+          data['startTime'] = startTime
+        }
+        client.send(JSON.stringify(data))
       }
     })
     console.log('Sent data to clients')
   } else {
-    // Convert clients Set to arr
+    // Convert clients Set to array
     const clients: WebSocketWithId[] = Array.from(sockserver.clients)
 
     const clientCount = clients.length
@@ -120,7 +130,13 @@ const sendChunksToClient = () => {
     }
 
     for (let i = 0; i < groupedChunks.length; i++) {
-      clients[i].send(JSON.stringify({ partialData: groupedChunks[i] }))
+      const data: Message = {
+        partialData: groupedChunks[i]
+      }
+      if (startTime) {
+        data['startTime'] = startTime
+      }
+      clients[i].send(JSON.stringify(data))
     }
     console.log('Sent data to clients')
   }
