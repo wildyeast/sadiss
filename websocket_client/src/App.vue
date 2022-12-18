@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { usePlayer } from './composables/usePlayer';
 import { generateMockPartialData, generateBeep, generateSplitPartial } from './helpers/generateMockData';
 import { PartialChunk } from './types/types';
@@ -33,13 +33,13 @@ const establishWebsocketConnection = () => {
   startAudioCtx(globalTime.value)
 
   ws.value = new WebSocket('ws://localhost:443/')
+
   ws.value.onopen = function () {
     console.log('Connection is open')
     this.send(JSON.stringify({ message: 'clientId', clientId: clientId.value }))
   }
-  ws.value.onerror = error => console.error(error)
 
-  // ws.value.send(JSON.stringify({ message: 'test', clientId: clientId.value }))
+  ws.value.onerror = error => console.error(error)
 
   ws.value.onmessage = (event) => {
     const data = JSON.parse(event.data)
