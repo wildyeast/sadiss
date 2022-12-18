@@ -89,7 +89,13 @@ const send = (data: { [key: string]: any }) => {
 const START_IN_SEC = 1
 const startTrack = () => {
   const startTime = globalTime.value + START_IN_SEC
-  send({ message: 'start', mode: mode.value, startTime })
+  send(
+    {
+      message: 'start',
+      mode: mode.value,
+      startTime
+    }
+  )
 }
 
 const sentPartialDataToServerViaHttp = async () => {
