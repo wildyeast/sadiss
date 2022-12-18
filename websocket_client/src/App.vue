@@ -9,7 +9,9 @@ const ws = ref<WebSocket>()
 
 const clientId = ref(1)
 
-const motion = ref()
+// MCorp motion
+let motion: any
+
 const globalTime = ref(0)
 
 const mode = ref('nonChoir')
@@ -17,7 +19,7 @@ const mode = ref('nonChoir')
 
 let trackRunning = false
 
-const { initialSetup, handleChunkData, shouldRequestChunks, chunksRequested, startAudioCtx, setStartTime } = usePlayer()
+const { handleChunkData, shouldRequestChunks, chunksRequested, startAudioCtx, setStartTime } = usePlayer()
 
 let mockData: PartialChunk[][] = []
 // for (let i = 10; i < 1; i++) {
@@ -31,9 +33,9 @@ const establishWebsocketConnection = () => {
   startAudioCtx(globalTime.value)
 
   ws.value = new WebSocket('ws://localhost:443/')
-  ws.value.onopen = (event) => {
+  ws.value.onopen = function () {
     console.log('Connection is open')
-    ws.value!.send(JSON.stringify({ message: 'clientId', clientId: clientId.value }))
+    this.send(JSON.stringify({ message: 'clientId', clientId: clientId.value }))
   }
   ws.value.onerror = error => console.error(error)
 
@@ -41,10 +43,6 @@ const establishWebsocketConnection = () => {
 
   ws.value.onmessage = (event) => {
     const data = JSON.parse(event.data)
-
-    if (data.startTime) {
-      setStartTime(data.startTime)
-    }
 
     // Stop track if no more chunks
     if (!Object.keys(data.partialData).length) {
@@ -54,13 +52,16 @@ const establishWebsocketConnection = () => {
       return
     }
 
+    if (data.startTime) {
+      setStartTime(data.startTime)
+    }
+
     if (!trackRunning) {
-      initialSetup(data.partialData)
       startRequestChunkInterval()
       trackRunning = true
-    } else {
-      handleChunkData(data.partialData)
     }
+
+    handleChunkData(data.partialData)
   }
 }
 
@@ -86,32 +87,39 @@ const startTrack = () => {
 }
 
 const sentPartialDataToServerViaHttp = async () => {
-  const res = await fetch('http://localhost:3000/partialData', {
-    method: 'POST',
-    // mode: 'cors',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({ data: mockData })
-  })
+  try {
+    await fetch('http://localhost:3010/partialData', {
+      method: 'POST',
+      // mode: 'cors',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ data: mockData })
+    })
+  }
+  catch (error: any) {
+    throw new Error(error)
+  }
 }
 
 const initializeMCorp = async () => {
   // @ts-ignore: Can't find name MCorp, which is added via <script> in index.html
   const mCorpApp = MCorp.app(import.meta.env.VITE_MCORP_API_KEY, { anon: true })
-  mCorpApp.run = () => motion.value = mCorpApp.motions['shared']
+  mCorpApp.run = () => {
+    motion = mCorpApp.motions['shared']
+    startClock()
+  }
   mCorpApp.init()
 }
 
 const startClock = () => {
   setInterval(() => {
-    globalTime.value = motion.value?.pos
+    globalTime.value = motion.pos
   }, 10)
 }
 
 onMounted(async () => {
   await initializeMCorp()
-  startClock()
 })
 
 

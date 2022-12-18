@@ -2,7 +2,7 @@ import { ref, computed } from "vue"
 import { PartialChunk, OscillatorObject, Breakpoint } from "../types/types"
 
 export function usePlayer () {
-  const ctx = ref<AudioContext>()
+  let ctx: AudioContext
   const oscillators: OscillatorObject[] = []
   const currentChunkStartTimeInCtxTime = ref()
   let globalStartTime: number
@@ -10,21 +10,20 @@ export function usePlayer () {
   let waitingForChunks = false
 
   const initialSetup = (partialChunks: PartialChunk[]) => {
-    if (!ctx.value) return
     handleChunkData(partialChunks)
   }
 
   const startAudioCtx = (globalTime: number) => {
     console.log('Starting ctx.')
-    ctx.value = new AudioContext()
-    offset = globalTime - ctx.value.currentTime
+    ctx = new AudioContext()
+    offset = globalTime - ctx.currentTime
   }
 
   const startTimeInCtxTime = computed(() => globalStartTime - offset)
 
   const MAXIMUM_CHUNK_LENGTH_MS = 999
   const handleChunkData = (partialChunks: PartialChunk[]) => {
-    if (!ctx.value) return
+    if (!ctx) return
 
     console.log(' ')
     console.log('Handling following chunk data: ', partialChunks)
@@ -42,11 +41,10 @@ export function usePlayer () {
           setBreakpoints(oscObj.oscillator, oscObj.gain, chunk.breakpoints)
         }
       } else {
-        if (!ctx.value) return
-        let oscNode = ctx.value.createOscillator()
-        const gainNode = ctx.value.createGain()
+        let oscNode = ctx.createOscillator()
+        const gainNode = ctx.createGain()
         oscNode.connect(gainNode)
-        gainNode.connect(ctx.value.destination)
+        gainNode.connect(ctx.destination)
         oscNode = setBreakpoints(oscNode, gainNode, chunk.breakpoints)
         oscNode.start(currentChunkStartTimeInCtxTime.value)
 
@@ -70,19 +68,11 @@ export function usePlayer () {
     return oscNode
   }
 
-  const shouldRequestChunks = () => {
-    if (ctx.value) {
-      return currentChunkStartTimeInCtxTime.value < ctx.value.currentTime && !waitingForChunks
-    } else {
-      return false
-    }
-  }
+  const shouldRequestChunks = () => currentChunkStartTimeInCtxTime.value < ctx.currentTime && !waitingForChunks
 
   const chunksRequested = () => waitingForChunks = true
 
-  const setStartTime = (startTime: number) => {
-    globalStartTime = startTime
-  }
+  const setStartTime = (startTime: number) => globalStartTime = startTime
 
   return {
     chunksRequested,
