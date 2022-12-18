@@ -23,8 +23,6 @@ export function usePlayer () {
 
   const MAXIMUM_CHUNK_LENGTH_MS = 999
   const handleChunkData = (partialChunks: PartialChunk[]) => {
-    if (!ctx) return
-
     console.log(' ')
     console.log('Handling following chunk data: ', partialChunks)
 
@@ -41,15 +39,15 @@ export function usePlayer () {
           setBreakpoints(oscObj.oscillator, oscObj.gain, chunk.breakpoints)
         }
       } else {
-        let oscNode = ctx.createOscillator()
+        const oscNode = ctx.createOscillator()
         const gainNode = ctx.createGain()
         oscNode.connect(gainNode)
         gainNode.connect(ctx.destination)
-        oscNode = setBreakpoints(oscNode, gainNode, chunk.breakpoints)
+
+        setBreakpoints(oscNode, gainNode, chunk.breakpoints)
+
         oscNode.start(currentChunkStartTimeInCtxTime.value)
-
         oscNode.stop(startTimeInCtxTime.value + chunk.endTime / 1000)
-
         oscNode.onended = (event) => {
           const oscObj = oscillators.find(oscObj => oscObj.oscillator === event.target)
           if (oscObj) oscillators.splice(oscillators.indexOf(oscObj), 1)
@@ -65,7 +63,6 @@ export function usePlayer () {
       oscNode.frequency.setValueAtTime(bp.freq, currentChunkStartTimeInCtxTime.value)
       gainNode.gain.setValueAtTime(bp.amp, currentChunkStartTimeInCtxTime.value)
     }
-    return oscNode
   }
 
   const shouldRequestChunks = () => currentChunkStartTimeInCtxTime.value < ctx.currentTime && !waitingForChunks

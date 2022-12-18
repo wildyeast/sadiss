@@ -4,6 +4,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
+// HTTP SERVER //
 const express_1 = __importDefault(require("express"));
 const cors = require('cors');
 const router = express_1.default.Router();
@@ -32,9 +33,7 @@ router.post('/partialData', (req, res) => {
     res.status(200).send();
 });
 app.use(router);
-app.use(function (req, res) {
-    res.status(404);
-});
+app.use((req, res) => res.status(404));
 // WEBSOCKETS //
 const { Server } = require('ws');
 let partialChunks = [];
@@ -48,7 +47,6 @@ sockserver.on('connection', (ws) => {
         const parsed = JSON.parse(event.data);
         console.log('Received message: ', parsed.message);
         if (parsed.message === 'start') {
-            console.log(parsed.startTime);
             if (!parsed.startTime) {
                 console.error('Received start but no startTime provided.');
                 return;
@@ -57,15 +55,12 @@ sockserver.on('connection', (ws) => {
             sendChunksToClient(parsed.startTime);
         }
         else if (parsed.message === 'chunkRequest') {
-            // console.log('Received chunkRequest from client.')
             sendChunksToClient();
         }
         else if (parsed.message === 'clientId') {
-            // console.log('Received id from client.')
             ws.id = parsed.clientId;
         }
         else {
-            // console.log('Received partialChunks from client.')
             partialChunks = parsed.partialChunks;
         }
     };
@@ -88,7 +83,6 @@ const sendChunksToClient = (startTime) => {
         sockserver.clients.forEach((client) => {
             if (client.id) {
                 const chunk = chunks.find(chunk => chunk.index === client.id);
-                console.log('Found chunk: ', chunk);
                 const data = {
                     partialData: chunk ? [chunk] : []
                 };

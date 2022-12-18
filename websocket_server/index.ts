@@ -1,7 +1,6 @@
 // Code in part taken from https://www.pubnub.com/blog/nodejs-websocket-programming-examples/
 
 // HTTP SERVER //
-import { json } from 'body-parser';
 import express from 'express';
 import { PartialChunk, WebSocketWithId, Message } from './types/types'
 
@@ -37,9 +36,7 @@ router.post('/partialData', (req, res) => {
 })
 
 app.use(router)
-app.use(function (req, res) {
-  res.status(404)
-})
+app.use((req, res) => res.status(404))
 
 
 // WEBSOCKETS //
@@ -57,7 +54,6 @@ sockserver.on('connection', (ws: WebSocketWithId) => {
     const parsed: Message = JSON.parse(event.data)
     console.log('Received message: ', parsed.message)
     if (parsed.message === 'start') {
-      console.log(parsed.startTime)
       if (!parsed.startTime) {
         console.error('Received start but no startTime provided.')
         return
@@ -65,13 +61,10 @@ sockserver.on('connection', (ws: WebSocketWithId) => {
       mode = parsed.mode
       sendChunksToClient(parsed.startTime)
     } else if (parsed.message === 'chunkRequest') {
-      // console.log('Received chunkRequest from client.')
       sendChunksToClient()
     } else if (parsed.message === 'clientId') {
-      // console.log('Received id from client.')
       ws.id = parsed.clientId
     } else {
-      // console.log('Received partialChunks from client.')
       partialChunks = parsed.partialChunks
     }
   }
@@ -99,7 +92,6 @@ const sendChunksToClient = (startTime?: number) => {
     sockserver.clients.forEach((client: WebSocketWithId) => {
       if (client.id) {
         const chunk = chunks.find(chunk => chunk.index === client.id)
-        console.log('Found chunk: ', chunk)
         const data: Message = {
           partialData: chunk ? [chunk] : []
         }
