@@ -11,7 +11,6 @@ const router = express_1.default.Router();
 const whitelist = ['http://localhost:3000', 'http://127.0.0.1:5173' /** other domains if any */];
 const corsOptions = {
     origin: (origin, callback) => {
-        console.log('Cors options hit: ', origin);
         if (whitelist.indexOf(origin) !== -1) {
             // TODO: Find out what exactly the follwing line does. Code is copy/pasted.
             // Read this https://www.npmjs.com/package/cors#configuring-cors-asynchronously
@@ -37,6 +36,7 @@ app.use((req, res) => res.status(404));
 // WEBSOCKETS //
 const { Server } = require('ws');
 let partialChunks = [];
+let ttsInstructions;
 let mode;
 const sockserver = new Server({ port: 443 });
 console.log(`Websocket server listening on port ${443}.`);
@@ -54,7 +54,7 @@ sockserver.on('connection', (ws) => {
             mode = parsed.mode;
             sendChunksToClient(parsed.startTime);
         }
-        else if (parsed.message === 'chunkRequest') {
+        else if (parsed.message === 'dataRequest') {
             sendChunksToClient();
         }
         else if (parsed.message === 'clientId') {
@@ -62,6 +62,7 @@ sockserver.on('connection', (ws) => {
         }
         else {
             partialChunks = parsed.partialChunks;
+            ttsInstructions = parsed.ttsInstructions;
         }
     };
 });
@@ -73,10 +74,17 @@ const sendChunksToClient = (startTime) => {
         });
     }
     let chunks = [];
+    let nextTtsInstructions = [];
     for (const partial of partialChunks) {
         const nextChunk = partial.shift();
         if (nextChunk) {
             chunks.push(nextChunk);
+        }
+    }
+    for (const ttsInstruction of ttsInstructions) {
+        const nextTtsInstruction = ttsInstruction.shift();
+        if (nextTtsInstruction) {
+            nextTtsInstructions.push(nextTtsInstruction);
         }
     }
     if (mode === 'choir') {
@@ -88,6 +96,10 @@ const sendChunksToClient = (startTime) => {
                 };
                 if (startTime) {
                     data['startTime'] = startTime;
+                }
+                const ttsInstruction = nextTtsInstructions.find(instruction => instruction.voice === client.id);
+                if (ttsInstruction) {
+                    data['ttsInstruction'] = ttsInstruction;
                 }
                 client.send(JSON.stringify(data));
             }

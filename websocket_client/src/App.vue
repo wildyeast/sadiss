@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref } from 'vue'
 import { usePlayer } from './composables/usePlayer';
-import { generateMockPartialData, generateBeep, generateSplitPartial } from './helpers/generateMockData';
+import { useTtsPlayer } from './composables/useTtsPlayer'
+import { generateMockPartialData, generateBeep, generateSplitPartial, generateChoirTTS } from './helpers/generateMockData';
 import { PartialChunk } from './types/types';
 
 const isRegistered = ref(false)
@@ -20,6 +21,7 @@ const mode = ref('nonChoir')
 let trackRunning = false
 
 const { handleChunkData, shouldRequestChunks, chunksRequested, startAudioCtx, setStartTime } = usePlayer()
+const { initializeTtsPlayer, shouldRequestTts, ttsRequested } = useTtsPlayer()
 
 let mockData: PartialChunk[][] = []
 // for (let i = 10; i < 1; i++) {
@@ -28,6 +30,13 @@ let mockData: PartialChunk[][] = []
 // mockData = generateBeep()
 mockData = generateBeep(true)
 // mockData = generateSplitPartial()
+
+const mockTTS = generateChoirTTS()
+
+const register = () => {
+  establishWebsocketConnection()
+  initializeTtsPlayer(globalTime)
+}
 
 const establishWebsocketConnection = () => {
   startAudioCtx(globalTime.value)
@@ -43,8 +52,10 @@ const establishWebsocketConnection = () => {
 
   ws.value.onmessage = (event) => {
     const data = JSON.parse(event.data)
+    console.log('Received message: ', data)
 
-    // Stop track if no more chunks
+    // Stop track if no more chunks.
+    // TODO: Devise a method to make playback stop when no more partials and no more tts instructions
     if (!Object.keys(data.partialData).length) {
       console.log('Received partialData is empty!')
       trackRunning = false
@@ -60,22 +71,37 @@ const establishWebsocketConnection = () => {
       startRequestChunkInterval()
       trackRunning = true
     }
-
-    handleChunkData(data.partialData)
+    if (Object.keys(data.partialData).length) {
+      handleChunkData(data.partialData)
+    }
   }
 }
 
 let requestChunkIntervalId: number
 const startRequestChunkInterval = () => {
   requestChunkIntervalId = window.setInterval(() => {
+    const data = {
+      message: 'dataRequest',
+      chunkRequest: false,
+      ttsRequest: false
+    }
+
     if (shouldRequestChunks()) {
-      send({ message: 'chunkRequest' })
+      data.chunkRequest = true
+      console.log('Chunks requested')
       chunksRequested()
+    }
+    if (shouldRequestTts.value) {
+      data.ttsRequest = true
+      ttsRequested()
+    }
+    if (data.chunkRequest || data.ttsRequest) {
+      send(data)
     }
   }, 100)
 }
 
-const sendPartialChunksToServer = () => send({ partialChunks: mockData })
+const sendPartialChunksToServer = () => send({ partialChunks: mockData, ttsInstructions: mockTTS })
 
 const send = (data: { [key: string]: any }) => {
   try {
@@ -142,7 +168,7 @@ onMounted(async () => {
   <p class="timeDisplay">Current time: {{ globalTime?.toFixed(2) }}</p>
   <p v-if="isRegistered">Currently registered</p>
   <p v-else>Not registered</p>
-  <button @click="establishWebsocketConnection"
+  <button @click="register"
           :disabled="isRegistered">Register</button>
   <button class="btn"
           @click="sendPartialChunksToServer">Send Chunks To Server</button>

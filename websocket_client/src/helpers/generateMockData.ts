@@ -1,4 +1,4 @@
-import { PartialChunk } from "../types/types"
+import { PartialChunk, TtsInstruction } from "../types/types"
 
 export function generateMockPartialData (partialIndex: number, countOfChunksToGenerate: number) {
   const chunks: PartialChunk[] = []
@@ -84,4 +84,19 @@ export function generateSplitPartial () {
   }
   console.log('Generated track: ', track)
   return track
+}
+
+export function generateChoirTTS () {
+  const VOICE_COUNT = 4
+  const tts: TtsInstruction[][] = Array.from({ length: VOICE_COUNT }, () => [])
+  for (let i = 0; i < 20; i++) {
+    tts[i % VOICE_COUNT].push({
+      startTime: i + 1,
+      voice: i % VOICE_COUNT + 1,
+      text: (i % VOICE_COUNT + 1).toString()
+    })
+  }
+
+  console.log('Generated TTS: ', tts)
+  return tts
 }

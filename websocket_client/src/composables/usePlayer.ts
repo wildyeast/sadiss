@@ -23,8 +23,7 @@ export function usePlayer () {
 
   const MAXIMUM_CHUNK_LENGTH_MS = 999
   const handleChunkData = (partialChunks: PartialChunk[]) => {
-    console.log(' ')
-    console.log('Handling following chunk data: ', partialChunks)
+    console.log('\nHandling following chunk data: ', partialChunks)
 
     currentChunkStartTimeInCtxTime.value = startTimeInCtxTime.value + partialChunks[0].startTime / 1000
 
@@ -65,7 +64,11 @@ export function usePlayer () {
     }
   }
 
-  const shouldRequestChunks = () => currentChunkStartTimeInCtxTime.value < ctx.currentTime && !waitingForChunks
+  // TODO: Refactor this as a computed with toRef(ctx.currentTime, 'ctxTime')
+  // https://stackoverflow.com/questions/66504701/how-to-make-a-vue-3-object-property-reactive
+  const shouldRequestChunks = () => {
+    return currentChunkStartTimeInCtxTime.value < ctx.currentTime && !waitingForChunks
+  }
 
   const chunksRequested = () => waitingForChunks = true
 

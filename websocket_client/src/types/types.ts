@@ -17,3 +17,17 @@ export interface OscillatorObject {
   oscillator: OscillatorNode,
   gain: GainNode
 }
+
+export interface TtsInstruction {
+  startTime: number,
+  text: string,
+  voice: number
+}
+
+export interface TtsInstruction {
+  startTime: number,
+  text: string,
+  voice: number
+}
+
+export type ClientTtsInstruction = Omit<TtsInstruction, 'voice'>

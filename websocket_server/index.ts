@@ -2,7 +2,7 @@
 
 // HTTP SERVER //
 import express from 'express';
-import { PartialChunk, WebSocketWithId, Message } from './types/types'
+import { PartialChunk, WebSocketWithId, Message, TtsInstruction } from './types/types'
 
 const cors = require('cors')
 const router = express.Router()
@@ -10,7 +10,6 @@ const router = express.Router()
 const whitelist = ['http://localhost:3000', 'http://127.0.0.1:5173' /** other domains if any */]
 const corsOptions = {
   origin: (origin: string, callback: Function) => {
-    console.log('Cors options hit: ', origin)
     if (whitelist.indexOf(origin) !== -1) {
       // TODO: Find out what exactly the follwing line does. Code is copy/pasted.
       // Read this https://www.npmjs.com/package/cors#configuring-cors-asynchronously
@@ -42,6 +41,7 @@ app.use((req, res) => res.status(404))
 // WEBSOCKETS //
 const { Server } = require('ws')
 let partialChunks: PartialChunk[][] = []
+let ttsInstructions: TtsInstruction[][]
 let mode: string
 
 const sockserver = new Server({ port: 443 })
@@ -60,12 +60,13 @@ sockserver.on('connection', (ws: WebSocketWithId) => {
       }
       mode = parsed.mode
       sendChunksToClient(parsed.startTime)
-    } else if (parsed.message === 'chunkRequest') {
+    } else if (parsed.message === 'dataRequest') {
       sendChunksToClient()
     } else if (parsed.message === 'clientId') {
       ws.id = parsed.clientId
     } else {
       partialChunks = parsed.partialChunks
+      ttsInstructions = parsed.ttsInstructions
     }
   }
 })
@@ -80,11 +81,19 @@ const sendChunksToClient = (startTime?: number) => {
   }
 
   let chunks: PartialChunk[] = []
+  let nextTtsInstructions: TtsInstruction[] = []
 
   for (const partial of partialChunks) {
     const nextChunk = partial.shift()
     if (nextChunk) {
       chunks.push(nextChunk)
+    }
+  }
+
+  for (const ttsInstruction of ttsInstructions) {
+    const nextTtsInstruction = ttsInstruction.shift()
+    if (nextTtsInstruction) {
+      nextTtsInstructions.push(nextTtsInstruction)
     }
   }
 
@@ -95,9 +104,16 @@ const sendChunksToClient = (startTime?: number) => {
         const data: Message = {
           partialData: chunk ? [chunk] : []
         }
+
         if (startTime) {
           data['startTime'] = startTime
         }
+
+        const ttsInstruction = nextTtsInstructions.find(instruction => instruction.voice === client.id)
+        if (ttsInstruction) {
+          data['ttsInstruction'] = ttsInstruction
+        }
+
         client.send(JSON.stringify(data))
       }
     })

@@ -16,3 +16,9 @@ export type WebSocketWithId = {
 } & WebSocket
 
 export type Message = { [key: string]: any }
+
+export interface TtsInstruction {
+  startTime: number,
+  voice?: number,
+  text: string
+}
