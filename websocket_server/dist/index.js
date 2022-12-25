@@ -38,6 +38,8 @@ const { Server } = require('ws');
 let partialChunks = [];
 let ttsInstructions;
 let mode;
+let partialDataRequested = false;
+let ttsInstructionsRequested = false;
 const sockserver = new Server({ port: 443 });
 console.log(`Websocket server listening on port ${443}.`);
 sockserver.on('connection', (ws) => {
@@ -51,22 +53,101 @@ sockserver.on('connection', (ws) => {
                 console.error('Received start but no startTime provided.');
                 return;
             }
-            mode = parsed.mode;
-            sendChunksToClient(parsed.startTime);
+            prepareAndSendDataToClient(parsed.startTime);
+            // sendChunksToClient(parsed.startTime)
         }
         else if (parsed.message === 'dataRequest') {
-            sendChunksToClient();
+            prepareAndSendDataToClient();
         }
         else if (parsed.message === 'clientId') {
             ws.id = parsed.clientId;
         }
         else {
+            mode = parsed.mode;
             partialChunks = parsed.partialChunks;
             ttsInstructions = parsed.ttsInstructions;
         }
     };
 });
-const sendChunksToClient = (startTime) => {
+const prepareAndSendDataToClient = (startTime) => {
+    const data = {};
+    if (startTime) {
+        data.startTime = startTime;
+    }
+    if (mode === 'choir') {
+        // If there is partial data prepare list of nextChunks for all clients, if they were requested
+        // Do the same for ttsInstructions, if they were requested
+        // Send all data to their respective client, according to clientId , partialId, and ttsInstructionId
+        if (partialChunks.length) {
+            const chunks = prepareNextChunks();
+            data.partialChunks = chunks;
+        }
+        if (ttsInstructions.length) {
+            const ttsInstructions = prepareNextTtsInstructions();
+            data.ttsInstructions = ttsInstructions;
+        }
+        if (data.partialChunks.length && data.ttsInstructions.length) {
+            sendData(data);
+        }
+    }
+    else {
+    }
+};
+const sendData = (dataToSend) => {
+    sockserver.clients.forEach((client) => {
+        const data = {
+            startTime: dataToSend.startTime
+        };
+        if (client.id) {
+            if (dataToSend.partialChunks.length) {
+                const chunk = dataToSend.partialChunks.find((chunk) => chunk.index === client.id);
+                data.partialData = [chunk];
+            }
+            if (dataToSend.ttsInstructions.length) {
+                const ttsInstruction = dataToSend.ttsInstructions.find((instruction) => instruction.voice === client.id);
+                if (ttsInstruction) {
+                    data.ttsInstruction = ttsInstruction;
+                }
+            }
+            client.send(JSON.stringify(data));
+        }
+    });
+    console.log('Sent data to client.');
+};
+// const prepareChoirData = () => {
+//   let data = {}
+//   if (partialChunks.length) {
+//     data = { ...data, ...prepareChunks('choir') }
+//   }
+//   if (ttsInstructions.length) {
+//     data = { ...data, ...prepareTtsInstructions() }
+//   }
+// }
+const prepareNonChoirDataForSending = () => {
+    if (partialChunks.length) {
+    }
+};
+const prepareNextChunks = () => {
+    const chunks = [];
+    for (const partial of partialChunks) {
+        const nextChunk = partial.shift();
+        if (nextChunk) {
+            chunks.push(nextChunk);
+        }
+    }
+    return chunks;
+};
+const prepareNextTtsInstructions = () => {
+    const instructions = [];
+    for (const instruction of ttsInstructions) {
+        const nextInstruction = instruction.shift();
+        if (nextInstruction) {
+            instructions.push(nextInstruction);
+        }
+    }
+    return instructions;
+};
+const prepareChunks = (mode) => {
     if (!partialChunks.length) {
         console.log('No more chunks!');
         sockserver.clients.forEach((client) => {
@@ -94,9 +175,6 @@ const sendChunksToClient = (startTime) => {
                 const data = {
                     partialData: chunk ? [chunk] : []
                 };
-                if (startTime) {
-                    data['startTime'] = startTime;
-                }
                 const ttsInstruction = nextTtsInstructions.find(instruction => instruction.voice === client.id);
                 if (ttsInstruction) {
                     data['ttsInstruction'] = ttsInstruction;
@@ -124,9 +202,6 @@ const sendChunksToClient = (startTime) => {
             const data = {
                 partialData: groupedChunks[i]
             };
-            if (startTime) {
-                data['startTime'] = startTime;
-            }
             clients[i].send(JSON.stringify(data));
         }
         console.log('Sent data to clients');

@@ -15,8 +15,8 @@ let motion: any
 
 const globalTime = ref(0)
 
-const mode = ref('nonChoir')
-// const mode = ref('choir')
+// const mode = ref('nonChoir')
+const mode = ref('choir')
 
 let trackRunning = false
 
@@ -101,7 +101,7 @@ const startRequestChunkInterval = () => {
   }, 100)
 }
 
-const sendPartialChunksToServer = () => send({ partialChunks: mockData, ttsInstructions: mockTTS })
+const sendPartialChunksToServer = () => send({ partialChunks: mockData, ttsInstructions: mockTTS, mode: mode.value })
 
 const send = (data: { [key: string]: any }) => {
   try {
@@ -118,7 +118,6 @@ const startTrack = () => {
   send(
     {
       message: 'start',
-      mode: mode.value,
       startTime
     }
   )

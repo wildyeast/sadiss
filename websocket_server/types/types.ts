@@ -22,3 +22,5 @@ export interface TtsInstruction {
   voice?: number,
   text: string
 }
+
+export type Mode = 'choir' | 'nonChoir'

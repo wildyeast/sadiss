@@ -24,10 +24,4 @@ export interface TtsInstruction {
   voice: number
 }
 
-export interface TtsInstruction {
-  startTime: number,
-  text: string,
-  voice: number
-}
-
 export type ClientTtsInstruction = Omit<TtsInstruction, 'voice'>
