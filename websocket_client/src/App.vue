@@ -2,7 +2,8 @@
 import { onMounted, ref } from 'vue'
 import { usePlayer } from './composables/usePlayer';
 import { useTtsPlayer } from './composables/useTtsPlayer'
-import { generateMockPartialData, generateBeep, generateSplitPartial, generateChoirTTS } from './helpers/generateMockData';
+// import { generateMockPartialData, generateBeep, generateSplitPartial, generateChoirTTS } from './helpers/generateMockData';
+import { generateChunks } from './helpers/generateMockData'
 import { PartialChunk } from './types/types';
 
 const isRegistered = ref(false)
@@ -23,15 +24,18 @@ let trackRunning = false
 const { handleChunkData, shouldRequestChunks, chunksRequested, startAudioCtx, setStartTime } = usePlayer()
 const { initializeTtsPlayer, shouldRequestTts, ttsRequested } = useTtsPlayer()
 
-let mockData: PartialChunk[][] = []
+// let mockData: PartialChunk[][] = []
 // for (let i = 10; i < 1; i++) {
 //   mockData.push(generateMockPartialData(i, 10))
 // }
 // mockData = generateBeep()
-mockData = generateBeep(true)
+// mockData = generateBeep(true)
 // mockData = generateSplitPartial()
 
-const mockTTS = generateChoirTTS()
+// const mockTTS = generateChoirTTS()
+
+const mockData = generateChunks(10)
+console.log('Generated data: ', mockData)
 
 const register = () => {
   establishWebsocketConnection()
@@ -101,7 +105,8 @@ const startRequestChunkInterval = () => {
   }, 100)
 }
 
-const sendPartialChunksToServer = () => send({ partialChunks: mockData, ttsInstructions: mockTTS, mode: mode.value })
+// const sendPartialChunksToServer = () => send({ partialChunks: mockData, ttsInstructions: mockTTS, mode: mode.value })
+const sendPartialChunksToServer = () => send({ partialChunks: mockData, mode: mode.value })
 
 const send = (data: { [key: string]: any }) => {
   try {
@@ -156,7 +161,7 @@ const startClock = () => {
 }
 
 onMounted(async () => {
-  await initializeMCorp()
+  // await initializeMCorp()
 })
 
 </script>
