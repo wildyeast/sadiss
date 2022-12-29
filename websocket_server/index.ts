@@ -121,6 +121,8 @@ const startSendingInterval = () => {
     }
 
     // Send data to clients
+    // TODO: Distribute partials, right now all partials are sent to all clients
+    // TODO: Handle choir mode
     sockserver.clients.forEach((client: WebSocket) => {
       client.send(JSON.stringify({ startTime: startTime + 2, chunk: track[chunkIndex] }))
     })
