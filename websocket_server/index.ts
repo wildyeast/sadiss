@@ -1,11 +1,13 @@
 // Code in part taken from https://www.pubnub.com/blog/nodejs-websocket-programming-examples/
 
 // HTTP SERVER //
-import express from 'express';
+import express from 'express'
 import { PartialChunk, WebSocketWithId, Message, TtsInstruction, Mode } from './types/types'
 
 const cors = require('cors')
 const router = express.Router()
+const fs = require('fs')
+const readline = require('readline')
 
 const whitelist = ['http://localhost:3000', 'http://127.0.0.1:5173' /** other domains if any */]
 const corsOptions = {
@@ -32,9 +34,15 @@ const app = express()
 app.listen(3000, () => console.log(`Http server listening on port ${3000}.`))
 
 router.post('/init', upload.array('pfile'), (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
-  // @ts-expect-error
-  console.log(req.files)
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080') // cors error without this
+  try {
+    // @ts-expect-error
+    const file = req.files[0]
+    const path = file.path
+    chunk(path)
+  } catch (e) {
+    console.error(e)
+  }
   res.status(200).send()
 })
 
@@ -250,6 +258,45 @@ const sendData = (dataToSend: Message) => {
 //     console.log('Sent data to clients')
 //   }
 // }
+
+/** Takes partial path and returns chunk array */
+/* WORK IN PROGRESS */
+const chunk = async (path) => {
+  console.log('Analyzing ' + path)
+  const fileStream = fs.createReadStream(path)
+  const rl = readline.createInterface({
+    input: fileStream,
+    crlfDelay: Infinity
+  })
+  let frameCount = 0
+  let chunks
+  for await (const line of rl) {
+    const f = line.split(' ')
+
+    // Handle first few lines
+    if (!frameCount && f[0] === 'frame-count') {
+      frameCount = f[1]
+      continue
+    } else if (!frameCount || f[0] === 'frame-data') {
+      continue
+    }
+    // Handle frame data
+    const time = f[0]
+    const partialsCount = f[1]
+    const partials = []
+    for (let i = 2; i <= f.length - 2; i += 3) {
+      const index = f[i]
+      const freq = f[i + 1]
+      const amp = f[i + 2]
+      if (!partials[index]) {
+        partials[index] = {}
+      }
+      partials[index].freq = freq
+      partials[index].amp = amp
+    }
+    console.log(partials)
+  }
+}
 
 // setInterval(() => {
 //   sockserver.clients.forEach((client) => {
