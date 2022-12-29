@@ -60,53 +60,54 @@ const establishWebsocketConnection = () => {
 
     // Stop track if no more chunks.
     // TODO: Devise a method to make playback stop when no more partials and no more tts instructions
-    if (!Object.keys(data.partialData).length) {
-      console.log('Received partialData is empty!')
-      trackRunning = false
-      window.clearInterval(requestChunkIntervalId)
-      return
-    }
+    // if (!Object.keys(data.trackData).length) {
+    //   console.log('Received partialData is empty!')
+    //   trackRunning = false
+    //   // window.clearInterval(requestChunkIntervalId)
+    //   return
+    // }
 
-    if (data.startTime) {
-      setStartTime(data.startTime)
-    }
+    // if (data.startTime) {
+    //   setStartTime(data.startTime)
+    // }
 
     if (!trackRunning) {
-      startRequestChunkInterval()
+      // startRequestChunkInterval()
       trackRunning = true
     }
-    if (Object.keys(data.partialData).length) {
-      handleChunkData(data.partialData)
+    setStartTime(data.startTime)
+    if (Object.keys(data.chunk)) {
+      handleChunkData(data.chunk)
     }
   }
 }
 
-let requestChunkIntervalId: number
-const startRequestChunkInterval = () => {
-  requestChunkIntervalId = window.setInterval(() => {
-    const data = {
-      message: 'dataRequest',
-      chunkRequest: false,
-      ttsRequest: false
-    }
+// let requestChunkIntervalId: number
+// const startRequestChunkInterval = () => {
+//   requestChunkIntervalId = window.setInterval(() => {
+//     const data = {
+//       message: 'dataRequest',
+//       chunkRequest: false,
+//       ttsRequest: false
+//     }
 
-    if (shouldRequestChunks()) {
-      data.chunkRequest = true
-      console.log('Chunks requested')
-      chunksRequested()
-    }
-    if (shouldRequestTts.value) {
-      data.ttsRequest = true
-      ttsRequested()
-    }
-    if (data.chunkRequest || data.ttsRequest) {
-      send(data)
-    }
-  }, 100)
-}
+//     if (shouldRequestChunks()) {
+//       data.chunkRequest = true
+//       console.log('Chunks requested')
+//       chunksRequested()
+//     }
+//     if (shouldRequestTts.value) {
+//       data.ttsRequest = true
+//       ttsRequested()
+//     }
+//     if (data.chunkRequest || data.ttsRequest) {
+//       send(data)
+//     }
+//   }, 100)
+// }
 
 // const sendPartialChunksToServer = () => send({ partialChunks: mockData, ttsInstructions: mockTTS, mode: mode.value })
-const sendPartialChunksToServer = () => send({ partialChunks: mockData, mode: mode.value })
+const sendPartialChunksToServer = () => send({ trackData: mockData, mode: mode.value })
 
 const send = (data: { [key: string]: any }) => {
   try {
@@ -161,7 +162,7 @@ const startClock = () => {
 }
 
 onMounted(async () => {
-  // await initializeMCorp()
+  await initializeMCorp()
 })
 
 </script>

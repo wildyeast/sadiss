@@ -9,7 +9,7 @@ export function usePlayer () {
   let offset: number
   let waitingForChunks = false
 
-  const initialSetup = (partialChunks: PartialChunk[]) => {
+  const initialSetup = (partialChunks: { partials: PartialChunk[], ttsInstructions: { startTime: number, text: string; }; }) => {
     handleChunkData(partialChunks)
   }
 
@@ -21,43 +21,47 @@ export function usePlayer () {
 
   const startTimeInCtxTime = computed(() => globalStartTime - offset)
 
+  let numberOfChunksHandled = 0
   const MAXIMUM_CHUNK_LENGTH_MS = 999
-  const handleChunkData = (partialChunks: PartialChunk[]) => {
-    console.log('\nHandling following chunk data: ', partialChunks)
+  const handleChunkData = (trackData: { partials: PartialChunk[], ttsInstructions: { startTime: number, text: string } }) => {
+    console.log('\nHandling following chunk data: ', trackData)
 
-    currentChunkStartTimeInCtxTime.value = startTimeInCtxTime.value + partialChunks[0].startTime / 1000
+    currentChunkStartTimeInCtxTime.value = startTimeInCtxTime.value + trackData.partials[0].startTime / 1000
 
-    for (const chunk of partialChunks) {
-      if (chunk.endTime === MAXIMUM_CHUNK_LENGTH_MS) {
-        // Only assign new chunk to found oscillator if last breakpoint of chunk ends
+    for (const partialChunk of trackData.partials) {
+      if (oscillators.length && partialChunk.endTime === numberOfChunksHandled * 1000 + MAXIMUM_CHUNK_LENGTH_MS) {
+        // Only assign new partialChunk to found oscillator if last breakpoint of partialChunk ends
         // MAXIMUM_CHUNK_LENGTH_MS after chunk start.
         // In this case we assume this is part of a longer partial and stitch the parts
         // together seamlessly.
-        const oscObj = oscillators.find(el => el.index === chunk.index)
+        const oscObj = oscillators.find(el => el.index === partialChunk.index)
         if (oscObj) {
-          setBreakpoints(oscObj.oscillator, oscObj.gain, chunk.breakpoints)
+          console.log('Found osc.')
+          setBreakpoints(oscObj.oscillator, oscObj.gain, partialChunk.breakpoints, startTimeInCtxTime.value + partialChunk.endTime / 1000)
         }
       } else {
+        console.log('Creating osc.')
         const oscNode = ctx.createOscillator()
         const gainNode = ctx.createGain()
         oscNode.connect(gainNode)
         gainNode.connect(ctx.destination)
 
-        setBreakpoints(oscNode, gainNode, chunk.breakpoints)
-
         oscNode.start(currentChunkStartTimeInCtxTime.value)
-        oscNode.stop(startTimeInCtxTime.value + chunk.endTime / 1000)
+        setBreakpoints(oscNode, gainNode, partialChunk.breakpoints, startTimeInCtxTime.value + partialChunk.endTime / 1000)
+
+        oscNode.stop(startTimeInCtxTime.value + partialChunk.endTime / 1000)
         oscNode.onended = (event) => {
           const oscObj = oscillators.find(oscObj => oscObj.oscillator === event.target)
           if (oscObj) oscillators.splice(oscillators.indexOf(oscObj), 1)
         }
-        oscillators.push({ index: chunk.index, oscillator: oscNode, gain: gainNode })
+        oscillators.push({ index: partialChunk.index, oscillator: oscNode, gain: gainNode })
       }
     }
-    waitingForChunks = false
+    numberOfChunksHandled++
   }
 
-  const setBreakpoints = (oscNode: OscillatorNode, gainNode: GainNode, breakpoints: Breakpoint[]) => {
+  const setBreakpoints = (oscNode: OscillatorNode, gainNode: GainNode, breakpoints: Breakpoint[], chunkEndTime: number) => {
+    oscNode.stop(chunkEndTime)
     for (const bp of breakpoints) {
       oscNode.frequency.setValueAtTime(bp.freq, currentChunkStartTimeInCtxTime.value)
       gainNode.gain.setValueAtTime(bp.amp, currentChunkStartTimeInCtxTime.value)

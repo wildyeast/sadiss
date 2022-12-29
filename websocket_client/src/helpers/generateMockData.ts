@@ -14,12 +14,12 @@ export function generateChunks (secondsToGenerate: number) {
       })
     }
     chunks.push({
-      partials: {
+      partials: [{
         index: 1,
         startTime: startTime,
         endTime: startTime + 999,
         breakpoints
-      },
+      }],
       ttsInstructions: {
         startTime: ttsStartTime + i,
         text: i.toString()
