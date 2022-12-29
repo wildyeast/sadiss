@@ -22,14 +22,16 @@ const corsOptions = {
         }
     }
 };
+const multer = require('multer');
+const upload = multer({ dest: 'uploads/' });
 const app = (0, express_1.default)()
     .use(express_1.default.json())
     //.use(cors(corsOptions))
     .use(express_1.default.urlencoded({ extended: false }));
 app.listen(3000, () => console.log(`Http server listening on port ${3000}.`));
-router.post('/init', (req, res) => {
+router.post('/init', upload.array('pfile'), (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
-    console.log(req.query, req.body, req.params, Object.keys(req));
+    console.log(req.files);
     res.status(200).send();
 });
 router.post('/partialData', (req, res) => {

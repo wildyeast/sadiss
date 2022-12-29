@@ -21,6 +21,9 @@ const corsOptions = {
   }
 }
 
+const multer  = require('multer')
+const upload = multer({ dest: 'uploads/' })
+
 const app = express()
   .use(express.json())
   //.use(cors(corsOptions))
@@ -28,9 +31,9 @@ const app = express()
 
 app.listen(3000, () => console.log(`Http server listening on port ${3000}.`))
 
-router.post('/init', (req, res) => {
+router.post('/init', upload.array('pfile'), (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
-  console.log(req.query, req.body, req.params, Object.keys(req))
+  console.log(req.files)
   res.status(200).send()
 })
 

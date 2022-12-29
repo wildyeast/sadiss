@@ -22,8 +22,8 @@ const handleFileUpload = async (e) => {
 const play = () => {
   console.log('play', file)
   const data = new FormData()
-  data.append('filename', file)
-  axios.post('http://localhost:3000/init', data)
+  data.append('pfile', file)
+  axios.post('http://localhost:3002/init', data)
   .then(response => {
         console.log(response.data)
     })
