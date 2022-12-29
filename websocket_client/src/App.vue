@@ -41,7 +41,7 @@ const register = () => {
 const establishWebsocketConnection = () => {
   startAudioCtx(globalTime.value)
 
-  ws.value = new WebSocket('ws://localhost:443/')
+  ws.value = new WebSocket('ws://localhost:444/')
 
   ws.value.onopen = function () {
     console.log('Connection is open')

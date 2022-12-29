@@ -23,11 +23,16 @@ const corsOptions = {
 
 const app = express()
   .use(express.json())
-  .use(cors(corsOptions))
+  //.use(cors(corsOptions))
   .use(express.urlencoded({ extended: false }))
 
 app.listen(3000, () => console.log(`Http server listening on port ${3000}.`))
 
+router.post('/init', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080');
+  console.log(req.query, req.body, req.params, Object.keys(req))
+  res.status(200).send()
+})
 
 router.post('/partialData', (req, res) => {
   console.log(req.body)
@@ -47,7 +52,7 @@ let mode: Mode
 let partialDataRequested = false
 let ttsInstructionsRequested = false
 
-const sockserver = new Server({ port: 443 })
+const sockserver = new Server({ port: 444 })
 console.log(`Websocket server listening on port ${443}.`)
 sockserver.on('connection', (ws: WebSocketWithId) => {
   console.log('New client connected!')
