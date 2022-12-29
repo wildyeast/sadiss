@@ -26,7 +26,10 @@ export function usePlayer () {
   const handleChunkData = (trackData: { partials: PartialChunk[], ttsInstructions: { startTime: number, text: string } }) => {
     console.log('\nHandling following chunk data: ', trackData)
 
-    currentChunkStartTimeInCtxTime.value = startTimeInCtxTime.value + trackData.partials[0].startTime / 1000
+    // currentChunkStartTimeInCtxTime.value = startTimeInCtxTime.value + trackData.partials[0].startTime / 1000
+
+    // TODO: This is not ideal, we shouldn't set globalStartTime every time we receive data
+    currentChunkStartTimeInCtxTime.value = startTimeInCtxTime.value
 
     for (const partialChunk of trackData.partials) {
       if (oscillators.length && partialChunk.endTime === numberOfChunksHandled * 1000 + MAXIMUM_CHUNK_LENGTH_MS) {
@@ -63,8 +66,9 @@ export function usePlayer () {
   const setBreakpoints = (oscNode: OscillatorNode, gainNode: GainNode, breakpoints: Breakpoint[], chunkEndTime: number) => {
     oscNode.stop(chunkEndTime)
     for (const bp of breakpoints) {
-      oscNode.frequency.setValueAtTime(bp.freq, currentChunkStartTimeInCtxTime.value)
-      gainNode.gain.setValueAtTime(bp.amp, currentChunkStartTimeInCtxTime.value)
+      console.log('setting bps: ', currentChunkStartTimeInCtxTime.value + bp.time / 1000)
+      oscNode.frequency.setValueAtTime(bp.freq, currentChunkStartTimeInCtxTime.value + bp.time / 1000)
+      gainNode.gain.setValueAtTime(bp.amp, currentChunkStartTimeInCtxTime.value + bp.time / 1000)
     }
   }
 

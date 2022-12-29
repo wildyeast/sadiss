@@ -75,6 +75,8 @@ const establishWebsocketConnection = () => {
       // startRequestChunkInterval()
       trackRunning = true
     }
+
+    // TODO: This is not ideal, we shouldn't set globalStartTime every time we receive data
     setStartTime(data.startTime)
     if (Object.keys(data.chunk)) {
       handleChunkData(data.chunk)
