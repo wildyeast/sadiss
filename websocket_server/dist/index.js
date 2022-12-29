@@ -53,7 +53,7 @@ sockserver.on('connection', (ws) => {
     ws.onclose = () => console.log('Client has disconnected!');
     ws.onmessage = (event) => {
         const parsed = JSON.parse(event.data);
-        console.log('Received message: ', parsed.message);
+        // console.log('Received message: ', parsed.message)
         if (parsed.message === 'start') {
             if (!parsed.startTime) {
                 console.error('Received start but no startTime provided.');
@@ -66,6 +66,7 @@ sockserver.on('connection', (ws) => {
             ws.id = parsed.clientId;
         }
         else {
+            // TODO: In no message in request, it was sending of partial data. Make this more clear.
             mode = parsed.mode;
             track = parsed.trackData;
         }
@@ -85,7 +86,7 @@ const startSendingInterval = () => {
             return;
         }
         if (chunkIndex >= track.length) {
-            console.log('No more chunks');
+            console.log('No more chunks. Stopping.');
             return;
         }
         const dt = Date.now() - expected;
