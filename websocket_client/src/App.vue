@@ -56,7 +56,7 @@ const establishWebsocketConnection = () => {
 
   ws.value.onmessage = (event) => {
     const data = JSON.parse(event.data)
-    console.log('Received message: ', data)
+    console.log('\nReceived message: ', data)
 
     // Stop track if no more chunks.
     // TODO: Devise a method to make playback stop when no more partials and no more tts instructions

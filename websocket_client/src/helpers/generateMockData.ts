@@ -1,15 +1,15 @@
-import { PartialChunk, TtsInstruction, Chunk } from "../types/types"
+import { PartialChunk, TtsInstruction, Chunk, Breakpoint } from "../types/types"
 
 export function generateChunks (secondsToGenerate: number) {
   let startTime = 0
   let ttsStartTime = 0
   const chunks = []
   for (let i = 0; i < secondsToGenerate; i++) {
-    const breakpoints = []
-    for (let j = 0; j < 10; j++) {
+    const breakpoints: Breakpoint[] = []
+    for (let j = 0; j < 100; j++) {
       breakpoints.push({
-        time: startTime + 100 * j,
-        freq: 300 + 10 * j,
+        time: startTime + 10 * j,
+        freq: chunks.length % 2 === 0 ? 300 + 1 * j : 400 - 1 * j,
         amp: 0.1
       })
     }
