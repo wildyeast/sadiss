@@ -1,10 +1,31 @@
+export interface Chunk {
+  partials: Partial[],
+  ttsInstruction: ClientTtsInstruction
+}
+
+export interface Partial {
+  index: number,
+  startTime: number,
+  endTime: number,
+  breakpoints: Breakpoint[]
+}
+
 export interface PartialChunk {
   index: number,
   startTime: number,
   endTime: number,
-  partialEndTime: number, // End time of the partial this chunk is from
   breakpoints: Breakpoint[]
 }
+
+// OLD, but maybe not obsolete, we'll see //
+
+// export interface PartialChunk {
+//   index: number,
+//   startTime: number,
+//   endTime: number,
+//   partialEndTime: number, // End time of the partial this chunk is from
+//   breakpoints: Breakpoint[]
+// }
 
 export interface Breakpoint {
   time: number,
