@@ -53,8 +53,9 @@ router.post('/init', upload.array('pfile'), (req, res) => __awaiter(void 0, void
         // @ts-expect-error
         const file = req.files[0];
         const path = file.path;
-        const chunks = yield chunk(path);
-        res.status(200).send(JSON.stringify(chunks));
+        // @ts-expect-error
+        track = yield chunk(path);
+        res.status(200).send(JSON.stringify(track));
     }
     catch (e) {
         console.log('ERR');
@@ -246,7 +247,6 @@ ttsInstructions [{
 }]
 */
 /** Takes partial path and returns chunk array */
-/* WORK IN PROGRESS */
 const chunk = (path) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
     const CHUNK_DURATION = 0.999; // float in seconds
@@ -297,7 +297,7 @@ const chunk = (path) => __awaiter(void 0, void 0, void 0, function* () {
                 const partialsCount = f[1];
                 // Read each triple of frame data
                 for (let i = 2; i <= f.length - 2; i += 3) {
-                    const index = f[i];
+                    const index = +f[i];
                     const freq = f[i + 1];
                     const amp = f[i + 2];
                     // Find partial if it exists in chunk array
