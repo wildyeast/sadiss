@@ -54,6 +54,7 @@ router.post('/init', upload.array('pfile'), (req, res) => __awaiter(void 0, void
         const file = req.files[0];
         const path = file.path;
         const chunks = yield chunk(path);
+        track = chunks;
         res.status(200).send(JSON.stringify(chunks));
     }
     catch (e) {
@@ -246,7 +247,6 @@ ttsInstructions [{
 }]
 */
 /** Takes partial path and returns chunk array */
-/* WORK IN PROGRESS */
 const chunk = (path) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
     const CHUNK_DURATION = 0.999; // float in seconds
@@ -254,12 +254,13 @@ const chunk = (path) => __awaiter(void 0, void 0, void 0, function* () {
     let chunks = [];
     const initChunk = () => {
         return {
-            time: null,
+            time: 0,
             partials: [],
             ttsInstructions: []
         };
     };
     let chunk = initChunk();
+    chunk.time = 0;
     // Open partials file
     console.log('Analyzing', path, '...');
     const fileStream = fs.createReadStream(path);
@@ -286,13 +287,14 @@ const chunk = (path) => __awaiter(void 0, void 0, void 0, function* () {
                 }
                 // Handle frame data
                 const time = parseFloat(parseFloat(f[0]).toFixed(2));
-                if (!chunk.time) {
+                if (chunk.time == null) {
                     chunk.time = time;
                 }
                 // Create new chunk if chunk time exceeded
                 if (time >= chunk.time + CHUNK_DURATION) {
                     chunks.push(chunk);
                     chunk = initChunk();
+                    chunk.time = time;
                 }
                 const partialsCount = f[1];
                 // Read each triple of frame data

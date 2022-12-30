@@ -40,6 +40,7 @@ router.post('/init', upload.array('pfile'), async (req, res) => {
     const file = req.files[0]
     const path = file.path
     const chunks = await chunk(path)
+    track = chunks 
     res.status(200).send(JSON.stringify(chunks))
   } catch (e) {
     console.log('ERR')
@@ -281,12 +282,13 @@ const chunk = async (path) => {
   let chunks = []
   const initChunk = () => {
     return {
-      time: null,
+      time: 0,
       partials: [],
       ttsInstructions: []
     }
   }
   let chunk = initChunk()
+  chunk.time = 0
 
   // Open partials file
   console.log('Analyzing', path, '...')
@@ -311,13 +313,14 @@ const chunk = async (path) => {
 
     // Handle frame data
     const time = parseFloat(parseFloat(f[0]).toFixed(2))
-    if (!chunk.time) {
+    if (chunk.time == null) {
       chunk.time = time
     }
     // Create new chunk if chunk time exceeded
     if (time >= chunk.time + CHUNK_DURATION) {
       chunks.push(chunk)
       chunk = initChunk()
+      chunk.time = time
     }
 
     const partialsCount = f[1]
