@@ -47,19 +47,21 @@ const app = (0, express_1.default)()
     //.use(cors(corsOptions))
     .use(express_1.default.urlencoded({ extended: false }));
 app.listen(3000, () => console.log(`Http server listening on port ${3000}.`));
-router.post('/init', upload.array('pfile'), (req, res) => {
+router.post('/init', upload.array('pfile'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080'); // cors error without this
     try {
         // @ts-expect-error
         const file = req.files[0];
         const path = file.path;
-        chunk(path);
+        const chunks = yield chunk(path);
+        res.status(200).send(JSON.stringify(chunks));
     }
     catch (e) {
-        console.error(e);
+        console.log('ERR');
+        console.log(e);
+        res.status(500).send();
     }
-    res.status(200).send();
-});
+}));
 router.post('/partialData', (req, res) => {
     console.log(req.body);
     res.status(200).send();
@@ -121,6 +123,8 @@ const startSendingInterval = () => {
             return;
         }
         // Send data to clients
+        // TODO: Distribute partials, right now all partials are sent to all clients
+        // TODO: Handle choir mode
         sockserver.clients.forEach((client) => {
             client.send(JSON.stringify({ startTime: startTime + 2, chunk: track[chunkIndex] }));
         });
@@ -233,19 +237,39 @@ const sendData = (dataToSend) => {
 //     console.log('Sent data to clients')
 //   }
 // }
+/* Chunk structure:
+partials [{
+  index, startTime, endTime, breakpoints [{ time, freq, amp }]
+}],
+ttsInstructions [{
+  startTime, text
+}]
+*/
 /** Takes partial path and returns chunk array */
 /* WORK IN PROGRESS */
 const chunk = (path) => __awaiter(void 0, void 0, void 0, function* () {
     var _a, e_1, _b, _c;
-    console.log('Analyzing ' + path);
+    const CHUNK_DURATION = 0.999; // float in seconds
+    // Initialize chunks array and first chunk object
+    let chunks = [];
+    const initChunk = () => {
+        return {
+            time: null,
+            partials: [],
+            ttsInstructions: []
+        };
+    };
+    let chunk = initChunk();
+    // Open partials file
+    console.log('Analyzing', path, '...');
     const fileStream = fs.createReadStream(path);
     const rl = readline.createInterface({
         input: fileStream,
         crlfDelay: Infinity
     });
     let frameCount = 0;
-    let chunks;
     try {
+        // Read each line
         for (var _d = true, rl_1 = __asyncValues(rl), rl_1_1; rl_1_1 = yield rl_1.next(), _a = rl_1_1.done, !_a;) {
             _c = rl_1_1.value;
             _d = false;
@@ -261,20 +285,38 @@ const chunk = (path) => __awaiter(void 0, void 0, void 0, function* () {
                     continue;
                 }
                 // Handle frame data
-                const time = f[0];
+                const time = parseFloat(parseFloat(f[0]).toFixed(2));
+                if (!chunk.time) {
+                    chunk.time = time;
+                }
+                // Create new chunk if chunk time exceeded
+                if (time >= chunk.time + CHUNK_DURATION) {
+                    chunks.push(chunk);
+                    chunk = initChunk();
+                }
                 const partialsCount = f[1];
-                const partials = [];
+                // Read each triple of frame data
                 for (let i = 2; i <= f.length - 2; i += 3) {
                     const index = f[i];
                     const freq = f[i + 1];
                     const amp = f[i + 2];
-                    if (!partials[index]) {
-                        partials[index] = {};
+                    // Find partial if it exists in chunk array
+                    let partial = chunk.partials.find(p => p.index === index);
+                    if (!partial) { // init if it doesn't
+                        partial = {
+                            index,
+                            startTime: time,
+                            endTime: time + CHUNK_DURATION,
+                            breakpoints: []
+                        };
+                        chunk.partials.push(partial);
                     }
-                    partials[index].freq = freq;
-                    partials[index].amp = amp;
+                    partial.breakpoints.push({
+                        time,
+                        freq,
+                        amp
+                    });
                 }
-                console.log(partials);
             }
             finally {
                 _d = true;
@@ -288,6 +330,9 @@ const chunk = (path) => __awaiter(void 0, void 0, void 0, function* () {
         }
         finally { if (e_1) throw e_1.error; }
     }
+    chunks.push(chunk);
+    console.log('Created', chunks.length, 'chunks');
+    return chunks;
 });
 // setInterval(() => {
 //   sockserver.clients.forEach((client) => {
