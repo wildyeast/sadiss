@@ -8,7 +8,7 @@ export function generateChunks (secondsToGenerate: number) {
     const breakpoints: Breakpoint[] = []
     for (let j = 0; j < 100; j++) {
       breakpoints.push({
-        time: startTime + 10 * j,
+        time: startTime + 0.01 * j,
         freq: chunks.length % 2 === 0 ? 300 + 1 * j : 400 - 1 * j,
         amp: 0.1
       })
@@ -17,7 +17,7 @@ export function generateChunks (secondsToGenerate: number) {
       partials: [{
         index: 1,
         startTime: startTime,
-        endTime: startTime + 999,
+        endTime: startTime + 0.999,
         breakpoints
       }],
       ttsInstructions: {
@@ -25,8 +25,8 @@ export function generateChunks (secondsToGenerate: number) {
         text: i.toString()
       }
     })
-    startTime += 1000
-    ttsStartTime += 1000
+    startTime += 1
+    ttsStartTime += 1
   }
   return chunks
 }
