@@ -2,7 +2,7 @@
 
 // HTTP SERVER //
 import express from 'express'
-import { PartialChunk, WebSocketWithId, Message, TtsInstruction, Mode } from './types/types'
+import { PartialChunk, WebSocketWithIds, Message, TtsInstruction, Mode } from './types/types'
 import * as dotenv from 'dotenv'
 
 const cors = require('cors')
@@ -104,11 +104,14 @@ let startTime: number
 
 const sockserver = new Server({ port: 444 })
 console.log(`Websocket server listening on port ${443}.`)
-sockserver.on('connection', (ws: WebSocketWithId) => {
-  console.log('New client connected!')
-  ws.onclose = () => console.log('Client has disconnected!')
+sockserver.on('connection', (client: WebSocketWithIds) => {
+  // Assign id to new connection, needed for nonChoir partial distribution
+  client.id = sockserver.clients.size
+  console.log('New client connected! Assigned id: ', client.id)
 
-  ws.onmessage = (event: MessageEvent<string>) => {
+  client.onclose = () => console.log('Client has disconnected!')
+
+  client.onmessage = (event: MessageEvent<string>) => {
     const parsed: Message = JSON.parse(event.data)
     // console.log('Received message: ', parsed.message)
     if (parsed.message === 'start') {
@@ -119,9 +122,9 @@ sockserver.on('connection', (ws: WebSocketWithId) => {
       startTime = parsed.startTime
       startSendingInterval()
     } else if (parsed.message === 'clientId') {
-      ws.id = parsed.clientId
+      client.choirId = parsed.clientId
     } else {
-      // TODO: In no message in request, it was sending of partial data. Make this more clear.
+      // TODO: If no message in request, it was sending of partial data. Make this more clear.
       mode = parsed.mode
       track = parsed.trackData
     }
@@ -164,15 +167,69 @@ const startSendingInterval = () => {
 
     // Choir mode
     if (mode === 'choir') {
-      sockserver.clients.forEach((client: WebSocketWithId) => {
-        const partialById = track[chunkIndex].partials.find((chunk: PartialChunk) => chunk.index === client.id)
+      sockserver.clients.forEach((client: WebSocketWithIds) => {
+        const partialById = track[chunkIndex].partials.find((chunk: PartialChunk) => chunk.index === client.choirId)
         if (partialById) {
           client.send(JSON.stringify({ startTime: startTime + 2, chunk: { partials: [partialById] } }))
         }
       })
     } else {
-      sockserver.clients.forEach((client: WebSocket) => {
-        client.send(JSON.stringify({ startTime: startTime + 2, chunk: track[chunkIndex] }))
+      // nonChoir mode
+
+      const clients = sockserver.clients
+      const partials = track[chunkIndex].partials
+
+      // key is client.id
+      const allocatedPartials: { [key: string]: PartialChunk[] } = {}
+
+      // key is partial.index
+      const partialMap: { [key: string]: WebSocketWithIds | undefined } = {}
+
+      for (let i = 0; i < clients.length; i++) {
+        allocatedPartials[clients[i].id] = []
+      }
+
+      for (let i = 0; i < partials.length; i++) {
+        const partial = partials[i]
+        let client: WebSocketWithIds | undefined
+
+        if (partialMap[partial.index]) {
+          client = partialMap[partial.index]
+          if (!(client && client.id in allocatedPartials)) {
+            // Client has disconnected, redistribute partial
+            client = undefined
+            delete partialMap[partial.index]
+          }
+        }
+
+        if (!client) {
+          client = clients[i % clients.length]
+          partialMap[partial.index] = client
+        }
+
+        if (client) {
+          allocatedPartials[client.id].push(partial)
+        }
+      }
+
+      // Make sure all clients get at least one partial
+      for (const client of clients) {
+        if (allocatedPartials[client.id].length === 0) {
+          const unallocatedPartials = Object.values(allocatedPartials).flat();
+          if (unallocatedPartials.length > 0) {
+            const partial = unallocatedPartials.pop()
+            if (partial) {
+              allocatedPartials[client.id].push(partial)
+              if (partialMap[partial.index]) {
+                delete partialMap[partial.index]
+              }
+            }
+          }
+        }
+      }
+
+      sockserver.clients.forEach((client: WebSocketWithIds) => {
+        client.send(JSON.stringify({ startTime: startTime + 2, chunk: allocatedPartials[client.id] }))
       })
     }
 

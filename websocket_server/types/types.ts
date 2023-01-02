@@ -11,8 +11,9 @@ export interface Breakpoint {
   amp: number
 }
 
-export type WebSocketWithId = {
-  id: number
+export type WebSocketWithIds = {
+  id: number,
+  choirId: number
 } & WebSocket
 
 export type Message = { [key: string]: any }
