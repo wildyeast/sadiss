@@ -3,11 +3,33 @@
 // HTTP SERVER //
 import express from 'express'
 import { PartialChunk, WebSocketWithId, Message, TtsInstruction, Mode } from './types/types'
+import * as dotenv from 'dotenv'
 
 const cors = require('cors')
 const router = express.Router()
 const fs = require('fs')
 const readline = require('readline')
+const mongoose = require('mongoose')
+
+// Load .env
+dotenv.config()
+
+// Connect to database
+//const mongoURI = 'mongodb://sadiss.net:27017/sadiss'
+const mongoHost = process.env.MONGO_HOST
+const mongoUser = process.env.MONGO_USER
+const mongoPW = process.env.MONGO_PW
+const mongoDbName = process.env.MONGO_DB_NAME
+const mongoURI = `mongodb://${mongoUser}:${mongoPW}@${mongoHost}/${mongoDbName}?directConnection=true&serverSelectionTimeoutMS=2000`
+mongoose.connect(mongoURI)
+
+// Define track schema for db
+const trackSchema = new mongoose.Schema({
+  name: String,
+  chunks: String,
+  notes: String 
+})
+trackSchema.set('timestamps', true)
 
 const whitelist = ['http://localhost:3000', 'http://127.0.0.1:5173' /** other domains if any */]
 const corsOptions = {
@@ -33,14 +55,27 @@ const app = express()
 
 app.listen(3000, () => console.log(`Http server listening on port ${3000}.`))
 
-router.post('/init', upload.array('pfile'), async (req, res) => {
+
+// Upload track
+router.post('/upload', upload.array('pfile'), async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080') // cors error without this
   try {
     // @ts-expect-error
     const file = req.files[0]
     const path = file.path
     // @ts-expect-error
-    track = await chunk(path)
+    const name = req.body.name
+    const chunks = await chunk(path)
+    const notes = req.body.notes
+    // Save track to DB
+    const Track = mongoose.model('Track', trackSchema)
+    const t = new Track({name, chunks: JSON.stringify(chunks), notes})
+    t.save(function (err) {
+      if (err) {
+        console.error('Error while uploading track', err)
+        return
+      }
+    })
     res.status(200).send(JSON.stringify(track))
   } catch (e) {
     console.log('ERR')
@@ -48,6 +83,8 @@ router.post('/init', upload.array('pfile'), async (req, res) => {
     res.status(500).send()
   }
 })
+
+// Get tracks
 
 router.post('/partialData', (req, res) => {
   console.log(req.body)

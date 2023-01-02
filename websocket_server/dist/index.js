@@ -1,5 +1,28 @@
 "use strict";
 // Code in part taken from https://www.pubnub.com/blog/nodejs-websocket-programming-examples/
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
     return new (P || (P = Promise))(function (resolve, reject) {
@@ -22,10 +45,29 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 // HTTP SERVER //
 const express_1 = __importDefault(require("express"));
+const dotenv = __importStar(require("dotenv"));
 const cors = require('cors');
 const router = express_1.default.Router();
 const fs = require('fs');
 const readline = require('readline');
+const mongoose = require('mongoose');
+// Load .env
+dotenv.config();
+// Connect to database
+//const mongoURI = 'mongodb://sadiss.net:27017/sadiss'
+const mongoHost = process.env.MONGO_HOST;
+const mongoUser = process.env.MONGO_USER;
+const mongoPW = process.env.MONGO_PW;
+const mongoDbName = process.env.MONGO_DB_NAME;
+const mongoURI = `mongodb://${mongoUser}:${mongoPW}@${mongoHost}/${mongoDbName}?directConnection=true&serverSelectionTimeoutMS=2000`;
+mongoose.connect(mongoURI);
+// Define track schema for db
+const trackSchema = new mongoose.Schema({
+    name: String,
+    chunks: String,
+    notes: String
+});
+trackSchema.set('timestamps', true);
 const whitelist = ['http://localhost:3000', 'http://127.0.0.1:5173' /** other domains if any */];
 const corsOptions = {
     origin: (origin, callback) => {
@@ -47,14 +89,26 @@ const app = (0, express_1.default)()
     //.use(cors(corsOptions))
     .use(express_1.default.urlencoded({ extended: false }));
 app.listen(3000, () => console.log(`Http server listening on port ${3000}.`));
-router.post('/init', upload.array('pfile'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
+// Upload track
+router.post('/upload', upload.array('pfile'), (req, res) => __awaiter(void 0, void 0, void 0, function* () {
     res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080'); // cors error without this
     try {
         // @ts-expect-error
         const file = req.files[0];
         const path = file.path;
         // @ts-expect-error
-        track = yield chunk(path);
+        const name = req.body.name;
+        const chunks = yield chunk(path);
+        const notes = req.body.notes;
+        // Save track to DB
+        const Track = mongoose.model('Track', trackSchema);
+        const t = new Track({ name, chunks: JSON.stringify(chunks), notes });
+        t.save(function (err) {
+            if (err) {
+                console.error('Error while uploading track', err);
+                return;
+            }
+        });
         res.status(200).send(JSON.stringify(track));
     }
     catch (e) {
@@ -63,6 +117,7 @@ router.post('/init', upload.array('pfile'), (req, res) => __awaiter(void 0, void
         res.status(500).send();
     }
 }));
+// Get tracks
 router.post('/partialData', (req, res) => {
     console.log(req.body);
     res.status(200).send();

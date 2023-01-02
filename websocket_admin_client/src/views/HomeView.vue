@@ -1,10 +1,19 @@
 <template>
-  <div class="home">
-    <label for="pfile">Upload a partials file:</label>
-    <input type="file" @change="handleFileUpload($event)"
-       id="pfile" name="pfile"
-       accept="*.txt">
-    <button @click="play">Play</button>
+  <div class="flex flex-col">
+    <div class="flex flex-col my-8">
+      <div>Track name</div>
+      <input v-model="trackName">
+    </div>
+    <div class="flex flex-col my-8">
+      <div>Partials file</div>
+      <input type="file" @change="handleFileUpload($event)"
+         accept="*.txt">
+    </div>
+    <div class="flex flex-col my-8">
+      <div>Track notes</div>
+      <textarea v-model="trackNotes" />
+    </div>
+    <button @click="upload">Upload</button>
   </div>
 </template>
 
@@ -13,17 +22,20 @@ import { ref, onMounted, inject } from 'vue'
 
 const axios: any = inject('axios')
 
+const trackName = ref('')
+const trackNotes = ref('')
 let file
 
 const handleFileUpload = async (e) => {
   file = e.target.files[0]
 }
 
-const play = () => {
-  console.log('play', file)
+const upload = () => {
   const data = new FormData()
   data.append('pfile', file)
-  axios.post('http://localhost:3000/init', data)
+  data.append('name', trackName.value)
+  data.append('notes', trackNotes.value)
+  axios.post('http://localhost:3000/upload', data)
   .then(response => {
         console.log(response.data)
     })
