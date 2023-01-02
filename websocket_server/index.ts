@@ -96,7 +96,7 @@ app.use((req, res) => res.status(404))
 
 // WEBSOCKETS //
 const { Server } = require('ws')
-let track: []
+let track: { partials: PartialChunk[], ttsInstructions: TtsInstruction[] }[]
 
 let mode: Mode
 
