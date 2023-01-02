@@ -161,10 +161,21 @@ const startSendingInterval = () => {
 
     // Send data to clients
     // TODO: Distribute partials, right now all partials are sent to all clients
-    // TODO: Handle choir mode
-    sockserver.clients.forEach((client: WebSocket) => {
-      client.send(JSON.stringify({ startTime: startTime + 2, chunk: track[chunkIndex] }))
-    })
+
+    // Choir mode
+    if (mode === 'choir') {
+      sockserver.clients.forEach((client: WebSocketWithId) => {
+        const partialById = track[chunkIndex].partials.find((chunk: PartialChunk) => chunk.index === client.id)
+        if (partialById) {
+          client.send(JSON.stringify({ startTime: startTime + 2, chunk: { partials: [partialById] } }))
+        }
+      })
+    } else {
+      sockserver.clients.forEach((client: WebSocket) => {
+        client.send(JSON.stringify({ startTime: startTime + 2, chunk: track[chunkIndex] }))
+      })
+    }
+
 
     chunkIndex++
 
@@ -174,38 +185,28 @@ const startSendingInterval = () => {
 
 }
 
-const prepareAndSendDataToClient = () => {
+// const sendData = (dataToSend: Message) => {
+//   sockserver.clients.forEach((client: WebSocketWithId) => {
+//     const data: Message = {
+//       startTime: dataToSend.startTime
+//     }
+//     if (client.id) {
+//       if (dataToSend.partialChunks.length) {
+//         const chunk = dataToSend.partialChunks.find((chunk: PartialChunk) => chunk.index === client.id)
+//         data.partialData = [chunk]
+//       }
 
-
-
-  const data: Message = {}
-
-
-  sendData(data)
-}
-
-const sendData = (dataToSend: Message) => {
-  sockserver.clients.forEach((client: WebSocketWithId) => {
-    const data: Message = {
-      startTime: dataToSend.startTime
-    }
-    if (client.id) {
-      if (dataToSend.partialChunks.length) {
-        const chunk = dataToSend.partialChunks.find((chunk: PartialChunk) => chunk.index === client.id)
-        data.partialData = [chunk]
-      }
-
-      if (dataToSend.ttsInstructions.length) {
-        const ttsInstruction = dataToSend.ttsInstructions.find((instruction: TtsInstruction) => instruction.voice === client.id)
-        if (ttsInstruction) {
-          data.ttsInstruction = ttsInstruction
-        }
-      }
-      client.send(JSON.stringify(data))
-    }
-  })
-  console.log('Sent data to client.')
-}
+//       if (dataToSend.ttsInstructions.length) {
+//         const ttsInstruction = dataToSend.ttsInstructions.find((instruction: TtsInstruction) => instruction.voice === client.id)
+//         if (ttsInstruction) {
+//           data.ttsInstruction = ttsInstruction
+//         }
+//       }
+//       client.send(JSON.stringify(data))
+//     }
+//   })
+//   console.log('Sent data to client.')
+// }
 
 // const prepareNextChunks = () => {
 //   const chunks: PartialChunk[] = []
