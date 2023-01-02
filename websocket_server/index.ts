@@ -27,7 +27,7 @@ mongoose.connect(mongoURI)
 const trackSchema = new mongoose.Schema({
   name: String,
   chunks: String,
-  notes: String 
+  notes: String
 })
 trackSchema.set('timestamps', true)
 
@@ -63,14 +63,13 @@ router.post('/upload', upload.array('pfile'), async (req, res) => {
     // @ts-expect-error
     const file = req.files[0]
     const path = file.path
-    // @ts-expect-error
     const name = req.body.name
     const chunks = await chunk(path)
     const notes = req.body.notes
     // Save track to DB
     const Track = mongoose.model('Track', trackSchema)
-    const t = new Track({name, chunks: JSON.stringify(chunks), notes})
-    t.save(function (err) {
+    const t = new Track({ name, chunks: JSON.stringify(chunks), notes })
+    t.save(function (err: Error) {
       if (err) {
         console.error('Error while uploading track', err)
         return
@@ -166,6 +165,7 @@ const startSendingInterval = () => {
     sockserver.clients.forEach((client: WebSocket) => {
       client.send(JSON.stringify({ startTime: startTime + 2, chunk: track[chunkIndex] }))
     })
+
     chunkIndex++
 
     expected += interval
@@ -312,7 +312,7 @@ ttsInstructions [{
 */
 
 /** Takes partial path and returns chunk array */
-const chunk = async (path) => {
+const chunk = async (path: string) => {
   const CHUNK_DURATION = 0.999 // float in seconds
 
   // Initialize chunks array and first chunk object

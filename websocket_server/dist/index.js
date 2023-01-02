@@ -96,7 +96,6 @@ router.post('/upload', upload.array('pfile'), (req, res) => __awaiter(void 0, vo
         // @ts-expect-error
         const file = req.files[0];
         const path = file.path;
-        // @ts-expect-error
         const name = req.body.name;
         const chunks = yield chunk(path);
         const notes = req.body.notes;
