@@ -12,7 +12,7 @@ export interface Breakpoint {
 }
 
 export type WebSocketWithIds = {
-  id: number,
+  id: string,
   choirId: number
 } & WebSocket
 

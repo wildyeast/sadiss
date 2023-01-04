@@ -20,6 +20,11 @@ export function generateChunks (secondsToGenerate: number, partialsPerSecond = 1
           startTime: startTime,
           endTime: startTime + 0.999,
           breakpoints
+        }, {
+          index: j + 2,
+          startTime: startTime,
+          endTime: startTime + 0.999,
+          breakpoints
         }],
         ttsInstructions: {
           startTime: ttsStartTime + i,
