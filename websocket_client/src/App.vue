@@ -45,7 +45,11 @@ const register = () => {
 const establishWebsocketConnection = () => {
   startAudioCtx(globalTime.value)
 
-  ws.value = new WebSocket('ws://localhost:444/')
+  const url = import.meta.env.VITE_WS_SERVER_URL
+  const port = import.meta.env.VITE_WS_SERVER_PORT
+
+  console.log(url, port)
+  ws.value = new WebSocket(`ws://${url}:${port}`)
 
   ws.value.onopen = function () {
     console.log('Connection is open')

@@ -102,7 +102,7 @@ let mode: Mode
 
 let startTime: number
 
-const sockserver = new Server({ port: 444 })
+const sockserver = new Server({ URL: process.env.WS_SERVER_URL, port: process.env.WS_SERVER_PORT })
 console.log(`Websocket server listening on port ${443}.`)
 sockserver.on('connection', (client: WebSocketWithIds) => {
   // Assign id to new connection, needed for nonChoir partial distribution
