@@ -42,7 +42,7 @@ export function usePlayer () {
         oscNode.connect(gainNode)
         gainNode.connect(ctx.destination)
 
-        oscNode.start(startTimeInCtxTime.value + partialChunk.endTime + partialChunk.startTime)
+        oscNode.start(startTimeInCtxTime.value + partialChunk.startTime)
         setBreakpoints(oscNode, gainNode, partialChunk.breakpoints, startTimeInCtxTime.value + partialChunk.endTime)
 
         oscNode.stop(startTimeInCtxTime.value + partialChunk.endTime)
