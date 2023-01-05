@@ -16,12 +16,12 @@ let motion: any
 
 const globalTime = ref(0)
 
-// const mode = ref('nonChoir')
-const mode = ref('choir')
+const mode = ref('nonChoir')
+// const mode = ref('choir')
 
 let trackRunning = false
 
-const { handleChunkData, shouldRequestChunks, chunksRequested, startAudioCtx, setStartTime } = usePlayer()
+const { handleChunkData, shouldRequestChunks, chunksRequested, startAudioCtx, setStartTime, setLogFunction } = usePlayer()
 const { initializeTtsPlayer, shouldRequestTts, ttsRequested } = useTtsPlayer()
 
 // let mockData: PartialChunk[][] = []
@@ -52,30 +52,21 @@ const establishWebsocketConnection = () => {
 
   ws.value.onopen = function () {
     console.log('Connection is open')
+    isRegistered.value = true
     this.send(JSON.stringify({ message: 'clientId', clientId: clientId.value }))
   }
 
-  ws.value.onerror = error => console.error(error)
+  ws.value.onerror = error => {
+    isRegistered.value = false
+    console.error(error)
+  }
 
   ws.value.onmessage = (event) => {
     const data = JSON.parse(event.data)
     console.log('\nReceived message: ', data)
 
-    // Stop track if no more chunks.
-    // TODO: Devise a method to make playback stop when no more partials and no more tts instructions
-    // if (!Object.keys(data.trackData).length) {
-    //   console.log('Received partialData is empty!')
-    //   trackRunning = false
-    //   // window.clearInterval(requestChunkIntervalId)
-    //   return
-    // }
-
-    // if (data.startTime) {
-    //   setStartTime(data.startTime)
-    // }
 
     if (!trackRunning) {
-      // startRequestChunkInterval()
       trackRunning = true
     }
 
@@ -170,6 +161,16 @@ onMounted(async () => {
   await initializeMCorp()
 })
 
+const logText = ref<string[]>([])
+/** 
+* Prints the given string to the on-screen log.
+* @param string text - String to print to log.
+*/
+const dLog = (text: string) => {
+  logText.value?.push(text)
+}
+setLogFunction(dLog)
+
 </script>
 
 <template>
@@ -191,6 +192,11 @@ onMounted(async () => {
   <button class="btn"
           @click="sentPartialDataToServerViaHttp">Send data per http</button>
 
+  <div class="dLog">
+    <h3>Log</h3>
+    <p v-for="text of logText">{{ text }}</p>
+  </div>
+
 </template>
 
 <style scoped>
@@ -201,5 +207,9 @@ onMounted(async () => {
 .btn {
   display: block;
   margin-top: 5px;
+}
+
+.dLog {
+  width: 100%;
 }
 </style>

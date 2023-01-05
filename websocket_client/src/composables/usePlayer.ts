@@ -7,6 +7,10 @@ export function usePlayer () {
   const currentChunkStartTimeInCtxTime = ref()
   let offset: number
   let waitingForChunks = false
+  let dlog: Function
+
+  const setLogFunction = (logFunction: Function) => dlog = logFunction
+
 
   const initialSetup = (partialChunks: { partials: PartialChunk[], ttsInstructions: { startTime: number, text: string; }; }) => {
     handleChunkData(partialChunks)
@@ -27,6 +31,7 @@ export function usePlayer () {
     // TODO: This is not ideal, we shouldn't set globalStartTime every time we receive data
     currentChunkStartTimeInCtxTime.value = startTimeInCtxTime
 
+    // dlog('Calc global startime: ' + (currentChunkStartTimeInCtxTime.value + offset + trackData.partials[0].startTime))
 
     for (const partialChunk of trackData.partials) {
       const oscObj = oscillators.find(el => el.index === partialChunk.index)
@@ -78,6 +83,7 @@ export function usePlayer () {
     initialSetup,
     shouldRequestChunks,
     startAudioCtx,
-    setStartTime
+    setStartTime,
+    setLogFunction
   }
 }
