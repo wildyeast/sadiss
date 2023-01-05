@@ -153,6 +153,7 @@ const startSendingInterval = () => {
     if (!sendingIntervalRunning) {
       console.log('Sending interval stopped.')
       partialMap = {}
+      chunkIndex = 0
       return
     }
 
@@ -160,6 +161,7 @@ const startSendingInterval = () => {
       console.log('No more chunks. Stopping.')
       sendingIntervalRunning = false
       partialMap = {}
+      chunkIndex = 0
       return
     }
 
@@ -168,6 +170,7 @@ const startSendingInterval = () => {
       console.log('Sending interval somehow broke. Stopping.')
       sendingIntervalRunning = false
       partialMap = {}
+      chunkIndex = 0
       return
     }
 
@@ -242,13 +245,9 @@ const startSendingInterval = () => {
 
       console.log('Allocation finished: ', allocatedPartials)
 
-      // sockserver.clients.forEach((client: WebSocketWithIds) => {
-      //   client.send(JSON.stringify({ startTime: startTime + 2, chunk: { partials: allocatedPartials[client.id] } }))
-      // })
-
-      for (const client of sockserver.clients) {
+      sockserver.clients.forEach((client: WebSocketWithIds) => {
         client.send(JSON.stringify({ startTime: startTime + 2, chunk: { partials: allocatedPartials[client.id] } }))
-      }
+      })
 
       partialMap = newPartialMap
     }
