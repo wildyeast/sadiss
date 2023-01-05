@@ -24,7 +24,7 @@
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton } from '@ionic/vue';
 import { ref, onMounted } from 'vue';
-import { TextToSpeech } from '@capacitor-community/text-to-speech'
+// import { TextToSpeech } from '@capacitor-community/text-to-speech'
 import { usePlayer } from '../composables/usePlayer';
 
 // 'env'
@@ -44,12 +44,9 @@ let motion: any
 
 const globalTime = ref(0)
 
-const mode = ref('nonChoir')
-// const mode = ref('choir')
-
 let trackRunning = false
 
-const { handleChunkData, shouldRequestChunks, chunksRequested, startAudioCtx, setStartTime, setLogFunction } = usePlayer()
+const { handleChunkData, startAudioCtx, setStartTime, setLogFunction } = usePlayer()
 
 
 const register = () => {
@@ -59,9 +56,6 @@ const register = () => {
 
 const establishWebsocketConnection = () => {
   startAudioCtx(globalTime.value)
-
-  const url = process.env.VITE_WS_SERVER_URL
-  const port = process.env.VITE_WS_SERVER_PORT
 
   ws.value = new WebSocket(`ws://${VUE_APP_WS_SERVER_URL}:${VUE_APP_WS_SERVER_PORT}`)
 

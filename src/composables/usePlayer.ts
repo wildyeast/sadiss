@@ -1,4 +1,4 @@
-import { ref, computed } from "vue"
+import { ref } from "vue"
 import { PartialChunk, OscillatorObject, Breakpoint } from "../types/types"
 
 export function usePlayer () {
@@ -6,7 +6,6 @@ export function usePlayer () {
   const oscillators: OscillatorObject[] = []
   const currentChunkStartTimeInCtxTime = ref()
   let offset: number
-  let waitingForChunks = false
   let dlog: (text: string) => void
 
   const setLogFunction = (logFunction: (text: string) => void) => dlog = logFunction
@@ -53,6 +52,7 @@ export function usePlayer () {
           const oscObj = oscillators.find(oscObj => oscObj.oscillator === event.target)
           if (oscObj) oscillators.splice(oscillators.indexOf(oscObj), 1)
         }
+
         oscillators.push({ index: partialChunk.index, oscillator: oscNode, gain: gainNode })
       }
     }
@@ -66,21 +66,11 @@ export function usePlayer () {
     }
   }
 
-  // TODO: Refactor this as a computed with toRef(ctx.currentTime, 'ctxTime')
-  // https://stackoverflow.com/questions/66504701/how-to-make-a-vue-3-object-property-reactive
-  const shouldRequestChunks = () => {
-    return currentChunkStartTimeInCtxTime.value < ctx.currentTime && !waitingForChunks
-  }
-
-  const chunksRequested = () => waitingForChunks = true
-
   const setStartTime = (startTime: number) => startTimeInCtxTime = startTime - offset
 
   return {
-    chunksRequested,
     handleChunkData,
     initialSetup,
-    shouldRequestChunks,
     startAudioCtx,
     setStartTime,
     setLogFunction
