@@ -35,7 +35,7 @@ const whitelist = ['http://localhost:3000', 'http://127.0.0.1:5173' /** other do
 const corsOptions = {
   origin: (origin: string, callback: Function) => {
     if (whitelist.indexOf(origin) !== -1) {
-      // TODO: Find out what exactly the follwing line does. Code is copy/pasted.
+      // TODO: Find out what exactly the following line does. Code is copy/pasted.
       // Read this https://www.npmjs.com/package/cors#configuring-cors-asynchronously
       // and this https://stackoverflow.com/questions/72287773/do-not-understand-the-function-with-express-and-cors
       callback(null, true)
