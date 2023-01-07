@@ -16,6 +16,8 @@
       <div id="container">
         <ion-button @click="register">Test</ion-button>
         <ion-button @click="dLog('User interaction')">User interaction</ion-button>
+        <p v-if="isRegistered">Registered</p>
+        <p v-else>Not registered.</p>
         <p v-for="text, idx of logText"
            :key="idx">{{ text }}</p>
       </div>
@@ -28,6 +30,7 @@ import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton } from 
 import { ref, onMounted } from 'vue';
 // import { TextToSpeech } from '@capacitor-community/text-to-speech'
 import { usePlayer } from '../composables/usePlayer';
+
 
 // 'env'
 const VUE_APP_MCORP_API_KEY = '8844095860530063641'
@@ -64,7 +67,11 @@ const establishWebsocketConnection = () => {
     this.send(JSON.stringify({ message: 'clientId', clientId: clientId.value }))
   }
 
-  ws.value.onclose = () => dLog('Websocket connection closed.')
+  ws.value.onclose = () => {
+    dLog('Websocket connection closed.')
+    isRegistered.value = true
+    // Trying to reconnect here while App is in background does not work.
+  }
 
   ws.value.onerror = error => {
     isRegistered.value = false
@@ -108,6 +115,7 @@ const startClock = () => {
 
 onMounted(async () => {
   await initializeMCorp()
+  // register()
 })
 
 const logText = ref<string[]>([])
