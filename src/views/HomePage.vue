@@ -15,7 +15,9 @@
 
       <div id="container">
         <ion-button @click="register">Test</ion-button>
-        <!-- <p>{{ currentTime }}</p> -->
+        <ion-button @click="dLog('User interaction')">User interaction</ion-button>
+        <p v-for="text, idx of logText"
+           :key="idx">{{ text }}</p>
       </div>
     </ion-content>
   </ion-page>
@@ -38,9 +40,6 @@ const isRegistered = ref(false)
 const ws = ref<WebSocket>()
 
 const clientId = ref(1)
-
-// MCorp motion
-let motion: any
 
 const globalTime = ref(0)
 
@@ -65,6 +64,8 @@ const establishWebsocketConnection = () => {
     this.send(JSON.stringify({ message: 'clientId', clientId: clientId.value }))
   }
 
+  ws.value.onclose = () => dLog('Websocket connection closed.')
+
   ws.value.onerror = error => {
     isRegistered.value = false
     console.error(error)
@@ -87,7 +88,7 @@ const establishWebsocketConnection = () => {
   }
 }
 
-
+let motion: any
 const initializeMCorp = async () => {
   // @ts-expect-error: Can't find name MCorp, which is added via <script> in index.html
   // eslint-disable-next-line
