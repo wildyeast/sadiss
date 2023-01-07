@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.ionic.starter">
 
+    <queries>
+      <intent>
+        <action android:name="android.intent.action.TTS_SERVICE" />
+      </intent>
+    </queries>
+
     <!-- remove usesCleartextTraffic on https -->
     <application
         android:allowBackup="true"

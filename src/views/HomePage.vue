@@ -69,7 +69,7 @@ const establishWebsocketConnection = () => {
 
   ws.value.onclose = () => {
     dLog('Websocket connection closed.')
-    isRegistered.value = true
+    isRegistered.value = false
     // Trying to reconnect here while App is in background does not work.
   }
 
