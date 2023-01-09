@@ -2,24 +2,37 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>Blank</ion-title>
+        <ion-title>SADISS</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true">
       <ion-header collapse="condense">
         <ion-toolbar>
-          <ion-title size="large">Blank</ion-title>
+          <ion-title size="large">SADISS</ion-title>
         </ion-toolbar>
       </ion-header>
 
       <div id="container">
-        <ion-button @click="register">Test</ion-button>
-        <ion-button @click="dLog('User interaction')">User interaction</ion-button>
-        <p v-if="isRegistered">Registered</p>
-        <p v-else>Not registered.</p>
-        <p v-for="text, idx of logText"
-           :key="idx">{{ text }}</p>
+        <ion-button @click="register"
+                    :disabled="!mcorpConnected"
+                    class="btn__register"
+                    :class="{ btn__register_active: isRegistered }">
+          {{ isRegistered ? 'Registered' : 'Register' }}
+        </ion-button>
+        <div class="logContainer">
+          <div v-for="log, idx of logText"
+               :key="idx"
+               style="width: 100%; display: flex; color: white;">
+            <span style="min-width: 20%;">{{ log.timestamp }}</span>
+            <span style="text-align: left">{{ log.text }}</span>
+          </div>
+        </div>
+        <!-- <ion-button @click="speak('This is a test.')">Speak</ion-button> -->
+        <!-- <p v-if="isRegistered">Registered</p> -->
+        <!-- <p v-else>Not registered.</p> -->
+        <!-- <p v-for="text, idx of logText"
+           :key="idx">{{ text }}</p> -->
       </div>
     </ion-content>
   </ion-page>
@@ -27,8 +40,8 @@
 
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton } from '@ionic/vue';
-import { ref, onMounted } from 'vue';
-// import { TextToSpeech } from '@capacitor-community/text-to-speech'
+import { ref, onMounted, computed } from 'vue';
+import { TextToSpeech } from '@capacitor-community/text-to-speech'
 import { usePlayer } from '../composables/usePlayer';
 
 
@@ -50,8 +63,8 @@ let trackRunning = false
 
 const { handleChunkData, startAudioCtx, setStartTime, setLogFunction } = usePlayer()
 
-
 const register = () => {
+  if (isRegistered.value) return
   establishWebsocketConnection()
   // initializeTtsPlayer(globalTime)
 }
@@ -90,18 +103,21 @@ const establishWebsocketConnection = () => {
     // TODO: This is not ideal, we shouldn't set globalStartTime every time we receive data
     setStartTime(data.startTime)
     if (Object.keys(data.chunk)) {
+      dLog('Partials: ' + Object.keys(data.chunk.partials).join())
       handleChunkData(data.chunk)
     }
   }
 }
 
 let motion: any
+const mcorpConnected = ref(false)
 const initializeMCorp = async () => {
   // @ts-expect-error: Can't find name MCorp, which is added via <script> in index.html
   // eslint-disable-next-line
   const mCorpApp = MCorp.app(VUE_APP_MCORP_API_KEY, { anon: true })
   mCorpApp.run = () => {
     motion = mCorpApp.motions['shared']
+    mcorpConnected.value = true
     startClock()
   }
   mCorpApp.init()
@@ -118,28 +134,43 @@ onMounted(async () => {
   // register()
 })
 
-const logText = ref<string[]>([])
+const logText = ref<{ text: string, timestamp: string }[]>([])
 /** 
 * Prints the given string to the on-screen log.
-* @param string text - String to print to log.
+* @param string text - String to print to log. 
 */
 const dLog = (text: string) => {
-  logText.value?.push(text)
+  const localTime = new Date().toLocaleString()
+  logText.value.push({
+    text,
+    timestamp: localTime.slice(11, localTime.length)
+  })
 }
 setLogFunction(dLog)
+
+const speak = async (text: string) => {
+  await TextToSpeech.speak({
+    text: text,
+    lang: 'en-US',
+    rate: 1.0,
+    pitch: 1.0,
+    volume: 1.0,
+    category: 'playback',
+  })
+}
 
 
 </script>
 
 <style scoped>
+* {
+  --background: #222;
+}
+
 #container {
   text-align: center;
+  height: 100%;
 
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
 }
 
 #container strong {
@@ -154,9 +185,32 @@ setLogFunction(dLog)
   color: #8c8c8c;
 
   margin: 0;
+
 }
 
 #container a {
   text-decoration: none;
+}
+
+.btn__register {
+  width: 160px;
+  height: 160px;
+  --border-radius: 100%;
+  font-weight: bold;
+  font-size: 1.2em;
+  --background: #444;
+}
+
+.btn__register_active {
+  --background: orange;
+}
+
+.logContainer {
+  width: 100%;
+  height: 33%;
+  background-color: #444;
+  position: absolute;
+  bottom: 0;
+  overflow: scroll;
 }
 </style>

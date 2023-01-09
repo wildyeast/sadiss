@@ -1,4 +1,5 @@
 import { ref } from "vue"
+import { TextToSpeech } from '@capacitor-community/text-to-speech'
 import { PartialChunk, OscillatorObject, Breakpoint } from "../types/types"
 
 export function usePlayer () {
@@ -56,6 +57,13 @@ export function usePlayer () {
         oscillators.push({ index: partialChunk.index, oscillator: oscNode, gain: gainNode })
       }
     }
+
+    if (trackData.ttsInstructions) {
+      const tts = trackData.ttsInstructions
+      console.log('Speaking: ', tts.text)
+      speak(tts.text)
+    }
+
   }
 
   const setBreakpoints = (oscNode: OscillatorNode, gainNode: GainNode, breakpoints: Breakpoint[], chunkEndTime: number) => {
@@ -67,6 +75,17 @@ export function usePlayer () {
   }
 
   const setStartTime = (startTime: number) => startTimeInCtxTime = startTime - offset
+
+  const speak = async (text: string) => {
+    await TextToSpeech.speak({
+      text: text,
+      lang: 'en-US',
+      rate: 1.0,
+      pitch: 1.0,
+      volume: 1.0,
+      category: 'playback',
+    })
+  }
 
   return {
     handleChunkData,
