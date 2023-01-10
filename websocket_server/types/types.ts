@@ -11,9 +11,10 @@ export interface Breakpoint {
   amp: number
 }
 
-export type WebSocketWithIds = {
+export type SadissWebSocket = {
   id: string,
-  choirId: number
+  choirId: number,
+  isAdmin: boolean
 } & WebSocket
 
 export type Message = { [key: string]: any }
@@ -25,3 +26,4 @@ export interface TtsInstruction {
 }
 
 export type Mode = 'choir' | 'nonChoir'
+

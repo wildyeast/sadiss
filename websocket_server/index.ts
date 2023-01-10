@@ -2,7 +2,7 @@
 
 // HTTP SERVER //
 import express from 'express'
-import { PartialChunk, WebSocketWithIds, Message, TtsInstruction, Mode } from './types/types'
+import { PartialChunk, SadissWebSocket, Message, TtsInstruction, Mode } from './types/types'
 import * as dotenv from 'dotenv'
 
 const cors = require('cors')
@@ -65,6 +65,7 @@ router.post('/upload', upload.array('pfile'), async (req, res) => {
     const path = file.path
     const name = req.body.name
     const chunks = await chunk(path)
+    track = chunks
     const notes = req.body.notes
     // Save track to DB
     const Track = mongoose.model('Track', trackSchema)
@@ -104,7 +105,7 @@ let startTime: number
 
 const sockserver = new Server({ URL: process.env.WS_SERVER_URL, port: process.env.WS_SERVER_PORT })
 console.log(`Websocket server listening on port ${443}.`)
-sockserver.on('connection', (client: WebSocketWithIds) => {
+sockserver.on('connection', (client: SadissWebSocket) => {
   // Assign id to new connection, needed for nonChoir partial distribution
   client.id = generateUuid()
   console.log('New client connected! Assigned id: ', client.id)
@@ -123,6 +124,8 @@ sockserver.on('connection', (client: WebSocketWithIds) => {
       startSendingInterval()
     } else if (parsed.message === 'clientId') {
       client.choirId = parsed.clientId
+    } else if (parsed.message === 'identifyAsAdmin') {
+      client.isAdmin = true
     } else {
       // TODO: If no message in request, it was sending of partial data. Make this more clear.
       mode = parsed.mode
@@ -132,7 +135,6 @@ sockserver.on('connection', (client: WebSocketWithIds) => {
 })
 
 let sendingIntervalRunning = false
-
 // More or less accurate timer taken from https://stackoverflow.com/a/29972322/16725862
 const startSendingInterval = () => {
 
@@ -178,16 +180,18 @@ const startSendingInterval = () => {
 
     if (mode === 'choir') {
       // Choir mode
-      sockserver.clients.forEach((client: WebSocketWithIds) => {
-        const partialById = track[chunkIndex].partials.find((chunk: PartialChunk) => chunk.index === client.choirId)
-        if (partialById) {
-          client.send(JSON.stringify({ startTime: startTime + 2, chunk: { partials: [partialById] } }))
+      sockserver.clients.forEach((client: SadissWebSocket) => {
+        if (!client.isAdmin) {
+          const partialById = track[chunkIndex].partials.find((chunk: PartialChunk) => chunk.index === client.choirId)
+          if (partialById) {
+            client.send(JSON.stringify({ startTime: startTime + 2, chunk: { partials: [partialById] } }))
+          }
         }
       })
     } else {
       // nonChoir mode
 
-      const clients: WebSocketWithIds[] = Array.from(sockserver.clients)
+      const clients: SadissWebSocket[] = Array.from(sockserver.clients).filter((client: SadissWebSocket) => !client.isAdmin)
       const partials = track[chunkIndex].partials
 
       const newPartialMap: { [partialIndex: string]: string[] } = {}
@@ -243,10 +247,16 @@ const startSendingInterval = () => {
         }
       }
 
-      console.log('Allocation finished: ', allocatedPartials)
+      console.log('Allocation finished. Clients to distribute to: ', Object.keys(allocatedPartials))
 
-      sockserver.clients.forEach((client: WebSocketWithIds) => {
-        client.send(JSON.stringify({ startTime: startTime + 2, chunk: { partials: allocatedPartials[client.id] } }))
+      sockserver.clients.forEach((client: SadissWebSocket) => {
+        if (!client.isAdmin) {
+          const dataToSend: { partials: PartialChunk[], ttsInstructions?: {} } = { partials: allocatedPartials[client.id] }
+          if (chunkIndex % 5 === 0) {
+            dataToSend.ttsInstructions = { startTime: -1, text: chunkIndex.toString() }
+          }
+          client.send(JSON.stringify({ startTime: startTime + 2, chunk: dataToSend }))
+        }
       })
 
       partialMap = newPartialMap
