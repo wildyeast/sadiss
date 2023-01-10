@@ -1,8 +1,11 @@
 <template>
-  <nav>
+  <nav v-if="false">
     <router-link to="/">Home</router-link> |
     <router-link to="/about">About</router-link>
   </nav>
+  <div>
+    <img src="https://sadiss.net/wp-content/uploads/2022/07/Sadiss-Logo.png" class="w-auto h-16">
+  </div>
   <router-view/>
 </template>
 
