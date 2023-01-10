@@ -20,7 +20,8 @@
                     :class="{ btn__register_active: isRegistered }">
           {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
-        <div class="logContainer">
+        <div class="logContainer"
+             ref="logContainer">
           <div v-for="log, idx of logText"
                :key="idx"
                style="width: 100%; display: flex; color: white;">
@@ -40,7 +41,7 @@
 
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton } from '@ionic/vue';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { TextToSpeech } from '@capacitor-community/text-to-speech'
 import { usePlayer } from '../composables/usePlayer';
 
@@ -103,7 +104,7 @@ const establishWebsocketConnection = () => {
     // TODO: This is not ideal, we shouldn't set globalStartTime every time we receive data
     setStartTime(data.startTime)
     if (Object.keys(data.chunk)) {
-      dLog('Partials: ' + Object.keys(data.chunk.partials).join())
+      dLog('Partials: ' + data.chunk.partials.map((el: any) => el.index).join())
       handleChunkData(data.chunk)
     }
   }
@@ -134,6 +135,7 @@ onMounted(async () => {
   // register()
 })
 
+const logContainer = ref<HTMLDivElement | null>(null)
 const logText = ref<{ text: string, timestamp: string }[]>([])
 /** 
 * Prints the given string to the on-screen log.
@@ -145,7 +147,19 @@ const dLog = (text: string) => {
     text,
     timestamp: localTime.slice(11, localTime.length)
   })
+  if (logContainer.value) {
+    logContainer.value.scrollIntoView()
+  }
 }
+
+// Scroll to bottom of logContainer after adding new log entry
+watch(() => logText.value.length, () => {
+  const lastChild = logContainer.value?.lastElementChild
+  if (lastChild) {
+    lastChild.scrollIntoView({ behavior: 'smooth' })
+  }
+})
+
 setLogFunction(dLog)
 
 const speak = async (text: string) => {
