@@ -191,7 +191,8 @@ const startSendingInterval = () => {
     } else {
       // nonChoir mode
 
-      const clients: SadissWebSocket[] = Array.from(sockserver.clients).filter((client: SadissWebSocket) => !client.isAdmin)
+      const clientArr: SadissWebSocket[] = Array.from(sockserver.clients)
+      const clients = clientArr.filter((client: SadissWebSocket) => !client.isAdmin)
       const partials = track[chunkIndex].partials
 
       const newPartialMap: { [partialIndex: string]: string[] } = {}
