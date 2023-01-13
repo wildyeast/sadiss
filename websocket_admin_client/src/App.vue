@@ -3,10 +3,13 @@
     <router-link to="/">Home</router-link> |
     <router-link to="/about">About</router-link>
   </nav>
-  <div>
-    <img src="https://sadiss.net/wp-content/uploads/2022/07/Sadiss-Logo.png" class="w-auto h-16">
+  <div class="flex flex-col justify-center items-center">
+    <div class="flex flex-col mt-8">
+      <img src="https://sadiss.net/wp-content/uploads/2022/07/Sadiss-Logo.png" class="w-auto h-16">
+      Performer's Interface
+    </div>
+    <router-view/>
   </div>
-  <router-view/>
 </template>
 
 <style>
@@ -15,7 +18,11 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
+  color: #faf1f1;
+}
+
+html {
+  background-color: #3e5b53;
 }
 
 nav {
@@ -29,5 +36,9 @@ nav a {
 
 nav a.router-link-exact-active {
   color: #42b983;
+}
+
+input {
+  border: 1px solid lightgrey;
 }
 </style>
