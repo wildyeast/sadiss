@@ -45,6 +45,7 @@ export function usePlayer () {
         oscNode.connect(gainNode)
         gainNode.connect(ctx.destination)
 
+        console.log('Setting osc startTime at: ', startTimeInCtxTime + partialChunk.startTime)
         oscNode.start(startTimeInCtxTime + partialChunk.startTime)
         setBreakpoints(oscNode, gainNode, partialChunk.breakpoints, startTimeInCtxTime + partialChunk.endTime)
 

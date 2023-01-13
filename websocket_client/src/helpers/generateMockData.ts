@@ -20,12 +20,14 @@ export function generateChunks (secondsToGenerate: number, partialsPerSecond = 1
           startTime: startTime,
           endTime: startTime + 0.999,
           breakpoints
-        }, {
-          index: j + 2,
-          startTime: startTime,
-          endTime: startTime + 0.999,
-          breakpoints
-        }],
+        },
+          // {
+          //   index: j + 2,
+          //   startTime: startTime,
+          //   endTime: startTime + 0.999,
+          //   breakpoints
+          // }
+        ],
         ttsInstructions: {
           startTime: ttsStartTime + i,
           text: i.toString()
@@ -34,6 +36,32 @@ export function generateChunks (secondsToGenerate: number, partialsPerSecond = 1
     }
     startTime += 1
     ttsStartTime += 1
+  }
+  return chunks
+}
+
+export function generateClicks (secondsToGenerate: number, voices = 1) {
+  let startTime = 0
+  let partialIndex = 0
+  const chunks = []
+  for (let i = 0; i < secondsToGenerate; i++) {
+    const partials = []
+    for (let j = 0; j < voices; j++) {
+      partials.push({
+        index: partialIndex++,
+        startTime: startTime,
+        endTime: startTime + 0.250,
+        breakpoints: [
+          {
+            time: startTime,
+            freq: 300 + 100 * j,
+            amp: 0.1
+          }
+        ]
+      })
+    }
+    chunks.push({ partials })
+    startTime += 1
   }
   return chunks
 }

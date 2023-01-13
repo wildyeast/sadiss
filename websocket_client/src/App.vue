@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue'
 import { usePlayer } from './composables/usePlayer';
 import { useTtsPlayer } from './composables/useTtsPlayer'
 // import { generateMockPartialData, generateBeep, generateSplitPartial, generateChoirTTS } from './helpers/generateMockData';
-import { generateChunks } from './helpers/generateMockData'
+import { generateChunks, generateClicks } from './helpers/generateMockData'
 import { PartialChunk } from './types/types';
 
 const isRegistered = ref(false)
@@ -34,7 +34,8 @@ const { initializeTtsPlayer, shouldRequestTts, ttsRequested } = useTtsPlayer()
 
 // const mockTTS = generateChoirTTS()
 
-const mockData = generateChunks(10)
+// const mockData = generateChunks(10)
+const mockData = generateClicks(10, 3)
 console.log('Generated data: ', mockData)
 
 const register = () => {
@@ -53,7 +54,8 @@ const establishWebsocketConnection = () => {
   ws.value.onopen = function () {
     console.log('Connection is open')
     isRegistered.value = true
-    this.send(JSON.stringify({ message: 'clientId', clientId: clientId.value }))
+    // this.send(JSON.stringify({ message: 'clientId', clientId: clientId.value }))
+    this.send(JSON.stringify({ message: 'identifyAsAdmin' }))
   }
 
   ws.value.onerror = error => {
@@ -64,7 +66,6 @@ const establishWebsocketConnection = () => {
   ws.value.onmessage = (event) => {
     const data = JSON.parse(event.data)
     console.log('\nReceived message: ', data)
-
 
     if (!trackRunning) {
       trackRunning = true
