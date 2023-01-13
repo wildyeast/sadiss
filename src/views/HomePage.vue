@@ -14,6 +14,11 @@
       </ion-header>
 
       <div id="container">
+        <ion-item>
+          <ion-label>Choir ID:</ion-label>
+          <ion-input type="number"
+                     v-model.number="choirId" />
+        </ion-item>
         <ion-button @click="register"
                     :disabled="!mcorpConnected"
                     class="btn__register"
@@ -45,13 +50,15 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton } from '@ionic/vue';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonInput } from '@ionic/vue';
 import { ref, onMounted, watch } from 'vue';
 import { TextToSpeech } from '@capacitor-community/text-to-speech'
 import { usePlayer } from '../composables/usePlayer';
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner';
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
+import { Storage } from '@ionic/storage';
 
+// Init storage
+const store = new Storage()
 
 // 'env'
 const VUE_APP_MCORP_API_KEY = '8844095860530063641'
@@ -63,7 +70,7 @@ const VUE_APP_WS_SERVER_PORT = '443'
 const isRegistered = ref(false)
 const ws = ref<WebSocket>()
 
-const clientId = ref(1)
+const choirId = ref(1)
 
 const globalTime = ref(0)
 
@@ -74,9 +81,9 @@ const { handleChunkData, startAudioCtx, setStartTime, setLogFunction } = usePlay
 const { startScan } = useBarcodeScanner()
 
 const register = () => {
-  if (isRegistered.value) return
-  establishWebsocketConnection()
-  // initializeTtsPlayer(globalTime)
+  console.log(choirId.value)
+  // if (isRegistered.value) return
+  // establishWebsocketConnection()
 }
 
 const establishWebsocketConnection = () => {
@@ -87,7 +94,7 @@ const establishWebsocketConnection = () => {
   ws.value.onopen = function () {
     console.log('Connection is open')
     isRegistered.value = true
-    this.send(JSON.stringify({ message: 'clientId', clientId: clientId.value }))
+    this.send(JSON.stringify({ message: 'clientId', clientId: choirId.value }))
   }
 
   ws.value.onclose = () => {
@@ -140,6 +147,8 @@ const startClock = () => {
 }
 
 onMounted(async () => {
+  await store.create()
+  choirId.value = await store.get('choirId')
   await initializeMCorp()
   // register()
 })
@@ -169,6 +178,15 @@ watch(() => logText.value.length, () => {
   }
 })
 
+// Watch choir id input change and save to storage if changed
+// TODO: This is only for testing and should be commented out / removed in final version
+// since choir ids are assigned to clients via QR code and not by user
+watch(() => choirId.value, async (value, oldValue) => {
+  if (typeof value === 'number' && value !== oldValue) {
+    await store.set('choirId', value)
+  }
+})
+
 setLogFunction(dLog)
 
 const speak = async (text: string) => {
@@ -193,7 +211,9 @@ const speak = async (text: string) => {
 #container {
   text-align: center;
   height: 100%;
-
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 #container strong {
