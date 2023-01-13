@@ -20,6 +20,11 @@
                     :class="{ btn__register_active: isRegistered }">
           {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
+        <ion-button @click="startScan"
+                    class="btn__scan_barcode"
+                    :class="{ btn__register_active: isRegistered }">
+          QR
+        </ion-button>
         <div class="logContainer"
              ref="logContainer">
           <div v-for="log, idx of logText"
@@ -44,6 +49,8 @@ import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton } from 
 import { ref, onMounted, watch } from 'vue';
 import { TextToSpeech } from '@capacitor-community/text-to-speech'
 import { usePlayer } from '../composables/usePlayer';
+import { useBarcodeScanner } from '@/composables/useBarcodeScanner';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
 
 
 // 'env'
@@ -63,6 +70,8 @@ const globalTime = ref(0)
 let trackRunning = false
 
 const { handleChunkData, startAudioCtx, setStartTime, setLogFunction } = usePlayer()
+
+const { startScan } = useBarcodeScanner()
 
 const register = () => {
   if (isRegistered.value) return
@@ -219,6 +228,15 @@ const speak = async (text: string) => {
   --background: orange;
 }
 
+.btn__scan_barcode {
+  width: 80px;
+  height: 80px;
+  --border-radius: 100%;
+  font-weight: bold;
+  font-size: 1.2em;
+  --background: #444;
+}
+
 .logContainer {
   width: 100%;
   height: 33%;
@@ -226,5 +244,11 @@ const speak = async (text: string) => {
   position: absolute;
   bottom: 0;
   overflow: scroll;
+}
+
+/* For BarcodeScanner */
+body.scanner-active {
+  --background: transparent;
+  --ion-background-color: transparent;
 }
 </style>

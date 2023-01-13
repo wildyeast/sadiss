@@ -975,6 +975,11 @@
   resolved "https://registry.yarnpkg.com/@bcoe/v8-coverage/-/v8-coverage-0.2.3.tgz#75a2e8b51cb758a7553d6804a5932d7aace75c39"
   integrity sha512-0hYQ8SB4Db5zvZB4axdMHGwEaQjkZzFjQiN9LVYvIFB2nSUHW9tYpxWriPrWDASIxiaXax83REcLxuSdnGPZtw==
 
+"@capacitor-community/barcode-scanner@^3.0.1":
+  version "3.0.1"
+  resolved "https://registry.yarnpkg.com/@capacitor-community/barcode-scanner/-/barcode-scanner-3.0.1.tgz#3cee584046f2fa71d6047b05b4bc7b5c5c4f926d"
+  integrity sha512-3R6LXQ3kikuc71Pvffkul9pLvHK8v85VcvBw6E0rjAWgWJbCLf0ssBmycrqMa8/aMZjdw1XNn3nJTXijkfCifQ==
+
 "@capacitor-community/text-to-speech@^2.0.1":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@capacitor-community/text-to-speech/-/text-to-speech-2.0.1.tgz#d98c399dfddec7db15715f9c3358ddb459589e72"
