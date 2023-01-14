@@ -61,7 +61,7 @@ app.listen(BASE_PORT, () => console.log(`Http server listening on port ${BASE_PO
 
 // Upload track
 router.post('/upload', upload.array('pfile'), async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080', 'https://sadiss.net/admin') // cors error without this
+  res.setHeader('Access-Control-Allow-Origin', ['http://localhost:8080', 'https://sadiss.net/admin']) // cors error without this
   try {
     // @ts-expect-error
     const file = req.files[0]
