@@ -66,6 +66,31 @@ export function generateClicks (secondsToGenerate: number, voices = 1) {
   return chunks
 }
 
+export function generateChoir (secondsToGenerate: number, voices = 2) {
+  let startTime = 0
+  const chunks = []
+  for (let i = 0; i < secondsToGenerate; i++) {
+    const partials = []
+    for (let j = 0; j < voices; j++) {
+      partials.push({
+        index: j + 1,
+        startTime: startTime,
+        endTime: startTime + 0.250,
+        breakpoints: [
+          {
+            time: startTime,
+            freq: 300 + 100 * j,
+            amp: 0.1
+          }
+        ]
+      })
+    }
+    chunks.push({ partials })
+    startTime += 1
+  }
+  return chunks
+}
+
 const example: Chunk = {
   partials: [
     {

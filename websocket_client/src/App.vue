@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue'
 import { usePlayer } from './composables/usePlayer';
 import { useTtsPlayer } from './composables/useTtsPlayer'
 // import { generateMockPartialData, generateBeep, generateSplitPartial, generateChoirTTS } from './helpers/generateMockData';
-import { generateChunks, generateClicks } from './helpers/generateMockData'
+import { generateChunks, generateClicks, generateChoir } from './helpers/generateMockData'
 import { PartialChunk } from './types/types';
 
 const isRegistered = ref(false)
@@ -35,7 +35,8 @@ const { initializeTtsPlayer, shouldRequestTts, ttsRequested } = useTtsPlayer()
 // const mockTTS = generateChoirTTS()
 
 // const mockData = generateChunks(10)
-const mockData = generateClicks(10, 3)
+// const mockData = generateClicks(10, 3)
+const mockData = generateChoir(10)
 console.log('Generated data: ', mockData)
 
 const register = () => {
