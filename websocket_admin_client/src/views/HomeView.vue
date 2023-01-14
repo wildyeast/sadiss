@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { AxiosResponse } from 'axios';
 import { ref, onMounted, inject } from 'vue'
 
 const isUploadModalVisible = ref(false)
@@ -6,10 +7,11 @@ const axios: any = inject('axios')
 
 const trackName = ref('')
 const trackNotes = ref('')
-let file
+let file: File
 
-const handleFileUpload = async (e) => {
-  file = e.target.files[0]
+const handleFileUpload = async (e: Event) => {
+  // TODO: Refactor this so we don't use non-null assertion
+  file = (<HTMLInputElement>e.target).files![0]
 }
 
 const upload = () => {
@@ -21,10 +23,10 @@ const upload = () => {
   data.append('name', trackName.value)
   data.append('notes', trackNotes.value)
   axios.post('http://localhost:3000/upload', data)
-    .then(response => {
+    .then((response: AxiosResponse) => {
       console.log(response.data)
     })
-    .catch(error => {
+    .catch((error: Error) => {
       console.log(error)
     });
 }
