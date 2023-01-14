@@ -25,7 +25,7 @@
                     :class="{ btn__register_active: isRegistered }">
           {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
-        <ion-button @click="startScan"
+        <ion-button @click="scanCode"
                     class="btn__scan_barcode"
                     :class="{ btn__register_active: isRegistered }">
           QR
@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonInput } from '@ionic/vue';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonInput, IonLabel, IonItem } from '@ionic/vue';
 import { ref, onMounted, watch } from 'vue';
 import { TextToSpeech } from '@capacitor-community/text-to-speech'
 import { usePlayer } from '../composables/usePlayer';
@@ -81,9 +81,8 @@ const { handleChunkData, startAudioCtx, setStartTime, setLogFunction } = usePlay
 const { startScan } = useBarcodeScanner()
 
 const register = () => {
-  console.log(choirId.value)
-  // if (isRegistered.value) return
-  // establishWebsocketConnection()
+  if (isRegistered.value) return
+  establishWebsocketConnection()
 }
 
 const establishWebsocketConnection = () => {
@@ -144,6 +143,14 @@ const startClock = () => {
   setInterval(() => {
     globalTime.value = motion.pos
   }, 10)
+}
+
+const scanCode = async () => {
+  // Make camera visible and everything else invisible in app viewport, classes defined in App.vue
+  document.body.classList.add("qrscanner");
+  await startScan()
+  // Make camera invisible, and everythin else visible
+  document.body.classList.remove("qrscanner");
 }
 
 onMounted(async () => {
@@ -264,11 +271,5 @@ const speak = async (text: string) => {
   position: absolute;
   bottom: 0;
   overflow: scroll;
-}
-
-/* For BarcodeScanner */
-body.scanner-active {
-  --background: transparent;
-  --ion-background-color: transparent;
 }
 </style>

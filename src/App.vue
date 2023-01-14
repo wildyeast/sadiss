@@ -1,7 +1,10 @@
 <template>
-  <ion-app>
+  <ion-app class="scanner-hide">
     <ion-router-outlet />
   </ion-app>
+  <div class="scanner-ui">
+    <!-- QR Scanner Interface -->
+  </div>
 </template>
 
 <script lang="ts">
@@ -16,3 +19,30 @@ export default defineComponent({
   }
 });
 </script>
+
+<style>
+body.scanner-active {
+  --background: transparent;
+  --ion-background-color: transparent;
+}
+
+.scanner-ui {
+  display: none;
+}
+
+.scanner-hide {
+  visibility: visible;
+}
+
+body.qrscanner {
+  background-color: transparent;
+}
+
+body.qrscanner .scanner-ui {
+  display: block;
+}
+
+body.qrscanner .scanner-hide {
+  visibility: hidden;
+}
+</style>

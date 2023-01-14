@@ -11,7 +11,8 @@ export function useBarcodeScanner () {
   const startScan = async () => {
     // Check camera permission
     // This is just a simple example, check out the better checks below
-    await BarcodeScanner.checkPermission({ force: true })
+    const permissionResult = await BarcodeScanner.checkPermission({ force: true })
+    console.log('Permission granted: ', permissionResult.granted)
 
     // make background of WebView transparent
     // note: if you are using ionic this might not be enough, check below
@@ -23,6 +24,8 @@ export function useBarcodeScanner () {
     if (result.hasContent) {
       console.log(result.content) // log the raw scanned content
     }
+
+    console.log('End of scan.')
   }
 
   return {
