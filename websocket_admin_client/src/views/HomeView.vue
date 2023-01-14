@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { AxiosResponse } from 'axios';
 import { ref, onMounted, inject } from 'vue'
+import TrackTile from '@/components/TrackTile.vue';
 
 const isUploadModalVisible = ref(false)
 const axios: any = inject('axios')
@@ -28,12 +29,27 @@ const upload = () => {
     })
     .catch((error: Error) => {
       console.log(error)
-    });
+    })
 }
+
+const tracks = ref<{ _id: string, name: string, notes: string }[]>([])
+onMounted(async () => {
+  const data = await fetch('http://localhost:3000/get-tracks')
+    .then(res => res.json())
+  tracks.value = JSON.parse(data).tracks
+})
+
 </script>
 <template>
   <div class="flex flex-col">
     <Button @click="isUploadModalVisible = true">Upload new track</Button>
+
+    <div v-if="tracks.length">
+      <TrackTile v-for="track of tracks"
+                 :key="track._id"
+                 :track="track" />
+    </div>
+
     <Modal title="Upload track"
            v-if="isUploadModalVisible">
       <div class="flex flex-row my-8 justify-between p-2">

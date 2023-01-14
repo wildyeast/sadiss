@@ -50,7 +50,7 @@ const upload = multer({ dest: 'uploads/' })
 
 const app = express()
   .use(express.json())
-  //.use(cors(corsOptions))
+  // .use(cors(corsOptions))
   .use(express.urlencoded({ extended: false }))
 
 app.listen(3000, () => console.log(`Http server listening on port ${3000}.`))
@@ -87,6 +87,7 @@ router.post('/upload', upload.array('pfile'), async (req, res) => {
 // Get tracks
 
 router.get('/get-tracks', async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080') // cors error without this
   const Track = mongoose.model('Track', trackSchema)
   try {
     const allTracks = await Track.find({}, '_id name notes')
