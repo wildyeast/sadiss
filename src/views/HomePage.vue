@@ -213,6 +213,7 @@ const speak = async (text: string) => {
 <style scoped>
 * {
   --background: #222;
+  color: white;
 }
 
 #container {
