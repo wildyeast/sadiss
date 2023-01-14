@@ -86,6 +86,18 @@ router.post('/upload', upload.array('pfile'), async (req, res) => {
 
 // Get tracks
 
+router.get('/get-tracks', async (req, res) => {
+  const Track = mongoose.model('Track', trackSchema)
+  try {
+    const allTracks = await Track.find({}, '_id name notes')
+    res.json(JSON.stringify({ tracks: allTracks }))
+  }
+  catch (err) {
+    console.log('Failed getting tracks with:', err)
+    res.status(500).json(JSON.stringify({ Error: 'Failed fetching tracks.' }))
+  }
+})
+
 router.post('/partialData', (req, res) => {
   console.log(req.body)
   res.status(200).send()
