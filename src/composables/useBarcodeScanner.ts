@@ -3,8 +3,7 @@
 // Changes in Info.plist (iOS) NOT yet implemented
 // Click on the link above for more information
 
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner';
-import { __asyncDelegator } from 'tslib';
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner'
 
 export function useBarcodeScanner () {
 
