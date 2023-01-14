@@ -6,6 +6,9 @@ import TrackTile from '@/components/TrackTile.vue';
 const isUploadModalVisible = ref(false)
 const axios: any = inject('axios')
 
+//const API_URL = 'http://localhost:3000'
+const API_URL = 'https://sadiss.net/wss'
+
 const trackName = ref('')
 const trackNotes = ref('')
 let file: File
@@ -23,7 +26,7 @@ const upload = () => {
   data.append('pfile', file)
   data.append('name', trackName.value)
   data.append('notes', trackNotes.value)
-  axios.post('http://localhost:3000/upload', data)
+  axios.post(`${API_URL}/upload`, data)
     .then((response: AxiosResponse) => {
       console.log(response.data)
     })
@@ -34,7 +37,7 @@ const upload = () => {
 
 const tracks = ref<{ _id: string, name: string, notes: string }[]>([])
 onMounted(async () => {
-  const data = await fetch('http://localhost:3000/get-tracks')
+  const data = await fetch(`${API_URL}/get-tracks`)
     .then(res => res.json())
   tracks.value = JSON.parse(data).tracks
 })

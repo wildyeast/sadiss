@@ -31,7 +31,10 @@ const trackSchema = new mongoose.Schema({
 })
 trackSchema.set('timestamps', true)
 
-const whitelist = ['http://localhost:3000', 'http://127.0.0.1:5173' /** other domains if any */]
+const BASE_URL = '127.0.0.1'
+const BASE_PORT = 3005
+
+const whitelist = [`http://${BASE_URL}:${BASE_PORT}`, 'http://127.0.0.1:5173' /** other domains if any */]
 const corsOptions = {
   origin: (origin: string, callback: Function) => {
     if (whitelist.indexOf(origin) !== -1) {
@@ -53,12 +56,12 @@ const app = express()
   // .use(cors(corsOptions))
   .use(express.urlencoded({ extended: false }))
 
-app.listen(3000, () => console.log(`Http server listening on port ${3000}.`))
+app.listen(BASE_PORT, () => console.log(`Http server listening on port ${BASE_PORT}.`))
 
 
 // Upload track
 router.post('/upload', upload.array('pfile'), async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080') // cors error without this
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080', 'https://sadiss.net/admin') // cors error without this
   try {
     // @ts-expect-error
     const file = req.files[0]
