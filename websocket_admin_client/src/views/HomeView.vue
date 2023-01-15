@@ -7,7 +7,7 @@ const isUploadModalVisible = ref(false)
 const axios: any = inject('axios')
 
 // const API_URL = 'http://localhost:3005'
-// const API_URL = 'https://sadiss.net/'
+// const API_URL = 'https://sadiss.net/server'
 
 const trackName = ref('')
 const trackNotes = ref('')
@@ -45,7 +45,7 @@ const startTrack = async (id: string) => {
     method: 'POST'
   })
     .then(res => res.json())
-    .then(res => console.log(JSON.parse(res).data))
+    .then(res => console.log(res))
 }
 
 const deleteTrack = async (id: string, name: string) => {
