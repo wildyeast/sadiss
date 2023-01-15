@@ -31,6 +31,9 @@ const upload = () => {
   axios.post(`${API_URL}/upload`, data)
     .then((response: AxiosResponse) => {
       console.log(response.data)
+      // Add newly added track to tracks
+      tracks.value.push(response.data)
+      isUploadModalVisible.value = false
     })
     .catch((error: Error) => {
       console.log(error)
@@ -45,10 +48,23 @@ const startTrack = async (id: string) => {
 
 const deleteTrack = async (id: string, name: string) => {
   if (confirm('Do you want to delete track: ' + name + '? This cannot be reversed.')) {
-    const res = await fetch('http://localhost:3005/delete-track/' + id, {
-      method: 'POST'
-    })
+    try {
+      await fetch('http://localhost:3005/delete-track/' + id, {
+        method: 'POST'
+      })
+      tracks.value = tracks.value.filter(track => track._id !== id)
+    }
+    catch (err) {
+      console.log('Failed deleting track with: ', err)
+    }
   }
+}
+
+const getTracks = async () => {
+  await fetch(`${API_URL}/get-tracks`)
+    .then(res => res.json())
+    .then(data => tracks.value = JSON.parse(data).tracks)
+    .catch(err => console.log('Failed getting Tracks with: ', err))
 }
 
 let motion: any
@@ -72,9 +88,7 @@ const startClock = () => {
 const tracks = ref<{ _id: string, name: string, notes: string }[]>([])
 onMounted(async () => {
   await initializeMCorp()
-  const data = await fetch(`${API_URL}/get-tracks`)
-    .then(res => res.json())
-  tracks.value = JSON.parse(data).tracks
+  await getTracks()
 })
 
 </script>
