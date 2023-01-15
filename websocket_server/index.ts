@@ -88,7 +88,6 @@ router.post('/upload', upload.array('pfile'), async (req, res) => {
 })
 
 // Get tracks
-
 router.get('/get-tracks', async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080') // cors error without this
   const Track = mongoose.model('Track', trackSchema)
@@ -100,6 +99,20 @@ router.get('/get-tracks', async (req, res) => {
     console.log('Failed getting tracks with:', err)
     res.status(500).json(JSON.stringify({ Error: 'Failed fetching tracks.' }))
   }
+})
+
+// Start track
+router.post('/start-track/:id', async (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080') // cors error without this
+  const Track = mongoose.model('Track', trackSchema)
+  const track = await Track.findById(req.params.id)
+  console.log(track)
+})
+
+// Delete track
+router.post('/delete-track/:id', async (req, res) => {
+  const Track = mongoose.model('Track', trackSchema)
+  await Track.deleteOne({ _id: req.params.id })
 })
 
 router.post('/partialData', (req, res) => {
