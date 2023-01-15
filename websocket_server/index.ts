@@ -27,6 +27,7 @@ mongoose.connect(mongoURI)
 const trackSchema = new mongoose.Schema({
   name: String,
   chunks: String,
+  mode: String,
   notes: String
 })
 trackSchema.set('timestamps', true)
@@ -68,11 +69,11 @@ router.post('/upload', upload.array('pfile'), async (req, res) => {
     const path = file.path
     const name = req.body.name
     const chunks = await chunk(path)
-    track = chunks
     const notes = req.body.notes
+    const mode = req.body.mode
     // Save track to DB
     const Track = mongoose.model('Track', trackSchema)
-    const t = new Track({ name, chunks: JSON.stringify(chunks), notes })
+    const t = new Track({ name, chunks: JSON.stringify(chunks), notes, mode })
     t.save(function (err: Error) {
       if (err) {
         console.error('Error while uploading track', err)
@@ -102,11 +103,14 @@ router.get('/get-tracks', async (req, res) => {
 })
 
 // Start track
-router.post('/start-track/:id', async (req, res) => {
+router.post('/start-track/:id/:startTime', async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080') // cors error without this
   const Track = mongoose.model('Track', trackSchema)
-  const track = await Track.findById(req.params.id)
-  console.log(track)
+  const t = await Track.findById(req.params.id)
+  mode = t.mode
+  startTime = +req.params.startTime
+  track = JSON.parse(t.chunks)
+  startSendingInterval()
 })
 
 // Delete track
