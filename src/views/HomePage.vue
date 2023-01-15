@@ -66,7 +66,7 @@ const VUE_APP_MCORP_API_KEY = '8844095860530063641'
 const VUE_APP_WS_SERVER_URL = '192.168.0.87'
 const VUE_APP_WS_SERVER_PORT = '443'
 
-const VUE_APP_WS_LIVE_SERVER_URL = 'ws://sadiss.net/ws'
+const VUE_APP_WS_LIVE_SERVER_URL = 'wss://sadiss.net/ws/'
 
 const isRegistered = ref(false)
 const ws = ref<WebSocket>()
@@ -89,8 +89,8 @@ const register = () => {
 const establishWebsocketConnection = () => {
   startAudioCtx(globalTime.value)
 
-  ws.value = new WebSocket(`ws://${VUE_APP_WS_SERVER_URL}:${VUE_APP_WS_SERVER_PORT}`)
-  // ws.value = new WebSocket(VUE_APP_WS_LIVE_SERVER_URL)
+  // ws.value = new WebSocket(`ws://${VUE_APP_WS_SERVER_URL}:${VUE_APP_WS_SERVER_PORT}`)
+  ws.value = new WebSocket(VUE_APP_WS_LIVE_SERVER_URL)
 
   ws.value.onopen = function () {
     console.log('Connection is open')
