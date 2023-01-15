@@ -93,7 +93,7 @@ router.get('/get-tracks', async (req, res) => {
   res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080') // cors error without this
   const Track = mongoose.model('Track', trackSchema)
   try {
-    const allTracks = await Track.find({}, '_id name notes')
+    const allTracks = await Track.find({}, '_id name notes mode')
     res.json(JSON.stringify({ tracks: allTracks }))
   }
   catch (err) {
