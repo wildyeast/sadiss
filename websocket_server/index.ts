@@ -104,7 +104,6 @@ router.get('/get-tracks', async (req, res) => {
 
 // Start track
 router.post('/start-track/:id/:startTime', async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080') // cors error without this
   const Track = mongoose.model('Track', trackSchema)
   const t = await Track.findById(req.params.id)
   mode = t.mode
