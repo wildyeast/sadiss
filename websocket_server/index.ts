@@ -112,7 +112,7 @@ router.post('/start-track/:id/:startTime', async (req, res) => {
   startTime = +req.params.startTime
   track = JSON.parse(t.chunks)
   startSendingInterval()
-  res.send()
+  res.send(JSON.stringify({ data: 'Track started.' }))
 })
 
 // Delete track
