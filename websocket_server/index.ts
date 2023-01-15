@@ -63,7 +63,7 @@ app.listen(BASE_PORT, () => console.log(`Http server listening on port ${BASE_PO
 // Upload track
 router.post('/upload', upload.array('pfile'), async (req, res) => {
   // res.setHeader('Access-Control-Allow-Origin', ['http://localhost:8080', 'https://sadiss.net/admin']) // cors error without this
-  res.setHeader('Access-Control-Allow-Origin', ['http://localhost:8080']) // cors error without this
+  res.setHeader('Access-Control-Allow-Origin', ['http://localhost:8080', 'https://sadiss.net/admin']) // cors error without this
   try {
     // @ts-expect-error
     const file = req.files[0]
@@ -91,7 +91,7 @@ router.post('/upload', upload.array('pfile'), async (req, res) => {
 
 // Get tracks
 router.get('/get-tracks', async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080') // cors error without this
+  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   const Track = mongoose.model('Track', trackSchema)
   try {
     const allTracks = await Track.find({}, '_id name notes mode')
@@ -105,13 +105,7 @@ router.get('/get-tracks', async (req, res) => {
 
 // Start track
 router.post('/start-track/:id/:startTime', async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080') // cors error without this
-
-  if (!sockserver.clients.size) {
-    res.json(JSON.stringify({ data: 'Unable to start: No clients registered.' })).send()
-    return
-  }
-
+  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   const Track = mongoose.model('Track', trackSchema)
   const t = await Track.findById(req.params.id)
   mode = t.mode
@@ -123,7 +117,7 @@ router.post('/start-track/:id/:startTime', async (req, res) => {
 
 // Delete track
 router.post('/delete-track/:id', async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', 'http://localhost:8080') // cors error without this
+  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   const Track = mongoose.model('Track', trackSchema)
   await Track.deleteOne({ _id: req.params.id })
   res.send()
@@ -147,7 +141,7 @@ let mode: Mode
 let startTime: number
 
 const sockserver = new Server({ port: process.env.WS_SERVER_PORT })
-console.log(`Websocket server listening on port ${443}.`)
+console.log(`Websocket server listening on port ${process.env.WS_SERVER_PORT}.`)
 sockserver.on('connection', (client: SadissWebSocket) => {
   // Assign id to new connection, needed for nonChoir partial distribution
   client.id = generateUuid()
