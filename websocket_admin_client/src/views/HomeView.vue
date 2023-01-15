@@ -79,11 +79,12 @@ onMounted(async () => {
 
 </script>
 <template>
-  <div class="flex flex-col">
+  <div class="flex flex-col w-[90%] mx-auto">
     <p>{{ globalTime.toFixed(0) }}</p>
     <Button @click="isUploadModalVisible = true">Upload new track</Button>
 
-    <div v-if="tracks.length">
+    <div v-if="tracks.length"
+         class="flex flex-col gap-2">
       <TrackTile v-for="track of tracks"
                  :key="track._id"
                  :track="track"
