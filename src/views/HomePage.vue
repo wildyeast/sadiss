@@ -23,7 +23,7 @@
                     :disabled="!mcorpConnected"
                     class="btn__register"
                     :class="{ btn__register_active: isRegistered }">
-          {{ isRegistered ? 'Registered' : 'Register' }}
+          {{ isRegistered? 'Registered': 'Register' }}
         </ion-button>
         <ion-button @click="scanCode"
                     class="btn__scan_barcode"
@@ -149,7 +149,7 @@ const scanCode = async () => {
   // Make camera visible and everything else invisible in app viewport, classes defined in App.vue
   document.body.classList.add("qrscanner");
   await startScan()
-  // Make camera invisible, and everythin else visible
+  // Make camera invisible, and everything else visible
   document.body.classList.remove("qrscanner");
 }
 
