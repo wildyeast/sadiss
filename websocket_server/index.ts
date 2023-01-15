@@ -81,7 +81,7 @@ router.post('/upload', upload.array('pfile'), async (req, res) => {
         return
       }
     })
-    res.status(200).send(JSON.stringify(track))
+    res.status(200).send(JSON.stringify(t))
   } catch (e) {
     console.log('ERR')
     console.log(e)
