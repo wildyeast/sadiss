@@ -7,7 +7,7 @@ const isUploadModalVisible = ref(false)
 const axios: any = inject('axios')
 
 //const API_URL = 'http://localhost:3000'
-const API_URL = 'https://sadiss.net/wss'
+const API_URL = 'https://sadiss.net/server'
 
 const trackName = ref('')
 const trackNotes = ref('')
