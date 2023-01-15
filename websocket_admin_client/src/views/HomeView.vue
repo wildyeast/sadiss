@@ -6,8 +6,8 @@ import TrackTile from '@/components/TrackTile.vue';
 const isUploadModalVisible = ref(false)
 const axios: any = inject('axios')
 
-//const API_URL = 'http://localhost:3000'
-const API_URL = 'https://sadiss.net/wss'
+// const API_URL = 'http://localhost:3005'
+// const API_URL = 'https://sadiss.net/'
 
 const trackName = ref('')
 const trackNotes = ref('')
@@ -28,7 +28,7 @@ const upload = () => {
   data.append('name', trackName.value)
   data.append('notes', trackNotes.value)
   data.append('mode', trackIsChoir.value ? 'choir' : 'nonChoir')
-  axios.post(`${API_URL}/upload`, data)
+  axios.post(`${process.env.VUE_APP_API_URL}/upload`, data)
     .then((response: AxiosResponse) => {
       console.log(response.data)
       // Add newly added track to tracks
@@ -41,15 +41,17 @@ const upload = () => {
 }
 
 const startTrack = async (id: string) => {
-  const res = await fetch(`http://localhost:3005/start-track/${id}/${globalTime.value + 2}`, {
+  await fetch(`${process.env.VUE_APP_API_URL}/start-track/${id}/${globalTime.value + 2}`, {
     method: 'POST'
   })
+    .then(res => res.json())
+    .then(res => console.log(JSON.parse(res).data))
 }
 
 const deleteTrack = async (id: string, name: string) => {
   if (confirm('Do you want to delete track: ' + name + '? This cannot be reversed.')) {
     try {
-      await fetch('http://localhost:3005/delete-track/' + id, {
+      await fetch(`${process.env.VUE_APP_API_URL}/delete-track/${id}`, {
         method: 'POST'
       })
       tracks.value = tracks.value.filter(track => track._id !== id)
@@ -61,7 +63,7 @@ const deleteTrack = async (id: string, name: string) => {
 }
 
 const getTracks = async () => {
-  await fetch(`${API_URL}/get-tracks`)
+  await fetch(`${process.env.VUE_APP_API_URL}/get-tracks`)
     .then(res => res.json())
     .then(data => tracks.value = JSON.parse(data).tracks)
     .catch(err => console.log('Failed getting Tracks with: ', err))
