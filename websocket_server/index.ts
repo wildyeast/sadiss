@@ -289,10 +289,7 @@ const startSendingInterval = () => {
 
       sockserver.clients.forEach((client: SadissWebSocket) => {
         if (!client.isAdmin) {
-          const dataToSend: { partials: PartialChunk[], ttsInstructions?: {} } = { partials: allocatedPartials[client.id] }
-          if (chunkIndex % 5 === 0) {
-            dataToSend.ttsInstructions = { startTime: -1, text: chunkIndex.toString() }
-          }
+          const dataToSend: { partials: PartialChunk[], ttsInstructions?: {} } = { partials: allocatedPartials[client.id]} 
           client.send(JSON.stringify({ startTime: startTime + 2, chunk: dataToSend }))
         }
       })
