@@ -1,11 +1,7 @@
 import express from 'express'
-import { Mode } from 'node:fs'
 import { chunk, startSendingInterval } from "../tools"
-import { PartialChunk, TtsInstruction } from "../types/types"
 
 const mongoose = require('mongoose')
-const multer = require('multer')
-const upload = multer({ dest: 'uploads/' })
 
 // Define track schema for db
 const trackSchema = new mongoose.Schema({

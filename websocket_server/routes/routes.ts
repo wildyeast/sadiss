@@ -6,10 +6,10 @@ import { PartialChunk, TtsInstruction } from '../types/types'
 const track_controller = require('../controllers/trackController')
 
 const router = express.Router()
-const multer = require('multer')
-const upload = multer({ dest: 'uploads/' })
 
 // Upload track
+const multer = require('multer')
+const upload = multer({ dest: 'uploads/' })
 router.post('/upload', upload.array('pfile'), track_controller.upload_track)
 
 // Get tracks
