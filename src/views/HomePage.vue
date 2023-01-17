@@ -83,6 +83,7 @@ const { startScan } = useBarcodeScanner()
 
 const register = () => {
   if (isRegistered.value) return
+  dLog('Websocket connection opening.')
   establishWebsocketConnection()
 }
 
@@ -93,7 +94,7 @@ const establishWebsocketConnection = () => {
   ws.value = new WebSocket(VUE_APP_WS_LIVE_SERVER_URL)
 
   ws.value.onopen = function () {
-    console.log('Connection is open')
+    dLog('Websocket connection opened.')
     isRegistered.value = true
     this.send(JSON.stringify({ message: 'clientId', clientId: choirId.value }))
   }
