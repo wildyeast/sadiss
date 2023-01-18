@@ -6,6 +6,8 @@ let sendingIntervalRunning = false
 export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstructions: TtsInstruction[] }[],
   mode: Mode, startTime: number, wss: Server) => {
 
+  clearInterval(keepAliveIntervalId)
+
   sendingIntervalRunning = true
 
   const interval = 1000 // ms
@@ -160,16 +162,10 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
 let keepAliveIntervalId: NodeJS.Timer
 /** 
 * Sends a message to all clients connnected to the websocket server every 50 seconds to keep the connection alive.
-* Stops on its own when partial sending starts.
 * @param {Server} wss The current ws websocket server instance.
 */
 export const startKeepAliveInterval = (wss: Server) => {
   keepAliveIntervalId = setInterval(() => {
-    if (sendingIntervalRunning) {
-      clearInterval(keepAliveIntervalId)
-      console.log('Keep Alive Interval stopped.')
-      return
-    }
     if (wss.clients.size) {
       for (const client of wss.clients) {
         client.send('')
