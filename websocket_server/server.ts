@@ -5,7 +5,7 @@ import express from 'express'
 import { Message } from './types/types'
 import * as dotenv from 'dotenv'
 
-import { Server } from 'ws'
+import { WebSocket } from 'ws'
 import { startKeepAliveInterval } from './tools/startSendingInterval'
 
 const cors = require('cors')
@@ -48,11 +48,13 @@ const app = express()
 
 app.listen(BASE_PORT, () => console.log(`Http server listening on port ${BASE_PORT}.`))
 
+
 // WEBSOCKETS //
+const { Server } = require('ws')
 const wss = new Server({ port: +process.env.WS_SERVER_PORT! })
 console.log(`Websocket server listening on port ${process.env.WS_SERVER_PORT}.`)
 startKeepAliveInterval(wss)
-wss.on('connection', client => {
+wss.on('connection', (client: WebSocket) => {
   // Assign id to new connection, needed for nonChoir partial distribution
   client.id = uuid.v4()
   console.log('New client connected! Assigned id: ', client.id)
