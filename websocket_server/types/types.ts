@@ -11,12 +11,6 @@ export interface Breakpoint {
   amp: number
 }
 
-export type SadissWebSocket = {
-  id: string,
-  choirId: number,
-  isAdmin: boolean
-} & WebSocket
-
 export type Message = { [key: string]: any }
 
 export interface TtsInstruction {

@@ -1,8 +1,10 @@
-import { SadissWebSocket, PartialChunk, TtsInstruction, Mode } from "../types/types"
+import { Server } from "ws"
+import { PartialChunk, TtsInstruction, Mode } from "../types/types"
 
 let sendingIntervalRunning = false
 // More or less accurate timer taken from https://stackoverflow.com/a/29972322/16725862
-export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstructions: TtsInstruction[] }[], mode: Mode, startTime: number, wss: any) => {
+export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstructions: TtsInstruction[] }[],
+  mode: Mode, startTime: number, wss: Server) => {
 
   sendingIntervalRunning = true
 
@@ -20,16 +22,14 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
   function step () {
     if (!sendingIntervalRunning) {
       console.log('Sending interval stopped.')
-      partialMap = {}
-      chunkIndex = 0
+      reset()
       return
     }
 
     if (chunkIndex >= track.length) {
       console.log('No more chunks. Stopping.')
       sendingIntervalRunning = false
-      partialMap = {}
-      chunkIndex = 0
+      reset()
       return
     }
 
@@ -37,8 +37,7 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
     if (dt > interval) {
       console.log('Sending interval somehow broke. Stopping.')
       sendingIntervalRunning = false
-      partialMap = {}
-      chunkIndex = 0
+      reset()
       return
     }
 
@@ -46,7 +45,7 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
 
     if (mode === 'choir') {
       // Choir mode
-      wss.clients.forEach((client: SadissWebSocket) => {
+      wss.clients.forEach((client) => {
         if (!client.isAdmin) {
           const partialById = track[chunkIndex].partials.find((chunk: PartialChunk) => chunk.index === client.choirId)
           if (partialById) {
@@ -57,8 +56,8 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
     } else {
       // nonChoir mode
 
-      const clientArr: SadissWebSocket[] = Array.from(wss.clients)
-      const clients = clientArr.filter((client: SadissWebSocket) => !client.isAdmin)
+      const clientArr = Array.from(wss.clients)
+      const clients = clientArr.filter(client => !client.isAdmin)
       const partials = track[chunkIndex].partials
 
       const newPartialMap: { [partialIndex: string]: string[] } = {}
@@ -116,10 +115,10 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
 
       console.log('Allocation finished. Clients to distribute to: ', Object.keys(allocatedPartials))
 
-      wss.clients.forEach((client: SadissWebSocket) => {
+      for (const client of wss.clients) {
         const dataToSend: { partials: PartialChunk[], ttsInstructions?: {} } = { partials: allocatedPartials[client.id] }
         client.send(JSON.stringify({ startTime: startTime + 2, chunk: dataToSend }))
-      })
+      }
 
       partialMap = newPartialMap
     }
@@ -149,4 +148,33 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
     //  .filter((clientId) => allocatedPartials[clientId].length === minPartialCount)
     // return minPartialCountClientIds[Math.floor(Math.random() * minPartialCountClientIds.length)]
   }
+
+  const reset = () => {
+    partialMap = {}
+    chunkIndex = 0
+    startKeepAliveInterval(wss)
+  }
+}
+
+
+let keepAliveIntervalId: NodeJS.Timer
+/** 
+* Sends a message to all clients connnected to the websocket server every 50 seconds to keep the connection alive.
+* Stops on its own when partial sending starts.
+* @param {Server} wss The current ws websocket server instance.
+*/
+export const startKeepAliveInterval = (wss: Server) => {
+  keepAliveIntervalId = setInterval(() => {
+    if (sendingIntervalRunning) {
+      clearInterval(keepAliveIntervalId)
+      console.log('Keep Alive Interval stopped.')
+      return
+    }
+    if (wss.clients.size) {
+      for (const client of wss.clients) {
+        client.send('')
+      }
+    }
+  }, 50000)
+  console.log('Keep Alive Interval started.')
 }

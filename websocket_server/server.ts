@@ -2,11 +2,13 @@
 
 // HTTP SERVER //
 import express from 'express'
-import { PartialChunk, SadissWebSocket, Message, TtsInstruction, Mode } from './types/types'
+import { Message } from './types/types'
 import * as dotenv from 'dotenv'
 
+import { Server } from 'ws'
+import { startKeepAliveInterval } from './tools/startSendingInterval'
+
 const cors = require('cors')
-const router = express.Router()
 const mongoose = require('mongoose')
 const uuid = require('uuid')
 
@@ -47,19 +49,18 @@ const app = express()
 app.listen(BASE_PORT, () => console.log(`Http server listening on port ${BASE_PORT}.`))
 
 // WEBSOCKETS //
-const { Server } = require('ws')
-
-const wss = new Server({ port: process.env.WS_SERVER_PORT })
+const wss = new Server({ port: +process.env.WS_SERVER_PORT! })
 console.log(`Websocket server listening on port ${process.env.WS_SERVER_PORT}.`)
-wss.on('connection', (client: SadissWebSocket) => {
+startKeepAliveInterval(wss)
+wss.on('connection', client => {
   // Assign id to new connection, needed for nonChoir partial distribution
   client.id = uuid.v4()
   console.log('New client connected! Assigned id: ', client.id)
 
   client.onclose = () => console.log('Client has disconnected!')
 
-  client.onmessage = (event: MessageEvent<string>) => {
-    const parsed: Message = JSON.parse(event.data)
+  client.onmessage = event => {
+    const parsed: Message = JSON.parse(event.data.toString())
     if (parsed.message === 'clientId') {
       client.choirId = parsed.clientId
     }
