@@ -5,9 +5,9 @@ let sendingIntervalRunning = false
 // More or less accurate timer taken from https://stackoverflow.com/a/29972322/16725862
 export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstructions: TtsInstruction[] }[],
   mode: Mode, startTime: number, wss: Server) => {
-
+  
   clearInterval(keepAliveIntervalId)
-
+  console.log('Keep alive interval stopped')
   sendingIntervalRunning = true
 
   const interval = 1000 // ms
