@@ -75,21 +75,19 @@ const choirId = ref(1)
 
 const globalTime = ref(0)
 
-let trackRunning = false
-
 const { handleChunkData, startAudioCtx, setStartTime, setLogFunction } = usePlayer()
 
 const { startScan } = useBarcodeScanner()
 
 const register = () => {
   if (isRegistered.value) return
-  dLog('Websocket connection opening.')
+  startAudioCtx(globalTime.value)
+  dLog('Audio ctx started.')
+
   establishWebsocketConnection()
 }
 
 const establishWebsocketConnection = () => {
-  startAudioCtx(globalTime.value)
-
   // ws.value = new WebSocket(`ws://${VUE_APP_WS_SERVER_URL}:${VUE_APP_WS_SERVER_PORT}`)
   ws.value = new WebSocket(VUE_APP_WS_LIVE_SERVER_URL)
 
@@ -111,13 +109,13 @@ const establishWebsocketConnection = () => {
   }
 
   ws.value.onmessage = (event) => {
+    if (!event.data) {
+      dLog('Keep Alive Message received.')
+      return
+    }
+
     const data = JSON.parse(event.data)
     console.log('\nReceived message: ', data)
-
-
-    if (!trackRunning) {
-      trackRunning = true
-    }
 
     // TODO: This is not ideal, we shouldn't set globalStartTime every time we receive data
     setStartTime(data.startTime)
