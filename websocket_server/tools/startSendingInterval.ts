@@ -108,7 +108,9 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
       const clientsWithoutPartials = clients.filter(client => !allocatedPartials[client.id].length)
 
       for (const client of clientsWithoutPartials) {
-        const partialIdLeastDistributed = Object.keys(partialMap).sort((a, b) => partialMap[a].length - partialMap[b].length)[0]
+        const partialIdLeastDistributed =
+          Object.keys(newPartialMap).sort((a, b) => newPartialMap[a].length - newPartialMap[b].length)[0]
+
         const partial = partials.find(p => p.index === +partialIdLeastDistributed)
         if (partial) {
           newPartialMap[partialIdLeastDistributed].push(client.id)
