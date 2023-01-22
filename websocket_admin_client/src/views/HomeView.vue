@@ -55,7 +55,7 @@ const upload = () => {
   }
   for (const voice in ttsFiles) {
     for (const lang in ttsFiles[voice]) {
-      data.append('files', ttsFiles[voice][lang], `ttsfile-${voice}-${lang}`)
+      data.append('files', ttsFiles[voice][lang], `ttsfile_${voice}_${lang}`)
     }
   }
 
@@ -108,8 +108,6 @@ const initializeMCorp = async () => {
   const mCorpApp = MCorp.app(process.env.VUE_APP_MCORP_API_KEY, { anon: true })
   mCorpApp.run = () => {
     motion = mCorpApp.motions['shared']
-    console.log(motion)
-
     startClock()
   }
   mCorpApp.init()
@@ -123,7 +121,7 @@ const startClock = () => {
 
 onMounted(async () => {
   await initializeMCorp()
-  // await getTracks()
+  await getTracks()
 })
 
 </script>

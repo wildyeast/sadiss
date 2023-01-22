@@ -47,17 +47,18 @@ exports.get_tracks = async (req: express.Request, res: express.Response) => {
 exports.upload_track = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
 
-  console.log('Req files: ', req.files)
-
   try {
     // @ts-expect-error
     const partialFile = req.files.filter(file => file.originalname === 'partialfile')[0]
     let chunks
     if (partialFile) {
-      console.log('Found partialfile: ', partialFile)
       const path = partialFile.path
       chunks = await chunk(path)
     }
+
+    // @ts-expect-error
+    const ttsFiles = req.files.filter(file => file.originalname.includes('ttsfile'))
+    console.log('TTS files: ', ttsFiles)
 
     const name = req.body.name
     const notes = req.body.notes
