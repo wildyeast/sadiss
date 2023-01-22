@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { AxiosResponse } from 'axios';
-import { ref, onMounted, inject } from 'vue'
+import { ref, onMounted, inject, computed, watch } from 'vue'
 import TrackTile from '@/components/TrackTile.vue';
 
 const isUploadModalVisible = ref(false)
@@ -14,9 +14,31 @@ const trackNotes = ref('')
 const trackIsChoir = ref(false)
 let file: File
 
+const numberOfVoices = ref(2)
+const ttsLanguages = ref('en-US, de-DE')
+
+const voiceLangCombinations = computed(() => {
+  const combinations = []
+  for (let i = 1; i <= numberOfVoices.value; i++) {
+    for (const lang of ttsLanguages.value.split(',')) {
+      combinations.push([i, lang.trim()])
+    }
+  }
+  return combinations
+})
+
 const handleFileUpload = async (e: Event) => {
   // TODO: Refactor this so we don't use non-null assertion
   file = (<HTMLInputElement>e.target).files![0]
+}
+
+const ttsFiles: { [voice: number]: { [lang: string]: File } } = {}
+const handleTtsFileUpload = async (e: Event, voice: number, lang: string) => {
+  if (!ttsFiles[voice]) {
+    ttsFiles[voice] = {}
+  }
+  ttsFiles[voice][lang] = (<HTMLInputElement>e.target).files![0]
+  console.log(`Added to ttsFiles: Voice: ${voice}, lang: ${lang}, file: ${ttsFiles[voice][lang]}`)
 }
 
 const upload = () => {
@@ -24,10 +46,19 @@ const upload = () => {
     alert('You must enter a track title.')
   }
   const data = new FormData()
-  data.append('pfile', file)
   data.append('name', trackName.value)
   data.append('notes', trackNotes.value)
   data.append('mode', trackIsChoir.value ? 'choir' : 'nonChoir')
+
+  if (file) {
+    data.append('files', file, 'partialfile')
+  }
+  for (const voice in ttsFiles) {
+    for (const lang in ttsFiles[voice]) {
+      data.append('files', ttsFiles[voice][lang], `ttsfile-${voice}-${lang}`)
+    }
+  }
+
   axios.post(`${process.env.VUE_APP_API_URL}/upload`, data)
     .then((response: AxiosResponse) => {
       console.log(response.data)
@@ -62,6 +93,7 @@ const deleteTrack = async (id: string, name: string) => {
   }
 }
 
+const tracks = ref<{ _id: string, name: string, notes: string }[]>([])
 const getTracks = async () => {
   await fetch(`${process.env.VUE_APP_API_URL}/get-tracks`)
     .then(res => res.json())
@@ -76,6 +108,8 @@ const initializeMCorp = async () => {
   const mCorpApp = MCorp.app(process.env.VUE_APP_MCORP_API_KEY, { anon: true })
   mCorpApp.run = () => {
     motion = mCorpApp.motions['shared']
+    console.log(motion)
+
     startClock()
   }
   mCorpApp.init()
@@ -87,10 +121,9 @@ const startClock = () => {
   }, 10)
 }
 
-const tracks = ref<{ _id: string, name: string, notes: string }[]>([])
 onMounted(async () => {
   await initializeMCorp()
-  await getTracks()
+  // await getTracks()
 })
 
 </script>
@@ -124,10 +157,23 @@ onMounted(async () => {
       </div>
       <div class="flex flex-row my-8 justify-between p-2">
         <div>Subtitle files</div>
-        <input type="file"
-               @change="handleFileUpload($event)"
-               accept="*.txt"
-               class="w-3/4">
+        <div class="w-3/4">
+          <div class="flex gap-2">
+            <input type="number"
+                   v-model.number="numberOfVoices" />
+            <input type="text"
+                   placeholder="e.g. en-US, de-DE"
+                   v-model="ttsLanguages" />
+          </div>
+          <div v-for="voiceLang of voiceLangCombinations"
+               class="flex gap-2">
+            <label>{{ voiceLang[0] }} {{ voiceLang[1] }}</label>
+            <input type="file"
+                   @change="handleTtsFileUpload($event, +voiceLang[0], voiceLang[1].toString())"
+                   accept="*.txt"
+                   class="w-3/4">
+          </div>
+        </div>
       </div>
       <div class="flex flex-row my-8 justify-between p-2">
         <div>Choir</div>

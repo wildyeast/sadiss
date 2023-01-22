@@ -8,7 +8,8 @@ const trackSchema = new mongoose.Schema({
   name: String,
   chunks: String,
   mode: String,
-  notes: String
+  notes: String,
+  ttsFilePaths: String
 })
 trackSchema.set('timestamps', true)
 
@@ -46,12 +47,19 @@ exports.get_tracks = async (req: express.Request, res: express.Response) => {
 exports.upload_track = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
 
+  console.log('Req files: ', req.files)
+
   try {
     // @ts-expect-error
-    const file = req.files[0]
-    const path = file.path
+    const partialFile = req.files.filter(file => file.originalname === 'partialfile')[0]
+    let chunks
+    if (partialFile) {
+      console.log('Found partialfile: ', partialFile)
+      const path = partialFile.path
+      chunks = await chunk(path)
+    }
+
     const name = req.body.name
-    const chunks = await chunk(path)
     const notes = req.body.notes
     const mode = req.body.mode
     // Save track to DB

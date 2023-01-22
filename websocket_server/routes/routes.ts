@@ -7,7 +7,7 @@ const router = express.Router()
 // Upload track
 const multer = require('multer')
 const upload = multer({ dest: 'uploads/' })
-router.post('/upload', upload.array('pfile'), track_controller.upload_track)
+router.post('/upload', upload.array('files'), track_controller.upload_track)
 
 // Get tracks
 router.get('/get-tracks', track_controller.get_tracks)
