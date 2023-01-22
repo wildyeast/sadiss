@@ -1,5 +1,6 @@
 import express from 'express'
 import { chunk, startSendingInterval } from "../tools"
+import { convertSrtToJson } from '../tools/convertSrtToJson'
 
 const mongoose = require('mongoose')
 
@@ -9,7 +10,7 @@ const trackSchema = new mongoose.Schema({
   chunks: String,
   mode: String,
   notes: String,
-  ttsFilePaths: String
+  ttsInstrunctions: String
 })
 trackSchema.set('timestamps', true)
 
@@ -58,14 +59,20 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
 
     // @ts-expect-error
     const ttsFiles = req.files.filter(file => file.originalname.includes('ttsfile'))
-    console.log('TTS files: ', ttsFiles)
+    const ttsJson = convertSrtToJson(ttsFiles)
 
     const name = req.body.name
     const notes = req.body.notes
     const mode = req.body.mode
     // Save track to DB
     const Track = mongoose.model('Track', trackSchema)
-    const t = new Track({ name, chunks: JSON.stringify(chunks), notes, mode })
+    const t = new Track({
+      name,
+      chunks: JSON.stringify(chunks),
+      ttsInstructions: JSON.stringify(ttsJson),
+      notes,
+      mode
+    })
     t.save(function (err: Error) {
       if (err) {
         console.error('Error while uploading track', err)
