@@ -19,5 +19,13 @@ export interface TtsInstruction {
   text: string
 }
 
+export interface TtsJson {
+  [timestamp: number]: {
+    [voice: string]: {
+      [language: string]: string
+    }
+  }
+}
+
 export type Mode = 'choir' | 'nonChoir'
 

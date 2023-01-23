@@ -19,7 +19,7 @@ exports.start_track = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   const Track = mongoose.model('Track', trackSchema)
   const t = await Track.findById(req.params.id)
-  const track = JSON.parse(t.chunks)
+  const track = t.chunks ? JSON.parse(t.chunks) : null
   const startTime = +req.params.startTime
   startSendingInterval(track, t.mode, startTime, req.wss)
   res.send(JSON.stringify({ data: 'Track started.' }))
@@ -48,18 +48,22 @@ exports.get_tracks = async (req: express.Request, res: express.Response) => {
 exports.upload_track = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
 
+  if (!req.files) return
+
   try {
-    // @ts-expect-error
-    const partialFile = req.files.filter(file => file.originalname === 'partialfile')[0]
-    let chunks
+    const partialFile = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname === 'partialfile')[0]
+    let path
     if (partialFile) {
-      const path = partialFile.path
-      chunks = await chunk(path)
+      path = partialFile.path
     }
 
-    // @ts-expect-error
-    const ttsFiles = req.files.filter(file => file.originalname.includes('ttsfile'))
-    const ttsJson = convertSrtToJson(ttsFiles)
+    const ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes('ttsfile'))
+    let ttsJson
+    if (ttsFiles.length) {
+      ttsJson = convertSrtToJson(ttsFiles)
+    }
+
+    const chunks = await chunk(path, ttsJson)
 
     const name = req.body.name
     const notes = req.body.notes
@@ -69,7 +73,6 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
     const t = new Track({
       name,
       chunks: JSON.stringify(chunks),
-      ttsInstructions: JSON.stringify(ttsJson),
       notes,
       mode
     })

@@ -121,7 +121,10 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
       console.log('Allocation finished. Clients to distribute to: ', Object.keys(allocatedPartials))
 
       for (const client of wss.clients) {
-        const dataToSend: { partials: PartialChunk[], ttsInstructions?: {} } = { partials: allocatedPartials[client.id] }
+        const dataToSend: { partials: PartialChunk[], ttsInstructions?: {} } = {
+          partials: allocatedPartials[client.id],
+          ttsInstructions: track[chunkIndex].ttsInstructions
+        }
         client.send(JSON.stringify({ startTime: startTime + 2, chunk: dataToSend }))
       }
 

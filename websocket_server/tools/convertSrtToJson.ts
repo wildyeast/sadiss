@@ -1,7 +1,9 @@
+import { TtsJson } from "../types/types"
+
 const fs = require('fs')
 
 export const convertSrtToJson = (srtFiles: { path: string, originalname: string }[]) => {
-  const result: { [timestamp: number]: { [voice: number | string]: { [language: string]: string } } } = {}
+  const result: TtsJson = {}
 
   for (const file of srtFiles) {
     const data = fs.readFileSync(file.path, 'utf-8')
