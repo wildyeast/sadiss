@@ -50,9 +50,29 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
       // Choir mode
       wss.clients.forEach((client) => {
         if (!client.isAdmin) {
+          let sendableData = false
+          const dataToSend: { startTime: number, chunk: { partials: PartialChunk[], ttsInstructions: TtsInstruction[] } } = {
+            startTime: startTime + 2,
+            chunk: {
+              partials: [],
+              ttsInstructions: []
+            }
+          }
           const partialById = track[chunkIndex].partials.find((chunk: PartialChunk) => chunk.index === client.choirId)
           if (partialById) {
-            client.send(JSON.stringify({ startTime: startTime + 2, chunk: { partials: [partialById] } }))
+            dataToSend.chunk.partials = [partialById]
+            sendableData = true
+          }
+          const ttsInstructionForClientId = track[chunkIndex].ttsInstructions[+client.choirId]
+
+          if (ttsInstructionForClientId) {
+            // @ts-expect-error
+            dataToSend.chunk.ttsInstructions = ttsInstructionForClientId[client.ttsLang]
+            sendableData = true
+          }
+
+          if (sendableData) {
+            client.send(JSON.stringify(dataToSend))
           }
         }
       })
