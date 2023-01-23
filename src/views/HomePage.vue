@@ -19,6 +19,15 @@
           <ion-input type="number"
                      v-model.number="choirId" />
         </ion-item>
+
+        <ion-item>
+          <ion-label>TTS language:</ion-label>
+          <ion-select v-model="ttsLanguage">
+            <ion-select-option value="en-US">English</ion-select-option>
+            <ion-select-option value="de-DE">Deutsch</ion-select-option>
+          </ion-select>
+        </ion-item>
+
         <ion-button @click="register"
                     :disabled="!mcorpConnected"
                     class="btn__register"
@@ -50,7 +59,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonInput, IonLabel, IonItem } from '@ionic/vue';
+import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonInput, IonLabel, IonItem, IonSelect, IonSelectOption } from '@ionic/vue';
 import { ref, onMounted, watch } from 'vue';
 import { TextToSpeech } from '@capacitor-community/text-to-speech'
 import { usePlayer } from '../composables/usePlayer';
@@ -72,16 +81,18 @@ const isRegistered = ref(false)
 const ws = ref<WebSocket>()
 
 const choirId = ref(1)
+const ttsLanguage = ref('en-US')
 
 const globalTime = ref(0)
 
-const { handleChunkData, startAudioCtx, setStartTime, setLogFunction } = usePlayer()
+const { handleChunkData, startAudioCtx, setStartTime, setLogFunction, setTtsLanguage } = usePlayer()
 
 const { startScan } = useBarcodeScanner()
 
 const register = () => {
   if (isRegistered.value) return
   startAudioCtx(globalTime.value)
+  setTtsLanguage(ttsLanguage.value)
   dLog('Audio ctx started.')
 
   establishWebsocketConnection()
@@ -94,7 +105,7 @@ const establishWebsocketConnection = () => {
   ws.value.onopen = function () {
     dLog('Websocket connection opened.')
     isRegistered.value = true
-    this.send(JSON.stringify({ message: 'clientId', clientId: choirId.value }))
+    this.send(JSON.stringify({ message: 'clientInfo', clientId: choirId.value, ttsLang: ttsLanguage.value }))
   }
 
   ws.value.onclose = () => {

@@ -12,7 +12,7 @@ export function usePlayer () {
   const setLogFunction = (logFunction: (text: string) => void) => dlog = logFunction
 
 
-  const initialSetup = (partialChunks: { partials: PartialChunk[], ttsInstructions: { startTime: number, text: string; }; }) => {
+  const initialSetup = (partialChunks: { partials: PartialChunk[], ttsInstructions: string }) => {
     handleChunkData(partialChunks)
   }
 
@@ -24,7 +24,7 @@ export function usePlayer () {
 
   let startTimeInCtxTime: number
 
-  const handleChunkData = (trackData: { partials: PartialChunk[], ttsInstructions: { startTime: number, text: string } }) => {
+  const handleChunkData = (trackData: { partials: PartialChunk[], ttsInstructions: string }) => {
     console.log('\nHandling following chunk data: ', trackData)
 
     // TODO: This is not ideal, we shouldn't set globalStartTime every time we receive data
@@ -60,8 +60,8 @@ export function usePlayer () {
 
     if (trackData.ttsInstructions) {
       const tts = trackData.ttsInstructions
-      console.log('Speaking: ', tts.text)
-      speak(tts.text)
+      console.log('Speaking: ', tts)
+      speak(tts)
     }
 
   }
@@ -79,7 +79,7 @@ export function usePlayer () {
   const speak = async (text: string) => {
     await TextToSpeech.speak({
       text: text,
-      lang: 'en-US',
+      lang: ttsLanguage,
       rate: 1.0,
       pitch: 1.0,
       volume: 1.0,
@@ -87,11 +87,17 @@ export function usePlayer () {
     })
   }
 
+  let ttsLanguage: string
+  const setTtsLanguage = (lang: string) => {
+    ttsLanguage = lang
+  }
+
   return {
     handleChunkData,
     initialSetup,
     startAudioCtx,
     setStartTime,
-    setLogFunction
+    setLogFunction,
+    setTtsLanguage
   }
 }
