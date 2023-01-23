@@ -61,9 +61,10 @@ wss.on('connection', client => {
 
   client.onmessage = event => {
     const parsed: Message = JSON.parse(event.data.toString())
-    if (parsed.message === 'clientId') {
+    if (parsed.message === 'clientInfo') {
       client.choirId = parsed.clientId
-      console.log(`Client ${client.id} registered with choir id ${client.choirId}`)
+      client.ttsLang = parsed.ttsLang
+      console.log(`Client ${client.id} registered with choir id ${client.choirId} and TTS lang ${client.ttsLang}`)
     }
   }
 })
