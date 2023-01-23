@@ -13,12 +13,6 @@ export interface Breakpoint {
 
 export type Message = { [key: string]: any }
 
-export interface TtsInstruction {
-  startTime: number,
-  voice?: number,
-  text: string
-}
-
 export interface TtsJson {
   [timestamp: number]: {
     [voice: string]: {

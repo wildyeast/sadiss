@@ -88,16 +88,19 @@ export const chunk = async (path: string, ttsInstructions?: TtsJson) => {
 
   // Insert TTS data into chunks
   if (ttsInstructions) {
-    for (const tts in ttsInstructions) {
-      if (chunks[tts]) {
-        chunks[tts].ttsInstructions = ttsInstructions[tts]
+    for (const ttsTime in ttsInstructions) {
+      const flooredTime = Math.floor(+ttsTime)
+      if (chunks[flooredTime]) {
+        chunks[flooredTime].ttsInstructions = ttsInstructions[flooredTime]
       } else {
         const chunk = initChunk()
-        chunk.ttsInstructions = ttsInstructions[tts]
-        chunks[tts] = chunk
+        chunk.ttsInstructions = ttsInstructions[flooredTime]
+        chunks[flooredTime] = chunk
       }
     }
   }
+
+  console.log('chunk 1: ', chunks[0])
 
   return chunks
 }

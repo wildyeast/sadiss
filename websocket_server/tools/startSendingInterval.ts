@@ -1,9 +1,9 @@
 import { Server } from "ws"
-import { PartialChunk, TtsInstruction, Mode } from "../types/types"
+import { PartialChunk, Mode } from "../types/types"
 
 let sendingIntervalRunning = false
 // More or less accurate timer taken from https://stackoverflow.com/a/29972322/16725862
-export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstructions: TtsInstruction[] }[],
+export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstructions: { [voice: string]: { [lang: string]: string } } }[],
   mode: Mode, startTime: number, wss: Server) => {
 
   clearInterval(keepAliveIntervalId)
@@ -50,28 +50,22 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
       // Choir mode
       wss.clients.forEach((client) => {
         if (!client.isAdmin) {
-          let sendableData = false
-          const dataToSend: { startTime: number, chunk: { partials: PartialChunk[], ttsInstructions: TtsInstruction[] } } = {
+          const dataToSend: { startTime: number, chunk: { partials?: PartialChunk[], ttsInstructions?: string } } = {
             startTime: startTime + 2,
-            chunk: {
-              partials: [],
-              ttsInstructions: []
-            }
+            chunk: {}
           }
+
           const partialById = track[chunkIndex].partials.find((chunk: PartialChunk) => chunk.index === client.choirId)
           if (partialById) {
             dataToSend.chunk.partials = [partialById]
-            sendableData = true
           }
+
           const ttsInstructionForClientId = track[chunkIndex].ttsInstructions[+client.choirId]
-
           if (ttsInstructionForClientId) {
-            // @ts-expect-error
             dataToSend.chunk.ttsInstructions = ttsInstructionForClientId[client.ttsLang]
-            sendableData = true
           }
 
-          if (sendableData) {
+          if (dataToSend.chunk.partials || dataToSend.chunk.ttsInstructions) {
             client.send(JSON.stringify(dataToSend))
           }
         }
@@ -148,7 +142,6 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
         }
         const ttsInstructions = Object.values(track[chunkIndex].ttsInstructions)[0]
         if (ttsInstructions) {
-          // @ts-expect-error
           dataToSend.ttsInstructions = ttsInstructions[client.ttsLang]
         }
         client.send(JSON.stringify({ startTime: startTime + 2, chunk: dataToSend }))
