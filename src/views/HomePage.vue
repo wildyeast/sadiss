@@ -131,7 +131,8 @@ const establishWebsocketConnection = () => {
     // TODO: This is not ideal, we shouldn't set globalStartTime every time we receive data
     setStartTime(data.startTime)
     if (Object.keys(data.chunk)) {
-      dLog('Partials: ' + data.chunk.partials.map((el: any) => el.index).sort((a: number, b: number) => a - b).join(', '))
+      dLog('Partials: ' + data.chunk.partials?.map((el: any) => el.index).sort((a: number, b: number) => a - b).join(', '))
+      dLog('TTS: ' + data.chunk.ttsInstructions)
       handleChunkData(data.chunk)
     }
   }
