@@ -45,8 +45,6 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
     }
 
     // Distribute partials among clients and send them to clients
-    console.log('Track: ', track)
-    console.log('Idx: ', track[chunkIndex])
     if (mode === 'choir') {
       // Choir mode
       wss.clients.forEach((client) => {
