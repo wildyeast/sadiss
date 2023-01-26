@@ -100,7 +100,5 @@ export const chunk = async (path: string, ttsInstructions?: TtsJson) => {
     }
   }
 
-  console.log('chunk 1: ', chunks[0])
-
   return chunks
 }
