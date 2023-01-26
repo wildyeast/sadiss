@@ -208,19 +208,6 @@ watch(() => choirId.value, async (value, oldValue) => {
 })
 
 setLogFunction(dLog)
-
-const speak = async (text: string) => {
-  await TextToSpeech.speak({
-    text: text,
-    lang: 'en-US',
-    rate: 1.0,
-    pitch: 1.0,
-    volume: 1.0,
-    category: 'playback',
-  })
-}
-
-
 </script>
 
 <style scoped>
