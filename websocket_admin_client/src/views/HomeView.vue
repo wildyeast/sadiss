@@ -18,8 +18,10 @@ const numberOfVoices = ref(2)
 const ttsLanguages = ref('en-US, de-DE')
 
 const voiceLangCombinations = computed(() => {
+  // If nonChoir, only allow 1 voice
+  const allowedNumberOfVoices = trackIsChoir.value ? numberOfVoices.value : 1
   const combinations = []
-  for (let i = 1; i <= numberOfVoices.value; i++) {
+  for (let i = 1; i <= allowedNumberOfVoices; i++) {
     for (const lang of ttsLanguages.value.split(',')) {
       combinations.push([i, lang.trim()])
     }
@@ -154,11 +156,18 @@ onMounted(async () => {
                class="w-3/4">
       </div>
       <div class="flex flex-row my-8 justify-between p-2">
+        <div>Choir</div>
+        <input type="checkbox"
+               v-model="trackIsChoir"
+               class="w-3/4">
+      </div>
+      <div class="flex flex-row my-8 justify-between p-2">
         <div>Subtitle files</div>
         <div class="w-3/4">
           <div class="flex gap-2">
             <input type="number"
-                   v-model.number="numberOfVoices" />
+                   v-model.number="numberOfVoices"
+                   v-show="trackIsChoir" />
             <input type="text"
                    placeholder="e.g. en-US, de-DE"
                    v-model="ttsLanguages" />
@@ -172,12 +181,6 @@ onMounted(async () => {
                    class="w-3/4">
           </div>
         </div>
-      </div>
-      <div class="flex flex-row my-8 justify-between p-2">
-        <div>Choir</div>
-        <input type="checkbox"
-               v-model="trackIsChoir"
-               class="w-3/4">
       </div>
       <div class="flex flex-row my-8 justify-between p-2">
         <div>Private notes</div>
