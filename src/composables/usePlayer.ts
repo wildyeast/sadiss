@@ -32,29 +32,31 @@ export function usePlayer () {
 
     // dlog('Calc global startime: ' + (currentChunkStartTimeInCtxTime.value + offset + trackData.partials[0].startTime))
 
-    for (const partialChunk of trackData.partials) {
-      const oscObj = oscillators.find(el => el.index === partialChunk.index)
-      if (oscObj) {
-        console.log('Found osc.')
-        setBreakpoints(oscObj.oscillator, oscObj.gain, partialChunk.breakpoints, startTimeInCtxTime + partialChunk.endTime)
-      } else {
-        console.log('Creating osc.')
-        const oscNode = ctx.createOscillator()
-        const gainNode = ctx.createGain()
-        oscNode.connect(gainNode)
-        gainNode.connect(ctx.destination)
+    if (trackData.partials) {
+      for (const partialChunk of trackData.partials) {
+        const oscObj = oscillators.find(el => el.index === partialChunk.index)
+        if (oscObj) {
+          console.log('Found osc.')
+          setBreakpoints(oscObj.oscillator, oscObj.gain, partialChunk.breakpoints, startTimeInCtxTime + partialChunk.endTime)
+        } else {
+          console.log('Creating osc.')
+          const oscNode = ctx.createOscillator()
+          const gainNode = ctx.createGain()
+          oscNode.connect(gainNode)
+          gainNode.connect(ctx.destination)
 
-        oscNode.start(startTimeInCtxTime + partialChunk.startTime)
-        setBreakpoints(oscNode, gainNode, partialChunk.breakpoints, startTimeInCtxTime + partialChunk.endTime)
+          oscNode.start(startTimeInCtxTime + partialChunk.startTime)
+          setBreakpoints(oscNode, gainNode, partialChunk.breakpoints, startTimeInCtxTime + partialChunk.endTime)
 
-        oscNode.stop(startTimeInCtxTime + partialChunk.endTime)
+          oscNode.stop(startTimeInCtxTime + partialChunk.endTime)
 
-        oscNode.onended = (event) => {
-          const oscObj = oscillators.find(oscObj => oscObj.oscillator === event.target)
-          if (oscObj) oscillators.splice(oscillators.indexOf(oscObj), 1)
+          oscNode.onended = (event) => {
+            const oscObj = oscillators.find(oscObj => oscObj.oscillator === event.target)
+            if (oscObj) oscillators.splice(oscillators.indexOf(oscObj), 1)
+          }
+
+          oscillators.push({ index: partialChunk.index, oscillator: oscNode, gain: gainNode })
         }
-
-        oscillators.push({ index: partialChunk.index, oscillator: oscNode, gain: gainNode })
       }
     }
 
