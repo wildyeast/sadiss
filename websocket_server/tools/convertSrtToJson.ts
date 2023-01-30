@@ -12,20 +12,40 @@ export const convertSrtToJson = (srtFiles: { path: string, originalname: string 
     const [_, voice, lang] = file.originalname.split('_')
 
     let lastLineWasTimestamp = false
-    let currentTimestamp: number = -1
+    let currentTimestamp = -1
+    let currentLine = ''
 
     for (const line of lines) {
       const timestampDelimiter = ' --> '
 
-      if (lastLineWasTimestamp) {
-        if (!result[currentTimestamp]) {
-          result[currentTimestamp] = {}
+      if (!line) {
+        // if (!result[currentTimestamp]) {
+        //   result[currentTimestamp] = {}
+        // }
+        // if (!result[currentTimestamp][voice]) {
+        //   result[currentTimestamp][voice] = {}
+        // }
+        // if (result[currentTimestamp][voice][lang]) {
+        //   result[currentTimestamp][voice][lang] = ' ' + currentLine
+        // } else {
+        //   result[currentTimestamp][voice][lang] = currentLine
+        // }
+
+        // Same as what is commented above
+        // More concise, but still pretty hard to understand
+        result[currentTimestamp] = {
+          ...result[currentTimestamp],
+          [voice]: {
+            ...(result[currentTimestamp]?.[voice] || {}),
+            [lang]: currentLine
+          }
         }
-        if (!result[currentTimestamp][voice]) {
-          result[currentTimestamp][voice] = {}
-        }
-        result[currentTimestamp][voice][lang] = line
+        // End of equivalent code to commented above
+
+        currentLine = ''
         lastLineWasTimestamp = false
+      } else if (lastLineWasTimestamp) {
+        currentLine += line
       }
       else if (line.includes(timestampDelimiter)) {
         const [start, _] = line.split(timestampDelimiter)
@@ -34,6 +54,7 @@ export const convertSrtToJson = (srtFiles: { path: string, originalname: string 
       }
     }
   }
+  console.log('Converted .srt to folling JSON: ', result)
   return result
 }
 

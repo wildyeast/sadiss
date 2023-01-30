@@ -60,9 +60,11 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
           dataToSend.chunk.partials = [partialById]
         }
 
-        const ttsInstructionForClientId = track[chunkIndex]?.ttsInstructions[+client.choirId]
-        if (ttsInstructionForClientId) {
-          dataToSend.chunk.ttsInstructions = ttsInstructionForClientId[client.ttsLang]
+        if (track[chunkIndex]?.ttsInstructions) {
+          const ttsInstructionForClientId = track[chunkIndex]?.ttsInstructions[+client.choirId]
+          if (ttsInstructionForClientId) {
+            dataToSend.chunk.ttsInstructions = ttsInstructionForClientId[client.ttsLang]
+          }
         }
 
         if (dataToSend.chunk.partials || dataToSend.chunk.ttsInstructions) {
