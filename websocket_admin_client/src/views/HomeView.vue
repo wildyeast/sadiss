@@ -71,6 +71,9 @@ const upload = () => {
     .catch((error: Error) => {
       console.log(error)
     })
+
+  // Clear TTS file object so they don't get uploaded on next track upload
+  for (const ttsFile in ttsFiles) delete ttsFiles[ttsFile];
 }
 
 const startTrack = async (id: string) => {
