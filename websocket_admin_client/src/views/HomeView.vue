@@ -164,7 +164,7 @@ onMounted(async () => {
       <div class="flex flex-row my-8 justify-between p-2">
         <div>Subtitle files</div>
         <div class="w-3/4">
-          <div class="flex gap-2">
+          <div class="flex gap-2 mb-2">
             <input type="number"
                    v-model.number="numberOfVoices"
                    v-show="trackIsChoir" />
@@ -173,8 +173,8 @@ onMounted(async () => {
                    v-model="ttsLanguages" />
           </div>
           <div v-for="voiceLang of voiceLangCombinations"
-               class="flex gap-2">
-            <label>{{ voiceLang[0] }} {{ voiceLang[1] }}</label>
+               class="flex gap-2 justify-between">
+            <label class="w-1/4">{{ voiceLang[0] }} {{ voiceLang[1] }}</label>
             <input type="file"
                    @change="handleTtsFileUpload($event, +voiceLang[0], voiceLang[1].toString())"
                    accept="*.txt"
