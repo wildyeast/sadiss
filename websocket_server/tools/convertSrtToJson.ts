@@ -54,7 +54,7 @@ export const convertSrtToJson = (srtFiles: { path: string, originalname: string 
       }
     }
   }
-  console.log('Converted .srt to folling JSON: ', result)
+  console.log('Converted .srt to following JSON: ', result)
   return result
 }
 
