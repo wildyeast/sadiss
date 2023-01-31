@@ -19,28 +19,28 @@ export const convertSrtToJson = (srtFiles: { path: string, originalname: string 
       const timestampDelimiter = ' --> '
 
       if (!line) {
-        // if (!result[currentTimestamp]) {
-        //   result[currentTimestamp] = {}
-        // }
-        // if (!result[currentTimestamp][voice]) {
-        //   result[currentTimestamp][voice] = {}
-        // }
-        // if (result[currentTimestamp][voice][lang]) {
-        //   result[currentTimestamp][voice][lang] = ' ' + currentLine
-        // } else {
-        //   result[currentTimestamp][voice][lang] = currentLine
-        // }
-
-        // Same as what is commented above
-        // More concise, but still pretty hard to understand
-        result[currentTimestamp] = {
-          ...result[currentTimestamp],
-          [voice]: {
-            ...(result[currentTimestamp]?.[voice] || {}),
-            [lang]: currentLine
-          }
+        if (!result[currentTimestamp]) {
+          result[currentTimestamp] = {}
         }
-        // End of equivalent code to commented above
+        if (!result[currentTimestamp][voice]) {
+          result[currentTimestamp][voice] = {}
+        }
+        if (result[currentTimestamp][voice][lang]) {
+          result[currentTimestamp][voice][lang] = ' ' + currentLine
+        } else {
+          result[currentTimestamp][voice][lang] = currentLine
+        }
+
+        // Same as above, except not adding space when adding to non-empty currentLine
+        // More concise, but still pretty hard to understand
+        // result[currentTimestamp] = {
+        //   ...result[currentTimestamp],
+        //   [voice]: {
+        //     ...(result[currentTimestamp]?.[voice] || {}),
+        //     [lang]: currentLine
+        //   }
+        // }
+        // End of equivalent code as above
 
         currentLine = ''
         lastLineWasTimestamp = false
