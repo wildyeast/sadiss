@@ -21,7 +21,7 @@ const voiceLangCombinations = computed(() => {
   // If nonChoir, only allow 1 voice
   const allowedNumberOfVoices = trackIsChoir.value ? numberOfVoices.value : 1
   const combinations = []
-  for (let i = 1; i <= allowedNumberOfVoices; i++) {
+  for (let i = 0; i < allowedNumberOfVoices; i++) {
     for (const lang of ttsLanguages.value.split(',')) {
       combinations.push([i, lang.trim()])
     }
