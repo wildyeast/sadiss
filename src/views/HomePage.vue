@@ -85,13 +85,13 @@ const ttsLanguage = ref('en-US')
 
 const globalTime = ref(0)
 
-const { handleChunkData, startAudioCtx, setStartTime, setLogFunction, setTtsLanguage } = usePlayer()
+const { handleChunkData, startAudioCtx, setStartTime, setLogFunction, setTtsLanguage, setGlobalTimeRef } = usePlayer()
 
 const { startScan } = useBarcodeScanner()
 
 const register = () => {
   if (isRegistered.value) return
-  startAudioCtx(globalTime.value)
+  startAudioCtx()
   setTtsLanguage(ttsLanguage.value)
   dLog('Audio ctx started.')
 
@@ -147,6 +147,7 @@ const initializeMCorp = async () => {
   mCorpApp.run = () => {
     motion = mCorpApp.motions['shared']
     mcorpConnected.value = true
+    setGlobalTimeRef(globalTime)
     startClock()
   }
   mCorpApp.init()

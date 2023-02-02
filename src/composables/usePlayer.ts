@@ -1,4 +1,4 @@
-import { ref } from "vue"
+import { Ref, ref } from "vue"
 import { TextToSpeech } from '@capacitor-community/text-to-speech'
 import { PartialChunk, OscillatorObject, Breakpoint } from "../types/types"
 
@@ -16,15 +16,19 @@ export function usePlayer () {
     handleChunkData(partialChunks)
   }
 
-  const startAudioCtx = (globalTime: number) => {
+  const startAudioCtx = () => {
     console.log('Starting ctx.')
     ctx = new AudioContext()
-    offset = globalTime - ctx.currentTime
+    setOffset()
   }
 
   let startTimeInCtxTime: number
 
   const handleChunkData = (trackData: { partials: PartialChunk[], ttsInstructions: string }) => {
+
+    // Set offset to allow for ctx time drift
+    setOffset()
+
     console.log('\nHandling following chunk data: ', trackData)
 
     // TODO: This is not ideal, we shouldn't set globalStartTime every time we receive data
@@ -94,12 +98,17 @@ export function usePlayer () {
     ttsLanguage = lang
   }
 
+  let globalTime: Ref<number>
+  const setGlobalTimeRef = (globalTimeRef: Ref<number>) => globalTime = globalTimeRef
+  const setOffset = () => offset = globalTime.value - ctx.currentTime
+
   return {
     handleChunkData,
     initialSetup,
     startAudioCtx,
     setStartTime,
     setLogFunction,
-    setTtsLanguage
+    setTtsLanguage,
+    setGlobalTimeRef
   }
 }
