@@ -145,7 +145,8 @@ onMounted(async () => {
     </div>
 
     <Modal title="Upload track"
-           v-if="isUploadModalVisible">
+           v-if="isUploadModalVisible"
+           @close="isUploadModalVisible = false">
       <div class="flex flex-row my-8 justify-between p-2">
         <div>Title</div>
         <input v-model="trackName"
