@@ -3,7 +3,7 @@ import { TtsJson } from "../types/types"
 const fs = require('fs')
 
 export const convertSrtToJson = (srtFiles: { path: string, originalname: string }[]) => {
-  const result: TtsJson = {}
+  let result: TtsJson = {}
 
   for (const file of srtFiles) {
     const data = fs.readFileSync(file.path, 'utf-8')
@@ -19,33 +19,15 @@ export const convertSrtToJson = (srtFiles: { path: string, originalname: string 
       const timestampDelimiter = ' --> '
 
       if (!line) {
-        if (!result[currentTimestamp]) {
-          result[currentTimestamp] = {}
-        }
-        if (!result[currentTimestamp][voice]) {
-          result[currentTimestamp][voice] = {}
-        }
-        if (result[currentTimestamp][voice][lang]) {
-          result[currentTimestamp][voice][lang] = ' ' + currentLine
-        } else {
-          result[currentTimestamp][voice][lang] = currentLine
-        }
-
-        // Same as above, except not adding space when adding to non-empty currentLine
-        // More concise, but still pretty hard to understand
-        // result[currentTimestamp] = {
-        //   ...result[currentTimestamp],
-        //   [voice]: {
-        //     ...(result[currentTimestamp]?.[voice] || {}),
-        //     [lang]: currentLine
-        //   }
-        // }
-        // End of equivalent code as above
-
+        result = writeToObject(result, currentTimestamp, voice, lang, currentLine)
         currentLine = ''
         lastLineWasTimestamp = false
       } else if (lastLineWasTimestamp) {
-        currentLine += line
+        if (currentLine) {
+          currentLine += ' ' + line
+        } else {
+          currentLine = line
+        }
       }
       else if (line.includes(timestampDelimiter)) {
         const [start, _] = line.split(timestampDelimiter)
@@ -53,8 +35,11 @@ export const convertSrtToJson = (srtFiles: { path: string, originalname: string 
         lastLineWasTimestamp = true
       }
     }
+
+    // Write last timestamp and its lines to object
+    result = writeToObject(result, currentTimestamp, voice, lang, currentLine)
   }
-  console.log('Converted .srt to following JSON: ', result)
+  console.log('Converted .srt to following object: ', result)
   return result
 }
 
@@ -64,4 +49,26 @@ export const convertSrtToJson = (srtFiles: { path: string, originalname: string 
 const convertTimestampToSeconds = (timestamp: string) => {
   const time = timestamp.split(':')
   return +time[0] * 3600 + +time[1] * 60 + +time[2].replace(',', '.');
+}
+
+const writeToObject = (result: TtsJson, currentTimestamp: number, voice: string, lang: string, currentLine: string) => {
+  if (!result[currentTimestamp]) {
+    result[currentTimestamp] = {}
+  }
+  if (!result[currentTimestamp][voice]) {
+    result[currentTimestamp][voice] = {}
+  }
+  result[currentTimestamp][voice][lang] = currentLine
+  return result
+
+  // Same as above
+  // More concise, but still pretty hard to understand
+  // result[currentTimestamp] = {
+  //   ...result[currentTimestamp],
+  //   [voice]: {
+  //     ...(result[currentTimestamp]?.[voice] || {}),
+  //     [lang]: currentLine
+  //   }
+  // }
+  // End of equivalent code as above
 }
