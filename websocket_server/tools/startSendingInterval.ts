@@ -4,7 +4,7 @@ import { PartialChunk, Mode } from "../types/types"
 let sendingIntervalRunning = false
 // More or less accurate timer taken from https://stackoverflow.com/a/29972322/16725862
 export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstructions: { [voice: string]: { [lang: string]: string } } }[],
-  mode: Mode, startTime: number, wss: Server) => {
+  mode: Mode, waveform: string, ttsRate: string, startTime: number, wss: Server) => {
 
   clearInterval(keepAliveIntervalId)
   console.log('Keep alive interval stopped.')
@@ -52,8 +52,10 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
         wss.clients.forEach((client) => {
           if (client.isAdmin) return
 
-          const dataToSend: { startTime: number, chunk: { partials?: PartialChunk[], ttsInstructions?: string } } = {
+          const dataToSend: { startTime: number, waveform: string, ttsRate: string, chunk: { partials?: PartialChunk[], ttsInstructions?: string } } = {
             startTime: startTime + 2,
+            waveform,
+            ttsRate,
             chunk: {}
           }
 
@@ -151,7 +153,7 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
           }
 
           if (dataToSend.partials.length || dataToSend.ttsInstructions) {
-            client.send(JSON.stringify({ startTime: startTime + 2, chunk: dataToSend }))
+            client.send(JSON.stringify({ startTime: startTime + 2, waveform, ttsRate, chunk: dataToSend }))
           }
         }
 

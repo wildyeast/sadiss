@@ -12,6 +12,8 @@ const axios: any = inject('axios')
 const trackName = ref('')
 const trackNotes = ref('')
 const trackIsChoir = ref(false)
+const trackWaveform = ref('sine')
+const trackTtsRate = ref(1)
 let file: File
 
 const numberOfVoices = ref(2)
@@ -51,6 +53,8 @@ const upload = () => {
   data.append('name', trackName.value)
   data.append('notes', trackNotes.value)
   data.append('mode', trackIsChoir.value ? 'choir' : 'nonChoir')
+  data.append('waveform', trackWaveform.value)
+  data.append('ttsRate', trackTtsRate.value.toString())
 
   if (file) {
     data.append('files', file, 'partialfile')
@@ -124,6 +128,15 @@ const startClock = () => {
   }, 10)
 }
 
+// Enforce min and max values
+watch(trackTtsRate, (newValue) => {
+  if (newValue > 2) {
+    trackTtsRate.value = 2
+  } else if (newValue < 0.5) {
+    trackTtsRate.value = 0.5
+  }
+})
+
 onMounted(async () => {
   await initializeMCorp()
   await getTracks()
@@ -183,6 +196,30 @@ onMounted(async () => {
                    @change="handleTtsFileUpload($event, +voiceLang[0], voiceLang[1].toString())"
                    accept="*.txt"
                    class="w-3/4">
+          </div>
+        </div>
+      </div>
+      <div class="flex flex-row my-8 justify-between p-2">
+        <div>Settings</div>
+        <div class="w-3/4 flex flex-col items-start gap-2">
+          <div class="flex gap-4">
+            <label for="waveform">Waveform</label>
+            <select name="waveform"
+                    v-model="trackWaveform">
+              <option value="sine">Sine</option>
+              <option value="square">Square</option>
+              <option value="triangle">Triangle</option>
+              <option value="sawtooth">Sawtooth</option>
+            </select>
+          </div>
+          <div class="flex gap-4">
+            <label for="ttsRate">TTS Rate</label>
+            <input name="ttsRate"
+                   type="number"
+                   step="0.1"
+                   min="0.5"
+                   max="2"
+                   v-model="trackTtsRate" />
           </div>
         </div>
       </div>

@@ -10,7 +10,9 @@ const trackSchema = new mongoose.Schema({
   chunks: String,
   mode: String,
   notes: String,
-  ttsInstrunctions: String
+  ttsInstrunctions: String,
+  waveform: String,
+  ttsRate: String
 })
 trackSchema.set('timestamps', true)
 
@@ -21,7 +23,7 @@ exports.start_track = async (req: express.Request, res: express.Response) => {
   const t = await Track.findById(req.params.id)
   const track = t.chunks ? JSON.parse(t.chunks) : null
   const startTime = +req.params.startTime
-  startSendingInterval(track, t.mode, startTime, req.wss)
+  startSendingInterval(track, t.mode, t.waveform, t.ttsRate, startTime, req.wss)
   res.send(JSON.stringify({ data: 'Track started.' }))
 }
 
@@ -68,13 +70,17 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
     const name = req.body.name
     const notes = req.body.notes
     const mode = req.body.mode
+    const waveform = req.body.waveform
+    const ttsRate = req.body.ttsRate
     // Save track to DB
     const Track = mongoose.model('Track', trackSchema)
     const t = new Track({
       name,
       chunks: JSON.stringify(chunks),
       notes,
-      mode
+      mode,
+      waveform,
+      ttsRate
     })
     t.save(function (err: Error) {
       if (err) {
