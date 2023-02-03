@@ -38,7 +38,7 @@ exports.get_tracks = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   const Track = mongoose.model('Track', trackSchema)
   try {
-    const allTracks = await Track.find({}, '_id name notes mode')
+    const allTracks = await Track.find({}, '_id name notes mode waveform ttsRate')
     res.json(JSON.stringify({ tracks: allTracks }))
   }
   catch (err) {

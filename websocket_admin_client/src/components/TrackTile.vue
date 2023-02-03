@@ -9,6 +9,8 @@ defineEmits(['startTrack', 'deleteTrack'])
          class="cursor-pointer absolute top-0 right-1">✖</div>
     <h4 class="font-bold">{{ track.name }}</h4>
     <p>Mode: {{ track.mode }}</p>
+    <p>Waveform: {{ track.waveform }}</p>
+    <p>TTS Rate: {{ track.ttsRate }}</p>
     <p class="text-start">{{ track.notes }}</p>
     <Button @click="$emit('startTrack')"
             class="m-0 mb-2 self-center">Start</Button>
