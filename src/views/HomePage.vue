@@ -61,7 +61,6 @@
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonInput, IonLabel, IonItem, IonSelect, IonSelectOption } from '@ionic/vue';
 import { ref, onMounted, watch } from 'vue';
-import { TextToSpeech } from '@capacitor-community/text-to-speech'
 import { usePlayer } from '../composables/usePlayer';
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner';
 import { Storage } from '@ionic/storage';
@@ -85,7 +84,7 @@ const ttsLanguage = ref('en-US')
 
 const globalTime = ref(0)
 
-const { handleChunkData, startAudioCtx, setStartTime, setLogFunction, setTtsLanguage, setGlobalTimeRef } = usePlayer()
+const { handleChunkData, startAudioCtx, setStartTime, setLogFunction, setTtsLanguage, setGlobalTimeRef, setTrackSettings } = usePlayer()
 
 const { startScan } = useBarcodeScanner()
 
@@ -99,8 +98,8 @@ const register = () => {
 }
 
 const establishWebsocketConnection = () => {
-  // ws.value = new WebSocket(`ws://${VUE_APP_WS_SERVER_URL}:${VUE_APP_WS_SERVER_PORT}`)
-  ws.value = new WebSocket(VUE_APP_WS_LIVE_SERVER_URL)
+  ws.value = new WebSocket(`ws://${VUE_APP_WS_SERVER_URL}:${VUE_APP_WS_SERVER_PORT}`)
+  // ws.value = new WebSocket(VUE_APP_WS_LIVE_SERVER_URL)
 
   ws.value.onopen = function () {
     dLog('Websocket connection opened.')
@@ -129,10 +128,16 @@ const establishWebsocketConnection = () => {
     console.log('\nReceived message: ', data)
 
     // TODO: This is not ideal, we shouldn't set globalStartTime every time we receive data
+    // Is there a way around it though? Clients can join late. Do they need this information?
     setStartTime(data.startTime)
+    setTrackSettings(data.waveform, data.ttsRate)
     if (Object.keys(data.chunk)) {
-      dLog('Partials: ' + data.chunk.partials?.map((el: any) => el.index).sort((a: number, b: number) => a - b).join(', '))
-      dLog('TTS: ' + data.chunk.ttsInstructions)
+      if (data.chunk.partials) {
+        dLog('Partials: ' + data.chunk.partials.map((el: any) => el.index).sort((a: number, b: number) => a - b).join(', '))
+      }
+      if (data.chunk.ttsInstructions) {
+        dLog('TTS: ' + data.chunk.ttsInstructions)
+      }
       handleChunkData(data.chunk)
     }
   }

@@ -31,10 +31,8 @@ export function usePlayer () {
 
     console.log('\nHandling following chunk data: ', trackData)
 
-    // TODO: This is not ideal, we shouldn't set globalStartTime every time we receive data
+    // TODO: Refactor this
     currentChunkStartTimeInCtxTime.value = startTimeInCtxTime
-
-    // dlog('Calc global startime: ' + (currentChunkStartTimeInCtxTime.value + offset + trackData.partials[0].startTime))
 
     if (trackData.partials) {
       for (const partialChunk of trackData.partials) {
@@ -48,6 +46,8 @@ export function usePlayer () {
           const gainNode = ctx.createGain()
           oscNode.connect(gainNode)
           gainNode.connect(ctx.destination)
+
+          oscNode.type = waveform
 
           oscNode.start(startTimeInCtxTime + partialChunk.startTime)
           setBreakpoints(oscNode, gainNode, partialChunk.breakpoints, startTimeInCtxTime + partialChunk.endTime)
@@ -86,7 +86,7 @@ export function usePlayer () {
     await TextToSpeech.speak({
       text: text,
       lang: ttsLanguage,
-      rate: 1.0,
+      rate: ttsRate,
       pitch: 1.0,
       volume: 1.0,
       category: 'playback',
@@ -102,6 +102,14 @@ export function usePlayer () {
   const setGlobalTimeRef = (globalTimeRef: Ref<number>) => globalTime = globalTimeRef
   const setOffset = () => offset = globalTime.value - ctx.currentTime
 
+  let waveform: OscillatorType
+  let ttsRate = 1
+  const setTrackSettings = (wf: OscillatorType, rate: string) => {
+    console.log('Settings: ', wf, rate)
+    waveform = wf
+    ttsRate = +rate
+  }
+
   return {
     handleChunkData,
     initialSetup,
@@ -109,6 +117,7 @@ export function usePlayer () {
     setStartTime,
     setLogFunction,
     setTtsLanguage,
-    setGlobalTimeRef
+    setGlobalTimeRef,
+    setTrackSettings
   }
 }
