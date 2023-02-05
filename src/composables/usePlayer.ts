@@ -26,7 +26,7 @@ export function usePlayer () {
 
   const handleChunkData = (trackData: { partials: PartialChunk[], ttsInstructions: string }) => {
 
-    // Set offset to allow for ctx time drift
+    // Set offset again to allow for ctx time drift
     setOffset()
 
     console.log('\nHandling following chunk data: ', trackData)

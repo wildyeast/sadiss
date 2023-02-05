@@ -64,6 +64,8 @@ import { ref, onMounted, watch } from 'vue';
 import { usePlayer } from '../composables/usePlayer';
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner';
 import { Storage } from '@ionic/storage';
+import { Capacitor } from '@capacitor/core';
+import { BackgroundMode } from 'capacitor-plugin-background-mode'
 
 // Init storage
 const store = new Storage()
@@ -98,8 +100,8 @@ const register = () => {
 }
 
 const establishWebsocketConnection = () => {
-  ws.value = new WebSocket(`ws://${VUE_APP_WS_SERVER_URL}:${VUE_APP_WS_SERVER_PORT}`)
-  // ws.value = new WebSocket(VUE_APP_WS_LIVE_SERVER_URL)
+  // ws.value = new WebSocket(`ws://${VUE_APP_WS_SERVER_URL}:${VUE_APP_WS_SERVER_PORT}`)
+  ws.value = new WebSocket(VUE_APP_WS_LIVE_SERVER_URL)
 
   ws.value.onopen = function () {
     dLog('Websocket connection opened.')
@@ -176,7 +178,6 @@ onMounted(async () => {
   await store.create()
   choirId.value = await store.get('choirId')
   await initializeMCorp()
-  // register()
 })
 
 const logContainer = ref<HTMLDivElement | null>(null)
@@ -196,6 +197,8 @@ const dLog = (text: string) => {
   }
 }
 
+setLogFunction(dLog)
+
 // Scroll to bottom of logContainer after adding new log entry
 watch(() => logText.value.length, () => {
   const lastChild = logContainer.value?.lastElementChild
@@ -213,7 +216,17 @@ watch(() => choirId.value, async (value, oldValue) => {
   }
 })
 
-setLogFunction(dLog)
+watch(() => isRegistered.value, async (value) => {
+  if (Capacitor.isNativePlatform()) {
+    if (value) {
+      await BackgroundMode.enable()
+      dLog('Background Mode enabled.')
+    } else {
+      await BackgroundMode.disable()
+      dLog('Background Mode disabled.')
+    }
+  }
+})
 </script>
 
 <style scoped>

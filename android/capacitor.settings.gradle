@@ -19,3 +19,6 @@ project(':capacitor-keyboard').projectDir = new File('../node_modules/@capacitor
 
 include ':capacitor-status-bar'
 project(':capacitor-status-bar').projectDir = new File('../node_modules/@capacitor/status-bar/android')
+
+include ':capacitor-plugin-background-mode'
+project(':capacitor-plugin-background-mode').projectDir = new File('../node_modules/capacitor-plugin-background-mode/android')
