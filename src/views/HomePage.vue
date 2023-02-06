@@ -65,7 +65,7 @@ import { usePlayer } from '../composables/usePlayer';
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner';
 import { Storage } from '@ionic/storage';
 import { Capacitor } from '@capacitor/core';
-import { BackgroundMode } from 'capacitor-plugin-background-mode'
+import { BackgroundMode } from '@awesome-cordova-plugins/background-mode';
 
 // Init storage
 const store = new Storage()
@@ -100,8 +100,8 @@ const register = () => {
 }
 
 const establishWebsocketConnection = () => {
-  ws.value = new WebSocket(`ws://${VUE_APP_WS_SERVER_URL}:${VUE_APP_WS_SERVER_PORT}`)
-  // ws.value = new WebSocket(VUE_APP_WS_LIVE_SERVER_URL)
+  // ws.value = new WebSocket(`ws://${VUE_APP_WS_SERVER_URL}:${VUE_APP_WS_SERVER_PORT}`)
+  ws.value = new WebSocket(VUE_APP_WS_LIVE_SERVER_URL)
 
   ws.value.onopen = function () {
     dLog('Websocket connection opened.')
@@ -175,6 +175,9 @@ const scanCode = async () => {
 }
 
 onMounted(async () => {
+  // if (Capacitor.isNativePlatform()) {
+  // await BackgroundMode.requestForegroundPermission()
+  // }
   await store.create()
   choirId.value = await store.get('choirId')
   await initializeMCorp()
@@ -217,14 +220,20 @@ watch(() => choirId.value, async (value, oldValue) => {
 })
 
 watch(() => isRegistered.value, async (value) => {
-  if (Capacitor.isNativePlatform()) {
-    if (value) {
-      await BackgroundMode.enable()
-      dLog('Background Mode enabled.')
-    } else {
-      await BackgroundMode.disable()
-      dLog('Background Mode disabled.')
+  dLog('Test')
+  dLog(`Platform: ${Capacitor.getPlatform()}`)
+  try {
+    if (Capacitor.getPlatform() !== 'web') {
+      if (value) {
+        BackgroundMode.enable()
+        dLog('Background Mode enabled.')
+      } else {
+        BackgroundMode.disable()
+        dLog('Background Mode disabled.')
+      }
     }
+  } catch (error) {
+    dLog((error as string).toString())
   }
 })
 </script>
