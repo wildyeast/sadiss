@@ -201,6 +201,7 @@ let keepAliveIntervalId: NodeJS.Timer
 * @param {Server} wss The current ws websocket server instance.
 */
 export const startKeepAliveInterval = (wss: Server) => {
+  if (keepAliveIntervalId) return
   keepAliveIntervalId = setInterval(() => {
     if (wss.clients.size) {
       for (const client of wss.clients) {
