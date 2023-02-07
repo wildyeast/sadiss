@@ -102,6 +102,10 @@ const deleteTrack = async (id: string, name: string) => {
   }
 }
 
+const editTrack = async (id: string) => {
+  isUploadModalVisible.value = true
+}
+
 const tracks = ref<{ _id: string, name: string, notes: string }[]>([])
 const getTracks = async () => {
   await fetch(`${process.env.VUE_APP_API_URL}/get-tracks`)
@@ -154,7 +158,8 @@ onMounted(async () => {
                  :key="track._id"
                  :track="track"
                  @delete-track="deleteTrack(track._id, track.name)"
-                 @start-track="startTrack(track._id)" />
+                 @start-track="startTrack(track._id)"
+                 @edit-track="editTrack(track._id)" />
     </div>
 
     <Modal title="Upload track"

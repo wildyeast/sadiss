@@ -1,12 +1,14 @@
 <script setup lang="ts">
 defineProps(['track'])
-defineEmits(['startTrack', 'deleteTrack'])
+defineEmits(['startTrack', 'deleteTrack', 'editTrack'])
 </script>
 
 <template>
   <div class="border border-white rounded px-4 py-2 relative flex flex-col items-start">
-    <div @click="$emit('deleteTrack')"
-         class="cursor-pointer absolute top-0 right-1">✖</div>
+    <button @click="$emit('editTrack')"
+            class="absolute top-0 right-6">✎</button>
+    <button @click="$emit('deleteTrack')"
+            class="absolute top-0 right-1">✖</button>
     <h4 class="font-bold">{{ track.name }}</h4>
     <p>Mode: {{ track.mode }}</p>
     <p>Waveform: {{ track.waveform }}</p>
