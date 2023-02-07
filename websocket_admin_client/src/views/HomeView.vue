@@ -102,15 +102,38 @@ const deleteTrack = async (id: string, name: string) => {
   }
 }
 
+const partialFilePath = ref()
+const ttsFilePaths = ref<{ name: string, path: string }[]>()
 const editTrack = async (id: string) => {
-  isUploadModalVisible.value = true
+  try {
+    const data = await fetch(`${process.env.VUE_APP_API_URL}/get-track/${id}`)
+      .then(res => res.json())
+    const track = data[0]
+    trackName.value = track.name
+    trackIsChoir.value = track.mode === 'choir'
+    trackNotes.value = track.notes
+    trackWaveform.value = track.waveform
+    trackTtsRate.value = track.ttsRate
+
+    const partialFileArr = track.files.filter((file: { name: string, path: string }) => file.name === 'partialfile')
+    if (partialFileArr.length) {
+      partialFilePath.value = partialFileArr[0]
+    }
+
+    ttsFilePaths.value = track.files.filter((file: { name: string, path: string }) => file.name.includes('ttsfile'))
+
+    isUploadModalVisible.value = true
+  } catch (err) {
+    alert('Something went wrong. Error: ' + err)
+    return
+  }
 }
 
 const tracks = ref<{ _id: string, name: string, notes: string }[]>([])
 const getTracks = async () => {
   await fetch(`${process.env.VUE_APP_API_URL}/get-tracks`)
     .then(res => res.json())
-    .then(data => tracks.value = JSON.parse(data).tracks)
+    .then(data => tracks.value = data.tracks)
     .catch(err => console.log('Failed getting Tracks with: ', err))
 }
 
@@ -170,12 +193,18 @@ onMounted(async () => {
         <input v-model="trackName"
                class="w-3/4">
       </div>
-      <div class="flex flex-row my-8 justify-between p-2">
-        <div>Partials file</div>
-        <input type="file"
-               @change="handleFileUpload($event)"
-               accept="*.txt"
-               class="w-3/4">
+      <div class="my-8">
+        <div class="flex flex-row justify-between p-2">
+          <div>Partials file</div>
+          <input type="file"
+                 @change="handleFileUpload($event)"
+                 accept="*.txt"
+                 class="w-3/4">
+        </div>
+        <div>
+          <span>{{ partialFilePath.name }}</span>
+          <button>⤓</button>
+        </div>
       </div>
       <div class="flex flex-row my-8 justify-between p-2">
         <div>Choir</div>

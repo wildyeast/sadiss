@@ -12,6 +12,9 @@ router.post('/upload', upload.array('files'), track_controller.upload_track)
 // Get tracks
 router.get('/get-tracks', track_controller.get_tracks)
 
+// Get track
+router.get('/get-track/:id', track_controller.get_track)
+
 // Start track
 router.post('/start-track/:id/:startTime', track_controller.start_track)
 

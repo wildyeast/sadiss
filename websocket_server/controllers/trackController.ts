@@ -12,7 +12,8 @@ const trackSchema = new mongoose.Schema({
   notes: String,
   ttsInstrunctions: String,
   waveform: String,
-  ttsRate: String
+  ttsRate: String,
+  files: Object
 })
 trackSchema.set('timestamps', true)
 
@@ -39,11 +40,25 @@ exports.get_tracks = async (req: express.Request, res: express.Response) => {
   const Track = mongoose.model('Track', trackSchema)
   try {
     const allTracks = await Track.find({}, '_id name notes mode waveform ttsRate')
-    res.json(JSON.stringify({ tracks: allTracks }))
+    res.json({ tracks: allTracks })
   }
   catch (err) {
     console.log('Failed getting tracks with:', err)
-    res.status(500).json(JSON.stringify({ Error: 'Failed fetching tracks.' }))
+    res.status(500).json({ Error: 'Failed fetching tracks.' })
+  }
+}
+
+
+exports.get_track = async (req: express.Request, res: express.Response) => {
+  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+  const Track = mongoose.model('Track', trackSchema)
+  try {
+    const track = await Track.find({ _id: req.params.id }, '_id name notes mode waveform ttsRate files')
+    res.json(track)
+  }
+  catch (err) {
+    console.log('Failed getting track with:', err)
+    res.status(500).json({ Error: 'Failed fetching track.' })
   }
 }
 
@@ -80,8 +95,10 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
       notes,
       mode,
       waveform,
-      ttsRate
+      ttsRate,
+      files: Object.values(req.files).map((file: Express.Multer.File) => ({ name: file.originalname, path: file.path }))
     })
+
     t.save(function (err: Error) {
       if (err) {
         console.error('Error while uploading track', err)
