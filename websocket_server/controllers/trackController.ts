@@ -96,7 +96,7 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
       mode,
       waveform,
       ttsRate,
-      files: Object.values(req.files).map((file: Express.Multer.File) => ({ name: file.originalname, path: file.path }))
+      files: Object.values(req.files).map((file: Express.Multer.File) => ({ origName: file.originalname, fileName: file.filename }))
     })
 
     t.save(function (err: Error) {

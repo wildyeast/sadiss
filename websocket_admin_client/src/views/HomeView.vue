@@ -102,8 +102,8 @@ const deleteTrack = async (id: string, name: string) => {
   }
 }
 
-const partialFilePath = ref()
-const ttsFilePaths = ref<{ name: string, path: string }[]>()
+const partialFileDownloadInfo = ref()
+const ttsFileDownloadInfo = ref<{ name: string, path: string }[]>()
 const editTrack = async (id: string) => {
   try {
     const data = await fetch(`${process.env.VUE_APP_API_URL}/get-track/${id}`)
@@ -115,12 +115,12 @@ const editTrack = async (id: string) => {
     trackWaveform.value = track.waveform
     trackTtsRate.value = track.ttsRate
 
-    const partialFileArr = track.files.filter((file: { name: string, path: string }) => file.name === 'partialfile')
+    const partialFileArr = track.files.filter((file: { origName: string, fileName: string }) => file.origName === 'partialfile')
     if (partialFileArr.length) {
-      partialFilePath.value = partialFileArr[0]
+      partialFileDownloadInfo.value = partialFileArr[0]
     }
 
-    ttsFilePaths.value = track.files.filter((file: { name: string, path: string }) => file.name.includes('ttsfile'))
+    ttsFileDownloadInfo.value = track.files.filter((file: { origName: string, fileName: string }) => file.origName.includes('ttsfile'))
 
     isUploadModalVisible.value = true
   } catch (err) {
@@ -201,9 +201,9 @@ onMounted(async () => {
                  accept="*.txt"
                  class="w-3/4">
         </div>
-        <div v-if="partialFilePath">
-          <span>{{ partialFilePath.name }}</span>
-          <a :href="`https://sadiss.net/f/${partialFilePath.path.split('/')[1]}`"
+        <div v-if="partialFileDownloadInfo">
+          <span>{{ partialFileDownloadInfo.origName }}</span>
+          <a :href="`https://sadiss.net/f/${partialFileDownloadInfo.fileName}`"
              download="partials.txt">⤓</a>
         </div>
       </div>
