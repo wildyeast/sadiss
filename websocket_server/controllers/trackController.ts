@@ -1,8 +1,7 @@
 import express from 'express'
 import { chunk, startSendingInterval } from "../tools"
 import { convertSrtToJson } from '../tools/convertSrtToJson'
-
-const mongoose = require('mongoose')
+import mongoose from 'mongoose'
 
 // Define track schema for db
 const trackSchema = new mongoose.Schema({
@@ -16,28 +15,35 @@ const trackSchema = new mongoose.Schema({
   files: Object
 })
 trackSchema.set('timestamps', true)
+const Track = mongoose.model('Track', trackSchema)
 
 // Start track
 exports.start_track = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-  const Track = mongoose.model('Track', trackSchema)
-  const t = await Track.findById(req.params.id)
-  const track = t.chunks ? JSON.parse(t.chunks) : null
-  const startTime = +req.params.startTime
-  startSendingInterval(track, t.mode, t.waveform, t.ttsRate, startTime, req.wss)
-  res.send(JSON.stringify({ data: 'Track started.' }))
+  try {
+    const t = await Track.findById(req.params.id)
+    if (t) {
+      const track = t.chunks ? JSON.parse(t.chunks) : null
+      const startTime = +req.params.startTime
+      // @ts-expect-error TODO
+      startSendingInterval(track, t.mode, t.waveform, t.ttsRate, startTime, req.wss)
+      res.json({ data: 'Track started.' })
+    } else {
+      throw new Error('Track not found.')
+    }
+  } catch (err) {
+    res.status(500).json({ error: err })
+  }
 }
 
 exports.delete_track = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-  const Track = mongoose.model('Track', trackSchema)
   await Track.deleteOne({ _id: req.params.id })
   res.send()
 }
 
 exports.get_tracks = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-  const Track = mongoose.model('Track', trackSchema)
   try {
     const allTracks = await Track.find({}, '_id name notes mode waveform ttsRate')
     res.json({ tracks: allTracks })
@@ -51,7 +57,6 @@ exports.get_tracks = async (req: express.Request, res: express.Response) => {
 
 exports.get_track = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-  const Track = mongoose.model('Track', trackSchema)
   try {
     const track = await Track.find({ _id: req.params.id }, '_id name notes mode waveform ttsRate files')
     res.json(track)
@@ -88,7 +93,6 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
     const waveform = req.body.waveform
     const ttsRate = req.body.ttsRate
     // Save track to DB
-    const Track = mongoose.model('Track', trackSchema)
     const t = new Track({
       name,
       chunks: JSON.stringify(chunks),
@@ -99,7 +103,7 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
       files: Object.values(req.files).map((file: Express.Multer.File) => ({ origName: file.originalname, fileName: file.filename }))
     })
 
-    t.save(function (err: Error) {
+    t.save(function (err) {
       if (err) {
         console.error('Error while uploading track', err)
         return
