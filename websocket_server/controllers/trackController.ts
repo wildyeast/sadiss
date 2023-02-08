@@ -116,3 +116,34 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
     res.status(500).send()
   }
 }
+
+exports.edit_track = async (req: express.Request, res: express.Response) => {
+  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+
+  const patch = req.body
+
+  if (req.files) {
+    const partialFile = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname === 'partialfile')[0]
+    let path
+    if (partialFile) {
+      path = partialFile.path
+    }
+
+    const ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes('ttsfile'))
+    let ttsJson
+    if (ttsFiles.length) {
+      ttsJson = convertSrtToJson(ttsFiles)
+    }
+
+    const chunks = await chunk(path, ttsJson)
+    patch.chunks = JSON.stringify(chunks)
+  }
+
+  Track.findByIdAndUpdate(req.params.id, patch, { new: true }, ((err, track) => {
+    if (err) {
+      res.status(500).json({ error: err.message })
+    } else {
+      res.json(track)
+    }
+  }))
+}

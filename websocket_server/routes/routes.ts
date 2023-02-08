@@ -4,10 +4,14 @@ const track_controller = require('../controllers/trackController')
 
 const router = express.Router()
 
-// Upload track
 const multer = require('multer')
 const upload = multer({ dest: 'uploads/' })
+
+// Upload track
 router.post('/upload', upload.array('files'), track_controller.upload_track)
+
+// Edit track
+router.patch('/edit/:id', upload.array('files'), track_controller.edit_track)
 
 // Get tracks
 router.get('/get-tracks', track_controller.get_tracks)

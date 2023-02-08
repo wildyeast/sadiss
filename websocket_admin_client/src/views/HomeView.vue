@@ -1,10 +1,13 @@
 <script setup lang="ts">
-import { AxiosResponse } from 'axios';
-import { ref, onMounted, inject, computed, watch } from 'vue'
+import { Axios } from 'axios';
+import { ref, reactive, onMounted, inject, computed, watch } from 'vue'
 import TrackTile from '@/components/TrackTile.vue';
 
 const isUploadModalVisible = ref(false)
-const axios: any = inject('axios')
+const axios: Axios | undefined = inject('axios')
+if (!axios) {
+  throw Error("Could not inject axios.")
+}
 
 // const API_URL = 'http://localhost:3005'
 // const API_URL = 'https://sadiss.net/server'
@@ -45,7 +48,7 @@ const handleTtsFileUpload = async (e: Event, voice: number, lang: string) => {
   console.log(`Added to ttsFiles: Voice: ${voice}, lang: ${lang}, file: ${ttsFiles[voice][lang]}`)
 }
 
-const upload = () => {
+const upload = async () => {
   if (!trackName.value) {
     alert('You must enter a track title.')
   }
@@ -65,16 +68,33 @@ const upload = () => {
     }
   }
 
-  axios.post(`${process.env.VUE_APP_API_URL}/upload`, data)
-    .then((response: AxiosResponse) => {
-      console.log(response.data)
-      // Add newly added track to tracks
-      tracks.value.push(response.data)
+  if (!editingTrackId) {
+    axios.post(`${process.env.VUE_APP_API_URL}/upload`, data)
+      .then(response => {
+        console.log(response.data)
+        // Add newly added track to tracks
+        tracks.value.push(response.data)
+        isUploadModalVisible.value = false
+      })
+      .catch((error: Error) => {
+        console.log(error)
+      })
+  } else {
+    try {
+      const res = await axios.patch(`${process.env.VUE_APP_API_URL}/edit/${editingTrackId}`, data)
+      console.log(res.data)
+      const trackIdx = tracks.value.map(track => track._id).indexOf(editingTrackId)
+      tracks.value[trackIdx] = {
+        ...tracks.value[trackIdx],
+        ...res.data
+      }
+    } catch (err) {
+      alert('Failed udpating track. ' + err)
+    } finally {
+      editingTrackId = ''
       isUploadModalVisible.value = false
-    })
-    .catch((error: Error) => {
-      console.log(error)
-    })
+    }
+  }
 
   // Clear TTS file object so they don't get uploaded on next track upload
   for (const ttsFile in ttsFiles) delete ttsFiles[ttsFile];
@@ -104,11 +124,13 @@ const deleteTrack = async (id: string, name: string) => {
 
 const partialFileDownloadInfo = ref()
 const ttsFileDownloadInfo = ref<{ origName: string, fileName: string }[]>()
+let editingTrackId = ''
 const editTrack = async (id: string) => {
   try {
     const data = await fetch(`${process.env.VUE_APP_API_URL}/get-track/${id}`)
       .then(res => res.json())
     const track = data[0]
+    editingTrackId = track._id
     trackName.value = track.name
     trackIsChoir.value = track.mode === 'choir'
     trackNotes.value = track.notes
@@ -125,6 +147,7 @@ const editTrack = async (id: string) => {
     isUploadModalVisible.value = true
   } catch (err) {
     alert('Something went wrong. Error: ' + err)
+    editingTrackId = ''
     return
   }
 }
