@@ -203,7 +203,8 @@ onMounted(async () => {
         </div>
         <div v-if="partialFilePath">
           <span>{{ partialFilePath.name }}</span>
-          <button>⤓</button>
+          <a :href="`https://sadiss.net/f/${partialFilePath.path.split('/')[1]}`"
+             download="partials.txt">⤓</a>
         </div>
       </div>
       <div class="flex flex-row my-8 justify-between p-2">
