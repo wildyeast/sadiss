@@ -103,7 +103,7 @@ const deleteTrack = async (id: string, name: string) => {
 }
 
 const partialFileDownloadInfo = ref()
-const ttsFileDownloadInfo = ref<{ name: string, path: string }[]>()
+const ttsFileDownloadInfo = ref<{ origName: string, fileName: string }[]>()
 const editTrack = async (id: string) => {
   try {
     const data = await fetch(`${process.env.VUE_APP_API_URL}/get-track/${id}`)
@@ -213,24 +213,33 @@ onMounted(async () => {
                v-model="trackIsChoir"
                class="w-3/4">
       </div>
-      <div class="flex flex-row my-8 justify-between p-2">
-        <div>Subtitle files</div>
-        <div class="w-3/4">
-          <div class="flex gap-2 mb-2">
-            <input type="number"
-                   v-model.number="numberOfVoices"
-                   v-show="trackIsChoir" />
-            <input type="text"
-                   placeholder="e.g. en-US, de-DE"
-                   v-model="ttsLanguages" />
+      <div class="my-8">
+        <div class="flex flex-row justify-between p-2">
+          <div>Subtitle files</div>
+          <div class="w-3/4">
+            <div class="flex gap-2 mb-2">
+              <input type="number"
+                     v-model.number="numberOfVoices"
+                     v-show="trackIsChoir" />
+              <input type="text"
+                     placeholder="e.g. en-US, de-DE"
+                     v-model="ttsLanguages" />
+            </div>
+            <div v-for="voiceLang of voiceLangCombinations"
+                 class="flex gap-2 justify-between">
+              <label class="w-1/4">{{ voiceLang[0] }} {{ voiceLang[1] }}</label>
+              <input type="file"
+                     @change="handleTtsFileUpload($event, +voiceLang[0], voiceLang[1].toString())"
+                     accept="*.txt"
+                     class="w-3/4">
+            </div>
           </div>
-          <div v-for="voiceLang of voiceLangCombinations"
-               class="flex gap-2 justify-between">
-            <label class="w-1/4">{{ voiceLang[0] }} {{ voiceLang[1] }}</label>
-            <input type="file"
-                   @change="handleTtsFileUpload($event, +voiceLang[0], voiceLang[1].toString())"
-                   accept="*.txt"
-                   class="w-3/4">
+        </div>
+        <div v-if="ttsFileDownloadInfo">
+          <div v-for="file of ttsFileDownloadInfo">
+            <span>{{ file.origName }}</span>
+            <a :href="`https://sadiss.net/f/${file.fileName}`"
+               :download="`${file.origName}.txt`">⤓</a>
           </div>
         </div>
       </div>
