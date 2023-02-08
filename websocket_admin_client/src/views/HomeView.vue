@@ -201,7 +201,7 @@ onMounted(async () => {
                  accept="*.txt"
                  class="w-3/4">
         </div>
-        <div>
+        <div v-if="partialFilePath">
           <span>{{ partialFilePath.name }}</span>
           <button>⤓</button>
         </div>
