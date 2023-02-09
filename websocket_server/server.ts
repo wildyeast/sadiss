@@ -27,7 +27,7 @@ mongoose.connect(mongoURI)
 const BASE_URL = '127.0.0.1'
 const BASE_PORT = 3005
 
-const whitelist = [`http://${BASE_URL}:${BASE_PORT}`, 'http://127.0.0.1:5173', 'http://localhost:8081' /** other domains if any */]
+const whitelist = [`http://${BASE_URL}:${BASE_PORT}`, 'http://127.0.0.1:5173', 'http://localhost:8081', 'https://sadiss.net' /** other domains if any */]
 const corsOptions = {
   origin: (origin: string, callback: Function) => {
     if (whitelist.indexOf(origin) !== -1) {
