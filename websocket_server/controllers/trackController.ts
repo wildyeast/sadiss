@@ -12,7 +12,8 @@ const trackSchema = new mongoose.Schema({
   ttsInstrunctions: String,
   waveform: String,
   ttsRate: String,
-  files: Object
+  partialFile: Object,
+  ttsFiles: Array
 })
 trackSchema.set('timestamps', true)
 const Track = mongoose.model('Track', trackSchema)
@@ -58,7 +59,7 @@ exports.get_tracks = async (req: express.Request, res: express.Response) => {
 exports.get_track = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   try {
-    const track = await Track.find({ _id: req.params.id }, '_id name notes mode waveform ttsRate files')
+    const track = await Track.find({ _id: req.params.id }, '_id name notes mode waveform ttsRate partialFile ttsFiles')
     res.json(track)
   }
   catch (err) {
@@ -75,8 +76,11 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
   try {
     const partialFile = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname === 'partialfile')[0]
     let path
+    const partialFileToSave = <{ origName: string, fileName: string }>{}
     if (partialFile) {
       path = partialFile.path
+      partialFileToSave.origName = partialFile.originalname
+      partialFileToSave.fileName = partialFile.filename
     }
 
     const ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes('ttsfile'))
@@ -100,7 +104,8 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
       mode,
       waveform,
       ttsRate,
-      files: Object.values(req.files).map((file: Express.Multer.File) => ({ origName: file.originalname, fileName: file.filename }))
+      partialFile: partialFileToSave,
+      ttsFiles: ttsFiles.map((file: Express.Multer.File) => ({ origName: file.originalname, fileName: file.filename }))
     })
 
     t.save(function (err) {
@@ -127,12 +132,17 @@ exports.edit_track = async (req: express.Request, res: express.Response) => {
     let path
     if (partialFile) {
       path = partialFile.path
+      patch.partialFile = {
+        origName: partialFile.originalname,
+        fileName: partialFile.filename
+      }
     }
 
     const ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes('ttsfile'))
     let ttsJson
     if (ttsFiles.length) {
       ttsJson = convertSrtToJson(ttsFiles)
+      patch.ttsFiles = Object.values(req.files).map((file: Express.Multer.File) => ({ origName: file.originalname, fileName: file.filename }))
     }
 
     const chunks = await chunk(path, ttsJson)

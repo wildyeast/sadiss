@@ -136,13 +136,8 @@ const editTrack = async (id: string) => {
     trackNotes.value = track.notes
     trackWaveform.value = track.waveform
     trackTtsRate.value = track.ttsRate
-
-    const partialFileArr = track.files.filter((file: { origName: string, fileName: string }) => file.origName === 'partialfile')
-    if (partialFileArr.length) {
-      partialFileDownloadInfo.value = partialFileArr[0]
-    }
-
-    ttsFileDownloadInfo.value = track.files.filter((file: { origName: string, fileName: string }) => file.origName.includes('ttsfile'))
+    partialFileDownloadInfo.value = track.partialFile
+    ttsFileDownloadInfo.value = track.ttsFiles
 
     isUploadModalVisible.value = true
   } catch (err) {
@@ -259,10 +254,12 @@ onMounted(async () => {
           </div>
         </div>
         <div v-if="ttsFileDownloadInfo">
-          <div v-for="file of ttsFileDownloadInfo">
+          <div v-for="file of ttsFileDownloadInfo"
+               class="flex justify-center items-center gap-2">
             <span>{{ file.origName }}</span>
             <a :href="`https://sadiss.net/f/${file.fileName}`"
-               :download="`${file.origName}.txt`">⤓</a>
+               :download="`${file.origName}.txt`"
+               class="text-xl">⤓</a>
           </div>
         </div>
       </div>
