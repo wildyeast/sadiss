@@ -30,8 +30,7 @@ const BASE_PORT = 3005
 const whitelist = [`http://${BASE_URL}:${BASE_PORT}`, 'http://127.0.0.1:5173', 'http://localhost:8081', 'https://sadiss.net' /** other domains if any */]
 const corsOptions = {
   origin: (origin: string, callback: Function) => {
-    console.log('CORS - Origin: ', origin)
-    if (whitelist.indexOf(origin) !== -1) {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
       // TODO: Find out what exactly the following line does. Code is copy/pasted.
       // Read this https://www.npmjs.com/package/cors#configuring-cors-asynchronously
       // and this https://stackoverflow.com/questions/72287773/do-not-understand-the-function-with-express-and-cors
