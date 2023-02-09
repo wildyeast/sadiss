@@ -17,7 +17,7 @@ const trackNotes = ref('')
 const trackIsChoir = ref(false)
 const trackWaveform = ref('sine')
 const trackTtsRate = ref(1)
-let file: File
+let file: File | undefined
 
 const numberOfVoices = ref(2)
 const ttsLanguages = ref('en-US, de-DE')
@@ -96,6 +96,8 @@ const upload = async () => {
     }
   }
 
+  // Clear partial file so it doesn't get uploaded on next track upload
+  file = undefined
   // Clear TTS file object so they don't get uploaded on next track upload
   for (const ttsFile in ttsFiles) delete ttsFiles[ttsFile];
 }
