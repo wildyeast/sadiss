@@ -219,10 +219,12 @@ onMounted(async () => {
                  accept="*.txt"
                  class="w-3/4">
         </div>
-        <div v-if="partialFileDownloadInfo">
-          <span>{{ partialFileDownloadInfo.origName }}</span>
+        <div v-if="partialFileDownloadInfo"
+             class="flex justify-center items-center gap-2">
+          <span>partials.txt</span>
           <a :href="`https://sadiss.net/f/${partialFileDownloadInfo.fileName}`"
-             download="partials.txt">⤓</a>
+             download="partials.txt"
+             class="text-xl">⤓</a>
         </div>
       </div>
       <div class="flex flex-row my-8 justify-between p-2">
