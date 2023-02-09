@@ -127,7 +127,7 @@ const establishWebsocketConnection = () => {
     }
 
     const data = JSON.parse(event.data)
-    console.log('\nReceived message: ', data)
+    console.log('\nReceived message: ', Object.keys(data))
 
     // TODO: This is not ideal, we shouldn't set globalStartTime every time we receive data
     // Is there a way around it though? Clients can join late. Do they need this information?
@@ -220,8 +220,6 @@ watch(() => choirId.value, async (value, oldValue) => {
 })
 
 watch(() => isRegistered.value, async (value) => {
-  dLog('Test')
-  dLog(`Platform: ${Capacitor.getPlatform()}`)
   try {
     if (Capacitor.getPlatform() !== 'web') {
       if (value) {

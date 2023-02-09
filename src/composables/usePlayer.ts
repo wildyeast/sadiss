@@ -24,12 +24,12 @@ export function usePlayer () {
 
   let startTimeInCtxTime: number
 
-  const handleChunkData = (trackData: { partials: PartialChunk[], ttsInstructions: string }) => {
+  const handleChunkData = async (trackData: { partials: PartialChunk[], ttsInstructions: string }) => {
 
     // Set offset again to allow for ctx time drift
     setOffset()
 
-    console.log('\nHandling following chunk data: ', trackData)
+    // console.log('\nHandling following chunk data: ', trackData)
 
     // TODO: Refactor this
     currentChunkStartTimeInCtxTime.value = startTimeInCtxTime
@@ -67,7 +67,7 @@ export function usePlayer () {
     if (trackData.ttsInstructions) {
       const tts = trackData.ttsInstructions
       console.log('Speaking: ', tts)
-      speak(tts)
+      await speak(tts)
     }
 
   }
@@ -105,7 +105,6 @@ export function usePlayer () {
   let waveform: OscillatorType
   let ttsRate = 1
   const setTrackSettings = (wf: OscillatorType, rate: string) => {
-    console.log('Settings: ', wf, rate)
     waveform = wf
     ttsRate = +rate
   }
