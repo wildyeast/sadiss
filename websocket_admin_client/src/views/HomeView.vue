@@ -107,7 +107,12 @@ const startTrack = async (id: string) => {
     method: 'POST'
   })
     .then(res => res.json())
-    .then(res => console.log(res))
+    .then(res => {
+      console.log(res)
+      if (res.data === 'Track already running.') {
+        alert('Cannot start track: Already running.')
+      }
+    })
 }
 
 const deleteTrack = async (id: string, name: string) => {

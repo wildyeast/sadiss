@@ -27,8 +27,12 @@ exports.start_track = async (req: express.Request, res: express.Response) => {
       const track = t.chunks ? JSON.parse(t.chunks) : null
       const startTime = +req.params.startTime
       // @ts-expect-error TODO
-      startSendingInterval(track, t.mode, t.waveform, t.ttsRate, startTime, req.wss)
-      res.json({ data: 'Track started.' })
+      const trackStarted = startSendingInterval(track, t.mode, t.waveform, t.ttsRate, startTime, req.wss)
+      if (trackStarted) {
+        res.json({ data: 'Track started.' })
+      } else {
+        res.json({ data: 'Track already running.' })
+      }
     } else {
       throw new Error('Track not found.')
     }

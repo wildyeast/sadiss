@@ -6,6 +6,10 @@ let sendingIntervalRunning = false
 export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstructions: { [voice: string]: { [lang: string]: string } } }[],
   mode: Mode, waveform: string, ttsRate: string, startTime: number, wss: Server) => {
 
+  if (sendingIntervalRunning) {
+    return false
+  }
+
   if (keepAliveIntervalId) {
     clearInterval(keepAliveIntervalId)
     keepAliveIntervalId = null
@@ -195,6 +199,8 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
     chunkIndex = 0
     startKeepAliveInterval(wss)
   }
+
+  return true
 }
 
 
