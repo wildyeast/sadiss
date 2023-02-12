@@ -14,6 +14,7 @@
       </ion-header>
 
       <div id="container">
+        <p>v0.0.5</p>
         <ion-item>
           <ion-label>Choir ID:</ion-label>
           <ion-input type="number"
