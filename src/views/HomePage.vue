@@ -15,6 +15,14 @@
 
       <div id="container">
         <p>v0.0.5</p>
+        <div v-if="motion && motion.pos"
+             style="display: flex; flex-direction: column; align-items: start; width: 20rem;">
+          <p>ctx Time: {{ debugData.ctxTime }}</p>
+          <p>Offset: {{ debugData.offset }}</p>
+          <p>Global Time: {{ motion.pos }}</p>
+          <p>Calced Global Time: {{ debugData.ctxTime! + debugData.offset }}</p>
+          <p>Diff: {{ motion.pos - debugData.offset - debugData.ctxTime! }}</p>
+        </div>
         <ion-item>
           <ion-label>Choir ID:</ion-label>
           <ion-input type="number"
@@ -61,7 +69,7 @@
 
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonInput, IonLabel, IonItem, IonSelect, IonSelectOption } from '@ionic/vue';
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, watch, computed, reactive } from 'vue';
 import { usePlayer } from '../composables/usePlayer';
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner';
 import { Storage } from '@ionic/storage';
@@ -85,9 +93,12 @@ const ws = ref<WebSocket>()
 const choirId = ref(1)
 const ttsLanguage = ref('en-US')
 
-const globalTime = ref(0)
+const { handleChunkData, startAudioCtx, setStartTime, setLogFunction, setTtsLanguage, setMotionRef, setTrackSettings, getDebugData } = usePlayer()
+const debugData = ref<{ ctxTime: number | undefined, offset: number }>({ ctxTime: -1, offset: -1 })
 
-const { handleChunkData, startAudioCtx, setStartTime, setLogFunction, setTtsLanguage, setGlobalTimeRef, setTrackSettings } = usePlayer()
+setInterval(() => {
+  debugData.value = getDebugData()
+}, 50)
 
 const { startScan } = useBarcodeScanner()
 
@@ -153,18 +164,11 @@ const initializeMCorp = async () => {
   // eslint-disable-next-line
   const mCorpApp = MCorp.app(VUE_APP_MCORP_API_KEY, { anon: true })
   mCorpApp.run = () => {
-    motion = mCorpApp.motions['shared']
+    motion = reactive(mCorpApp.motions['shared'])
     mcorpConnected.value = true
-    setGlobalTimeRef(globalTime)
-    startClock()
+    setMotionRef(motion)
   }
   mCorpApp.init()
-}
-
-const startClock = () => {
-  setInterval(() => {
-    globalTime.value = motion.pos
-  }, 10)
 }
 
 const scanCode = async () => {
@@ -222,7 +226,7 @@ watch(() => choirId.value, async (value, oldValue) => {
 
 watch(() => isRegistered.value, async (value) => {
   try {
-    if (Capacitor.getPlatform() !== 'web') {
+    if (Capacitor.getPlatform() === 'ios') {
       if (value) {
         BackgroundMode.enable()
         dLog('Background Mode enabled.')

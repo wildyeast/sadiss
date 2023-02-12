@@ -1,4 +1,4 @@
-import { Ref, ref } from "vue"
+import { reactive, Ref, ref } from "vue"
 import { TextToSpeech } from '@capacitor-community/text-to-speech'
 import { PartialChunk, OscillatorObject, Breakpoint } from "../types/types"
 
@@ -41,6 +41,7 @@ export function usePlayer () {
           console.log('Found osc.')
           setBreakpoints(oscObj.oscillator, oscObj.gain, partialChunk.breakpoints, startTimeInCtxTime + partialChunk.endTime)
         } else {
+          if (!ctx) return
           console.log('Creating osc.')
           const oscNode = ctx.createOscillator()
           const gainNode = ctx.createGain()
@@ -98,15 +99,23 @@ export function usePlayer () {
     ttsLanguage = lang
   }
 
-  let globalTime: Ref<number>
-  const setGlobalTimeRef = (globalTimeRef: Ref<number>) => globalTime = globalTimeRef
-  const setOffset = () => offset = globalTime.value - ctx.currentTime
+  let motion: { pos: number } = reactive({ pos: -1 })
+  const setMotionRef = (motionRef: { pos: number }) => motion = motionRef
+  const setOffset = () => offset = motion.pos - ctx.currentTime
 
   let waveform: OscillatorType
   let ttsRate = 1
   const setTrackSettings = (wf: OscillatorType, rate: string) => {
     waveform = wf
     ttsRate = +rate
+  }
+
+  const getDebugData = () => {
+    const ctxTime = ctx ? ctx.currentTime : undefined
+    return {
+      ctxTime,
+      offset
+    }
   }
 
   return {
@@ -116,7 +125,8 @@ export function usePlayer () {
     setStartTime,
     setLogFunction,
     setTtsLanguage,
-    setGlobalTimeRef,
-    setTrackSettings
+    setMotionRef,
+    setTrackSettings,
+    getDebugData
   }
 }
