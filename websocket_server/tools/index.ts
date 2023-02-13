@@ -1,2 +1,2 @@
 export { chunk } from './chunk'
-export { startSendingInterval } from './startSendingInterval'
+export { startSendingInterval, stopSendingInterval } from './startSendingInterval'

@@ -19,10 +19,13 @@ router.get('/get-tracks', track_controller.get_tracks)
 // Get track
 router.get('/get-track/:id', track_controller.get_track)
 
+// Delete track
+router.post('/delete-track/:id', track_controller.delete_track)
+
 // Start track
 router.post('/start-track/:id/:startTime', track_controller.start_track)
 
-// Delete track
-router.post('/delete-track/:id', track_controller.delete_track)
+// Stop track
+router.get('/stop-track', track_controller.stop_track)
 
 module.exports = router

@@ -207,6 +207,12 @@ export const startSendingInterval = (
   const reset = () => {
     partialMap = {}
     chunkIndex = 0
+
+    // Notify all clients of track end
+    for (const client of wss.clients) {
+      client.send(JSON.stringify({ stop: true }))
+    }
+
     startKeepAliveInterval(wss)
   }
 
@@ -228,4 +234,8 @@ export const startKeepAliveInterval = (wss: Server) => {
     }
   }, 50000)
   console.log('Keep Alive Interval started.')
+}
+
+export const stopSendingInterval = () => {
+  sendingIntervalRunning = false
 }

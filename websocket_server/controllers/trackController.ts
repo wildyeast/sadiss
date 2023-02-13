@@ -1,5 +1,5 @@
 import express from 'express'
-import { chunk, startSendingInterval } from '../tools'
+import { chunk, startSendingInterval, stopSendingInterval } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose from 'mongoose'
 
@@ -160,4 +160,9 @@ exports.edit_track = async (req: express.Request, res: express.Response) => {
       res.json(track)
     }
   })
+}
+
+exports.stop_track = (req: express.Request, res: express.Response) => {
+  stopSendingInterval()
+  res.send({ message: 'Track stopped.' })
 }
