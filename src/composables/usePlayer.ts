@@ -1,18 +1,17 @@
-import { reactive, Ref, ref } from "vue"
+import { reactive, Ref, ref } from 'vue'
 import { TextToSpeech } from '@capacitor-community/text-to-speech'
-import { PartialChunk, OscillatorObject, Breakpoint } from "../types/types"
+import { PartialChunk, OscillatorObject, Breakpoint } from '../types/types'
 
-export function usePlayer () {
+export function usePlayer() {
   let ctx: AudioContext
   const oscillators: OscillatorObject[] = []
   const currentChunkStartTimeInCtxTime = ref()
   let offset: number
   let dlog: (text: string) => void
 
-  const setLogFunction = (logFunction: (text: string) => void) => dlog = logFunction
+  const setLogFunction = (logFunction: (text: string) => void) => (dlog = logFunction)
 
-
-  const initialSetup = (partialChunks: { partials: PartialChunk[], ttsInstructions: string }) => {
+  const initialSetup = (partialChunks: { partials: PartialChunk[]; ttsInstructions: string }) => {
     handleChunkData(partialChunks)
   }
 
@@ -24,8 +23,7 @@ export function usePlayer () {
 
   let startTimeInCtxTime: number
 
-  const handleChunkData = async (trackData: { partials: PartialChunk[], ttsInstructions: string }) => {
-
+  const handleChunkData = async (trackData: { partials: PartialChunk[]; ttsInstructions: string }) => {
     // Set offset again to allow for ctx time drift
     setOffset()
 
@@ -36,7 +34,7 @@ export function usePlayer () {
 
     if (trackData.partials) {
       for (const partialChunk of trackData.partials) {
-        const oscObj = oscillators.find(el => el.index === partialChunk.index)
+        const oscObj = oscillators.find((el) => el.index === partialChunk.index)
         if (oscObj) {
           console.log('Found osc.')
           setBreakpoints(oscObj.oscillator, oscObj.gain, partialChunk.breakpoints, startTimeInCtxTime + partialChunk.endTime)
@@ -56,7 +54,7 @@ export function usePlayer () {
           oscNode.stop(startTimeInCtxTime + partialChunk.endTime)
 
           oscNode.onended = (event) => {
-            const oscObj = oscillators.find(oscObj => oscObj.oscillator === event.target)
+            const oscObj = oscillators.find((oscObj) => oscObj.oscillator === event.target)
             if (oscObj) oscillators.splice(oscillators.indexOf(oscObj), 1)
           }
 
@@ -70,7 +68,6 @@ export function usePlayer () {
       console.log('Speaking: ', tts)
       await speak(tts)
     }
-
   }
 
   const setBreakpoints = (oscNode: OscillatorNode, gainNode: GainNode, breakpoints: Breakpoint[], chunkEndTime: number) => {
@@ -81,7 +78,13 @@ export function usePlayer () {
     }
   }
 
-  const setStartTime = (startTime: number) => startTimeInCtxTime = startTime - offset
+  const setStartTime = (startTime: number) => (startTimeInCtxTime = startTime - offset)
+
+  const stopPlayback = () => {
+    for (const osc of oscillators) {
+      osc.oscillator.stop()
+    }
+  }
 
   const speak = async (text: string) => {
     await TextToSpeech.speak({
@@ -90,7 +93,7 @@ export function usePlayer () {
       rate: ttsRate,
       pitch: 1.0,
       volume: 1.0,
-      category: 'playback',
+      category: 'playback'
     })
   }
 
@@ -100,8 +103,8 @@ export function usePlayer () {
   }
 
   let motion: { pos: number } = reactive({ pos: -1 })
-  const setMotionRef = (motionRef: { pos: number }) => motion = motionRef
-  const setOffset = () => offset = motion.pos - ctx.currentTime
+  const setMotionRef = (motionRef: { pos: number }) => (motion = motionRef)
+  const setOffset = () => (offset = motion.pos - ctx.currentTime)
 
   let waveform: OscillatorType
   let ttsRate = 1
@@ -127,6 +130,7 @@ export function usePlayer () {
     setTtsLanguage,
     setMotionRef,
     setTrackSettings,
-    getDebugData
+    getDebugData,
+    stopPlayback
   }
 }

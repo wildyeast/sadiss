@@ -15,8 +15,9 @@
 
       <div id="container">
         <p>v0.0.5</p>
-        <div v-if="motion && motion.pos"
-             style="display: flex; flex-direction: column; align-items: start; width: 20rem;">
+        <div
+          v-if="motion && motion.pos"
+          style="display: flex; flex-direction: column; align-items: start; width: 20rem">
           <p>ctx Time: {{ debugData.ctxTime }}</p>
           <p>Offset: {{ debugData.offset }}</p>
           <p>Global Time: {{ motion.pos }}</p>
@@ -25,8 +26,9 @@
         </div>
         <ion-item>
           <ion-label>Choir ID:</ion-label>
-          <ion-input type="number"
-                     v-model.number="choirId" />
+          <ion-input
+            type="number"
+            v-model.number="choirId" />
         </ion-item>
 
         <ion-item>
@@ -37,23 +39,27 @@
           </ion-select>
         </ion-item>
 
-        <ion-button @click="register"
-                    :disabled="!mcorpConnected"
-                    class="btn__register"
-                    :class="{ btn__register_active: isRegistered }">
-          {{ isRegistered? 'Registered': 'Register' }}
+        <ion-button
+          @click="register"
+          :disabled="!mcorpConnected"
+          class="btn__register"
+          :class="{ btn__register_active: isRegistered }">
+          {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
-        <ion-button @click="scanCode"
-                    class="btn__scan_barcode"
-                    :class="{ btn__register_active: isRegistered }">
+        <ion-button
+          @click="scanCode"
+          class="btn__scan_barcode"
+          :class="{ btn__register_active: isRegistered }">
           QR
         </ion-button>
-        <div class="logContainer"
-             ref="logContainer">
-          <div v-for="log, idx of logText"
-               :key="idx"
-               style="width: 100%; display: flex; color: white;">
-            <span style="min-width: 20%;">{{ log.timestamp }}</span>
+        <div
+          class="logContainer"
+          ref="logContainer">
+          <div
+            v-for="(log, idx) of logText"
+            :key="idx"
+            style="width: 100%; display: flex; color: white">
+            <span style="min-width: 20%">{{ log.timestamp }}</span>
             <span style="text-align: left">{{ log.text }}</span>
           </div>
         </div>
@@ -68,13 +74,25 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, IonInput, IonLabel, IonItem, IonSelect, IonSelectOption } from '@ionic/vue';
-import { ref, onMounted, watch, computed, reactive } from 'vue';
-import { usePlayer } from '../composables/usePlayer';
-import { useBarcodeScanner } from '@/composables/useBarcodeScanner';
-import { Storage } from '@ionic/storage';
-import { Capacitor } from '@capacitor/core';
-import { BackgroundMode } from '@awesome-cordova-plugins/background-mode';
+import {
+  IonContent,
+  IonHeader,
+  IonPage,
+  IonTitle,
+  IonToolbar,
+  IonButton,
+  IonInput,
+  IonLabel,
+  IonItem,
+  IonSelect,
+  IonSelectOption
+} from '@ionic/vue'
+import { ref, onMounted, watch, reactive } from 'vue'
+import { usePlayer } from '../composables/usePlayer'
+import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
+import { Storage } from '@ionic/storage'
+import { Capacitor } from '@capacitor/core'
+import { BackgroundMode } from '@awesome-cordova-plugins/background-mode'
 
 // Init storage
 const store = new Storage()
@@ -93,8 +111,22 @@ const ws = ref<WebSocket>()
 const choirId = ref(1)
 const ttsLanguage = ref('en-US')
 
-const { handleChunkData, startAudioCtx, setStartTime, setLogFunction, setTtsLanguage, setMotionRef, setTrackSettings, getDebugData } = usePlayer()
-const debugData = ref<{ ctxTime: number | undefined, offset: number }>({ ctxTime: -1, offset: -1 })
+const {
+  handleChunkData,
+  startAudioCtx,
+  setStartTime,
+  setLogFunction,
+  setTtsLanguage,
+  setMotionRef,
+  setTrackSettings,
+  getDebugData,
+  stopPlayback
+} = usePlayer()
+
+const debugData = ref<{ ctxTime: number | undefined; offset: number }>({
+  ctxTime: -1,
+  offset: -1
+})
 
 setInterval(() => {
   debugData.value = getDebugData()
@@ -112,24 +144,32 @@ const register = () => {
 }
 
 const establishWebsocketConnection = () => {
-  // ws.value = new WebSocket(`ws://${VUE_APP_WS_SERVER_URL}:${VUE_APP_WS_SERVER_PORT}`)
-  ws.value = new WebSocket(VUE_APP_WS_LIVE_SERVER_URL)
+  ws.value = new WebSocket(`ws://${VUE_APP_WS_SERVER_URL}:${VUE_APP_WS_SERVER_PORT}`)
+  // ws.value = new WebSocket(VUE_APP_WS_LIVE_SERVER_URL)
 
   ws.value.onopen = function () {
     dLog('Websocket connection opened.')
     isRegistered.value = true
-    this.send(JSON.stringify({ message: 'clientInfo', clientId: choirId.value, ttsLang: ttsLanguage.value }))
+    this.send(
+      JSON.stringify({
+        message: 'clientInfo',
+        clientId: choirId.value,
+        ttsLang: ttsLanguage.value
+      })
+    )
   }
 
   ws.value.onclose = () => {
     dLog('Websocket connection closed.')
     isRegistered.value = false
+    stopPlayback()
     // Trying to reconnect here while App is in background does not work.
   }
 
-  ws.value.onerror = error => {
+  ws.value.onerror = (error) => {
     isRegistered.value = false
     console.error(error)
+    stopPlayback()
   }
 
   ws.value.onmessage = (event) => {
@@ -141,13 +181,25 @@ const establishWebsocketConnection = () => {
     const data = JSON.parse(event.data)
     console.log('\nReceived message: ', Object.keys(data))
 
+    if (data.stop) {
+      dLog('Track stopped.')
+      stopPlayback()
+      return
+    }
+
     // TODO: This is not ideal, we shouldn't set globalStartTime every time we receive data
     // Is there a way around it though? Clients can join late. Do they need this information?
     setStartTime(data.startTime)
     setTrackSettings(data.waveform, data.ttsRate)
     if (Object.keys(data.chunk)) {
       if (data.chunk.partials) {
-        dLog('Partials: ' + data.chunk.partials.map((el: any) => el.index).sort((a: number, b: number) => a - b).join(', '))
+        dLog(
+          'Partials: ' +
+            data.chunk.partials
+              .map((el: any) => el.index)
+              .sort((a: number, b: number) => a - b)
+              .join(', ')
+        )
       }
       if (data.chunk.ttsInstructions) {
         dLog('TTS: ' + data.chunk.ttsInstructions)
@@ -173,10 +225,10 @@ const initializeMCorp = async () => {
 
 const scanCode = async () => {
   // Make camera visible and everything else invisible in app viewport, classes defined in App.vue
-  document.body.classList.add("qrscanner");
+  document.body.classList.add('qrscanner')
   await startScan()
   // Make camera invisible, and everything else visible
-  document.body.classList.remove("qrscanner");
+  document.body.classList.remove('qrscanner')
 }
 
 onMounted(async () => {
@@ -189,12 +241,13 @@ onMounted(async () => {
 })
 
 const logContainer = ref<HTMLDivElement | null>(null)
-const logText = ref<{ text: string, timestamp: string }[]>([])
-/** 
-* Prints the given string to the on-screen log.
-* @param string text - String to print to log. 
-*/
+const logText = ref<{ text: string; timestamp: string }[]>([])
+/**
+ * Prints the given string to the on-screen log.
+ * @param string text - String to print to log.
+ */
 const dLog = (text: string) => {
+  console.log(text)
   const localTime = new Date().toLocaleString()
   logText.value.push({
     text,
@@ -208,37 +261,46 @@ const dLog = (text: string) => {
 setLogFunction(dLog)
 
 // Scroll to bottom of logContainer after adding new log entry
-watch(() => logText.value.length, () => {
-  const lastChild = logContainer.value?.lastElementChild
-  if (lastChild) {
-    lastChild.scrollIntoView({ behavior: 'smooth' })
+watch(
+  () => logText.value.length,
+  () => {
+    const lastChild = logContainer.value?.lastElementChild
+    if (lastChild) {
+      lastChild.scrollIntoView({ behavior: 'smooth' })
+    }
   }
-})
+)
 
 // Watch choir id input change and save to storage if changed
 // TODO: This is only for testing and should be commented out / removed in final version
 // since choir ids are assigned to clients via QR code and not by user
-watch(() => choirId.value, async (value, oldValue) => {
-  if (typeof value === 'number' && value !== oldValue) {
-    await store.set('choirId', value)
-  }
-})
-
-watch(() => isRegistered.value, async (value) => {
-  try {
-    if (Capacitor.getPlatform() === 'ios') {
-      if (value) {
-        BackgroundMode.enable()
-        dLog('Background Mode enabled.')
-      } else {
-        BackgroundMode.disable()
-        dLog('Background Mode disabled.')
-      }
+watch(
+  () => choirId.value,
+  async (value, oldValue) => {
+    if (typeof value === 'number' && value !== oldValue) {
+      await store.set('choirId', value)
     }
-  } catch (error) {
-    dLog((error as string).toString())
   }
-})
+)
+
+watch(
+  () => isRegistered.value,
+  async (value) => {
+    try {
+      if (Capacitor.getPlatform() === 'ios') {
+        if (value) {
+          BackgroundMode.enable()
+          dLog('Background Mode enabled.')
+        } else {
+          BackgroundMode.disable()
+          dLog('Background Mode disabled.')
+        }
+      }
+    } catch (error) {
+      dLog((error as string).toString())
+    }
+  }
+)
 </script>
 
 <style scoped>
@@ -267,7 +329,6 @@ watch(() => isRegistered.value, async (value) => {
   color: #8c8c8c;
 
   margin: 0;
-
 }
 
 #container a {
