@@ -1,11 +1,16 @@
-import { Server } from "ws"
-import { PartialChunk, Mode } from "../types/types"
+import { Server } from 'ws'
+import { PartialChunk, Mode } from '../types/types'
 
 let sendingIntervalRunning = false
 // More or less accurate timer taken from https://stackoverflow.com/a/29972322/16725862
-export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstructions: { [voice: string]: { [lang: string]: string } } }[],
-  mode: Mode, waveform: string, ttsRate: string, startTime: number, wss: Server) => {
-
+export const startSendingInterval = (
+  track: { partials: PartialChunk[]; ttsInstructions: { [voice: string]: { [lang: string]: string } } }[],
+  mode: Mode,
+  waveform: string,
+  ttsRate: string,
+  startTime: number,
+  wss: Server
+) => {
   if (sendingIntervalRunning) {
     return false
   }
@@ -29,7 +34,7 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
   // Start
   setTimeout(step, interval)
 
-  function step () {
+  function step() {
     if (!sendingIntervalRunning) {
       console.log('Sending interval stopped.')
       reset()
@@ -52,14 +57,18 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
     }
 
     if (wss.clients.size) {
-
       // Distribute partials among clients and send them to clients
       if (mode === 'choir') {
         // Choir mode
         wss.clients.forEach((client) => {
           if (client.isAdmin) return
 
-          const dataToSend: { startTime: number, waveform: string, ttsRate: string, chunk: { partials?: PartialChunk[], ttsInstructions?: string } } = {
+          const dataToSend: {
+            startTime: number
+            waveform: string
+            ttsRate: string
+            chunk: { partials?: PartialChunk[]; ttsInstructions?: string }
+          } = {
             startTime: startTime + 2,
             waveform,
             ttsRate,
@@ -86,7 +95,7 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
         // nonChoir mode
 
         const clientArr = Array.from(wss.clients)
-        const clients = clientArr.filter(client => !client.isAdmin)
+        const clients = clientArr.filter((client) => !client.isAdmin)
         const partials = track[chunkIndex]?.partials
 
         const newPartialMap: { [partialIndex: string]: string[] } = {}
@@ -106,7 +115,7 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
               // Distribute again to same client, if client still connected
               const clientIdsLastIteration = partialMap[partial.index]
               for (const clientId of clientIdsLastIteration) {
-                const client = clients.find(c => c.id === clientId)
+                const client = clients.find((c) => c.id === clientId)
                 if (!client) {
                   // Client has disconnected
                   clientIdsLastIteration.splice(clientIdsLastIteration.indexOf(clientId, 1))
@@ -132,13 +141,14 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
           }
 
           // If clients with no partials, give them the partial that is least distributed
-          const clientsWithoutPartials = clients.filter(client => !allocatedPartials[client.id].length)
+          const clientsWithoutPartials = clients.filter((client) => !allocatedPartials[client.id].length)
 
           for (const client of clientsWithoutPartials) {
-            const partialIdLeastDistributed =
-              Object.keys(newPartialMap).sort((a, b) => newPartialMap[a].length - newPartialMap[b].length)[0]
+            const partialIdLeastDistributed = Object.keys(newPartialMap).sort(
+              (a, b) => newPartialMap[a].length - newPartialMap[b].length
+            )[0]
 
-            const partial = partials.find(p => p.index === +partialIdLeastDistributed)
+            const partial = partials.find((p) => p.index === +partialIdLeastDistributed)
             if (partial) {
               newPartialMap[partialIdLeastDistributed].push(client.id)
               allocatedPartials[client.id].push(partial)
@@ -149,8 +159,8 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
         }
 
         for (const client of wss.clients) {
-          const dataToSend: { partials: PartialChunk[], ttsInstructions?: string } = {
-            partials: allocatedPartials[client.id],
+          const dataToSend: { partials: PartialChunk[]; ttsInstructions?: string } = {
+            partials: allocatedPartials[client.id]
           }
           if (track[chunkIndex] && track[chunkIndex].ttsInstructions) {
             const ttsInstructions = Object.values(track[chunkIndex].ttsInstructions)[0]
@@ -176,7 +186,7 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
 
   const getClientIdWithMinPartials = (allocatedPartials: { [clientId: string]: PartialChunk[] }) => {
     return Object.keys(allocatedPartials)
-      .map(k => ({ clientId: k, partials: allocatedPartials[k] }))
+      .map((k) => ({ clientId: k, partials: allocatedPartials[k] }))
       .sort((a, b) => a.partials.length - b.partials.length)[0].clientId
 
     // Probably faster
@@ -203,12 +213,11 @@ export const startSendingInterval = (track: { partials: PartialChunk[], ttsInstr
   return true
 }
 
-
 let keepAliveIntervalId: NodeJS.Timer | null
-/** 
-* Sends a message to all clients connnected to the websocket server every 50 seconds to keep the connection alive.
-* @param {Server} wss The current ws websocket server instance.
-*/
+/**
+ * Sends a message to all clients connnected to the websocket server every 50 seconds to keep the connection alive.
+ * @param {Server} wss The current ws websocket server instance.
+ */
 export const startKeepAliveInterval = (wss: Server) => {
   if (keepAliveIntervalId) return
   keepAliveIntervalId = setInterval(() => {
