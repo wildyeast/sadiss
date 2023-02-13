@@ -144,8 +144,8 @@ const register = () => {
 }
 
 const establishWebsocketConnection = () => {
-  ws.value = new WebSocket(`ws://${VUE_APP_WS_SERVER_URL}:${VUE_APP_WS_SERVER_PORT}`)
-  // ws.value = new WebSocket(VUE_APP_WS_LIVE_SERVER_URL)
+  // ws.value = new WebSocket(`ws://${VUE_APP_WS_SERVER_URL}:${VUE_APP_WS_SERVER_PORT}`)
+  ws.value = new WebSocket(VUE_APP_WS_LIVE_SERVER_URL)
 
   ws.value.onopen = function () {
     dLog('Websocket connection opened.')
