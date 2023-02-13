@@ -1,5 +1,5 @@
 import express from 'express'
-import { chunk, startSendingInterval } from "../tools"
+import { chunk, startSendingInterval } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose from 'mongoose'
 
@@ -52,21 +52,18 @@ exports.get_tracks = async (req: express.Request, res: express.Response) => {
   try {
     const allTracks = await Track.find({}, '_id name notes mode waveform ttsRate')
     res.json({ tracks: allTracks })
-  }
-  catch (err) {
+  } catch (err) {
     console.log('Failed getting tracks with:', err)
     res.status(500).json({ Error: 'Failed fetching tracks.' })
   }
 }
-
 
 exports.get_track = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   try {
     const track = await Track.find({ _id: req.params.id }, '_id name notes mode waveform ttsRate partialFile ttsFiles')
     res.json(track)
-  }
-  catch (err) {
+  } catch (err) {
     console.log('Failed getting track with:', err)
     res.status(500).json({ Error: 'Failed fetching track.' })
   }
@@ -80,7 +77,7 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
   try {
     const partialFile = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname === 'partialfile')[0]
     let path
-    const partialFileToSave = <{ origName: string, fileName: string }>{}
+    const partialFileToSave = <{ origName: string; fileName: string }>{}
     if (partialFile) {
       path = partialFile.path
       partialFileToSave.origName = partialFile.originalname
@@ -146,18 +143,21 @@ exports.edit_track = async (req: express.Request, res: express.Response) => {
     let ttsJson
     if (ttsFiles.length) {
       ttsJson = convertSrtToJson(ttsFiles)
-      patch.ttsFiles = Object.values(req.files).map((file: Express.Multer.File) => ({ origName: file.originalname, fileName: file.filename }))
+      patch.ttsFiles = Object.values(req.files).map((file: Express.Multer.File) => ({
+        origName: file.originalname,
+        fileName: file.filename
+      }))
     }
 
     const chunks = await chunk(path, ttsJson)
     patch.chunks = JSON.stringify(chunks)
   }
 
-  Track.findByIdAndUpdate(req.params.id, patch, { new: true }, ((err, track) => {
+  Track.findByIdAndUpdate(req.params.id, patch, { new: true }, (err, track) => {
     if (err) {
       res.status(500).json({ error: err.message })
     } else {
       res.json(track)
     }
-  }))
+  })
 }

@@ -31,7 +31,7 @@ const whitelist = [
   `http://${BASE_URL}:${BASE_PORT}`,
   'http://127.0.0.1:5173',
   'http://localhost:8081',
-  'https://sadiss.net' /** other domains if any */,
+  'https://sadiss.net' /** other domains if any */
 ]
 const corsOptions = {
   origin: (origin: string, callback: Function) => {
@@ -43,7 +43,7 @@ const corsOptions = {
     } else {
       callback(new Error('Not allowed by CORS.'))
     }
-  },
+  }
 }
 
 const app = express()
@@ -69,9 +69,7 @@ wss.on('connection', (client) => {
     if (parsed.message === 'clientInfo') {
       client.choirId = parsed.clientId
       client.ttsLang = parsed.ttsLang
-      console.log(
-        `Client ${client.id} registered with choir id ${client.choirId} and TTS lang ${client.ttsLang}`
-      )
+      console.log(`Client ${client.id} registered with choir id ${client.choirId} and TTS lang ${client.ttsLang}`)
     }
   }
 })
