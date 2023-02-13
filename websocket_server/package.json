@@ -30,6 +30,8 @@
     "@types/ws": "^8.5.4",
     "concurrently": "^7.6.0",
     "nodemon": "^2.0.20",
+    "prettier": "^2.8.4",
+    "prettier-plugin-tailwindcss": "^0.2.2",
     "typescript": "^4.9.4"
   }
 }
