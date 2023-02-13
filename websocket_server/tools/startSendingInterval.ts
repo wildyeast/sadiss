@@ -176,6 +176,8 @@ export const startSendingInterval = (
 
         partialMap = newPartialMap
       }
+    } else {
+      console.log('No clients to distribute to.')
     }
 
     chunkIndex++
