@@ -27,7 +27,12 @@ mongoose.connect(mongoURI)
 const BASE_URL = '127.0.0.1'
 const BASE_PORT = 3005
 
-const whitelist = [`http://${BASE_URL}:${BASE_PORT}`, 'http://127.0.0.1:5173', 'http://localhost:8081', 'https://sadiss.net' /** other domains if any */]
+const whitelist = [
+  `http://${BASE_URL}:${BASE_PORT}`,
+  'http://127.0.0.1:5173',
+  'http://localhost:8081',
+  'https://sadiss.net' /** other domains if any */,
+]
 const corsOptions = {
   origin: (origin: string, callback: Function) => {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
@@ -38,7 +43,7 @@ const corsOptions = {
     } else {
       callback(new Error('Not allowed by CORS.'))
     }
-  }
+  },
 }
 
 const app = express()
@@ -52,19 +57,21 @@ app.listen(BASE_PORT, () => console.log(`Http server listening on port ${BASE_PO
 const wss = new Server({ port: +process.env.WS_SERVER_PORT! })
 console.log(`Websocket server listening on port ${process.env.WS_SERVER_PORT}.`)
 startKeepAliveInterval(wss)
-wss.on('connection', client => {
+wss.on('connection', (client) => {
   // Assign id to new connection, needed for nonChoir partial distribution
   client.id = uuid.v4()
   console.log('New client connected! Assigned id: ', client.id)
 
   client.onclose = () => console.log('Client has disconnected!')
 
-  client.onmessage = event => {
+  client.onmessage = (event) => {
     const parsed: Message = JSON.parse(event.data.toString())
     if (parsed.message === 'clientInfo') {
       client.choirId = parsed.clientId
       client.ttsLang = parsed.ttsLang
-      console.log(`Client ${client.id} registered with choir id ${client.choirId} and TTS lang ${client.ttsLang}`)
+      console.log(
+        `Client ${client.id} registered with choir id ${client.choirId} and TTS lang ${client.ttsLang}`
+      )
     }
   }
 })
@@ -78,4 +85,3 @@ app.use((req, res, next) => {
 })
 app.use('/', routes)
 app.use((req, res) => res.status(404))
-
