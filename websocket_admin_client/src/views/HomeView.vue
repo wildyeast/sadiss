@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { Axios } from 'axios';
+import { Axios } from 'axios'
 import { ref, reactive, onMounted, inject, computed, watch } from 'vue'
-import TrackTile from '@/components/TrackTile.vue';
+import TrackTile from '@/components/TrackTile.vue'
 
 const isUploadModalVisible = ref(false)
 const axios: Axios | undefined = inject('axios')
 if (!axios) {
-  throw Error("Could not inject axios.")
+  throw Error('Could not inject axios.')
 }
 
 // const API_URL = 'http://localhost:3005'
@@ -69,8 +69,9 @@ const upload = async () => {
   }
 
   if (!editingTrackId) {
-    axios.post(`${process.env.VUE_APP_API_URL}/upload`, data)
-      .then(response => {
+    axios
+      .post(`${process.env.VUE_APP_API_URL}/upload`, data)
+      .then((response) => {
         console.log(response.data)
         // Add newly added track to tracks
         tracks.value.push(response.data)
@@ -83,7 +84,7 @@ const upload = async () => {
     try {
       const res = await axios.patch(`${process.env.VUE_APP_API_URL}/edit/${editingTrackId}`, data)
       console.log(res.data)
-      const trackIdx = tracks.value.map(track => track._id).indexOf(editingTrackId)
+      const trackIdx = tracks.value.map((track) => track._id).indexOf(editingTrackId)
       tracks.value[trackIdx] = {
         ...tracks.value[trackIdx],
         ...res.data
@@ -99,15 +100,15 @@ const upload = async () => {
   // Clear partial file so it doesn't get uploaded on next track upload
   file = undefined
   // Clear TTS file object so they don't get uploaded on next track upload
-  for (const ttsFile in ttsFiles) delete ttsFiles[ttsFile];
+  for (const ttsFile in ttsFiles) delete ttsFiles[ttsFile]
 }
 
 const startTrack = async (id: string) => {
   await fetch(`${process.env.VUE_APP_API_URL}/start-track/${id}/${globalTime.value + 2}`, {
     method: 'POST'
   })
-    .then(res => res.json())
-    .then(res => {
+    .then((res) => res.json())
+    .then((res) => {
       console.log(res)
       if (res.data === 'Track already running.') {
         alert('Cannot start track: Already running.')
@@ -121,21 +122,19 @@ const deleteTrack = async (id: string, name: string) => {
       await fetch(`${process.env.VUE_APP_API_URL}/delete-track/${id}`, {
         method: 'POST'
       })
-      tracks.value = tracks.value.filter(track => track._id !== id)
-    }
-    catch (err) {
+      tracks.value = tracks.value.filter((track) => track._id !== id)
+    } catch (err) {
       console.log('Failed deleting track with: ', err)
     }
   }
 }
 
 const partialFileDownloadInfo = ref()
-const ttsFileDownloadInfo = ref<{ origName: string, fileName: string }[]>()
+const ttsFileDownloadInfo = ref<{ origName: string; fileName: string }[]>()
 let editingTrackId = ''
 const editTrack = async (id: string) => {
   try {
-    const data = await fetch(`${process.env.VUE_APP_API_URL}/get-track/${id}`)
-      .then(res => res.json())
+    const data = await fetch(`${process.env.VUE_APP_API_URL}/get-track/${id}`).then((res) => res.json())
     const track = data[0]
     editingTrackId = track._id
     trackName.value = track.name
@@ -154,12 +153,12 @@ const editTrack = async (id: string) => {
   }
 }
 
-const tracks = ref<{ _id: string, name: string, notes: string }[]>([])
+const tracks = ref<{ _id: string; name: string; notes: string }[]>([])
 const getTracks = async () => {
   await fetch(`${process.env.VUE_APP_API_URL}/get-tracks`)
-    .then(res => res.json())
-    .then(data => tracks.value = data.tracks)
-    .catch(err => console.log('Failed getting Tracks with: ', err))
+    .then((res) => res.json())
+    .then((data) => (tracks.value = data.tracks))
+    .catch((err) => console.log('Failed getting Tracks with: ', err))
 }
 
 let motion: any
@@ -193,92 +192,110 @@ onMounted(async () => {
   await initializeMCorp()
   await getTracks()
 })
-
 </script>
 <template>
-  <div class="flex flex-col w-[90%] mx-auto">
+  <div class="mx-auto flex w-[90%] flex-col 2xl:w-[70%]">
     <p>{{ globalTime.toFixed(0) }}</p>
     <Button @click="isUploadModalVisible = true">Upload new track</Button>
 
-    <div v-if="tracks.length"
-         class="flex flex-col gap-2">
-      <TrackTile v-for="track of tracks"
-                 :key="track._id"
-                 :track="track"
-                 @delete-track="deleteTrack(track._id, track.name)"
-                 @start-track="startTrack(track._id)"
-                 @edit-track="editTrack(track._id)" />
+    <div
+      v-if="tracks.length"
+      class="grid gap-2 sm:grid-cols-3 lg:grid-cols-5">
+      <TrackTile
+        v-for="track of tracks"
+        :key="track._id"
+        :track="track"
+        @delete-track="deleteTrack(track._id, track.name)"
+        @start-track="startTrack(track._id)"
+        @edit-track="editTrack(track._id)" />
     </div>
 
-    <Modal title="Upload track"
-           v-if="isUploadModalVisible"
-           @close="isUploadModalVisible = false">
-      <div class="flex flex-row my-8 justify-between p-2">
+    <Modal
+      title="Upload track"
+      v-if="isUploadModalVisible"
+      @close="isUploadModalVisible = false">
+      <div class="my-8 flex flex-row justify-between p-2">
         <div>Title</div>
-        <input v-model="trackName"
-               class="w-3/4">
+        <input
+          v-model="trackName"
+          class="w-3/4" />
       </div>
       <div class="my-8">
         <div class="flex flex-row justify-between p-2">
           <div>Partials file</div>
-          <input type="file"
-                 @change="handleFileUpload($event)"
-                 accept="*.txt"
-                 class="w-3/4">
+          <input
+            type="file"
+            @change="handleFileUpload($event)"
+            accept="*.txt"
+            class="w-3/4" />
         </div>
-        <div v-if="partialFileDownloadInfo"
-             class="flex justify-center items-center gap-2">
+        <div
+          v-if="partialFileDownloadInfo"
+          class="flex items-center justify-center gap-2">
           <span>partials.txt</span>
-          <a :href="`https://sadiss.net/f/${partialFileDownloadInfo.fileName}`"
-             download="partials.txt"
-             class="text-xl">⤓</a>
+          <a
+            :href="`https://sadiss.net/f/${partialFileDownloadInfo.fileName}`"
+            download="partials.txt"
+            class="text-xl"
+            >⤓</a
+          >
         </div>
       </div>
-      <div class="flex flex-row my-8 justify-between p-2">
+      <div class="my-8 flex flex-row justify-between p-2">
         <div>Choir</div>
-        <input type="checkbox"
-               v-model="trackIsChoir"
-               class="w-3/4">
+        <input
+          type="checkbox"
+          v-model="trackIsChoir"
+          class="w-3/4" />
       </div>
       <div class="my-8">
         <div class="flex flex-row justify-between p-2">
           <div>Subtitle files</div>
           <div class="w-3/4">
-            <div class="flex gap-2 mb-2">
-              <input type="number"
-                     v-model.number="numberOfVoices"
-                     v-show="trackIsChoir" />
-              <input type="text"
-                     placeholder="e.g. en-US, de-DE"
-                     v-model="ttsLanguages" />
+            <div class="mb-2 flex gap-2">
+              <input
+                type="number"
+                v-model.number="numberOfVoices"
+                v-show="trackIsChoir" />
+              <input
+                type="text"
+                placeholder="e.g. en-US, de-DE"
+                v-model="ttsLanguages" />
             </div>
-            <div v-for="voiceLang of voiceLangCombinations"
-                 class="flex gap-2 justify-between">
+            <div
+              v-for="voiceLang of voiceLangCombinations"
+              class="flex justify-between gap-2">
               <label class="w-1/4">{{ voiceLang[0] }} {{ voiceLang[1] }}</label>
-              <input type="file"
-                     @change="handleTtsFileUpload($event, +voiceLang[0], voiceLang[1].toString())"
-                     accept="*.txt"
-                     class="w-3/4">
+              <input
+                type="file"
+                @change="handleTtsFileUpload($event, +voiceLang[0], voiceLang[1].toString())"
+                accept="*.txt"
+                class="w-3/4" />
             </div>
           </div>
         </div>
         <div v-if="ttsFileDownloadInfo">
-          <div v-for="file of ttsFileDownloadInfo"
-               class="flex justify-center items-center gap-2">
+          <div
+            v-for="file of ttsFileDownloadInfo"
+            class="flex items-center justify-center gap-2">
             <span>{{ file.origName }}</span>
-            <a :href="`https://sadiss.net/f/${file.fileName}`"
-               :download="`${file.origName}.txt`"
-               class="text-xl">⤓</a>
+            <a
+              :href="`https://sadiss.net/f/${file.fileName}`"
+              :download="`${file.origName}.txt`"
+              class="text-xl"
+              >⤓</a
+            >
           </div>
         </div>
       </div>
-      <div class="flex flex-row my-8 justify-between p-2">
+      <div class="my-8 flex flex-row justify-between p-2">
         <div>Settings</div>
-        <div class="w-3/4 flex flex-col items-start gap-2">
+        <div class="flex w-3/4 flex-col items-start gap-2">
           <div class="flex gap-4">
             <label for="waveform">Waveform</label>
-            <select name="waveform"
-                    v-model="trackWaveform">
+            <select
+              name="waveform"
+              v-model="trackWaveform">
               <option value="sine">Sine</option>
               <option value="square">Square</option>
               <option value="triangle">Triangle</option>
@@ -287,21 +304,23 @@ onMounted(async () => {
           </div>
           <div class="flex gap-4">
             <label for="ttsRate">TTS Rate</label>
-            <input name="ttsRate"
-                   type="number"
-                   step="0.1"
-                   min="0.5"
-                   max="2"
-                   v-model="trackTtsRate" />
+            <input
+              name="ttsRate"
+              type="number"
+              step="0.1"
+              min="0.5"
+              max="2"
+              v-model="trackTtsRate" />
           </div>
         </div>
       </div>
-      <div class="flex flex-row my-8 justify-between p-2">
+      <div class="my-8 flex flex-row justify-between p-2">
         <div>Private notes</div>
-        <textarea v-model="trackNotes"
-                  class="w-3/4" />
+        <textarea
+          v-model="trackNotes"
+          class="w-3/4" />
       </div>
-      <div class="flex flex-row w-full justify-center">
+      <div class="flex w-full flex-row justify-center">
         <Button @click="upload">Upload</Button>
       </div>
     </Modal>

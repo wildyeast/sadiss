@@ -4,10 +4,7 @@ defineEmits(['startTrack', 'deleteTrack', 'editTrack'])
 
 const stopTrack = async () => {
   try {
-    const res = await fetch(`${process.env.VUE_APP_API_URL}/stop-track`)
-    if (res.ok) {
-      alert('Playback stopped.')
-    }
+    await fetch(`${process.env.VUE_APP_API_URL}/stop-track`)
   } catch (err) {
     alert('Error when stopping track: ' + err)
   }
