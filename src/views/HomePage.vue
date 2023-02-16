@@ -120,7 +120,10 @@ const {
   setMotionRef,
   setTrackSettings,
   getDebugData,
-  stopPlayback
+  stopPlayback,
+  playContinuousSound,
+  stopContinuousSound,
+  setOffset
 } = usePlayer()
 
 const debugData = ref<{ ctxTime: number | undefined; offset: number }>({
@@ -180,6 +183,11 @@ const establishWebsocketConnection = () => {
 
     const data = JSON.parse(event.data)
     console.log('\nReceived message: ', Object.keys(data))
+
+    if (data.start) {
+      dLog('Initial setting of offset.')
+      setOffset()
+    }
 
     if (data.stop) {
       dLog('Track stopped.')
@@ -283,24 +291,36 @@ watch(
   }
 )
 
-watch(
-  () => isRegistered.value,
-  async (value) => {
-    try {
-      if (Capacitor.getPlatform() === 'ios') {
-        if (value) {
-          BackgroundMode.enable()
-          dLog('Background Mode enabled.')
-        } else {
-          BackgroundMode.disable()
-          dLog('Background Mode disabled.')
-        }
-      }
-    } catch (error) {
-      dLog((error as string).toString())
-    }
-  }
-)
+// Enable/Disable BackgroundMode depending on registration status (iOS only)
+// watch(
+//   () => isRegistered.value,
+//   async (value) => {
+//     try {
+//       if (Capacitor.getPlatform() === 'ios') {
+//         if (value) {
+//           BackgroundMode.enable()
+//           dLog('Background Mode enabled.')
+//         } else {
+//           BackgroundMode.disable()
+//           dLog('Background Mode disabled.')
+//         }
+//       }
+//     } catch (error) {
+//       dLog((error as string).toString())
+//     }
+//   }
+// )
+
+// watch(
+//   () => isRegistered.value,
+//   async (value) => {
+//     if (value) {
+//       playContinuousSound()
+//     } else {
+//       stopContinuousSound()
+//     }
+//   }
+// )
 </script>
 
 <style scoped>
