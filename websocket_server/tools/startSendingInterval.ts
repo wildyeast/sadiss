@@ -11,6 +11,7 @@ export const startSendingInterval = (
   startTime: number,
   wss: Server
 ) => {
+  console.log('SSI')
   if (sendingIntervalRunning) {
     return false
   }
@@ -22,6 +23,15 @@ export const startSendingInterval = (
   }
 
   sendingIntervalRunning = true
+
+  // Send start message to Max
+  for (const client of wss.clients) {
+    if (client.isAdmin) {
+      console.log('Sending start message to Max')
+      client.send('start')
+      break
+    }
+  }
 
   const interval = 1000 // ms
   let expected = Date.now() + interval
@@ -169,7 +179,7 @@ export const startSendingInterval = (
             }
           }
 
-          if (dataToSend.partials.length || dataToSend.ttsInstructions) {
+          if (dataToSend.partials?.length || dataToSend.ttsInstructions) {
             client.send(JSON.stringify({ startTime: startTime + 2, waveform, ttsRate, chunk: dataToSend }))
           }
         }
@@ -187,9 +197,11 @@ export const startSendingInterval = (
   }
 
   const getClientIdWithMinPartials = (allocatedPartials: { [clientId: string]: PartialChunk[] }) => {
-    return Object.keys(allocatedPartials)
+    const p = Object.keys(allocatedPartials)
       .map((k) => ({ clientId: k, partials: allocatedPartials[k] }))
-      .sort((a, b) => a.partials.length - b.partials.length)[0].clientId
+      .sort((a, b) => a.partials.length - b.partials.length)
+    if (!p) return
+    return p[0].clientId
 
     // Probably faster
     // return Object.keys(allocatedPartials).reduce((acc, clientId) => {
@@ -212,6 +224,10 @@ export const startSendingInterval = (
 
     // Notify all clients of track end
     for (const client of wss.clients) {
+      if (client.isAdmin) {
+	client.send('stop')
+	continue
+      }	      
       client.send(JSON.stringify({ stop: true }))
     }
 
