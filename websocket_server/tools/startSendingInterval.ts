@@ -133,8 +133,10 @@ export const startSendingInterval = (
                   // If all clients disconnected, give to client with least partials
                   if (!clientIdsLastIteration.length) {
                     const clientIdWithMinPartials = getClientIdWithMinPartials(allocatedPartials)
-                    newPartialMap[partial.index].push(clientIdWithMinPartials)
-                    allocatedPartials[clientIdWithMinPartials].push(partial)
+                    if (clientIdWithMinPartials) {
+                      newPartialMap[partial.index].push(clientIdWithMinPartials)
+                      allocatedPartials[clientIdWithMinPartials].push(partial)
+                    }
                   }
                 } else {
                   // Client still connected
@@ -145,8 +147,10 @@ export const startSendingInterval = (
             } else {
               // Partial was not distributed last iteration
               const clientIdWithMinPartials = getClientIdWithMinPartials(allocatedPartials)
-              newPartialMap[partial.index].push(clientIdWithMinPartials)
-              allocatedPartials[clientIdWithMinPartials].push(partial)
+              if (clientIdWithMinPartials) {
+                newPartialMap[partial.index].push(clientIdWithMinPartials)
+                allocatedPartials[clientIdWithMinPartials].push(partial)
+              }
             }
           }
 
@@ -225,9 +229,9 @@ export const startSendingInterval = (
     // Notify all clients of track end
     for (const client of wss.clients) {
       if (client.isAdmin) {
-	client.send('stop')
-	continue
-      }	      
+        client.send('stop')
+        continue
+      }
       client.send(JSON.stringify({ stop: true }))
     }
 
