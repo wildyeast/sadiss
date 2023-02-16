@@ -28,7 +28,12 @@ export function useBarcodeScanner() {
     console.log('End of scan.')
   }
 
+  const stopScan = () => {
+    BarcodeScanner.stopScan()
+  }
+
   return {
-    startScan
+    startScan,
+    stopScan
   }
 }

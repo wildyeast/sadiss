@@ -87,12 +87,13 @@ import {
   IonSelect,
   IonSelectOption
 } from '@ionic/vue'
-import { ref, onMounted, watch, reactive } from 'vue'
+import { ref, onMounted, watch, reactive, onDeactivated } from 'vue'
 import { usePlayer } from '../composables/usePlayer'
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
 import { Storage } from '@ionic/storage'
 import { Capacitor } from '@capacitor/core'
 import { BackgroundMode } from '@awesome-cordova-plugins/background-mode'
+import { BarcodeScanner } from '@capacitor-community/barcode-scanner'
 
 // Init storage
 const store = new Storage()
@@ -135,7 +136,7 @@ setInterval(() => {
   debugData.value = getDebugData()
 }, 50)
 
-const { startScan } = useBarcodeScanner()
+const { startScan, stopScan } = useBarcodeScanner()
 
 const register = () => {
   if (isRegistered.value) return
@@ -272,6 +273,11 @@ const dLog = (text: string) => {
 
 setLogFunction(dLog)
 
+onDeactivated(() => {
+  document.body.classList.remove('qrscanner')
+  stopScan()
+})
+
 // Scroll to bottom of logContainer after adding new log entry
 watch(
   () => logText.value.length,
@@ -383,7 +389,7 @@ watch(
 
 .logContainer {
   width: 100%;
-  height: 33%;
+  height: 20%;
   background-color: #444;
   position: absolute;
   bottom: 0;

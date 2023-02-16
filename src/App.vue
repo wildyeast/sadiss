@@ -8,8 +8,8 @@
 </template>
 
 <script lang="ts">
-import { IonApp, IonRouterOutlet } from '@ionic/vue';
-import { defineComponent } from 'vue';
+import { IonApp, IonRouterOutlet } from '@ionic/vue'
+import { defineComponent } from 'vue'
 
 export default defineComponent({
   name: 'App',
@@ -17,7 +17,7 @@ export default defineComponent({
     IonApp,
     IonRouterOutlet
   }
-});
+})
 </script>
 
 <style>
