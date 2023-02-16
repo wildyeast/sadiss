@@ -234,7 +234,11 @@ const initializeMCorp = async () => {
 const scanCode = async () => {
   // Make camera visible and everything else invisible in app viewport, classes defined in App.vue
   document.body.classList.add('qrscanner')
-  await startScan()
+  const result = await startScan()
+  if (result) {
+    dLog('QR scan result: ' + result)
+    choirId.value = +result
+  }
   // Make camera invisible, and everything else visible
   document.body.classList.remove('qrscanner')
 }
