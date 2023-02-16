@@ -24,12 +24,11 @@ export const startSendingInterval = (
 
   sendingIntervalRunning = true
 
-  // Send start message to Max
   for (const client of wss.clients) {
     if (client.isAdmin) {
-      console.log('Sending start message to Max')
       client.send('start')
-      break
+    } else {
+      client.send(JSON.stringify({ start: true }))
     }
   }
 
@@ -230,9 +229,9 @@ export const startSendingInterval = (
     for (const client of wss.clients) {
       if (client.isAdmin) {
         client.send('stop')
-        continue
+      } else {
+        client.send(JSON.stringify({ stop: true }))
       }
-      client.send(JSON.stringify({ stop: true }))
     }
 
     startKeepAliveInterval(wss)
