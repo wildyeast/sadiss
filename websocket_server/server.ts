@@ -73,7 +73,7 @@ wss.on('connection', (client) => {
     } else if (parsed.message === 'isAdmin') {
 	client.isAdmin = true
 	client.send('greet')
-	console.log('  this one is admin')
+	console.log('(this one is admin)')
     }
   }
 })
