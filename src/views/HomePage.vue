@@ -236,8 +236,9 @@ const scanCode = async () => {
   // Make camera visible and everything else invisible in app viewport, classes defined in App.vue
   document.body.classList.add('qrscanner')
   const result = await startScan()
-  if (result) {
-    dLog('QR scan result: ' + result)
+  // TODO: Result is being cast twice here, don't do this.
+  dLog('QR scan result: ' + result)
+  if (result && !Number.isNaN(+result)) {
     choirId.value = +result
   }
   // Make camera invisible, and everything else visible
