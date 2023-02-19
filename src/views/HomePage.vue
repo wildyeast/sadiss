@@ -137,9 +137,11 @@ const debugData = ref<{ ctxTime: number | undefined; offset: number }>({
   offset: -1
 })
 
-setInterval(() => {
-  debugData.value = getDebugData()
-}, 50)
+if (debug) {
+  setInterval(() => {
+    debugData.value = getDebugData()
+  }, 50)
+}
 
 const { startScan, stopScan } = useBarcodeScanner()
 
