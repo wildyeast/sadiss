@@ -26,6 +26,9 @@ import './theme/variables.css'
 /* Tailwind */
 import './theme/tailwind.css'
 
+/* Ionic specific CSS helper classes */
+import './theme/ionic.css'
+
 const app = createApp(App).use(IonicVue).use(router)
 
 router.isReady().then(() => {

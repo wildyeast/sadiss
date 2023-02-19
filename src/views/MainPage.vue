@@ -98,7 +98,7 @@ import { Capacitor } from '@capacitor/core'
 import { KeepAwake } from '@capacitor-community/keep-awake'
 
 // Development mode
-const debug = true
+const debug = false
 
 // Init storage
 const store = new Storage()

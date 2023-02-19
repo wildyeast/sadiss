@@ -1,0 +1,7 @@
+.ionic-rounded-full {
+  --border-radius: 100%;
+}
+
+.ionic-bg-secondary {
+  --background: #444;
+}
