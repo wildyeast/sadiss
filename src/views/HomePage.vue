@@ -92,7 +92,6 @@ import { usePlayer } from '../composables/usePlayer'
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
 import { Storage } from '@ionic/storage'
 import { Capacitor } from '@capacitor/core'
-import { BackgroundMode } from '@awesome-cordova-plugins/background-mode'
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner'
 
 // Init storage

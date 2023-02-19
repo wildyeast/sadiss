@@ -10,7 +10,6 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
-    "@awesome-cordova-plugins/background-mode": "^6.3.0",
     "@awesome-cordova-plugins/core": "^6.3.0",
     "@capacitor-community/barcode-scanner": "^3.0.1",
     "@capacitor-community/text-to-speech": "^2.0.1",
@@ -24,7 +23,6 @@
     "@ionic/storage": "^3.0.6",
     "@ionic/vue": "^6.0.0",
     "@ionic/vue-router": "^6.0.0",
-    "cordova-plugin-background-mode": "^0.7.3",
     "cordova-plugin-device": "^2.1.0",
     "core-js": "^3.6.5",
     "ionicons": "^6.0.3",
