@@ -93,15 +93,12 @@ import {
 import { ref, onMounted, watch, reactive, onDeactivated } from 'vue'
 import { usePlayer } from '../composables/usePlayer'
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
-import { Storage } from '@ionic/storage'
 import { Capacitor } from '@capacitor/core'
 import { KeepAwake } from '@capacitor-community/keep-awake'
+import { Preferences } from '@capacitor/preferences'
 
 // Development mode
 const debug = false
-
-// Init storage
-const store = new Storage()
 
 // 'env'
 const VUE_APP_MCORP_API_KEY = '8844095860530063641'
@@ -253,11 +250,16 @@ const scanCode = async () => {
 }
 
 onMounted(async () => {
-  // if (Capacitor.isNativePlatform()) {
-  // await BackgroundMode.requestForegroundPermission()
-  // }
-  await store.create()
-  choirId.value = await store.get('choirId')
+  const choirIdResult = await Preferences.get({ key: 'choirId' })
+  if (choirIdResult.value) {
+    choirId.value = +choirIdResult.value
+  }
+
+  const langResult = await Preferences.get({ key: 'lang' })
+  if (langResult.value) {
+    ttsLanguage.value = langResult.value
+  }
+
   await initializeMCorp()
 })
 
@@ -304,7 +306,10 @@ watch(
   () => choirId.value,
   async (value, oldValue) => {
     if (typeof value === 'number' && value !== oldValue) {
-      await store.set('choirId', value)
+      await Preferences.set({
+        key: 'choirId',
+        value: String(value)
+      })
     }
   }
 )
