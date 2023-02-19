@@ -93,6 +93,7 @@ import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
 import { Storage } from '@ionic/storage'
 import { Capacitor } from '@capacitor/core'
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner'
+import { KeepAwake } from '@capacitor-community/keep-awake'
 
 // Init storage
 const store = new Storage()
@@ -301,25 +302,25 @@ watch(
   }
 )
 
-// Enable/Disable BackgroundMode depending on registration status (iOS only)
-// watch(
-//   () => isRegistered.value,
-//   async (value) => {
-//     try {
-//       if (Capacitor.getPlatform() === 'ios') {
-//         if (value) {
-//           BackgroundMode.enable()
-//           dLog('Background Mode enabled.')
-//         } else {
-//           BackgroundMode.disable()
-//           dLog('Background Mode disabled.')
-//         }
-//       }
-//     } catch (error) {
-//       dLog((error as string).toString())
-//     }
-//   }
-// )
+// Enable/Disable KeepAwakt depending on registration status
+watch(
+  () => isRegistered.value,
+  async (value) => {
+    try {
+      if (Capacitor.getPlatform() !== 'web') {
+        if (value) {
+          await KeepAwake.keepAwake()
+          dLog('KeepAwake enabled.')
+        } else {
+          await KeepAwake.allowSleep()
+          dLog('KeepAwake disabled.')
+        }
+      }
+    } catch (error) {
+      dLog((error as string).toString())
+    }
+  }
+)
 
 // watch(
 //   () => isRegistered.value,

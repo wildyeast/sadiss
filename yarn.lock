@@ -19,13 +19,6 @@
     "@jridgewell/gen-mapping" "^0.1.0"
     "@jridgewell/trace-mapping" "^0.3.9"
 
-"@awesome-cordova-plugins/background-mode@^6.3.0":
-  version "6.3.0"
-  resolved "https://registry.yarnpkg.com/@awesome-cordova-plugins/background-mode/-/background-mode-6.3.0.tgz#ea6797f2a482544829fab39caf9d9be53f353356"
-  integrity sha512-jnyNFpM73Ba01nmoLKvzwyevB5nf8b5+aeyaFjIWinV3m1fXFV/bWqEu6QEXG1QENf5OhAk7jBMtRAMQMhP36Q==
-  dependencies:
-    "@types/cordova" latest
-
 "@awesome-cordova-plugins/core@^6.3.0":
   version "6.3.0"
   resolved "https://registry.yarnpkg.com/@awesome-cordova-plugins/core/-/core-6.3.0.tgz#05460eba56c06f9dce38f573f78bc74818fda321"
@@ -994,6 +987,11 @@
   resolved "https://registry.yarnpkg.com/@capacitor-community/barcode-scanner/-/barcode-scanner-3.0.1.tgz#3cee584046f2fa71d6047b05b4bc7b5c5c4f926d"
   integrity sha512-3R6LXQ3kikuc71Pvffkul9pLvHK8v85VcvBw6E0rjAWgWJbCLf0ssBmycrqMa8/aMZjdw1XNn3nJTXijkfCifQ==
 
+"@capacitor-community/keep-awake@^3.0.0":
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/@capacitor-community/keep-awake/-/keep-awake-3.0.0.tgz#ed48bc3fb53f703d6b524ab12b0cdc700ec22fb0"
+  integrity sha512-amK9qcQOtsLNBEQ+THXLtNRgHds6SmJUsZ5ZrxGfcqBK8NKzalljejqLUkx2wIbB4ixsKKlrtzlwByyuRGAK+w==
+
 "@capacitor-community/text-to-speech@^2.0.1":
   version "2.0.1"
   resolved "https://registry.yarnpkg.com/@capacitor-community/text-to-speech/-/text-to-speech-2.0.1.tgz#d98c399dfddec7db15715f9c3358ddb459589e72"
@@ -1032,10 +1030,10 @@
     tslib "^2.4.0"
     xml2js "^0.4.23"
 
-"@capacitor/core@4.2.0":
-  version "4.2.0"
-  resolved "https://registry.yarnpkg.com/@capacitor/core/-/core-4.2.0.tgz#608285d4d8d60388940fc8f25dc1576aa99187e4"
-  integrity sha512-kHKn6693Yt9TWfuJ0Q+fyxYCpYAvVMKdu3t500seMEfdgNlF6BGaX5GbOnXkU4cnM9p+sIhRiwXv8Iqwm0E+NA==
+"@capacitor/core@4.6.3":
+  version "4.6.3"
+  resolved "https://registry.yarnpkg.com/@capacitor/core/-/core-4.6.3.tgz#70004316bce957ac5b5b3dd35dfdf170a09bbfb3"
+  integrity sha512-VJTUoZWUCVrp1cV1S4rqAwcV1/bF7KSVI4+/YUdVIBoHwnNxVweX15k5/etIeUZYaWxM6jwS2iIK9I86+G7ccQ==
   dependencies:
     tslib "^2.1.0"
 
@@ -3566,11 +3564,6 @@ copy-webpack-plugin@^9.0.1:
     normalize-path "^3.0.0"
     schema-utils "^3.1.1"
     serialize-javascript "^6.0.0"
-
-cordova-plugin-background-mode@^0.7.3:
-  version "0.7.3"
-  resolved "https://registry.yarnpkg.com/cordova-plugin-background-mode/-/cordova-plugin-background-mode-0.7.3.tgz#066f92c99f403b3ed3d6fb91f281a0a7ccbc84ba"
-  integrity sha512-LsU1v7EgTUROaks+tcQ8TnMzVUcU/TwjDVwj2O/4e4aI2q2ldLGsiZorqKqfqvwh2HoIssmY73OwJk91hQi62w==
 
 cordova-plugin-device@^2.1.0:
   version "2.1.0"
