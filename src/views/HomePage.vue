@@ -14,15 +14,17 @@
       </ion-header>
 
       <div id="container">
-        <p>v0.0.5</p>
-        <div
-          v-if="motion && motion.pos"
-          style="display: flex; flex-direction: column; align-items: start; width: 20rem">
-          <p>ctx Time: {{ debugData.ctxTime }}</p>
-          <p>Offset: {{ debugData.offset }}</p>
-          <p>Global Time: {{ motion.pos }}</p>
-          <p>Calced Global Time: {{ debugData.ctxTime! + debugData.offset }}</p>
-          <p>Diff: {{ motion.pos - debugData.offset - debugData.ctxTime! }}</p>
+        <div v-if="debug">
+          <p>v0.0.5</p>
+          <div
+            v-if="motion && motion.pos"
+            style="display: flex; flex-direction: column; align-items: start; width: 20rem">
+            <p>ctx Time: {{ debugData.ctxTime }}</p>
+            <p>Offset: {{ debugData.offset }}</p>
+            <p>Global Time: {{ motion.pos }}</p>
+            <p>Calced Global Time: {{ debugData.ctxTime! + debugData.offset }}</p>
+            <p>Diff: {{ motion.pos - debugData.offset - debugData.ctxTime! }}</p>
+          </div>
         </div>
         <ion-item>
           <ion-label>Choir ID:</ion-label>
@@ -54,7 +56,8 @@
         </ion-button>
         <div
           class="logContainer"
-          ref="logContainer">
+          ref="logContainer"
+          v-if="debug">
           <div
             v-for="(log, idx) of logText"
             :key="idx"
@@ -92,8 +95,10 @@ import { usePlayer } from '../composables/usePlayer'
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
 import { Storage } from '@ionic/storage'
 import { Capacitor } from '@capacitor/core'
-import { BarcodeScanner } from '@capacitor-community/barcode-scanner'
 import { KeepAwake } from '@capacitor-community/keep-awake'
+
+// Development mode
+const debug = true
 
 // Init storage
 const store = new Storage()
