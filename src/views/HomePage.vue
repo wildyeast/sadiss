@@ -7,11 +7,11 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <ion-header collapse="condense">
+      <!-- <ion-header collapse="condense">
         <ion-toolbar>
           <ion-title size="large">SADISS</ion-title>
         </ion-toolbar>
-      </ion-header>
+      </ion-header> -->
 
       <div id="container">
         <div v-if="debug">
