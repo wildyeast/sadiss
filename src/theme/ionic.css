@@ -2,6 +2,14 @@
   --border-radius: 100%;
 }
 
+.ionic-bg-primary {
+  --background: #111;
+}
+
 .ionic-bg-secondary {
   --background: #444;
+}
+
+.ionic-bg-highlight {
+  --background: orange;
 }

@@ -1,15 +1,21 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
+    <ion-header>
       <ion-toolbar>
-        <ion-title>SADISS</ion-title>
+        <ion-title class="bg-primary text-white">SADISS</ion-title>
       </ion-toolbar>
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <div class="flex h-full w-full flex-col items-center justify-center gap-8">
-        <ion-item class="w-[80%]">
-          <ion-label>Language:</ion-label>
+      <div class="flex h-full w-full flex-col items-center justify-center gap-8 bg-primary">
+        <ion-item
+          class="ionic-bg-secondary w-[80%]"
+          lines="none">
+          <ion-label
+            position="stacked"
+            color="light"
+            >Please select a language
+          </ion-label>
           <ion-select
             v-model="ttsLanguage"
             class="w-full">

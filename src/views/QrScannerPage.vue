@@ -2,12 +2,14 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>SADISS</ion-title>
+        <ion-title class="bg-primary text-white">SADISS</ion-title>
       </ion-toolbar>
     </ion-header>
 
-    <ion-content :fullscreen="true">
-      <div class="flex h-full w-full items-center justify-center">
+    <ion-content
+      :fullscreen="true"
+      class="bg-slate-900">
+      <div class="flex h-full w-full items-center justify-center bg-primary">
         <ion-button
           @click="scanCode"
           class="ionic-rounded-full ionic-bg-secondary h-[200px] w-[200px] text-2xl">

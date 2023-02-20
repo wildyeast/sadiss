@@ -21,6 +21,13 @@ export default defineComponent({
 </script>
 
 <style>
+body,
+html {
+  --background: #111;
+  --ion-background-color: #111;
+  @apply bg-primary;
+}
+
 body.scanner-active {
   --background: transparent;
   --ion-background-color: transparent;

@@ -2,7 +2,7 @@
   <ion-page>
     <ion-header :translucent="true">
       <ion-toolbar>
-        <ion-title>SADISS</ion-title>
+        <ion-title class="bg-primary text-white">SADISS</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -13,12 +13,11 @@
         </ion-toolbar>
       </ion-header> -->
 
-      <div id="container">
+      <div class="flex h-full flex-col items-center justify-center bg-primary">
         <div v-if="debug">
-          <p>v0.0.5</p>
           <div
             v-if="motion && motion.pos"
-            style="display: flex; flex-direction: column; align-items: start; width: 20rem">
+            class="flex w-[20rem] flex-col items-start">
             <p>ctx Time: {{ debugData.ctxTime }}</p>
             <p>Offset: {{ debugData.offset }}</p>
             <p>Global Time: {{ motion.pos }}</p>
@@ -26,14 +25,20 @@
             <p>Diff: {{ motion.pos - debugData.offset - debugData.ctxTime! }}</p>
           </div>
         </div>
-        <ion-item>
+        <ion-item
+          v-if="debug"
+          class="ionic-bg-secondary b-0 mb-2 w-[80%] border-0 text-white"
+          lines="none">
           <ion-label>Choir ID:</ion-label>
           <ion-input
             type="number"
             v-model.number="choirId" />
         </ion-item>
 
-        <ion-item>
+        <ion-item
+          v-if="debug"
+          class="ionic-bg-secondary mb-2 w-[80%] text-white"
+          lines="none">
           <ion-label>TTS language:</ion-label>
           <ion-select v-model="ttsLanguage">
             <ion-select-option value="en-US">English</ion-select-option>
@@ -44,33 +49,36 @@
         <ion-button
           @click="register"
           :disabled="!mcorpConnected"
-          class="btn__register"
-          :class="{ btn__register_active: isRegistered }">
+          class="ionic-rounded-full ionic-bg-secondary h-[160px] w-[160px] text-2xl font-bold"
+          :class="{ 'ionic-bg-highlight': isRegistered }">
           {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
         <ion-button
           @click="scanCode"
-          class="btn__scan_barcode"
+          class="ionic-bg-secondary mt-4 h-[60px] font-bold"
           :class="{ btn__register_active: isRegistered }">
-          QR
+          Scan<br />QR-Code
         </ion-button>
+
+        <p v-if="debug">v0.0.6</p>
+        <p
+          v-else
+          class="absolute bottom-0">
+          v0.0.6
+        </p>
+
         <div
-          class="logContainer"
+          class="absolute bottom-0 h-[20%] w-full overflow-scroll bg-secondary"
           ref="logContainer"
           v-if="debug">
           <div
             v-for="(log, idx) of logText"
             :key="idx"
-            style="width: 100%; display: flex; color: white">
-            <span style="min-width: 20%">{{ log.timestamp }}</span>
-            <span style="text-align: left">{{ log.text }}</span>
+            class="flex w-full text-white">
+            <span class="min-w-[20%]">{{ log.timestamp }}</span>
+            <span class="align-left">{{ log.text }}</span>
           </div>
         </div>
-        <!-- <ion-button @click="speak('This is a test.')">Speak</ion-button> -->
-        <!-- <p v-if="isRegistered">Registered</p> -->
-        <!-- <p v-else>Not registered.</p> -->
-        <!-- <p v-for="text, idx of logText"
-           :key="idx">{{ text }}</p> -->
       </div>
     </ion-content>
   </ion-page>
@@ -264,7 +272,19 @@ onMounted(async () => {
 })
 
 const logContainer = ref<HTMLDivElement | null>(null)
-const logText = ref<{ text: string; timestamp: string }[]>([])
+const logText = ref<{ text: string; timestamp: string }[]>([
+  { text: 'test', timestamp: 'test' },
+  { text: 'test', timestamp: 'test' },
+  { text: 'test', timestamp: 'test' },
+  { text: 'test', timestamp: 'test' },
+  { text: 'test', timestamp: 'test' },
+  { text: 'test', timestamp: 'test' },
+  { text: 'test', timestamp: 'test' },
+  { text: 'test', timestamp: 'test' },
+  { text: 'test', timestamp: 'test' },
+  { text: 'test', timestamp: 'test' },
+  { text: 'test', timestamp: 'test' }
+])
 /**
  * Prints the given string to the on-screen log.
  * @param string text - String to print to log.
@@ -346,7 +366,7 @@ watch(
 // )
 </script>
 
-<style scoped>
+<!-- <style scoped>
 * {
   --background: #222;
   color: white;
@@ -396,7 +416,6 @@ watch(
   height: 80px;
   --border-radius: 100%;
   font-weight: bold;
-  font-size: 1.2em;
   --background: #444;
 }
 
@@ -408,4 +427,4 @@ watch(
   bottom: 0;
   overflow: scroll;
 }
-</style>
+</style> -->
