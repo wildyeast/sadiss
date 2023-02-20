@@ -2,22 +2,27 @@
   <ion-app class="scanner-hide">
     <ion-router-outlet />
   </ion-app>
-  <div class="scanner-ui">
+  <div class="scanner-ui justify-center">
     <!-- QR Scanner Interface -->
+    <ion-button
+      @click="stopScanning"
+      class="ionic-bg-secondary absolute bottom-0 font-bold text-white">
+      Go back
+    </ion-button>
   </div>
 </template>
 
-<script lang="ts">
-import { IonApp, IonRouterOutlet } from '@ionic/vue'
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { IonApp, IonRouterOutlet, IonButton } from '@ionic/vue'
+import { useBarcodeScanner } from './composables/useBarcodeScanner'
 
-export default defineComponent({
-  name: 'App',
-  components: {
-    IonApp,
-    IonRouterOutlet
-  }
-})
+const { stopScan } = useBarcodeScanner()
+
+const stopScanning = () => {
+  stopScan()
+  // Make camera invisible, and everything else visible
+  document.body.classList.remove('qrscanner')
+}
 </script>
 
 <style>
@@ -25,7 +30,7 @@ body,
 html {
   --background: #111;
   --ion-background-color: #111;
-  @apply bg-primary;
+  /* @apply bg-primary; */
 }
 
 body.scanner-active {
@@ -46,7 +51,7 @@ body.qrscanner {
 }
 
 body.qrscanner .scanner-ui {
-  display: block;
+  display: flex;
 }
 
 body.qrscanner .scanner-hide {
