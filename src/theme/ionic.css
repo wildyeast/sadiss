@@ -1,0 +1,15 @@
+.ionic-rounded-full {
+  --border-radius: 100%;
+}
+
+.ionic-bg-primary {
+  --background: #3e5b53;
+}
+
+.ionic-bg-secondary {
+  --background: #253833;
+}
+
+.ionic-bg-highlight {
+  --background: #79ea04;
+}
