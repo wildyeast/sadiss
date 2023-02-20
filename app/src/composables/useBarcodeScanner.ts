@@ -5,8 +5,7 @@
 
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner'
 
-export function useBarcodeScanner () {
-
+export function useBarcodeScanner() {
   const startScan = async () => {
     // Check camera permission
     // This is just a simple example, check out the better checks below
@@ -22,12 +21,19 @@ export function useBarcodeScanner () {
     // if the result has content
     if (result.hasContent) {
       console.log(result.content) // log the raw scanned content
+      console.log('End of scan.')
+      return result.content
     }
 
     console.log('End of scan.')
   }
 
+  const stopScan = () => {
+    BarcodeScanner.stopScan()
+  }
+
   return {
-    startScan
+    startScan,
+    stopScan
   }
 }

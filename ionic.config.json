@@ -1,7 +1,0 @@
-{
-  "name": "sadiss_app",
-  "integrations": {
-    "capacitor": {}
-  },
-  "type": "vue"
-}
