@@ -6,7 +6,7 @@
     <!-- QR Scanner Interface -->
     <ion-button
       @click="stopScanning"
-      class="ionic-bg-secondary absolute bottom-0 font-bold text-white">
+      class="ionic-bg-secondary absolute bottom-10 font-bold text-white">
       Go back
     </ion-button>
   </div>
