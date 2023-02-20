@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonApp, IonRouterOutlet, IonButton } from '@ionic/vue'
+import { IonApp, IonRouterOutlet, IonButton, IonHeader, IonToolbar, IonButtons, IonBackButton } from '@ionic/vue'
 import { useBarcodeScanner } from './composables/useBarcodeScanner'
 
 const { stopScan } = useBarcodeScanner()
@@ -27,10 +27,11 @@ const stopScanning = () => {
 
 <style>
 body,
-html {
+html,
+ion-toolbar {
   --background: #111;
   --ion-background-color: #111;
-  /* @apply bg-primary; */
+  @apply bg-primary;
 }
 
 body.scanner-active {

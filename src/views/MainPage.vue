@@ -1,8 +1,10 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
+    <ion-header>
       <ion-toolbar>
-        <ion-title class="bg-primary text-white">SADISS</ion-title>
+        <ion-buttons slot="start">
+          <ion-back-button></ion-back-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
@@ -96,7 +98,9 @@ import {
   IonLabel,
   IonItem,
   IonSelect,
-  IonSelectOption
+  IonSelectOption,
+  IonButtons,
+  IonBackButton
 } from '@ionic/vue'
 import { ref, onMounted, watch, reactive, onDeactivated } from 'vue'
 import { usePlayer } from '../composables/usePlayer'

@@ -2,7 +2,9 @@
   <ion-page>
     <ion-header>
       <ion-toolbar>
-        <ion-title class="bg-primary text-white">SADISS</ion-title>
+        <ion-buttons slot="start">
+          <ion-back-button></ion-back-button>
+        </ion-buttons>
       </ion-toolbar>
     </ion-header>
 
@@ -24,7 +26,7 @@
           </ion-select>
         </ion-item>
         <ion-button
-          @click="ionRouter.navigate('/main', 'forward', 'replace')"
+          @click="ionRouter.navigate('/main', 'forward', 'push')"
           :disabled="!ttsLanguage"
           class="ionic-rounded-full ionic-bg-secondary h-[100px] w-[100px] text-2xl">
           Done
@@ -46,7 +48,10 @@ import {
   IonButton,
   IonSelect,
   IonSelectOption,
-  IonLabel
+  IonLabel,
+  IonButtons,
+  IonBackButton,
+  useBackButton
 } from '@ionic/vue'
 import { ref, watch } from 'vue'
 import { Preferences } from '@capacitor/preferences'

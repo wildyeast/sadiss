@@ -1,14 +1,6 @@
 <template>
   <ion-page>
-    <ion-header :translucent="true">
-      <ion-toolbar>
-        <ion-title class="bg-primary text-white">SADISS</ion-title>
-      </ion-toolbar>
-    </ion-header>
-
-    <ion-content
-      :fullscreen="true"
-      class="bg-slate-900">
+    <ion-content :fullscreen="true">
       <div class="flex h-full w-full items-center justify-center bg-primary">
         <ion-button
           @click="scanCode"
@@ -47,9 +39,9 @@ const scanCode = async () => {
     }
 
     if (result.tts) {
-      ionRouter.navigate('/language-selection', 'forward', 'replace')
+      ionRouter.navigate('/language-selection', 'forward', 'push')
     } else {
-      ionRouter.navigate('/main', 'forward', 'replace')
+      ionRouter.navigate('/main', 'forward', 'push')
     }
   }
   stopScanning()
