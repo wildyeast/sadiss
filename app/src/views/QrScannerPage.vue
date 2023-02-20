@@ -39,6 +39,10 @@ const scanCode = async () => {
     }
 
     if (result.tts) {
+      await Preferences.set({
+        key: 'availableLanguages',
+        value: JSON.stringify(result.tts)
+      })
       ionRouter.navigate('/language-selection', 'forward', 'push')
     } else {
       ionRouter.navigate('/main', 'forward', 'push')

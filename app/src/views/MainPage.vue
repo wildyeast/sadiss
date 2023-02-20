@@ -85,7 +85,6 @@ import {
   IonContent,
   IonHeader,
   IonPage,
-  IonTitle,
   IonToolbar,
   IonButton,
   IonInput,
@@ -130,8 +129,6 @@ const {
   setTrackSettings,
   getDebugData,
   stopPlayback,
-  playContinuousSound,
-  stopContinuousSound,
   setOffset
 } = usePlayer()
 
@@ -261,7 +258,7 @@ onMounted(async () => {
     choirId.value = +choirIdResult.value
   }
 
-  const langResult = await Preferences.get({ key: 'lang' })
+  const langResult = await Preferences.get({ key: 'selectedLanguage' })
   if (langResult.value) {
     ttsLanguage.value = langResult.value
   }

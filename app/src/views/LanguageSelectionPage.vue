@@ -19,15 +19,19 @@
             >Please select a language
           </ion-label>
           <ion-select
-            v-model="ttsLanguage"
+            v-model="selectedLanguage"
             class="w-full">
-            <ion-select-option value="en-US">English</ion-select-option>
-            <ion-select-option value="de-DE">Deutsch</ion-select-option>
+            <ion-select-option
+              v-for="lang of availableLanguages"
+              :key="lang.iso"
+              :value="lang.iso"
+              >{{ lang.lang }}
+            </ion-select-option>
           </ion-select>
         </ion-item>
         <ion-button
           @click="ionRouter.navigate('/main', 'forward', 'push')"
-          :disabled="!ttsLanguage"
+          :disabled="!selectedLanguage"
           class="ionic-rounded-full ionic-bg-secondary h-[100px] w-[100px] text-2xl">
           Done
         </ion-button>
@@ -41,7 +45,6 @@ import {
   IonContent,
   IonHeader,
   IonPage,
-  IonTitle,
   IonToolbar,
   useIonRouter,
   IonItem,
@@ -50,22 +53,35 @@ import {
   IonSelectOption,
   IonLabel,
   IonButtons,
-  IonBackButton,
-  useBackButton
+  IonBackButton
 } from '@ionic/vue'
-import { ref, watch } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { Preferences } from '@capacitor/preferences'
 
 // Router
 const ionRouter = useIonRouter()
 
-const ttsLanguage = ref()
+const availableLanguages = ref()
+const selectedLanguage = ref()
+
+onMounted(async () => {
+  try {
+    const availableLanguagesResult = await Preferences.get({ key: 'availableLanguages' })
+    if (availableLanguagesResult.value) {
+      const parsed = await JSON.parse(availableLanguagesResult.value)
+      console.log('Parsed json: ', parsed)
+      availableLanguages.value = await JSON.parse(availableLanguagesResult.value)
+    }
+  } catch (err) {
+    console.log('Failed mounting lang selection page.')
+  }
+})
 
 watch(
-  () => ttsLanguage.value,
+  () => selectedLanguage.value,
   async (value) => {
     await Preferences.set({
-      key: 'lang',
+      key: 'selectedLanguage',
       value: value
     })
   }
