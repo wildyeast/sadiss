@@ -9,12 +9,6 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <!-- <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">SADISS</ion-title>
-        </ion-toolbar>
-      </ion-header> -->
-
       <div class="flex h-full flex-col items-center justify-center bg-primary">
         <div v-if="debug">
           <div
