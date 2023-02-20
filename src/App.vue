@@ -29,8 +29,8 @@ const stopScanning = () => {
 body,
 html,
 ion-toolbar {
-  --background: #111;
-  --ion-background-color: #111;
+  --background: #3e5b53;
+  --ion-background-color: #3e5b53;
   @apply bg-primary;
 }
 
