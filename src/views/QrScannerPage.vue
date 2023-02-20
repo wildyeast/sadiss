@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar, IonButton, useIonRouter } from '@ionic/vue'
+import { IonContent, IonPage, IonButton, useIonRouter } from '@ionic/vue'
 import { onDeactivated } from 'vue'
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
 import { Preferences } from '@capacitor/preferences'

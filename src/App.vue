@@ -34,6 +34,10 @@ ion-toolbar {
   @apply bg-primary;
 }
 
+ion-back-button {
+  --color: white !important;
+}
+
 body.scanner-active {
   --background: transparent;
   --ion-background-color: transparent;
