@@ -3,7 +3,7 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button></ion-back-button>
+          <ion-back-button :hidden="isRegistered"></ion-back-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
@@ -45,12 +45,13 @@
         <ion-button
           @click="register"
           :disabled="!mcorpConnected"
-          class="ionic-rounded-full ionic-bg-secondary h-[160px] w-[160px] text-2xl font-bold"
+          class="ionic-rounded-full ionic-bg-secondary h-[60vw] w-[60vw] text-2xl font-bold"
           :class="{ 'ionic-border-highlight text-highlight': isRegistered }">
           {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
         <ion-button
           @click="scanCode"
+          :disabled="isRegistered"
           class="ionic-bg-secondary mt-4 h-[60px] font-bold">
           Scan<br />QR-Code
         </ion-button>
