@@ -20,7 +20,7 @@
           </ion-label>
           <ion-select
             v-model="selectedLanguage"
-            class="w-full">
+            class="w-full text-white">
             <ion-select-option
               v-for="lang of availableLanguages"
               :key="lang.iso"
