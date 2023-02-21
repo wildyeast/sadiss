@@ -34,6 +34,12 @@ ion-toolbar {
   @apply bg-primary;
 }
 
+ion-button {
+  --background-hover: #253833;
+  --background-activated: #253833;
+  --background-focused: #253833;
+}
+
 ion-back-button {
   --color: white !important;
 }
