@@ -13,3 +13,9 @@
 .ionic-bg-highlight {
   --background: #79ea04;
 }
+
+.ionic-border-highlight {
+  --border-color: #79ea04;
+  --border-width: 4px;
+  --border-style: solid;
+}

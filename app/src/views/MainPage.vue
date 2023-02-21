@@ -46,13 +46,12 @@
           @click="register"
           :disabled="!mcorpConnected"
           class="ionic-rounded-full ionic-bg-secondary h-[160px] w-[160px] text-2xl font-bold"
-          :class="{ 'ionic-bg-highlight': isRegistered }">
+          :class="{ 'ionic-border-highlight text-highlight': isRegistered }">
           {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
         <ion-button
           @click="scanCode"
-          class="ionic-bg-secondary mt-4 h-[60px] font-bold"
-          :class="{ btn__register_active: isRegistered }">
+          class="ionic-bg-secondary mt-4 h-[60px] font-bold">
           Scan<br />QR-Code
         </ion-button>
 
