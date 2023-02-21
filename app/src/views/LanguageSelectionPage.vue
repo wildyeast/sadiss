@@ -61,7 +61,7 @@ import { Preferences } from '@capacitor/preferences'
 // Router
 const ionRouter = useIonRouter()
 
-const availableLanguages = ref()
+const availableLanguages = ref([{ iso: 'de-DE', lang: 'Deutsch' }])
 const selectedLanguage = ref()
 
 onMounted(async () => {

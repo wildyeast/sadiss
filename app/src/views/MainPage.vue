@@ -13,7 +13,7 @@
         <div v-if="debug">
           <div
             v-if="motion && motion.pos"
-            class="flex w-[20rem] flex-col items-start">
+            class="flex w-[20rem] flex-col items-start text-white">
             <p>ctx Time: {{ debugData.ctxTime }}</p>
             <p>Offset: {{ debugData.offset }}</p>
             <p>Global Time: {{ motion.pos }}</p>
@@ -267,19 +267,7 @@ onMounted(async () => {
 })
 
 const logContainer = ref<HTMLDivElement | null>(null)
-const logText = ref<{ text: string; timestamp: string }[]>([
-  { text: 'test', timestamp: 'test' },
-  { text: 'test', timestamp: 'test' },
-  { text: 'test', timestamp: 'test' },
-  { text: 'test', timestamp: 'test' },
-  { text: 'test', timestamp: 'test' },
-  { text: 'test', timestamp: 'test' },
-  { text: 'test', timestamp: 'test' },
-  { text: 'test', timestamp: 'test' },
-  { text: 'test', timestamp: 'test' },
-  { text: 'test', timestamp: 'test' },
-  { text: 'test', timestamp: 'test' }
-])
+const logText = ref<{ text: string; timestamp: string }[]>([])
 /**
  * Prints the given string to the on-screen log.
  * @param string text - String to print to log.
