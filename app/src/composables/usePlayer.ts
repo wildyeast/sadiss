@@ -18,6 +18,16 @@ export function usePlayer() {
   const startAudioCtx = () => {
     console.log('Starting ctx.')
     ctx = new AudioContext()
+
+    // Resume ctx when coming back from sleep/background etc preventing issue where iOS wouldn't restart playback
+    // Taken from https://github.com/Tonejs/Tone.js/issues/995#issuecomment-1005082160
+    ctx.onstatechange = () => {
+      // @ts-expect-error: 'interrupted' is correct here.
+      if (ctx.state === 'suspended' || ctx.state === 'interrupted') {
+        ctx.resume()
+      }
+    }
+
     setOffset()
   }
 
