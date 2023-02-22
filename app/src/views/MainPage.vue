@@ -145,11 +145,13 @@ if (debug) {
 
 const { startScan, stopScan } = useBarcodeScanner()
 
+let attemptingToRegister = false
 const register = () => {
-  if (isRegistered.value) return
+  if (attemptingToRegister || isRegistered.value) return
+  attemptingToRegister = true
   startAudioCtx()
-  setTtsLanguage(ttsLanguage.value)
   dLog('Audio ctx started.')
+  setTtsLanguage(ttsLanguage.value)
 
   establishWebsocketConnection()
 }
@@ -161,6 +163,7 @@ const establishWebsocketConnection = () => {
   ws.value.onopen = function () {
     dLog('Websocket connection opened.')
     isRegistered.value = true
+    attemptingToRegister = false
     this.send(
       JSON.stringify({
         message: 'clientInfo',
@@ -173,14 +176,16 @@ const establishWebsocketConnection = () => {
   ws.value.onclose = () => {
     dLog('Websocket connection closed.')
     isRegistered.value = false
+    attemptingToRegister = false
     stopPlayback()
     // Trying to reconnect here while App is in background does not work.
   }
 
   ws.value.onerror = (error) => {
     isRegistered.value = false
-    console.error(error)
+    attemptingToRegister = false
     stopPlayback()
+    console.error(error)
   }
 
   ws.value.onmessage = (event) => {
