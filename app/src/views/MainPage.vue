@@ -273,6 +273,8 @@ const logText = ref<{ text: string; timestamp: string }[]>([])
  * @param string text - String to print to log.
  */
 const dLog = (text: string) => {
+  if (!debug) return
+
   console.log(text)
   const localTime = new Date().toLocaleString()
   logText.value.push({
