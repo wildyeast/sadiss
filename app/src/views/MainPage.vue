@@ -56,11 +56,11 @@
           Scan<br />QR-Code
         </ion-button>
 
-        <p v-if="debug">v0.0.6</p>
+        <p v-if="debug">v1.0.0</p>
         <p
           v-else
           class="absolute bottom-0">
-          v0.0.6
+          v1.0.0
         </p>
 
         <div
