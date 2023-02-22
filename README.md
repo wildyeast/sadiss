@@ -10,10 +10,11 @@ SADISS is released under the GNU Affero General Public License ([AGPL](LICENSE))
 
 ### Architecture
 
-SADISS is composed of two distinct apps.
+SADISS is composed of three distinct apps.
 
-The SADISS server, a Laravel app, is supposed to run on a web server.
-The SADISS client, a Vue.js app, is supposed to run in the browser of a mobile phone.
+The SADISS server, a Node.js app, is supposed to run on a web server.
+The SADISS admin client, a Vue.js app, is supposed to run in the browser.
+The SADISS app, an Ionic app, is supposed to run on Android and iOS phones.
 
 ### Installation
 
