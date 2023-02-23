@@ -152,16 +152,23 @@ exports.edit_track = async (req: express.Request, res: express.Response) => {
     }
 
     const ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes('ttsfile'))
-    let ttsJson
+    let ttsLangs: Set<string> | undefined
+    let ttsJson: TtsJson | undefined
     if (ttsFiles.length) {
-      ttsJson = convertSrtToJson(ttsFiles)
+      ;({ ttsLangs, ttsJson } = convertSrtToJson(ttsFiles))
       patch.ttsFiles = Object.values(req.files).map((file: Express.Multer.File) => ({
         origName: file.originalname,
         fileName: file.filename
       }))
+      patch.ttsLangs = Array.from(ttsLangs)
     }
 
-    const chunks = await chunk(path, ttsJson)
+    const { partialsCount, chunks } = await chunk(path, ttsJson)
+
+    if (partialsCount > 0) {
+      patch.partialsCount = partialsCount
+    }
+
     patch.chunks = JSON.stringify(chunks)
   }
 
