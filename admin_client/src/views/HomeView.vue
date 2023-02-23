@@ -227,7 +227,6 @@ const downloadPartialQrCodes = async () => {
   await nextTick()
   const svgBlobs = []
   for (const qrCode of qrCodeContainer.value) {
-    console.log('container: ', qrCode)
     const svgData = qrCode.innerHTML
     const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
     svgBlobs.push({
@@ -235,7 +234,6 @@ const downloadPartialQrCodes = async () => {
       input: svgBlob
     })
   }
-  console.log('Here.')
   const blob = await downloadZip([...svgBlobs]).blob()
   const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)
