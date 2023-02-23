@@ -283,8 +283,8 @@ onMounted(async () => {
               :href="`https://sadiss.net/f/${file.fileName}`"
               :download="`${file.origName}.txt`"
               class="text-xl"
-              >⤓</a
-            >
+              >⤓
+            </a>
           </div>
         </div>
       </div>
