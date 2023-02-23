@@ -1,4 +1,4 @@
-import { PartialChunk, TtsJson } from "../types/types"
+import { PartialChunk, TtsJson } from '../types/types'
 
 const fs = require('fs')
 const readline = require('readline')
@@ -13,11 +13,13 @@ export const chunk = async (path: string, ttsInstructions?: TtsJson) => {
     return {
       time: 0,
       partials: <PartialChunk[]>[],
-      ttsInstructions: <{ [voice: string]: { [language: string]: string; }; }>{}
+      ttsInstructions: <{ [voice: string]: { [language: string]: string } }>{}
     }
   }
   let chunk = initChunk()
   chunk.time = 0
+
+  let partialsCount = -1
 
   if (path) {
     // Open partials file
@@ -34,7 +36,9 @@ export const chunk = async (path: string, ttsInstructions?: TtsJson) => {
       const f = line.split(' ')
 
       // Handle first few lines
-      if (!frameCount && f[0] === 'frame-count') {
+      if (partialsCount < 0 && f[0] === 'partials-count') {
+        partialsCount = +f[1]
+      } else if (!frameCount && f[0] === 'frame-count') {
         frameCount = f[1]
         continue
       } else if (!frameCount || f[0] === 'frame-data') {
@@ -53,8 +57,6 @@ export const chunk = async (path: string, ttsInstructions?: TtsJson) => {
         chunk.time = time
       }
 
-      const partialsCount = f[1]
-
       // Read each triple of frame data
       for (let i = 2; i <= f.length - 2; i += 3) {
         const index = +f[i]
@@ -62,8 +64,9 @@ export const chunk = async (path: string, ttsInstructions?: TtsJson) => {
         const amp = f[i + 2]
 
         // Find partial if it exists in chunk array
-        let partial = chunk.partials.find(p => p.index === index)
-        if (!partial) { // init if it doesn't
+        let partial = chunk.partials.find((p) => p.index === index)
+        if (!partial) {
+          // init if it doesn't
           partial = {
             index,
             startTime: time,
@@ -79,7 +82,6 @@ export const chunk = async (path: string, ttsInstructions?: TtsJson) => {
           amp
         })
       }
-
     }
     chunks.push(chunk)
   }
@@ -101,5 +103,5 @@ export const chunk = async (path: string, ttsInstructions?: TtsJson) => {
     }
   }
 
-  return chunks
+  return { partialsCount, chunks }
 }

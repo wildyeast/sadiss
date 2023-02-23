@@ -2,14 +2,17 @@ import express from 'express'
 import { chunk, startSendingInterval, stopSendingInterval } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose from 'mongoose'
+import { TtsJson } from '../types/types'
 
 // Define track schema for db
 const trackSchema = new mongoose.Schema({
   name: String,
   chunks: String,
+  partialsCount: Number,
   mode: String,
   notes: String,
-  ttsInstrunctions: String,
+  ttsInstructions: String,
+  ttsLangs: Array,
   waveform: String,
   ttsRate: String,
   partialFile: Object,
@@ -85,12 +88,13 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
     }
 
     const ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes('ttsfile'))
-    let ttsJson
+    let ttsLangs: Set<string> | undefined
+    let ttsJson: TtsJson | undefined
     if (ttsFiles.length) {
-      ttsJson = convertSrtToJson(ttsFiles)
+      ;({ ttsLangs, ttsJson } = convertSrtToJson(ttsFiles))
     }
 
-    const chunks = await chunk(path, ttsJson)
+    const { partialsCount, chunks } = await chunk(path, ttsJson)
 
     const name = req.body.name
     const notes = req.body.notes
@@ -108,6 +112,14 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
       partialFile: partialFileToSave,
       ttsFiles: ttsFiles.map((file: Express.Multer.File) => ({ origName: file.originalname, fileName: file.filename }))
     })
+
+    if (partialsCount > 0) {
+      t.partialsCount = partialsCount
+    }
+
+    if (ttsLangs) {
+      t.ttsLangs = Array.from(ttsLangs)
+    }
 
     t.save(function (err) {
       if (err) {

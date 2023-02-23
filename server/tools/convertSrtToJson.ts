@@ -1,15 +1,17 @@
-import { TtsJson } from "../types/types"
+import { TtsJson } from '../types/types'
 
 const fs = require('fs')
 
-export const convertSrtToJson = (srtFiles: { path: string, originalname: string }[]) => {
-  let result: TtsJson = {}
+export const convertSrtToJson = (srtFiles: { path: string; originalname: string }[]) => {
+  let ttsJson: TtsJson = {}
+  const ttsLangs = new Set<string>()
 
   for (const file of srtFiles) {
     const data = fs.readFileSync(file.path, 'utf-8')
     const lines = data.split('\n')
 
     const [_, voice, lang] = file.originalname.split('_')
+    ttsLangs.add(lang)
 
     let lastLineWasTimestamp = false
     let currentTimestamp = -1
@@ -19,7 +21,7 @@ export const convertSrtToJson = (srtFiles: { path: string, originalname: string 
       const timestampDelimiter = ' --> '
 
       if (!line) {
-        result = writeToObject(result, currentTimestamp, voice, lang, currentLine)
+        ttsJson = writeToObject(ttsJson, currentTimestamp, voice, lang, currentLine)
         currentLine = ''
         lastLineWasTimestamp = false
       } else if (lastLineWasTimestamp) {
@@ -28,8 +30,7 @@ export const convertSrtToJson = (srtFiles: { path: string, originalname: string 
         } else {
           currentLine = line
         }
-      }
-      else if (line.includes(timestampDelimiter)) {
+      } else if (line.includes(timestampDelimiter)) {
         const [start, _] = line.split(timestampDelimiter)
         currentTimestamp = convertTimestampToSeconds(start)
         lastLineWasTimestamp = true
@@ -37,18 +38,18 @@ export const convertSrtToJson = (srtFiles: { path: string, originalname: string 
     }
 
     // Write last timestamp and its lines to object
-    result = writeToObject(result, currentTimestamp, voice, lang, currentLine)
+    ttsJson = writeToObject(ttsJson, currentTimestamp, voice, lang, currentLine)
   }
-  console.log('Converted .srt to following object: ', result)
-  return result
+  console.log('Converted .srt to following object: ', ttsJson)
+  return { ttsLangs, ttsJson }
 }
 
-/** 
-* Converts string of format 'hours:minutes:seconds,milliseconds' to the total number of seconds.
-*/
+/**
+ * Converts string of format 'hours:minutes:seconds,milliseconds' to the total number of seconds.
+ */
 const convertTimestampToSeconds = (timestamp: string) => {
   const time = timestamp.split(':')
-  return +time[0] * 3600 + +time[1] * 60 + +time[2].replace(',', '.');
+  return +time[0] * 3600 + +time[1] * 60 + +time[2].replace(',', '.')
 }
 
 const writeToObject = (result: TtsJson, currentTimestamp: number, voice: string, lang: string, currentLine: string) => {
