@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Axios } from 'axios'
-import { ref, reactive, onMounted, inject, computed, watch } from 'vue'
+import { ref, onMounted, inject, computed, watch } from 'vue'
 import TrackTile from '@/components/TrackTile.vue'
 
 const isUploadModalVisible = ref(false)
