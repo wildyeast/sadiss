@@ -113,7 +113,7 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
       ttsFiles: ttsFiles.map((file: Express.Multer.File) => ({ origName: file.originalname, fileName: file.filename }))
     })
 
-    if (partialsCount > 0) {
+    if (mode === 'choir' && partialsCount > 0) {
       t.partialsCount = partialsCount
     }
 
@@ -184,4 +184,32 @@ exports.edit_track = async (req: express.Request, res: express.Response) => {
 exports.stop_track = (req: express.Request, res: express.Response) => {
   stopSendingInterval()
   res.send({ message: 'Track stopped.' })
+}
+
+exports.get_voices_and_languages = async (req: express.Request, res: express.Response) => {
+  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+  try {
+    let maxPartialsCount = -1
+    let ttsLangs: string[] = []
+
+    const tracks = await Track.find({}, 'partialsCount ttsLangs mode')
+    for (const track of tracks) {
+      if (track.mode === 'choir' && track.partialsCount && track.partialsCount > maxPartialsCount) {
+        maxPartialsCount = track.partialsCount
+      }
+
+      if (track.ttsLangs.length) {
+        for (const lang of track.ttsLangs) {
+          if (!ttsLangs.includes(lang)) {
+            ttsLangs.push(lang)
+          }
+        }
+      }
+    }
+
+    res.json({ maxPartialsCount, ttsLangs })
+  } catch (err) {
+    console.log('Failed getting voices and languages with:', err)
+    res.status(500).json({ Error: 'Failed fetching voices and languages.' })
+  }
 }
