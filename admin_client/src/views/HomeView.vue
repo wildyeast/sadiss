@@ -1,7 +1,9 @@
 <script setup lang="ts">
 import { Axios } from 'axios'
-import { ref, reactive, onMounted, inject, computed, watch } from 'vue'
+import { ref, onMounted, inject, computed, watch, nextTick } from 'vue'
 import TrackTile from '@/components/TrackTile.vue'
+import { downloadZip } from 'client-zip'
+import QrcodeVue from 'qrcode.vue'
 
 const isUploadModalVisible = ref(false)
 const axios: Axios | undefined = inject('axios')
@@ -176,6 +178,69 @@ const startClock = () => {
   }, 10)
 }
 
+const qrCodeData: QrCodeData[] = []
+
+const generateQrCodes = async () => {
+  let qrDataFromServer = <{ maxPartialsCount: number; ttsLangs: string[] }>{}
+  await fetch(`${process.env.VUE_APP_API_URL}/get-voices-and-languages`)
+    .then((res) => res.json())
+    .then((data) => (qrDataFromServer = data))
+    .catch((err) => console.log('Failed getting Tracks with: ', err))
+
+  if (Object.keys(qrDataFromServer).length) {
+    if (qrDataFromServer.maxPartialsCount) {
+      for (let i = 0; i < qrDataFromServer.maxPartialsCount; i++) {
+        const data: QrCodeData = { choirId: i }
+        if (qrDataFromServer.ttsLangs) {
+          data.tts = qrDataFromServer.ttsLangs.map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) }))
+        }
+        qrCodeData.push(data)
+      }
+    } else if (qrDataFromServer.ttsLangs) {
+      qrCodeData.push({
+        tts: qrDataFromServer.ttsLangs.map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) }))
+      })
+    }
+  }
+
+  await downloadPartialQrCodes()
+}
+
+// Adapted from https://stackoverflow.com/a/69968496/16725862
+// TODO: Returns e.g 'American English' and 'Deutsch (Deutschland)'. Ideally would return 'English' and 'Deutsch'.
+const convertIsoToLangName = (locale: string, iso: string) => {
+  const displayNames = new Intl.DisplayNames([locale], {
+    type: 'language'
+  })
+  return displayNames.of(iso)
+}
+
+const areQrCodesVisible = ref(false)
+const qrCodeContainer = ref()
+
+// Adapted from https://stackoverflow.com/a/38019175/16725862
+const downloadPartialQrCodes = async () => {
+  areQrCodesVisible.value = true
+  await nextTick()
+  const svgBlobs = []
+  for (const qrCode of qrCodeContainer.value) {
+    const svgData = qrCode.innerHTML
+    const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' })
+    svgBlobs.push({
+      name: `Voice-${qrCodeContainer.value.indexOf(qrCode)}.svg`,
+      input: svgBlob
+    })
+  }
+  const blob = await downloadZip([...svgBlobs]).blob()
+  const link = document.createElement('a')
+  link.href = URL.createObjectURL(blob)
+  // link.download = `${data['title'].replace(/ /g, '-')}_Voices_QR-Codes`
+  link.download = `QR-Codes`
+  link.click()
+  link.remove()
+  areQrCodesVisible.value = false
+}
+
 // Enforce min and max values
 watch(trackTtsRate, (newValue) => {
   if (newValue > 2) {
@@ -194,6 +259,7 @@ onMounted(async () => {
   <div class="mx-auto flex w-[90%] flex-col 2xl:w-[70%]">
     <p>{{ globalTime.toFixed(0) }}</p>
     <Button @click="isUploadModalVisible = true">Upload new track</Button>
+    <Button @click="generateQrCodes">Generate QR codes</Button>
 
     <div
       v-if="tracks.length"
@@ -280,8 +346,8 @@ onMounted(async () => {
               :href="`https://sadiss.net/f/${file.fileName}`"
               :download="`${file.origName}.txt`"
               class="text-xl"
-              >⤓</a
-            >
+              >⤓
+            </a>
           </div>
         </div>
       </div>
@@ -321,5 +387,19 @@ onMounted(async () => {
         <Button @click="upload">Upload</Button>
       </div>
     </Modal>
+    <div
+      v-if="areQrCodesVisible"
+      class="flex flex-wrap gap-2"
+      style="display: none">
+      <div v-for="qrCode of qrCodeData">
+        <div ref="qrCodeContainer">
+          <qrcode-vue
+            :value="JSON.stringify(qrCode)"
+            :size="200"
+            :render-as="'svg'"
+            level="H" />
+        </div>
+      </div>
+    </div>
   </div>
 </template>

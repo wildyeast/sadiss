@@ -2,14 +2,17 @@ import express from 'express'
 import { chunk, startSendingInterval, stopSendingInterval } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose from 'mongoose'
+import { TtsJson } from '../types/types'
 
 // Define track schema for db
 const trackSchema = new mongoose.Schema({
   name: String,
   chunks: String,
+  partialsCount: Number,
   mode: String,
   notes: String,
-  ttsInstrunctions: String,
+  ttsInstructions: String,
+  ttsLangs: Array,
   waveform: String,
   ttsRate: String,
   partialFile: Object,
@@ -85,12 +88,13 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
     }
 
     const ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes('ttsfile'))
-    let ttsJson
+    let ttsLangs: Set<string> | undefined
+    let ttsJson: TtsJson | undefined
     if (ttsFiles.length) {
-      ttsJson = convertSrtToJson(ttsFiles)
+      ;({ ttsLangs, ttsJson } = convertSrtToJson(ttsFiles))
     }
 
-    const chunks = await chunk(path, ttsJson)
+    const { partialsCount, chunks } = await chunk(path, ttsJson)
 
     const name = req.body.name
     const notes = req.body.notes
@@ -108,6 +112,14 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
       partialFile: partialFileToSave,
       ttsFiles: ttsFiles.map((file: Express.Multer.File) => ({ origName: file.originalname, fileName: file.filename }))
     })
+
+    if (mode === 'choir' && partialsCount > 0) {
+      t.partialsCount = partialsCount
+    }
+
+    if (ttsLangs) {
+      t.ttsLangs = Array.from(ttsLangs)
+    }
 
     t.save(function (err) {
       if (err) {
@@ -140,16 +152,23 @@ exports.edit_track = async (req: express.Request, res: express.Response) => {
     }
 
     const ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes('ttsfile'))
-    let ttsJson
+    let ttsLangs: Set<string> | undefined
+    let ttsJson: TtsJson | undefined
     if (ttsFiles.length) {
-      ttsJson = convertSrtToJson(ttsFiles)
+      ;({ ttsLangs, ttsJson } = convertSrtToJson(ttsFiles))
       patch.ttsFiles = Object.values(req.files).map((file: Express.Multer.File) => ({
         origName: file.originalname,
         fileName: file.filename
       }))
+      patch.ttsLangs = Array.from(ttsLangs)
     }
 
-    const chunks = await chunk(path, ttsJson)
+    const { partialsCount, chunks } = await chunk(path, ttsJson)
+
+    if (partialsCount > 0) {
+      patch.partialsCount = partialsCount
+    }
+
     patch.chunks = JSON.stringify(chunks)
   }
 
@@ -165,4 +184,32 @@ exports.edit_track = async (req: express.Request, res: express.Response) => {
 exports.stop_track = (req: express.Request, res: express.Response) => {
   stopSendingInterval()
   res.send({ message: 'Track stopped.' })
+}
+
+exports.get_voices_and_languages = async (req: express.Request, res: express.Response) => {
+  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+  try {
+    let maxPartialsCount = -1
+    let ttsLangs: string[] = []
+
+    const tracks = await Track.find({}, 'partialsCount ttsLangs mode')
+    for (const track of tracks) {
+      if (track.mode === 'choir' && track.partialsCount && track.partialsCount > maxPartialsCount) {
+        maxPartialsCount = track.partialsCount
+      }
+
+      if (track.ttsLangs.length) {
+        for (const lang of track.ttsLangs) {
+          if (!ttsLangs.includes(lang)) {
+            ttsLangs.push(lang)
+          }
+        }
+      }
+    }
+
+    res.json({ maxPartialsCount, ttsLangs })
+  } catch (err) {
+    console.log('Failed getting voices and languages with:', err)
+    res.status(500).json({ Error: 'Failed fetching voices and languages.' })
+  }
 }
