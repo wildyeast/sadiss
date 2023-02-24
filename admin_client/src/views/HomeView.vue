@@ -9,9 +9,6 @@ if (!axios) {
   throw Error('Could not inject axios.')
 }
 
-// const API_URL = 'http://localhost:3005'
-// const API_URL = 'https://sadiss.net/server'
-
 const trackName = ref('')
 const trackNotes = ref('')
 const trackIsChoir = ref(false)
