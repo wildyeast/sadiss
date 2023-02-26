@@ -1,28 +1,66 @@
 const WebSocket = require('ws')
 const Max = require('max-api')
+const axios = require('axios');
 
-let trackTime = -1
-let motion
+let ws
+const tracks = []
 
-Max.post('Ready to connect. Click "register"')
+/* Log to Max console */
+const log = (...args) => {
+  Max.post(...args)
+}
+
+/** Fetch track list from server */
+const fetch = async (endpoint) => {
+  Max.outlet(['tracklist', 'clear'])
+  await axios.get(`https://sadiss.net/server/${endpoint}`)
+    .then(response => {
+      for (const track of response.data.tracks) {
+        tracks.push(track)
+        Max.post(track)
+        Max.outlet(['tracklist', `append ${track.name}`])
+      }
+    })
+    .catch(error => {
+      Max.post(error)
+    })
+}
+
+
+log('Ready to connect. Click "register"')
+
+Max.addHandler('getTracks', async () => {
+  await fetch('get-tracks')
+})
+
+Max.addHandler('selectTrack', async (id) => {
+  if (!tracks) {
+    await fetch('get-tracks')
+  }
+  Max.post('select', id)
+  const track = tracks[id]
+  Max.outlet(['trackdetails',  track.name])
+})
+
+// Register with SADISS server
 Max.addHandler("register", async () => {
-
-	Max.post('Connecting to SADISS server...')
-  const ws = new WebSocket('wss://sadiss.net/ws/:443')
-
+	log('Connecting to SADISS server...')
+  ws = new WebSocket('wss://sadiss.net/ws/:443')
   ws.onopen = () => {
     ws.send(JSON.stringify({ message: 'isAdmin' }))
   }
-
-  Max.post('Waiting for track start...')
-
+  log('Waiting for track start...')
   ws.onmessage = (event) => {
-    if (event.data === 'start') {
-      Max.post("Start message received")
-      Max.outlet('bang')
-    } else if (event.data === 'stop') {
-      Max.post("Stop message received")
-      Max.outlet('stop')
+    let msg
+    //log('Received message', event)
+    switch (event) {
+      case 'start':
+        Max.outlet('bang')
+        break
+      case 'stop':
+        Max.outlet('stop')
+        break
     }
   }
 })
+
