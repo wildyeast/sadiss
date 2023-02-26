@@ -1,0 +1,11 @@
+{
+  "name": "sadiss-max",
+  "version": "1.0.0",
+  "description": "A max patch syncing with SADISS server",
+  "main": "sadiss-max.js",
+  "author": "Lukas Bindeus",
+  "license": "GPL3",
+  "dependencies": {
+    "ws": "^8.12.1"
+  }
+}
