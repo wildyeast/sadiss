@@ -203,6 +203,11 @@ const generateQrCodes = async () => {
     }
   }
 
+  if (!qrCodeData.length) {
+    alert('Not enough data to generate QR codes. Please contact an administrator.')
+    return
+  }
+
   await downloadPartialQrCodes()
 }
 
