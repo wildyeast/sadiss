@@ -178,6 +178,10 @@ const startClock = () => {
   }, 10)
 }
 
+const performanceName = ref('Performance Name')
+const expertMode = ref(false)
+const defaultLanguage = ref('en-US')
+
 const qrCodeData: QrCodeData[] = []
 
 const generateQrCodes = async () => {
@@ -190,22 +194,33 @@ const generateQrCodes = async () => {
   if (Object.keys(qrDataFromServer).length) {
     if (qrDataFromServer.maxPartialsCount) {
       for (let i = 0; i < qrDataFromServer.maxPartialsCount; i++) {
-        const data: QrCodeData = { choirId: i }
+        const data: QrCodeData = {
+          choirId: i,
+          performanceName: performanceName.value,
+          expertMode: expertMode.value
+        }
         if (qrDataFromServer.ttsLangs) {
           data.tts = qrDataFromServer.ttsLangs.map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) }))
+          data.defaultLang = defaultLanguage.value
         }
         qrCodeData.push(data)
       }
     } else if (qrDataFromServer.ttsLangs) {
       qrCodeData.push({
+        performanceName: performanceName.value,
+        expertMode: expertMode.value,
+        defaultLang: defaultLanguage.value,
         tts: qrDataFromServer.ttsLangs.map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) }))
       })
     }
   }
 
+  // If not enough data to generate QR codes, generate at least one code with performanceName and expertMode
   if (!qrCodeData.length) {
-    alert('Not enough data to generate QR codes. Please contact an administrator.')
-    return
+    qrCodeData.push({
+      performanceName: performanceName.value,
+      expertMode: false
+    })
   }
 
   await downloadPartialQrCodes()
@@ -263,6 +278,7 @@ onMounted(async () => {
 <template>
   <div class="mx-auto flex w-[90%] flex-col 2xl:w-[70%]">
     <p>{{ globalTime.toFixed(0) }}</p>
+    <h1 class="my-6 text-3xl">{{ performanceName }}</h1>
     <Button @click="isUploadModalVisible = true">Upload new track</Button>
     <Button @click="generateQrCodes">Generate QR codes</Button>
 
