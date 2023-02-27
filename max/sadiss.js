@@ -4,23 +4,17 @@ const axios = require('axios');
 
 let ws
 const tracks = []
+let selectedTrack
 
 /* Log to Max console */
 const log = (...args) => {
   Max.post(...args)
 }
 
-/** Fetch track list from server */
-const fetch = async (endpoint) => {
-  Max.outlet(['tracklist', 'clear'])
+/** Fetch from server */
+const fetch = async (endpoint, callback) => {
   await axios.get(`https://sadiss.net/server/${endpoint}`)
-    .then(response => {
-      for (const track of response.data.tracks) {
-        tracks.push(track)
-        Max.post(track)
-        Max.outlet(['tracklist', `append ${track.name}`])
-      }
-    })
+    .then(callback)
     .catch(error => {
       Max.post(error)
     })
@@ -29,17 +23,46 @@ const fetch = async (endpoint) => {
 
 log('Ready to connect. Click "register"')
 
+const getTracks = async () => {
+  Max.outlet(['tracklist', 'clear'])
+  await fetch('get-tracks', response => {
+      for (const track of response.data.tracks) {
+        tracks.push(track)
+        Max.post(track)
+        Max.outlet(['tracklist', `append ${track.name}`])
+      }
+    })
+}
+
 Max.addHandler('getTracks', async () => {
-  await fetch('get-tracks')
+  await getTracks()
 })
 
 Max.addHandler('selectTrack', async (id) => {
-  if (!tracks) {
-    await fetch('get-tracks')
+  if (!tracks.length) {
+    await getTracks()
   }
   Max.post('select', id)
   const track = tracks[id]
-  Max.outlet(['trackdetails',  track.name])
+  selectedTrack = track
+  Max.outlet(['trackdetails',  `set ${track.name} - ${track.mode} - waveform: ${track.waveform} - tts rate: ${track.ttsRate}`])
+})
+
+Max.addHandler('startTrack', async () => {
+  if (!selectedTrack) {
+    Max.post('no track selected')
+    return 
+  }
+  Max.post('starting', selectedTrack)
+  return
+  await fetch(`start-track/${selectedTrack.id}`, response => {
+    Max.post('Track started', response.data)
+  })
+})
+
+Max.addHandler('stopTrack', async () => {
+  await fetch('stop-track')
+
 })
 
 // Register with SADISS server
