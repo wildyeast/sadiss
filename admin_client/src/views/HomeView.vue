@@ -178,41 +178,55 @@ const startClock = () => {
   }, 10)
 }
 
+/* QR Codes */
+
 const performanceName = ref('Performance Name')
 const expertMode = ref(false)
 const defaultLanguage = ref('en-US')
+const voiceCount = ref<number>()
+const voiceNames = ref<string[]>([])
+const ttsLangs = ref<string>('')
 
-const qrCodeData: QrCodeData[] = []
-
-const generateQrCodes = async () => {
+const getVoicesAndLanguages = async () => {
   let qrDataFromServer = <{ maxPartialsCount: number; ttsLangs: string[] }>{}
   await fetch(`${process.env.VUE_APP_API_URL}/get-voices-and-languages`)
     .then((res) => res.json())
     .then((data) => (qrDataFromServer = data))
     .catch((err) => console.log('Failed getting Tracks with: ', err))
 
-  if (Object.keys(qrDataFromServer).length) {
-    if (qrDataFromServer.maxPartialsCount) {
-      for (let i = 0; i < qrDataFromServer.maxPartialsCount; i++) {
-        const data: QrCodeData = {
-          choirId: i,
-          performanceName: performanceName.value,
-          expertMode: expertMode.value
-        }
-        if (qrDataFromServer.ttsLangs) {
-          data.tts = qrDataFromServer.ttsLangs.map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) }))
-          data.defaultLang = defaultLanguage.value
-        }
-        qrCodeData.push(data)
-      }
-    } else if (qrDataFromServer.ttsLangs) {
-      qrCodeData.push({
+  voiceCount.value = qrDataFromServer.maxPartialsCount <= 0 ? 0 : qrDataFromServer.maxPartialsCount
+  ttsLangs.value = qrDataFromServer.ttsLangs.join(', ')
+}
+
+const openQrCodeModal = async () => {
+  await getVoicesAndLanguages()
+  isQrCodeModalVisible.value = true
+}
+
+const qrCodeData: QrCodeData[] = []
+
+const generateQrCodes = async () => {
+  if (voiceCount.value) {
+    for (let i = 0; i < voiceCount.value; i++) {
+      const data: QrCodeData = {
+        choirId: i,
+        roleName: voiceNames.value[i],
         performanceName: performanceName.value,
-        expertMode: expertMode.value,
-        defaultLang: defaultLanguage.value,
-        tts: qrDataFromServer.ttsLangs.map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) }))
-      })
+        expertMode: expertMode.value
+      }
+      if (ttsLangs.value) {
+        data.tts = ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) }))
+        data.defaultLang = defaultLanguage.value
+      }
+      qrCodeData.push(data)
     }
+  } else if (ttsLangs.value) {
+    qrCodeData.push({
+      performanceName: performanceName.value,
+      expertMode: expertMode.value,
+      defaultLang: defaultLanguage.value,
+      tts: ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) }))
+    })
   }
 
   // If not enough data to generate QR codes, generate at least one code with performanceName and expertMode
@@ -234,6 +248,8 @@ const convertIsoToLangName = (locale: string, iso: string) => {
   })
   return displayNames.of(iso)
 }
+
+const isQrCodeModalVisible = ref(false)
 
 const areQrCodesVisible = ref(false)
 const qrCodeContainer = ref()
@@ -259,6 +275,7 @@ const downloadPartialQrCodes = async () => {
   link.click()
   link.remove()
   areQrCodesVisible.value = false
+  isQrCodeModalVisible.value = false
 }
 
 // Enforce min and max values
@@ -280,7 +297,7 @@ onMounted(async () => {
     <p>{{ globalTime.toFixed(0) }}</p>
     <h1 class="my-6 text-3xl">{{ performanceName }}</h1>
     <Button @click="isUploadModalVisible = true">Upload new track</Button>
-    <Button @click="generateQrCodes">Generate QR codes</Button>
+    <Button @click="openQrCodeModal">Generate QR codes</Button>
 
     <div
       v-if="tracks.length"
@@ -404,10 +421,63 @@ onMounted(async () => {
           v-model="trackNotes"
           class="w-3/4" />
       </div>
+      <div class="my-8 flex flex-row justify-between p-2">
+        <div>Expert mode</div>
+        <input
+          type="checkbox"
+          v-model="expertMode"
+          class="w-3/4" />
+      </div>
       <div class="flex w-full flex-row justify-center">
         <Button @click="upload">Upload</Button>
       </div>
     </Modal>
+
+    <!-- QR Code Modal  -->
+
+    <Modal
+      v-if="isQrCodeModalVisible"
+      title="Generate QR codes"
+      @close="isQrCodeModalVisible = false">
+      <div class="my-8 flex flex-row justify-between p-2">
+        <div>Performance name</div>
+        <input
+          v-model="performanceName"
+          class="w-3/4" />
+      </div>
+      <div class="mt-8 flex flex-row justify-between p-2">
+        <div>Voice count</div>
+        <input
+          v-model="voiceCount"
+          type="number"
+          class="w-3/4" />
+      </div>
+      <div
+        v-for="voice in voiceCount"
+        class="flex flex-row justify-between p-2">
+        <div>Name for voice {{ voice - 1 }}</div>
+        <input
+          v-model="voiceNames[voice - 1]"
+          class="w-3/4" />
+      </div>
+      <div class="mt-8 flex flex-row justify-between p-2">
+        <div>TTS languages</div>
+        <input
+          v-model="ttsLangs"
+          type="text"
+          class="w-3/4" />
+      </div>
+      <div class="mt-8 flex flex-row justify-between p-2">
+        <div>Default lang</div>
+        <input
+          v-model="defaultLanguage"
+          type="text"
+          class="w-3/4" />
+      </div>
+      <button @click="generateQrCodes">Generate</button>
+    </Modal>
+
+    <!-- QR Codes themselves (not visible to user) -->
     <div
       v-if="areQrCodesVisible"
       class="flex flex-wrap gap-2"
