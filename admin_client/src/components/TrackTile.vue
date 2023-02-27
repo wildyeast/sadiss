@@ -12,7 +12,7 @@ const stopTrack = async () => {
 </script>
 
 <template>
-  <div class="relative flex flex-col items-start rounded border border-white px-4 py-2">
+  <div class="relative flex flex-col items-start overflow-hidden rounded border border-white px-4 py-2">
     <button
       @click="$emit('editTrack')"
       class="absolute top-0 right-6">
