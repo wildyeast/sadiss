@@ -13,12 +13,12 @@
         <div v-if="debug">
           <div
             v-if="motion && motion.pos"
-            class="flex w-[20rem] flex-col items-start text-white">
-            <p>ctx Time: {{ debugData.ctxTime }}</p>
-            <p>Offset: {{ debugData.offset }}</p>
-            <p>Global Time: {{ motion.pos }}</p>
-            <p>Calced Global Time: {{ debugData.ctxTime! + debugData.offset }}</p>
-            <p>Diff: {{ motion.pos - debugData.offset - debugData.ctxTime! }}</p>
+            class="flex w-[20rem] flex-col items-start text-sm text-white">
+            <p>ctx Time:<br />{{ debugData.ctxTime }}</p>
+            <p>Offset:<br />{{ debugData.offset }}</p>
+            <p>Global Time:<br />{{ motion.pos }}</p>
+            <p>Calced Global Time:<br />{{ debugData.ctxTime! + debugData.offset }}</p>
+            <p>Diff:<br />{{ motion.pos - debugData.offset - debugData.ctxTime! }}</p>
           </div>
         </div>
         <ion-item
