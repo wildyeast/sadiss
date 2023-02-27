@@ -1,0 +1,6 @@
+framework module CapacitorCommunityTextToSpeech {
+  umbrella header "CapacitorCommunityTextToSpeech-umbrella.h"
+
+  export *
+  module * { export * }
+}
