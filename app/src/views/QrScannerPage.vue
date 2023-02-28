@@ -16,7 +16,7 @@
 import { IonContent, IonPage, IonButton, useIonRouter } from '@ionic/vue'
 import { onDeactivated } from 'vue'
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
-import { Preferences } from '@capacitor/preferences'
+import { setPreference } from '@/tools/preferences'
 
 // Router
 const ionRouter = useIonRouter()
@@ -33,36 +33,24 @@ const scanCode = async () => {
     // Performance name
     const performanceName = result.performanceName
     if (performanceName) {
-      await Preferences.set({
-        key: 'performanceName',
-        value: performanceName
-      })
+      await setPreference('performanceName', performanceName)
     }
 
     // ChoirId (id of Role)
     const choirId = result.choirId
     if (choirId && !Number.isNaN(+choirId)) {
-      await Preferences.set({
-        key: 'choirId',
-        value: String(choirId)
-      })
+      await setPreference('choirId', String(choirId))
     }
 
     // Role Name
     const roleName = result.roleName
     if (roleName) {
-      await Preferences.set({
-        key: 'roleName',
-        value: roleName
-      })
+      await setPreference('roleName', roleName)
     }
 
     // TTS langs
     if (result.tts) {
-      await Preferences.set({
-        key: 'availableLanguages',
-        value: JSON.stringify(result.tts)
-      })
+      await setPreference('availableLanguages', JSON.stringify(result.tts))
       ionRouter.navigate('/language-selection', 'forward', 'push')
     } else {
       ionRouter.navigate('/main', 'forward', 'push')
@@ -71,10 +59,7 @@ const scanCode = async () => {
     // Default TTS lang
     const defaultLang = result.defaultLang
     if (defaultLang) {
-      await Preferences.set({
-        key: 'defaultLang',
-        value: defaultLang
-      })
+      await setPreference('defaultLang', defaultLang)
     }
 
     // Export Mode

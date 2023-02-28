@@ -61,37 +61,38 @@ import {
 } from '@ionic/vue'
 import { ref, watch, onMounted } from 'vue'
 import { Preferences } from '@capacitor/preferences'
+import { getPreference, setPreference } from '@/tools/preferences'
 
 // Router
 const ionRouter = useIonRouter()
 
-const performanceName = ref('Performance Name')
-const roleName = ref('Sepp Hiaslbauer')
+const performanceName = ref('')
+const roleName = ref('')
 
 const availableLanguages = ref()
 const selectedLanguage = ref()
 
 onMounted(async () => {
   // Load performance name from preferences
-  const performanceNameResult = await Preferences.get({ key: 'performanceName' })
+  const performanceNameResult = await getPreference('performanceName')
   if (performanceNameResult.value) {
     performanceName.value = performanceNameResult.value
   }
 
   // Load role name from preferences
-  const roleNameResult = await Preferences.get({ key: 'roleName' })
+  const roleNameResult = await getPreference('roleName')
   if (roleNameResult.value) {
     roleName.value = roleNameResult.value
   }
 
   // Load available languages from preferences
-  const availableLanguagesResult = await Preferences.get({ key: 'availableLanguages' })
+  const availableLanguagesResult = await getPreference('availableLanguages')
   if (availableLanguagesResult.value) {
     availableLanguages.value = await JSON.parse(availableLanguagesResult.value)
   }
 
   // Load default language from preferences
-  const defaultLanguageResult = await Preferences.get({ key: 'defaultLang' })
+  const defaultLanguageResult = await getPreference('defaultLang')
   if (defaultLanguageResult.value) {
     const availableLang = availableLanguages.value.find((lang: AvailableLanguage) => lang.iso === defaultLanguageResult.value)
     if (availableLang) {
@@ -103,10 +104,7 @@ onMounted(async () => {
 watch(
   () => selectedLanguage.value,
   async (value) => {
-    await Preferences.set({
-      key: 'selectedLanguage',
-      value: value
-    })
+    await setPreference('selectedLanguage', value)
   }
 )
 

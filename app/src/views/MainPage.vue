@@ -9,7 +9,7 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <div class="flex h-full flex-col items-center justify-center bg-primary">
+      <div class="flex h-full flex-col items-center justify-around bg-primary">
         <div v-if="debug">
           <div
             v-if="motion && motion.pos"
@@ -20,6 +20,12 @@
             <p>Calced Global Time:<br />{{ debugData.ctxTime! + debugData.offset }}</p>
             <p>Diff:<br />{{ motion.pos - debugData.offset - debugData.ctxTime! }}</p>
           </div>
+        </div>
+        <div
+          v-else
+          class="flex flex-col items-center gap-4">
+          <h1 class="text-3xl">{{ performanceName }}</h1>
+          <h2 class="text-2xl">{{ roleName }}</h2>
         </div>
         <ion-item
           v-if="debug"
@@ -100,7 +106,7 @@ import { usePlayer } from '../composables/usePlayer'
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
 import { Capacitor } from '@capacitor/core'
 import { KeepAwake } from '@capacitor-community/keep-awake'
-import { Preferences } from '@capacitor/preferences'
+import { getPreference, setPreference } from '@/tools/preferences'
 
 // Development mode
 const debug = false
@@ -257,13 +263,28 @@ const scanCode = async () => {
   document.body.classList.remove('qrscanner')
 }
 
+const performanceName = ref('')
+const roleName = ref('')
+
 onMounted(async () => {
-  const choirIdResult = await Preferences.get({ key: 'choirId' })
+  // Load performance name from preferences
+  const performanceNameResult = await getPreference('performanceName')
+  if (performanceNameResult.value) {
+    performanceName.value = performanceNameResult.value
+  }
+
+  // Load role name from preferences
+  const roleNameResult = await getPreference('roleName')
+  if (roleNameResult.value) {
+    roleName.value = roleNameResult.value
+  }
+
+  const choirIdResult = await getPreference('choirId')
   if (choirIdResult.value) {
     choirId.value = +choirIdResult.value
   }
 
-  const langResult = await Preferences.get({ key: 'selectedLanguage' })
+  const langResult = await getPreference('selectedLanguage')
   if (langResult.value) {
     ttsLanguage.value = langResult.value
   }
@@ -316,10 +337,7 @@ watch(
   () => choirId.value,
   async (value, oldValue) => {
     if (typeof value === 'number' && value !== oldValue) {
-      await Preferences.set({
-        key: 'choirId',
-        value: String(value)
-      })
+      await setPreference('choirId', String(value))
     }
   }
 )
