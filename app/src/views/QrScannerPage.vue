@@ -28,7 +28,14 @@ const scanCode = async () => {
   document.body.classList.add('qrscanner')
   const resultJson = await startScan()
   if (resultJson) {
-    const result: QrCodeScanResult = await JSON.parse(resultJson)
+    let result: QrCodeScanResult
+    try {
+      result = await JSON.parse(resultJson)
+    } catch (err) {
+      alert('Scan failed. Please try again.')
+      stopScanning()
+      return
+    }
 
     // Performance name
     const performanceName = result.performanceName
