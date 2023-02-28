@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonApp, IonRouterOutlet, IonButton, IonHeader, IonToolbar, IonButtons, IonBackButton } from '@ionic/vue'
+import { IonApp, IonRouterOutlet, IonButton } from '@ionic/vue'
 import { useBarcodeScanner } from './composables/useBarcodeScanner'
 
 const { stopScan } = useBarcodeScanner()
