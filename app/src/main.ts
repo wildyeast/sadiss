@@ -29,7 +29,7 @@ import './theme/tailwind.css'
 /* Ionic specific CSS helper classes */
 import './theme/ionic.css'
 
-const app = createApp(App).use(IonicVue).use(router)
+const app = createApp(App).use(IonicVue, { swipeBackEnabled: false }).use(router)
 
 router.isReady().then(() => {
   app.mount('#app')
