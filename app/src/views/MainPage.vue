@@ -23,7 +23,7 @@
         </div>
         <div
           v-else
-          class="flex flex-col items-center gap-4">
+          class="flex flex-col items-center gap-4 text-white">
           <h1 class="text-3xl">{{ performanceName }}</h1>
           <h2 class="text-2xl">{{ roleName }}</h2>
         </div>

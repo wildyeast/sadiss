@@ -10,7 +10,7 @@
 
     <ion-content :fullscreen="true">
       <div class="flex h-full w-full flex-col items-center justify-around gap-8 bg-primary">
-        <div class="flex flex-col items-center gap-4">
+        <div class="flex flex-col items-center gap-4 text-white">
           <h1 class="text-3xl">{{ performanceName }}</h1>
           <h2 class="text-2xl">{{ roleName }}</h2>
         </div>
@@ -60,7 +60,6 @@ import {
   IonBackButton
 } from '@ionic/vue'
 import { ref, watch, onMounted } from 'vue'
-import { Preferences } from '@capacitor/preferences'
 import { getPreference, setPreference } from '@/tools/preferences'
 
 // Router
@@ -69,8 +68,8 @@ const ionRouter = useIonRouter()
 const performanceName = ref('')
 const roleName = ref('')
 
-const availableLanguages = ref()
-const selectedLanguage = ref()
+const availableLanguages = ref<AvailableLanguage[]>([])
+const selectedLanguage = ref<string>('')
 
 onMounted(async () => {
   // Load performance name from preferences
@@ -96,7 +95,7 @@ onMounted(async () => {
   if (defaultLanguageResult.value) {
     const availableLang = availableLanguages.value.find((lang: AvailableLanguage) => lang.iso === defaultLanguageResult.value)
     if (availableLang) {
-      selectedLanguage.value = availableLang
+      selectedLanguage.value = availableLang.iso
     }
   }
 })
