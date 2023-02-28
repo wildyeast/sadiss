@@ -9,7 +9,11 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <div class="flex h-full w-full flex-col items-center justify-center gap-8 bg-primary">
+      <div class="flex h-full w-full flex-col items-center justify-around gap-8 bg-primary">
+        <div class="flex flex-col items-center gap-4">
+          <h1 class="text-3xl">{{ performanceName }}</h1>
+          <h2 class="text-2xl">{{ roleName }}</h2>
+        </div>
         <ion-item
           class="ionic-bg-secondary w-[80%]"
           lines="none">
@@ -61,19 +65,38 @@ import { Preferences } from '@capacitor/preferences'
 // Router
 const ionRouter = useIonRouter()
 
-const availableLanguages = ref([{ iso: 'de-DE', lang: 'Deutsch' }])
+const performanceName = ref('Performance Name')
+const roleName = ref('Sepp Hiaslbauer')
+
+const availableLanguages = ref()
 const selectedLanguage = ref()
 
 onMounted(async () => {
-  try {
-    const availableLanguagesResult = await Preferences.get({ key: 'availableLanguages' })
-    if (availableLanguagesResult.value) {
-      const parsed = await JSON.parse(availableLanguagesResult.value)
-      console.log('Parsed json: ', parsed)
-      availableLanguages.value = await JSON.parse(availableLanguagesResult.value)
+  // Load performance name from preferences
+  const performanceNameResult = await Preferences.get({ key: 'performanceName' })
+  if (performanceNameResult.value) {
+    performanceName.value = performanceNameResult.value
+  }
+
+  // Load role name from preferences
+  const roleNameResult = await Preferences.get({ key: 'roleName' })
+  if (roleNameResult.value) {
+    roleName.value = roleNameResult.value
+  }
+
+  // Load available languages from preferences
+  const availableLanguagesResult = await Preferences.get({ key: 'availableLanguages' })
+  if (availableLanguagesResult.value) {
+    availableLanguages.value = await JSON.parse(availableLanguagesResult.value)
+  }
+
+  // Load default language from preferences
+  const defaultLanguageResult = await Preferences.get({ key: 'defaultLang' })
+  if (defaultLanguageResult.value) {
+    const availableLang = availableLanguages.value.find((lang: AvailableLanguage) => lang.iso === defaultLanguageResult.value)
+    if (availableLang) {
+      selectedLanguage.value = availableLang
     }
-  } catch (err) {
-    console.log('Failed mounting lang selection page.')
   }
 })
 
@@ -86,4 +109,9 @@ watch(
     })
   }
 )
+
+interface AvailableLanguage {
+  iso: string
+  lang: string
+}
 </script>

@@ -28,8 +28,18 @@ const scanCode = async () => {
   document.body.classList.add('qrscanner')
   const resultJson = await startScan()
   if (resultJson) {
-    const result: { choirId: number; tts?: boolean } = await JSON.parse(resultJson)
+    const result: QrCodeScanResult = await JSON.parse(resultJson)
 
+    // Performance name
+    const performanceName = result.performanceName
+    if (performanceName) {
+      await Preferences.set({
+        key: 'performanceName',
+        value: performanceName
+      })
+    }
+
+    // ChoirId (id of Role)
     const choirId = result.choirId
     if (choirId && !Number.isNaN(+choirId)) {
       await Preferences.set({
@@ -38,6 +48,16 @@ const scanCode = async () => {
       })
     }
 
+    // Role Name
+    const roleName = result.roleName
+    if (roleName) {
+      await Preferences.set({
+        key: 'roleName',
+        value: roleName
+      })
+    }
+
+    // TTS langs
     if (result.tts) {
       await Preferences.set({
         key: 'availableLanguages',
@@ -47,6 +67,18 @@ const scanCode = async () => {
     } else {
       ionRouter.navigate('/main', 'forward', 'push')
     }
+
+    // Default TTS lang
+    const defaultLang = result.defaultLang
+    if (defaultLang) {
+      await Preferences.set({
+        key: 'defaultLang',
+        value: defaultLang
+      })
+    }
+
+    // Export Mode
+    // TODO Not yet implemented
   }
   stopScanning()
 }
@@ -61,4 +93,12 @@ onDeactivated(() => {
   document.body.classList.remove('qrscanner')
   stopScan()
 })
+
+interface QrCodeScanResult {
+  performanceName: string
+  choirId?: number
+  tts?: boolean
+  roleName?: string
+  defaultLang?: string
+}
 </script>
