@@ -20,6 +20,8 @@ PODS:
     - Capacitor
   - CordovaPlugins (4.2.0):
     - CapacitorCordova
+  - HugotomaziCapacitorNavigationBar (2.0.0):
+    - Capacitor
 
 DEPENDENCIES:
   - "Capacitor (from `../../node_modules/@capacitor/ios`)"
@@ -33,6 +35,7 @@ DEPENDENCIES:
   - "CapacitorPreferences (from `../../node_modules/@capacitor/preferences`)"
   - "CapacitorStatusBar (from `../../node_modules/@capacitor/status-bar`)"
   - CordovaPlugins (from `../capacitor-cordova-ios-plugins`)
+  - "HugotomaziCapacitorNavigationBar (from `../../node_modules/@hugotomazi/capacitor-navigation-bar`)"
 
 EXTERNAL SOURCES:
   Capacitor:
@@ -57,6 +60,8 @@ EXTERNAL SOURCES:
     :path: "../../node_modules/@capacitor/status-bar"
   CordovaPlugins:
     :path: "../capacitor-cordova-ios-plugins"
+  HugotomaziCapacitorNavigationBar:
+    :path: "../../node_modules/@hugotomazi/capacitor-navigation-bar"
 
 SPEC CHECKSUMS:
   Capacitor: 1dc8dbe3b5ffb9fd085739dbec754180975a7d37
@@ -70,7 +75,8 @@ SPEC CHECKSUMS:
   CapacitorPreferences: 1d66dc32299f55ed632c5611f312878979275ea5
   CapacitorStatusBar: e6cf2a9ed07f92ddae9ca101be36d08c61866b35
   CordovaPlugins: fd78569316dfb29cc635ddee18cde538a5d065cd
+  HugotomaziCapacitorNavigationBar: 026a9c46b514b6752f89d12c6cb66c2a50a1a1d5
 
-PODFILE CHECKSUM: bfefd05f2ad36dfb13a7c1f302d327fdcff3f573
+PODFILE CHECKSUM: 18c8b85326364af0fc5a5f84ae7d9bfa848035a9
 
 COCOAPODS: 1.11.3

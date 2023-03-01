@@ -104,10 +104,10 @@ import {
 } from '@ionic/vue'
 import { ref, onMounted, watch, reactive, onDeactivated } from 'vue'
 import { usePlayer } from '../composables/usePlayer'
-import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
 import { Capacitor } from '@capacitor/core'
 import { KeepAwake } from '@capacitor-community/keep-awake'
 import { getPreference, setPreference } from '@/tools/preferences'
+import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar'
 
 // Router
 const ionRouter = useIonRouter()
@@ -326,7 +326,7 @@ watch(
   }
 )
 
-// Enable/Disable KeepAwakt depending on registration status
+// Enable/Disable KeepAwake and Android Navigation Bar depending on registration status
 watch(
   () => isRegistered.value,
   async (value) => {
@@ -338,6 +338,13 @@ watch(
         } else {
           await KeepAwake.allowSleep()
           dLog('KeepAwake disabled.')
+        }
+      }
+      if (Capacitor.getPlatform() === 'android') {
+        if (value) {
+          await NavigationBar.hide()
+        } else {
+          await NavigationBar.show()
         }
       }
     } catch (error) {
