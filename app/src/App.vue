@@ -44,6 +44,8 @@ ion-back-button {
   --color: white !important;
 }
 
+/* QR Code Scanning */
+
 body.scanner-active {
   --background: transparent;
   --ion-background-color: transparent;
