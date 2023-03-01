@@ -102,7 +102,7 @@ import {
   IonBackButton,
   useIonRouter
 } from '@ionic/vue'
-import { ref, onMounted, watch, reactive, onDeactivated } from 'vue'
+import { ref, onMounted, watch, reactive, onUnmounted } from 'vue'
 import { usePlayer } from '../composables/usePlayer'
 import { Capacitor } from '@capacitor/core'
 import { KeepAwake } from '@capacitor-community/keep-awake'
@@ -279,6 +279,10 @@ onMounted(async () => {
   }
 
   await initializeMCorp()
+})
+
+onUnmounted(() => {
+  ws.value?.close()
 })
 
 const logContainer = ref<HTMLDivElement | null>(null)
