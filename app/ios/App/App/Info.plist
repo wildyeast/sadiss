@@ -24,10 +24,6 @@
 	<true/>
 	<key>NSCameraUsageDescription</key>
 	<string>The app needs to scan a QR code to function properly.</string>
-	<key>UIBackgroundModes</key>
-	<array>
-		<string>audio</string>
-	</array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
