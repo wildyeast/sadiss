@@ -31,6 +31,7 @@ const whitelist = [
   `http://${BASE_URL}:${BASE_PORT}`,
   'http://127.0.0.1:5173',
   'http://localhost:8081',
+  'http://localhost:8080',
   'https://sadiss.net' /** other domains if any */
 ]
 const corsOptions = {

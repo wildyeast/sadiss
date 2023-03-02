@@ -2,6 +2,8 @@ import express from 'express'
 
 const track_controller = require('../controllers/trackController')
 
+const performance_controller = require('../controllers/performanceController')
+
 const router = express.Router()
 
 const multer = require('multer')
@@ -30,5 +32,8 @@ router.get('/stop-track', track_controller.stop_track)
 
 // Stop track
 router.get('/get-voices-and-languages', track_controller.get_voices_and_languages)
+
+// Get performances
+router.get('/get-performances', performance_controller.get_performances)
 
 module.exports = router
