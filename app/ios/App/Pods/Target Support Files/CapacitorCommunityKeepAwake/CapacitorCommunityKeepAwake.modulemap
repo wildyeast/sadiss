@@ -1,0 +1,6 @@
+framework module CapacitorCommunityKeepAwake {
+  umbrella header "CapacitorCommunityKeepAwake-umbrella.h"
+
+  export *
+  module * { export * }
+}

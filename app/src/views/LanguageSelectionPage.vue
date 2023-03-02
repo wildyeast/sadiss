@@ -9,7 +9,11 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <div class="flex h-full w-full flex-col items-center justify-center gap-8 bg-primary">
+      <div class="flex h-full w-full flex-col items-center justify-around gap-8 bg-primary">
+        <div class="flex flex-col items-center gap-4 text-white">
+          <h1 class="text-3xl">{{ performanceName }}</h1>
+          <h2 class="text-2xl">{{ roleName }}</h2>
+        </div>
         <ion-item
           class="ionic-bg-secondary w-[80%]"
           lines="none">
@@ -56,34 +60,55 @@ import {
   IonBackButton
 } from '@ionic/vue'
 import { ref, watch, onMounted } from 'vue'
-import { Preferences } from '@capacitor/preferences'
+import { getPreference, setPreference } from '@/tools/preferences'
 
 // Router
 const ionRouter = useIonRouter()
 
-const availableLanguages = ref([{ iso: 'de-DE', lang: 'Deutsch' }])
-const selectedLanguage = ref()
+const performanceName = ref('')
+const roleName = ref('')
+
+const availableLanguages = ref<AvailableLanguage[]>([])
+const selectedLanguage = ref<string>('')
 
 onMounted(async () => {
-  try {
-    const availableLanguagesResult = await Preferences.get({ key: 'availableLanguages' })
-    if (availableLanguagesResult.value) {
-      const parsed = await JSON.parse(availableLanguagesResult.value)
-      console.log('Parsed json: ', parsed)
-      availableLanguages.value = await JSON.parse(availableLanguagesResult.value)
+  // Load performance name from preferences
+  const performanceNameResult = await getPreference('performanceName')
+  if (performanceNameResult.value) {
+    performanceName.value = performanceNameResult.value
+  }
+
+  // Load role name from preferences
+  const roleNameResult = await getPreference('roleName')
+  if (roleNameResult.value) {
+    roleName.value = roleNameResult.value
+  }
+
+  // Load available languages from preferences
+  const availableLanguagesResult = await getPreference('availableLanguages')
+  if (availableLanguagesResult.value) {
+    availableLanguages.value = await JSON.parse(availableLanguagesResult.value)
+  }
+
+  // Load default language from preferences
+  const defaultLanguageResult = await getPreference('defaultLang')
+  if (defaultLanguageResult.value) {
+    const availableLang = availableLanguages.value.find((lang: AvailableLanguage) => lang.iso === defaultLanguageResult.value)
+    if (availableLang) {
+      selectedLanguage.value = availableLang.iso
     }
-  } catch (err) {
-    console.log('Failed mounting lang selection page.')
   }
 })
 
 watch(
   () => selectedLanguage.value,
   async (value) => {
-    await Preferences.set({
-      key: 'selectedLanguage',
-      value: value
-    })
+    await setPreference('selectedLanguage', value)
   }
 )
+
+interface AvailableLanguage {
+  iso: string
+  lang: string
+}
 </script>

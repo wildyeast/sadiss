@@ -9,17 +9,23 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <div class="flex h-full flex-col items-center justify-center bg-primary">
+      <div class="flex h-full flex-col items-center justify-around bg-primary">
         <div v-if="debug">
           <div
             v-if="motion && motion.pos"
-            class="flex w-[20rem] flex-col items-start text-white">
-            <p>ctx Time: {{ debugData.ctxTime }}</p>
-            <p>Offset: {{ debugData.offset }}</p>
-            <p>Global Time: {{ motion.pos }}</p>
-            <p>Calced Global Time: {{ debugData.ctxTime! + debugData.offset }}</p>
-            <p>Diff: {{ motion.pos - debugData.offset - debugData.ctxTime! }}</p>
+            class="flex w-[20rem] flex-col items-start text-sm text-white">
+            <p>ctx Time:<br />{{ debugData.ctxTime }}</p>
+            <p>Offset:<br />{{ debugData.offset }}</p>
+            <p>Global Time:<br />{{ motion.pos }}</p>
+            <p>Calced Global Time:<br />{{ debugData.ctxTime! + debugData.offset }}</p>
+            <p>Diff:<br />{{ motion.pos - debugData.offset - debugData.ctxTime! }}</p>
           </div>
+        </div>
+        <div
+          v-else
+          class="flex flex-col items-center gap-4 text-white">
+          <h1 class="text-3xl">{{ performanceName }}</h1>
+          <h2 class="text-2xl">{{ roleName }}</h2>
         </div>
         <ion-item
           v-if="debug"
@@ -50,10 +56,10 @@
           {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
         <ion-button
-          @click="scanCode"
+          @click="ionRouter.navigate('/qr-scanner', 'root')"
           :disabled="isRegistered"
           class="ionic-bg-secondary mt-4 h-[60px] font-bold">
-          Scan<br />QR-Code
+          Re-Scan<br />QR-Code
         </ion-button>
 
         <p v-if="debug">v1.0.0</p>
@@ -93,14 +99,18 @@ import {
   IonSelect,
   IonSelectOption,
   IonButtons,
-  IonBackButton
+  IonBackButton,
+  useIonRouter
 } from '@ionic/vue'
-import { ref, onMounted, watch, reactive, onDeactivated } from 'vue'
+import { ref, onMounted, watch, reactive, onUnmounted } from 'vue'
 import { usePlayer } from '../composables/usePlayer'
-import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
 import { Capacitor } from '@capacitor/core'
 import { KeepAwake } from '@capacitor-community/keep-awake'
-import { Preferences } from '@capacitor/preferences'
+import { getPreference, setPreference } from '@/tools/preferences'
+import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar'
+
+// Router
+const ionRouter = useIonRouter()
 
 // Development mode
 const debug = false
@@ -142,8 +152,6 @@ if (debug) {
     debugData.value = getDebugData()
   }, 50)
 }
-
-const { startScan, stopScan } = useBarcodeScanner()
 
 let attemptingToRegister = false
 const register = () => {
@@ -244,31 +252,37 @@ const initializeMCorp = async () => {
   mCorpApp.init()
 }
 
-const scanCode = async () => {
-  // Make camera visible and everything else invisible in app viewport, classes defined in App.vue
-  document.body.classList.add('qrscanner')
-  const result = await startScan()
-  // TODO: Result is being cast twice here, don't do this.
-  dLog('QR scan result: ' + result)
-  if (result && !Number.isNaN(+result)) {
-    choirId.value = +result
-  }
-  // Make camera invisible, and everything else visible
-  document.body.classList.remove('qrscanner')
-}
+const performanceName = ref('')
+const roleName = ref('')
 
 onMounted(async () => {
-  const choirIdResult = await Preferences.get({ key: 'choirId' })
+  // Load performance name from preferences
+  const performanceNameResult = await getPreference('performanceName')
+  if (performanceNameResult.value) {
+    performanceName.value = performanceNameResult.value
+  }
+
+  // Load role name from preferences
+  const roleNameResult = await getPreference('roleName')
+  if (roleNameResult.value) {
+    roleName.value = roleNameResult.value
+  }
+
+  const choirIdResult = await getPreference('choirId')
   if (choirIdResult.value) {
     choirId.value = +choirIdResult.value
   }
 
-  const langResult = await Preferences.get({ key: 'selectedLanguage' })
+  const langResult = await getPreference('selectedLanguage')
   if (langResult.value) {
     ttsLanguage.value = langResult.value
   }
 
   await initializeMCorp()
+})
+
+onUnmounted(() => {
+  ws.value?.close()
 })
 
 const logContainer = ref<HTMLDivElement | null>(null)
@@ -293,11 +307,6 @@ const dLog = (text: string) => {
 
 setLogFunction(dLog)
 
-onDeactivated(() => {
-  document.body.classList.remove('qrscanner')
-  stopScan()
-})
-
 // Scroll to bottom of logContainer after adding new log entry
 watch(
   () => logText.value.length,
@@ -316,15 +325,12 @@ watch(
   () => choirId.value,
   async (value, oldValue) => {
     if (typeof value === 'number' && value !== oldValue) {
-      await Preferences.set({
-        key: 'choirId',
-        value: String(value)
-      })
+      await setPreference('choirId', String(value))
     }
   }
 )
 
-// Enable/Disable KeepAwakt depending on registration status
+// Enable/Disable KeepAwake and Android Navigation Bar depending on registration status
 watch(
   () => isRegistered.value,
   async (value) => {
@@ -336,6 +342,13 @@ watch(
         } else {
           await KeepAwake.allowSleep()
           dLog('KeepAwake disabled.')
+        }
+      }
+      if (Capacitor.getPlatform() === 'android') {
+        if (value) {
+          await NavigationBar.hide()
+        } else {
+          await NavigationBar.show()
         }
       }
     } catch (error) {
