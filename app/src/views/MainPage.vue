@@ -9,50 +9,56 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <div class="flex h-full flex-col items-center justify-around bg-primary">
+      <div class="flex h-full flex-col items-center justify-between bg-primary">
         <div v-if="debug">
           <div
             v-if="motion && motion.pos"
             class="flex w-[20rem] flex-col items-start text-sm text-white">
-            <p>ctx Time:<br />{{ debugData.ctxTime }}</p>
-            <p>Offset:<br />{{ debugData.offset }}</p>
-            <p>Global Time:<br />{{ motion.pos }}</p>
-            <p>Calced Global Time:<br />{{ debugData.ctxTime! + debugData.offset }}</p>
-            <p>Diff:<br />{{ motion.pos - debugData.offset - debugData.ctxTime! }}</p>
+            <p>ctx Time: {{ debugData.ctxTime }}</p>
+            <p>Offset: {{ debugData.offset }}</p>
+            <p>Global Time: {{ motion.pos }}</p>
+            <p>Calced Global Time: {{ debugData.ctxTime! + debugData.offset }}</p>
+            <p>Diff: {{ motion.pos - debugData.offset - debugData.ctxTime! }}</p>
           </div>
         </div>
         <div
           v-else
-          class="flex flex-col items-center gap-4 text-white">
+          class="flex flex-col items-center gap-4 pt-10 text-white">
           <h1 class="text-3xl">{{ performanceName }}</h1>
           <h2 class="text-2xl">{{ roleName }}</h2>
         </div>
-        <ion-item
-          v-if="debug"
-          class="ionic-bg-secondary b-0 mb-2 w-[80%] border-0 text-white"
-          lines="none">
-          <ion-label>Choir ID:</ion-label>
-          <ion-input
-            type="number"
-            v-model.number="choirId" />
-        </ion-item>
+        <div class="w-[80%]">
+          <ion-item
+            v-if="debug"
+            class="ionic-bg-secondary b-0 mb-2 border-0 text-white"
+            lines="none">
+            <ion-label>Choir ID:</ion-label>
+            <ion-input
+              type="number"
+              v-model.number="choirId" />
+          </ion-item>
 
-        <ion-item
-          v-if="debug"
-          class="ionic-bg-secondary mb-2 w-[80%] text-white"
-          lines="none">
-          <ion-label>TTS language:</ion-label>
-          <ion-select v-model="ttsLanguage">
-            <ion-select-option value="en-US">English</ion-select-option>
-            <ion-select-option value="de-DE">Deutsch</ion-select-option>
-          </ion-select>
-        </ion-item>
+          <ion-item
+            v-if="debug"
+            class="ionic-bg-secondary mb-2 text-white"
+            lines="none">
+            <ion-label>TTS language:</ion-label>
+            <ion-select v-model="ttsLanguage">
+              <ion-select-option value="en-US">English</ion-select-option>
+              <ion-select-option value="de-DE">Deutsch</ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
 
         <ion-button
           @click="register"
           :disabled="!mcorpConnected"
-          class="ionic-rounded-full ionic-bg-secondary h-[60vw] w-[60vw] text-2xl font-bold"
-          :class="{ 'ionic-border-highlight text-highlight': isRegistered }">
+          class="ionic-bg-secondary h-[60vw] w-[60vw] text-2xl font-bold"
+          :class="{
+            'ionic-border-highlight text-highlight': isRegistered,
+            'ionic-rounded-full': !debug,
+            'h-[10vh]': debug
+          }">
           {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
         <ion-button
@@ -62,15 +68,10 @@
           Re-Scan<br />QR-Code
         </ion-button>
 
-        <p v-if="debug">v1.0.0</p>
-        <p
-          v-else
-          class="absolute bottom-0">
-          v1.0.0
-        </p>
+        <p class="text-white">v1.1.0</p>
 
         <div
-          class="absolute bottom-0 h-[20%] w-full overflow-scroll bg-secondary"
+          class="h-[20%] w-full overflow-scroll bg-secondary"
           ref="logContainer"
           v-if="debug">
           <div
