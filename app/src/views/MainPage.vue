@@ -9,7 +9,7 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <div class="flex h-full flex-col items-center justify-between bg-primary">
+      <div class="flex h-full flex-col items-center justify-between overflow-y-scroll bg-primary">
         <div v-if="debug">
           <div
             v-if="motion && motion.pos"
@@ -51,13 +51,23 @@
         </div>
 
         <ion-button
+          v-if="!debug"
           @click="register"
           :disabled="!mcorpConnected"
-          class="ionic-bg-secondary h-[60vw] w-[60vw] text-2xl font-bold"
+          class="ionic-rounded-full ionic-bg-secondary h-[60vw] w-[60vw] text-2xl font-bold"
           :class="{
-            'ionic-border-highlight text-highlight': isRegistered,
-            'ionic-rounded-full': !debug,
-            'h-[10vh]': debug
+            'ionic-border-highlight text-highlight': isRegistered
+          }">
+          {{ isRegistered ? 'Registered' : 'Register' }}
+        </ion-button>
+        <!-- Duplicate button with different styling because setting height conditionally won't work -->
+        <ion-button
+          v-else
+          @click="register"
+          :disabled="!mcorpConnected"
+          class="ionic-bg-secondary h-[10vw] w-[60vw] text-2xl font-bold"
+          :class="{
+            'ionic-border-highlight text-highlight': isRegistered
           }">
           {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
@@ -114,7 +124,7 @@ import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar'
 const ionRouter = useIonRouter()
 
 // Development mode
-const debug = false
+const debug = true
 
 // 'env'
 const VUE_APP_MCORP_API_KEY = '8844095860530063641'
