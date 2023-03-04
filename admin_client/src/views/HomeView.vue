@@ -304,14 +304,16 @@ onMounted(async () => {
 </script>
 <template>
   <div class="mx-auto flex w-[90%] flex-col 2xl:w-[70%]">
-    <p>{{ globalTime.toFixed(0) }}</p>
+    <p>🕒 {{ globalTime.toFixed(0) }}</p>
     <h1 class="my-6 text-3xl">{{ performanceName }}</h1>
-    <Button @click="isUploadModalVisible = true">Upload new track</Button>
-    <Button @click="openQrCodeModal">Generate QR codes</Button>
+    <div class="flex flex-row justify-start">
+	    <Button @click="isUploadModalVisible = true" style="margin-left: 0 !important;">Upload new track</Button>
+	    <Button @click="openQrCodeModal">Generate QR codes</Button>
+    </div>
 
     <div
       v-if="tracks.length"
-      class="grid gap-2 sm:grid-cols-3 lg:grid-cols-5">
+      class="grid gap-4 sm:grid-cols-3 lg:grid-cols-5 mt-4">
       <TrackTile
         v-for="track of tracks"
         :key="track._id"
