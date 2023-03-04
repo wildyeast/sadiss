@@ -52,22 +52,25 @@
 
         <ion-button
           v-if="!debug"
+          ref="registerButton"
           @click="register"
           :disabled="!mcorpConnected"
           class="ionic-rounded-full ionic-bg-secondary h-[60vw] w-[60vw] text-2xl font-bold"
           :class="{
-            'ionic-border-highlight text-highlight': isRegistered
+            'ionic-border-highlight text-highlight': isRegistered,
+            'ionic-border-highlight-muted': muteBorderColor
           }">
           {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
-        <!-- Duplicate button with different styling because setting height conditionally won't work -->
+        <!-- Duplicate button with different styling because setting height conditionally doesn't seem to work -->
         <ion-button
           v-else
           @click="register"
           :disabled="!mcorpConnected"
           class="ionic-bg-secondary h-[10vw] w-[60vw] text-2xl font-bold"
           :class="{
-            'ionic-border-highlight text-highlight': isRegistered
+            'ionic-border-highlight text-highlight': isRegistered,
+            'ionic-border-highlight-muted': muteBorderColor
           }">
           {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
@@ -158,10 +161,21 @@ const debugData = ref<{ ctxTime: number | undefined; offset: number }>({
   offset: -1
 })
 
+const registerButton = ref()
+const muteBorderColor = ref(false)
 if (debug) {
   setInterval(() => {
     debugData.value = getDebugData()
   }, 50)
+} else {
+  let lastSwitchTimestamp = 0
+  setInterval(() => {
+    const ctxTime = getDebugData().ctxTime
+    if (ctxTime && ctxTime > lastSwitchTimestamp + 1) {
+      muteBorderColor.value = !muteBorderColor.value
+      lastSwitchTimestamp = ctxTime
+    }
+  }, 100)
 }
 
 let attemptingToRegister = false
@@ -370,5 +384,4 @@ watch(
     }
   }
 )
-
 </script>
