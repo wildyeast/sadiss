@@ -8,7 +8,7 @@
             class="my-8 w-3/5" />
           <div
             v-if="nextPerformance"
-            class="mb-4 border border-[#f5a700] px-6 pb-6 text-lg text-[#f5a700]">
+            class="border border-[#f5a700] px-6 pb-6 text-lg text-[#f5a700]">
             <h2 class="pt-2 pb-4 text-xl">Next performance</h2>
             <h3 class="text-2xl uppercase">{{ nextPerformance.name }}</h3>
             <p>{{ nextPerformance.location }}</p>
@@ -19,7 +19,7 @@
         </div>
         <ion-button
           @click="scanCode"
-          class="ionic-bg-secondary h-[60px] font-bold">
+          class="ionic-bg-secondary my-6 h-[60px] font-bold">
           Scan QR code
         </ion-button>
         <div class="text-lg text-white">
