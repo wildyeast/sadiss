@@ -221,7 +221,7 @@ exports.get_performances = async (req: express.Request, res: express.Response) =
   res.json([{
      date: new Date("10/3/2023"),
      name: 'Acousmonium',
-     location: 'echoraum, Sechshauser Straße 66, 1150 Wien, Austria'
+     location: 'echoraum, Sechshauser Straße 66, 1150 Wien, Austria',
      url: 'https://floatingsound.at/Acousmonium-2023-third'
   }])
 }
