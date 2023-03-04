@@ -81,6 +81,7 @@ const upload = async () => {
         console.log(response.data)
         // Add newly added track to tracks
         tracks.value.push(response.data)
+      	percentCompleted.value = null
         isUploadModalVisible.value = false
       })
       .catch((error: Error) => {
@@ -96,9 +97,11 @@ const upload = async () => {
         ...res.data
       }
     } catch (err) {
+      percentCompleted.value = null
       alert('Failed udpating track. ' + err)
     } finally {
       editingTrackId = ''
+      percentCompleted.value = null
       isUploadModalVisible.value = false
     }
   }
