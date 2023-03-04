@@ -47,6 +47,7 @@ const handleTtsFileUpload = async (e: Event, voice: number, lang: string) => {
   console.log(`Added to ttsFiles: Voice: ${voice}, lang: ${lang}, file: ${ttsFiles[voice][lang]}`)
 }
 
+const percentCompleted = ref()
 const upload = async () => {
   if (!trackName.value) {
     alert('You must enter a track title.')
@@ -67,9 +68,15 @@ const upload = async () => {
     }
   }
 
+  const config = {
+    onUploadProgress: function(progressEvent) {
+      percentCompleted.value = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
+    }
+  }     
+
   if (!editingTrackId) {
     axios
-      .post(`${process.env.VUE_APP_API_URL}/upload`, data)
+      .post(`${process.env.VUE_APP_API_URL}/upload`, data, config)
       .then((response) => {
         console.log(response.data)
         // Add newly added track to tracks
@@ -81,7 +88,7 @@ const upload = async () => {
       })
   } else {
     try {
-      const res = await axios.patch(`${process.env.VUE_APP_API_URL}/edit/${editingTrackId}`, data)
+      const res = await axios.patch(`${process.env.VUE_APP_API_URL}/edit/${editingTrackId}`, data, config)
       console.log(res.data)
       const trackIdx = tracks.value.map((track) => track._id).indexOf(editingTrackId)
       tracks.value[trackIdx] = {
@@ -429,7 +436,8 @@ onMounted(async () => {
           class="w-3/4" />
       </div>
       <div class="flex w-full flex-row justify-center">
-        <Button @click="upload">Upload</Button>
+	<div v-if="percentCompleted">Uploading... ({{ percentCompleted }}%)</div>
+        <Button v-else @click="upload">Upload</Button>
       </div>
     </Modal>
 
