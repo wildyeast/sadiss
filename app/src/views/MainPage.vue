@@ -124,7 +124,7 @@ import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar'
 const ionRouter = useIonRouter()
 
 // Development mode
-const debug = true
+const debug = false
 
 // 'env'
 const VUE_APP_MCORP_API_KEY = '8844095860530063641'
