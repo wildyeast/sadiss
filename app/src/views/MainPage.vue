@@ -292,8 +292,11 @@ onMounted(async () => {
   await initializeMCorp()
 })
 
-onUnmounted(() => {
+onUnmounted(async () => {
   ws.value?.close()
+  if (Capacitor.getPlatform() === 'android') {
+    await NavigationBar.show()
+  }
 })
 
 const logContainer = ref<HTMLDivElement | null>(null)
