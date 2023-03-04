@@ -25,7 +25,9 @@ export const startSendingInterval = (
   sendingIntervalRunning = true
 
   for (const client of wss.clients) {
+  console.log('admin client?', client.isAdmin)
     if (client.isAdmin) {
+      console.log('send start to admin')
       client.send('start')
     } else {
       client.send(JSON.stringify({ start: true }))
@@ -204,6 +206,7 @@ export const startSendingInterval = (
       .map((k) => ({ clientId: k, partials: allocatedPartials[k] }))
       .sort((a, b) => a.partials.length - b.partials.length)
     if (!p) return
+    if (!p[0]) return
     return p[0].clientId
 
     // Probably faster

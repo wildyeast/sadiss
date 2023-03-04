@@ -219,10 +219,9 @@ exports.get_voices_and_languages = async (req: express.Request, res: express.Res
 exports.get_performances = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   res.json([{
-     date: new Date("20230310T000000+0100"),
+     date: new Date("10/3/2023"),
      name: 'Acousmonium',
-     artist: 'Volkmar Klien',
-     location: 'echoraum, Sechshauser Straße 66, 1150 Wien, Austria'
+     location: 'echoraum, Sechshauser Straße 66, 1150 Wien, Austria',
      url: 'https://floatingsound.at/Acousmonium-2023-third'
   }])
 }
