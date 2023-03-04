@@ -1,8 +1,4 @@
 // https://github.com/capacitor-community/barcode-scanner
-// Changes in AndroidManifest.xml already implemented
-// Changes in Info.plist (iOS) NOT yet implemented
-// Click on the link above for more information
-
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner'
 
 export function useBarcodeScanner() {
