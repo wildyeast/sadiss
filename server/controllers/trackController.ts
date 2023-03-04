@@ -30,7 +30,6 @@ exports.start_track = async (req: express.Request, res: express.Response) => {
   try {
     const t = await Track.findById(req.params.id)
     if (t) {
-      // const track = t.chunks ? JSON.parse(t.chunks) : null
       let chunks
       fs.readFile(`chunks/${t.chunkFileName}`, 'utf8', (err: any, data: string) => {
         if (err) {
@@ -124,7 +123,6 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
     // Save track to DB
     const t = new Track({
       name,
-      // chunks: JSON.stringify(chunks),
       chunkFileName: filename,
       notes,
       mode,
