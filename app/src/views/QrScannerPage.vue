@@ -8,7 +8,7 @@
             class="my-8 w-3/5" />
           <div
             v-if="nextPerformance"
-            class="border border-[#f5a700] px-6 pb-6 text-lg text-[#f5a700]">
+            class="mb-4 border border-[#f5a700] px-6 pb-6 text-lg text-[#f5a700]">
             <h2 class="pt-2 pb-4 text-xl">Next performance</h2>
             <h3 class="text-2xl uppercase">{{ nextPerformance.name }}</h3>
             <p>{{ nextPerformance.location }}</p>
@@ -17,27 +17,25 @@
             <a :href="nextPerformance.url">[<span class="underline">open webpage</span>]</a>
           </div>
         </div>
-        <div class="text-lg text-white">
-          <p class="mb-2">
-            SADISS bundles phones of the audience into a massive, intricate sound system with numerous distinct sound sources
-            scattered throughout the space.<br /><br />
-            Physical presence is required at a performance venue. To participate, scan the QR code provided at the venue.
-          </p>
-        </div>
         <ion-button
           @click="scanCode"
           class="ionic-bg-secondary h-[60px] font-bold">
           Scan QR code
         </ion-button>
-        <p class="text-white">
-          Visit
-          <a
-            class="text-[#f5a700]"
-            href="https://sadiss.net">
-            <u>sadiss.net</u>
-          </a>
-          for more information!
-        </p>
+        <div class="text-lg text-white">
+          <p>
+            SADISS bundles phones of the audience into a massive, intricate sound system with numerous distinct sound sources
+            scattered throughout the space.<br /><br />
+            Physical presence is required at a performance venue. To participate, scan the QR code provided at the venue.<br /><br />
+            Visit
+            <a
+              class="text-[#f5a700]"
+              href="https://sadiss.net">
+              <u>sadiss.net</u>
+            </a>
+            for more information!
+          </p>
+        </div>
       </div>
     </ion-content>
   </ion-page>
