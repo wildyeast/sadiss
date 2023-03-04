@@ -102,14 +102,6 @@ const scanCode = async () => {
       await setPreference('roleName', roleName)
     }
 
-    // TTS langs
-    if (result.tts) {
-      await setPreference('availableLanguages', JSON.stringify(result.tts))
-      ionRouter.navigate('/language-selection', 'forward', 'push')
-    } else {
-      ionRouter.navigate('/main', 'forward', 'push')
-    }
-
     // Default TTS lang
     const defaultLang = result.defaultLang
     if (defaultLang) {
@@ -121,6 +113,14 @@ const scanCode = async () => {
 
     // Timestamp of scan
     await setPreference('lastScanTimestamp', Date.now().toString())
+
+    // TTS langs
+    if (result.tts) {
+      await setPreference('availableLanguages', JSON.stringify(result.tts))
+      ionRouter.navigate('/language-selection', 'forward', 'push')
+    } else {
+      ionRouter.navigate('/main', 'forward', 'push')
+    }
   }
   stopScanning()
 }
@@ -131,15 +131,21 @@ const stopScanning = () => {
   document.body.classList.remove('qrscanner')
 }
 
-let appHasJustStarted = true
 onMounted(async () => {
   const INVALIDATE_SCAN_AFTER_MS = 1000 * 60 * 90 // 90 Minutes
+  const qrCodeInvalidationCheckedThisSession = await getPreference('qrCodeInvalidationCheckedThisSession')
   const lastScanTimestamp = await getPreference('lastScanTimestamp')
-  if (appHasJustStarted && lastScanTimestamp.value && +lastScanTimestamp.value + INVALIDATE_SCAN_AFTER_MS > Date.now()) {
+  if (
+    qrCodeInvalidationCheckedThisSession.value === 'false' &&
+    lastScanTimestamp.value &&
+    +lastScanTimestamp.value + INVALIDATE_SCAN_AFTER_MS > Date.now()
+  ) {
     // Skip scanning requirement if app has just started and last scan less than INVALIDATE_SCAN_AFTER_MS milliseconds ago
-    appHasJustStarted = false
+    await setPreference('qrCodeInvalidationCheckedThisSession', 'true')
     ionRouter.navigate('/main', 'root', 'replace')
+    return
   } else {
+    await setPreference('qrCodeInvalidationCheckedThisSession', 'false')
     getPerformances()
   }
 })

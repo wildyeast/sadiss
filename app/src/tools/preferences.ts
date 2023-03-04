@@ -11,3 +11,4 @@ type PreferenceKey =
   | 'defaultLang'
   | 'selectedLanguage'
   | 'lastScanTimestamp'
+  | 'qrCodeInvalidationCheckedThisSession'
