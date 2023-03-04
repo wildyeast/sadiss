@@ -46,7 +46,7 @@ import { ref, onMounted, computed } from 'vue'
 import { IonContent, IonPage, IonButton, useIonRouter } from '@ionic/vue'
 import { onDeactivated } from 'vue'
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
-import { setPreference } from '@/tools/preferences'
+import { getPreference, setPreference } from '@/tools/preferences'
 
 // Router
 const ionRouter = useIonRouter()
@@ -118,6 +118,9 @@ const scanCode = async () => {
 
     // Export Mode
     // TODO Not yet implemented
+
+    // Timestamp of scan
+    await setPreference('lastScanTimestamp', Date.now().toString())
   }
   stopScanning()
 }
@@ -128,8 +131,17 @@ const stopScanning = () => {
   document.body.classList.remove('qrscanner')
 }
 
+let appHasJustStarted = true
 onMounted(async () => {
-  getPerformances()
+  const INVALIDATE_SCAN_AFTER_MS = 1000 * 60 * 90 // 90 Minutes
+  const lastScanTimestamp = await getPreference('lastScanTimestamp')
+  if (appHasJustStarted && lastScanTimestamp.value && +lastScanTimestamp.value + INVALIDATE_SCAN_AFTER_MS > Date.now()) {
+    // Skip scanning requirement if app has just started and last scan less than INVALIDATE_SCAN_AFTER_MS milliseconds ago
+    appHasJustStarted = false
+    ionRouter.navigate('/main', 'root', 'replace')
+  } else {
+    getPerformances()
+  }
 })
 
 onDeactivated(() => {
