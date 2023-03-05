@@ -20,7 +20,7 @@ let file: File | undefined
 
 const closeUploadModal = () => {
   if (trackName.value || trackNotes.value || trackIsChoir.value || trackWaveform.value !== 'sine' || trackTtsRate.value !== 1 || file) {
-    if (!confirm('Your changes will be saved.')) {
+    if (!confirm('Your changes will not be saved.')) {
       return
     }
   }
