@@ -324,7 +324,7 @@ onMounted(async () => {
     </div>
 
     <Modal
-      title="Upload track"
+      :title="editingTrackId ? 'Edit track' : 'Upload track'"
       v-if="isUploadModalVisible"
       @close="isUploadModalVisible = false">
       <div class="my-8 flex flex-row justify-between p-2">
@@ -442,6 +442,7 @@ onMounted(async () => {
       </div>
       <div class="flex w-full flex-row justify-center">
 	<div v-if="percentCompleted">Uploading... ({{ percentCompleted }}%)</div>
+        <Button v-else-if="editingTrackId" @click="upload">Save</Button>
         <Button v-else @click="upload">Upload</Button>
       </div>
     </Modal>
