@@ -19,6 +19,9 @@ const trackTtsRate = ref(1)
 let file: File | undefined
 
 const closeUploadModal = () => {
+  if (!isUploadModalVisible.value) {
+    return
+  }
   if (trackName.value || trackNotes.value || trackIsChoir.value || trackWaveform.value !== 'sine' || trackTtsRate.value !== 1 || file) {
     if (!confirm('Your changes will not be saved.')) {
       return
@@ -90,7 +93,7 @@ const upload = async () => {
     }
   }     
 
-  if (!editingTrackId) {
+  if (!editingTrackId.value) {
     axios
       .post(`${process.env.VUE_APP_API_URL}/upload`, data, config)
       .then((response) => {
@@ -105,9 +108,9 @@ const upload = async () => {
       })
   } else {
     try {
-      const res = await axios.patch(`${process.env.VUE_APP_API_URL}/edit/${editingTrackId}`, data, config)
+      const res = await axios.patch(`${process.env.VUE_APP_API_URL}/edit/${editingTrackId.value}`, data, config)
       console.log(res.data)
-      const trackIdx = tracks.value.map((track) => track._id).indexOf(editingTrackId)
+      const trackIdx = tracks.value.map((track) => track._id).indexOf(editingTrackId.value)
       tracks.value[trackIdx] = {
         ...tracks.value[trackIdx],
         ...res.data
@@ -116,7 +119,7 @@ const upload = async () => {
       percentCompleted.value = null
       alert('Failed udpating track. ' + err)
     } finally {
-      editingTrackId = ''
+      editingTrackId.value = ''
       percentCompleted.value = null
       isUploadModalVisible.value = false
     }
@@ -156,12 +159,12 @@ const deleteTrack = async (id: string, name: string) => {
 
 const partialFileDownloadInfo = ref()
 const ttsFileDownloadInfo = ref<{ origName: string; fileName: string }[]>()
-let editingTrackId = ''
+let editingTrackId = ref('')
 const editTrack = async (id: string) => {
   try {
     const data = await fetch(`${process.env.VUE_APP_API_URL}/get-track/${id}`).then((res) => res.json())
     const track = data[0]
-    editingTrackId = track._id
+    editingTrackId.value = track._id
     trackName.value = track.name
     trackIsChoir.value = track.mode === 'choir'
     trackNotes.value = track.notes
@@ -173,7 +176,7 @@ const editTrack = async (id: string) => {
     isUploadModalVisible.value = true
   } catch (err) {
     alert('Something went wrong. Error: ' + err)
-    editingTrackId = ''
+    editingTrackId.value = ''
     return
   }
 }
@@ -319,7 +322,7 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <div class="mx-auto flex w-[90%] flex-col 2xl:w-[70%]">
+  <div @keyup.esc="closeUploadModal" class="mx-auto flex w-[90%] flex-col 2xl:w-[70%]">
     <p>🕒 {{ globalTime.toFixed(0) }}</p>
     <h1 class="my-6 text-3xl">{{ performanceName }}</h1>
     <div class="flex flex-row justify-start">
@@ -342,7 +345,6 @@ onMounted(async () => {
     <Modal
       :title="editingTrackId ? 'Edit track' : 'Upload track'"
       v-if="isUploadModalVisible"
-      @keyup.esc="closeUploadModal"
       @close="closeUploadModal">
       <div class="my-8 flex flex-row justify-between p-2">
         <div>Title</div>
