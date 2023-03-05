@@ -36,6 +36,19 @@ const closeUploadModal = () => {
   isUploadModalVisible.value = false
 }
 
+const numberOfClients = ref(0)
+const maxNumberOfClients = ref(0)
+const getNumberOfClients = async () => {
+  const data = await fetch(`${process.env.VUE_APP_API_URL}/get-stats`).then((res) => res.json())
+  numberOfClients.value = data.clients
+  if (data.clients > maxNumberOfClients.value) {
+    maxNumberOfClients.value = data.clients
+  }
+}
+onMounted(() => {
+  setInterval(getNumberOfClients, 3000);
+})
+
 
 const numberOfVoices = ref(2)
 const ttsLanguages = ref('en-US, de-DE')
@@ -324,6 +337,7 @@ onMounted(async () => {
 <template>
   <div @keyup.esc="closeUploadModal" class="mx-auto flex w-[90%] flex-col 2xl:w-[70%]">
     <p>🕒 {{ globalTime.toFixed(0) }}</p>
+    <p>{{ maxNumberOfClients ? `👤 ${numberOfClients} (max ${maxNumberOfClients})` : 'No clients registered.' }}</p>
     <h1 class="my-6 text-3xl">{{ performanceName }}</h1>
     <div class="flex flex-row justify-start">
 	    <Button @click="isUploadModalVisible = true" style="margin-left: 0 !important;">Upload new track</Button>
