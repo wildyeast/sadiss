@@ -24,9 +24,12 @@ const trackSchema = new mongoose.Schema({
 trackSchema.set('timestamps', true)
 const Track = mongoose.model('Track', trackSchema)
 
+let wss
+
 // Start track
 exports.start_track = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+  wss = req.wss
   try {
     const t = await Track.findById(req.params.id)
     if (t) {
@@ -53,6 +56,15 @@ exports.start_track = async (req: express.Request, res: express.Response) => {
   } catch (err) {
     res.status(500).json({ error: err })
   }
+}
+
+exports.get_stats = async (req: express.Request, res: express.Response) => {
+  if (!wss) {
+    res.status(402).send()
+    return
+  }
+  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+  res.json({wss})
 }
 
 exports.delete_track = async (req: express.Request, res: express.Response) => {
