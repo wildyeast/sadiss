@@ -59,12 +59,12 @@ exports.start_track = async (req: express.Request, res: express.Response) => {
 }
 
 exports.get_stats = async (req: express.Request, res: express.Response) => {
+  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   if (!wss) {
-    res.status(402).send()
+    res.json({ error: 'WSS object undefined.' })
     return
   }
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-  res.json({wss})
+  res.json({ clients: wss.clients.size })
 }
 
 exports.delete_track = async (req: express.Request, res: express.Response) => {
