@@ -18,6 +18,22 @@ const trackWaveform = ref('sine')
 const trackTtsRate = ref(1)
 let file: File | undefined
 
+const closeUploadModal = () => {
+  if (trackName.value || trackNotes.value || trackIsChoir.value || trackWaveform.value !== 'sine' || trackTtsRate.value !== 1 || file) {
+    if (!confirm('Your changes will be saved.')) {
+      return
+    }
+  }
+  trackName.value = ''
+  trackNotes.value = ''
+  trackIsChoir.value = false
+  trackWaveform.value = 'sine'
+  trackTtsRate.value = 1
+  file = undefined
+  isUploadModalVisible.value = false
+}
+
+
 const numberOfVoices = ref(2)
 const ttsLanguages = ref('en-US, de-DE')
 
@@ -326,7 +342,8 @@ onMounted(async () => {
     <Modal
       :title="editingTrackId ? 'Edit track' : 'Upload track'"
       v-if="isUploadModalVisible"
-      @close="isUploadModalVisible = false">
+      @keyup.esc="closeUploadModal"
+      @close="closeUploadModal">
       <div class="my-8 flex flex-row justify-between p-2">
         <div>Title</div>
         <input
