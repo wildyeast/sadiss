@@ -36,4 +36,7 @@ router.get('/get-voices-and-languages', track_controller.get_voices_and_language
 // Get performances
 router.get('/get-performances', performance_controller.get_performances)
 
+// Get stats
+router.get('/get-stats', track_controller.get_stats)
+
 module.exports = router

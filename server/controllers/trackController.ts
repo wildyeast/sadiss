@@ -3,11 +3,14 @@ import { chunk, startSendingInterval, stopSendingInterval } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose from 'mongoose'
 import { TtsJson } from '../types/types'
+const fs = require('fs')
+const uuid = require('uuid')
 
 // Define track schema for db
 const trackSchema = new mongoose.Schema({
   name: String,
   chunks: String,
+  chunkFileName: String,
   partialsCount: Number,
   mode: String,
   notes: String,
@@ -21,27 +24,47 @@ const trackSchema = new mongoose.Schema({
 trackSchema.set('timestamps', true)
 const Track = mongoose.model('Track', trackSchema)
 
+let wss
+
 // Start track
 exports.start_track = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+  wss = req.wss
   try {
     const t = await Track.findById(req.params.id)
     if (t) {
-      const track = t.chunks ? JSON.parse(t.chunks) : null
-      const startTime = +req.params.startTime
-      // @ts-expect-error TODO
-      const trackStarted = startSendingInterval(track, t.mode, t.waveform, t.ttsRate, startTime, req.wss)
-      if (trackStarted) {
-        res.json({ data: 'Track started.' })
-      } else {
-        res.json({ data: 'Track already running.' })
-      }
-    } else {
-      throw new Error('Track not found.')
+      let chunks
+      fs.readFile(`chunks/${t.chunkFileName}`, 'utf8', (err: any, data: string) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+        chunks = JSON.parse(data)
+        const startTime = +req.params.startTime
+        if (!chunks) {
+          throw new Error('Chunks undefined')
+        }
+        // @ts-expect-error TODO
+        const trackStarted = startSendingInterval(chunks, t.mode, t.waveform, t.ttsRate, startTime, req.wss)
+        if (trackStarted) {
+          res.json({ data: 'Track started.' })
+        } else {
+          res.json({ data: 'Track already running.' })
+        }
+      })
     }
   } catch (err) {
     res.status(500).json({ error: err })
   }
+}
+
+exports.get_stats = async (req: express.Request, res: express.Response) => {
+  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+  if (!wss) {
+    res.json({ error: 'WSS object undefined.' })
+    return
+  }
+  res.json({ clients: wss.clients.size })
 }
 
 exports.delete_track = async (req: express.Request, res: express.Response) => {
@@ -81,12 +104,14 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
     const partialFile = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname === 'partialfile')[0]
     let path
     const partialFileToSave = <{ origName: string; fileName: string }>{}
+
     if (partialFile) {
       path = partialFile.path
       partialFileToSave.origName = partialFile.originalname
       partialFileToSave.fileName = partialFile.filename
     }
 
+    // @ts-ignore
     const ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes('ttsfile'))
     let ttsLangs: Set<string> | undefined
     let ttsJson: TtsJson | undefined
@@ -94,7 +119,13 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
       ;({ ttsLangs, ttsJson } = convertSrtToJson(ttsFiles))
     }
 
+    const filename = uuid.v4()
     const { partialsCount, chunks } = await chunk(path, ttsJson)
+    fs.writeFile(`chunks/${filename}`, JSON.stringify(chunks), (err: any) => {
+      if (err) {
+        console.error(err)
+      }
+    })
 
     const name = req.body.name
     const notes = req.body.notes
@@ -104,7 +135,7 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
     // Save track to DB
     const t = new Track({
       name,
-      chunks: JSON.stringify(chunks),
+      chunkFileName: filename,
       notes,
       mode,
       waveform,
