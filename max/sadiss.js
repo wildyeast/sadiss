@@ -74,14 +74,17 @@ Max.addHandler("register", async () => {
   }
   log('Waiting for track start...')
   ws.onmessage = (event) => {
+    Max.post('rec', event)
     let msg
     //log('Received message', event)
     switch (event) {
       case 'start':
-        Max.outlet('bang')
+        Max.post('received start')
+        Max.outlet(['clocker', 'bang'])
         break
       case 'stop':
-        Max.outlet('stop')
+        Max.post('received stop')
+        Max.outlet(['clocker', 'stop'])
         break
     }
   }
