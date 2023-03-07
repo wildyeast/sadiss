@@ -67,13 +67,14 @@ wss.on('connection', (client) => {
 
   client.onmessage = (event) => {
     const parsed: Message = JSON.parse(event.data.toString())
+    console.log('Received message from ws client:', parsed.message)
     if (parsed.message === 'clientInfo') {
       client.choirId = parsed.clientId
       client.ttsLang = parsed.ttsLang
       console.log(`Client ${client.id} registered with choir id ${client.choirId} and TTS lang ${client.ttsLang}`)
     } else if (parsed.message === 'isAdmin') {
       client.isAdmin = true
-      console.log(client.send('measure'))
+      client.send({ message: 'measure' })
       console.log('(this one is admin)')
     }
   }

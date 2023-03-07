@@ -25,13 +25,7 @@ export const startSendingInterval = (
   sendingIntervalRunning = true
 
   for (const client of wss.clients) {
-  console.log('admin client?', client.isAdmin)
-    if (client.isAdmin) {
-      console.log('send start to admin')
-      client.send('start')
-    } else {
-      client.send(JSON.stringify({ start: true }))
-    }
+    client.send(JSON.stringify({ start: true }))
   }
 
   const interval = 1000 // ms
@@ -230,11 +224,7 @@ export const startSendingInterval = (
 
     // Notify all clients of track end
     for (const client of wss.clients) {
-      if (client.isAdmin) {
-        client.send('stop')
-      } else {
-        client.send(JSON.stringify({ stop: true }))
-      }
+      client.send(JSON.stringify({ stop: true }))
     }
 
     startKeepAliveInterval(wss)
