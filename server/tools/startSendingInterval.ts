@@ -179,7 +179,7 @@ export const startSendingInterval = (
           }
 
           if (dataToSend.partials?.length || dataToSend.ttsInstructions) {
-            client.send(JSON.stringify({ startTime: startTime + 2, waveform, ttsRate, chunk: dataToSend }))
+            client.send(JSON.stringify({ startTime, waveform, ttsRate, chunk: dataToSend }))
           }
         }
 
