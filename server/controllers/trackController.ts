@@ -3,6 +3,7 @@ import { chunk, startSendingInterval, stopSendingInterval } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose from 'mongoose'
 import { TtsJson } from '../types/types'
+import { Server } from 'ws'
 const fs = require('fs')
 const uuid = require('uuid')
 
@@ -24,7 +25,7 @@ const trackSchema = new mongoose.Schema({
 trackSchema.set('timestamps', true)
 const Track = mongoose.model('Track', trackSchema)
 
-let wss
+let wss: Server
 
 // Start track
 exports.start_track = async (req: express.Request, res: express.Response) => {
