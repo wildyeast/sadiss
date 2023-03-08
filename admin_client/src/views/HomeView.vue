@@ -22,7 +22,14 @@ const closeUploadModal = () => {
   if (!isUploadModalVisible.value) {
     return
   }
-  if (trackName.value || trackNotes.value || trackIsChoir.value || trackWaveform.value !== 'sine' || trackTtsRate.value !== 1 || file) {
+  if (
+    trackName.value ||
+    trackNotes.value ||
+    trackIsChoir.value ||
+    trackWaveform.value !== 'sine' ||
+    trackTtsRate.value !== 1 ||
+    file
+  ) {
     if (!confirm('Your changes will not be saved.')) {
       return
     }
@@ -46,9 +53,8 @@ const getNumberOfClients = async () => {
   }
 }
 onMounted(() => {
-  setInterval(getNumberOfClients, 3000);
+  setInterval(getNumberOfClients, 3000)
 })
-
 
 const numberOfVoices = ref(2)
 const ttsLanguages = ref('en-US, de-DE')
@@ -101,10 +107,10 @@ const upload = async () => {
   }
 
   const config = {
-    onUploadProgress: function(progressEvent) {
-      percentCompleted.value = Math.round( (progressEvent.loaded * 100) / progressEvent.total )
+    onUploadProgress: function (progressEvent) {
+      percentCompleted.value = Math.round((progressEvent.loaded * 100) / progressEvent.total)
     }
-  }     
+  }
 
   if (!editingTrackId.value) {
     axios
@@ -113,7 +119,7 @@ const upload = async () => {
         console.log(response.data)
         // Add newly added track to tracks
         tracks.value.push(response.data)
-      	percentCompleted.value = null
+        percentCompleted.value = null
         isUploadModalVisible.value = false
       })
       .catch((error: Error) => {
@@ -145,7 +151,7 @@ const upload = async () => {
 }
 
 const startTrack = async (id: string) => {
-  await fetch(`${process.env.VUE_APP_API_URL}/start-track/${id}/${globalTime.value + 2}`, {
+  await fetch(`${process.env.VUE_APP_API_URL}/start-track/${id}/${globalTime.value}`, {
     method: 'POST'
   })
     .then((res) => res.json())
@@ -335,18 +341,24 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <div @keyup.esc="closeUploadModal" class="mx-auto flex w-[90%] flex-col 2xl:w-[70%]">
+  <div
+    @keyup.esc="closeUploadModal"
+    class="mx-auto flex w-[90%] flex-col 2xl:w-[70%]">
     <p>🕒 {{ globalTime.toFixed(0) }}</p>
     <p>{{ maxNumberOfClients ? `👤 ${numberOfClients} (max ${maxNumberOfClients})` : 'No clients registered.' }}</p>
     <h1 class="my-6 text-3xl">{{ performanceName }}</h1>
     <div class="flex flex-row justify-start">
-	    <Button @click="isUploadModalVisible = true" style="margin-left: 0 !important;">Upload new track</Button>
-	    <Button @click="openQrCodeModal">Generate QR codes</Button>
+      <Button
+        @click="isUploadModalVisible = true"
+        style="margin-left: 0 !important"
+        >Upload new track</Button
+      >
+      <Button @click="openQrCodeModal">Generate QR codes</Button>
     </div>
 
     <div
       v-if="tracks.length"
-      class="grid gap-4 sm:grid-cols-3 lg:grid-cols-5 mt-4">
+      class="mt-4 grid gap-4 sm:grid-cols-3 lg:grid-cols-5">
       <TrackTile
         v-for="track of tracks"
         :key="track._id"
@@ -474,9 +486,17 @@ onMounted(async () => {
           class="w-3/4" />
       </div>
       <div class="flex w-full flex-row justify-center">
-	<div v-if="percentCompleted">Uploading... ({{ percentCompleted }}%)</div>
-        <Button v-else-if="editingTrackId" @click="upload">Save</Button>
-        <Button v-else @click="upload">Upload</Button>
+        <div v-if="percentCompleted">Uploading... ({{ percentCompleted }}%)</div>
+        <Button
+          v-else-if="editingTrackId"
+          @click="upload"
+          >Save</Button
+        >
+        <Button
+          v-else
+          @click="upload"
+          >Upload</Button
+        >
       </div>
     </Modal>
 
