@@ -3,6 +3,7 @@ import { chunk, startSendingInterval, stopSendingInterval } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose from 'mongoose'
 import { TtsJson } from '../types/types'
+import { Server } from 'ws'
 const fs = require('fs')
 const uuid = require('uuid')
 
@@ -24,13 +25,15 @@ const trackSchema = new mongoose.Schema({
 trackSchema.set('timestamps', true)
 const Track = mongoose.model('Track', trackSchema)
 
+let wss: Server
+
 // Start track
 exports.start_track = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+  wss = req.wss
   try {
     const t = await Track.findById(req.params.id)
     if (t) {
-      // const track = t.chunks ? JSON.parse(t.chunks) : null
       let chunks
       fs.readFile(`chunks/${t.chunkFileName}`, 'utf8', (err: any, data: string) => {
         if (err) {
@@ -54,6 +57,15 @@ exports.start_track = async (req: express.Request, res: express.Response) => {
   } catch (err) {
     res.status(500).json({ error: err })
   }
+}
+
+exports.get_stats = async (req: express.Request, res: express.Response) => {
+  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+  if (!wss) {
+    res.json({ error: 'WSS object undefined.' })
+    return
+  }
+  res.json({ clients: wss.clients.size })
 }
 
 exports.delete_track = async (req: express.Request, res: express.Response) => {
@@ -124,7 +136,6 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
     // Save track to DB
     const t = new Track({
       name,
-      // chunks: JSON.stringify(chunks),
       chunkFileName: filename,
       notes,
       mode,

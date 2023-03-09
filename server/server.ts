@@ -61,19 +61,21 @@ startKeepAliveInterval(wss)
 wss.on('connection', (client) => {
   // Assign id to new connection, needed for nonChoir partial distribution
   client.id = uuid.v4()
-  console.log('New client connected! Assigned id: ', client.id)
+  console.log('New client connected! Assigned id: ', client.id, 'Total clients:', wss.clients.size)
 
   client.onclose = () => console.log('Client has disconnected!')
 
   client.onmessage = (event) => {
     const parsed: Message = JSON.parse(event.data.toString())
+    console.log('Received message from ws client:', parsed.message)
     if (parsed.message === 'clientInfo') {
       client.choirId = parsed.clientId
       client.ttsLang = parsed.ttsLang
       console.log(`Client ${client.id} registered with choir id ${client.choirId} and TTS lang ${client.ttsLang}`)
+    } else if (parsed.message === 'measure') {
+      client.send('measure')
     } else if (parsed.message === 'isAdmin') {
       client.isAdmin = true
-      console.log(client.send('measure'))
       console.log('(this one is admin)')
     }
   }
