@@ -1,11 +1,12 @@
 // From https://blog.logrocket.com/extend-express-request-object-typescript/
 
-export { }
+export {}
 
 declare global {
   namespace Express {
     export interface Request {
-      wss: any
+      wss?: any
+      user?: any
     }
   }
 }

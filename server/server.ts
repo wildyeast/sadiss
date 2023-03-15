@@ -5,12 +5,15 @@ import express from 'express'
 import { Message } from './types/types'
 import * as dotenv from 'dotenv'
 
+import { passport } from './auth'
+
 import { Server } from 'ws'
 import { startKeepAliveInterval } from './tools/startSendingInterval'
 
 const cors = require('cors')
 const mongoose = require('mongoose')
 const uuid = require('uuid')
+const session = require('express-session')
 
 // Load .env
 dotenv.config()
@@ -51,6 +54,17 @@ const app = express()
   .use(express.json())
   //.use(cors(corsOptions))
   .use(express.urlencoded({ extended: false }))
+  // Initialize express-session middleware
+  .use(
+    session({
+      secret: 'your-secret-key',
+      resave: false,
+      saveUninitialized: false
+    })
+  )
+  // Initialize Passport and restore authentication state, if any, from the session.
+  .use(passport.initialize())
+  .use(passport.session())
 
 app.listen(BASE_PORT, () => console.log(`Http server listening on port ${BASE_PORT}.`))
 

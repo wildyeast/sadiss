@@ -1,8 +1,11 @@
 import express from 'express'
+import passport from 'passport'
 
 const track_controller = require('../controllers/trackController')
 
 const performance_controller = require('../controllers/performanceController')
+
+const auth_controller = require('../controllers/authController')
 
 const router = express.Router()
 
@@ -38,5 +41,13 @@ router.get('/get-performances', performance_controller.get_performances)
 
 // Get stats
 router.get('/get-stats', track_controller.get_stats)
+
+/* AUTH */
+
+// Login
+router.post('/login', passport.authenticate('local', { session: false }), auth_controller.login)
+
+// Register
+router.post('/register', auth_controller.register)
 
 module.exports = router
