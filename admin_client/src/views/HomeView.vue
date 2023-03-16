@@ -395,8 +395,8 @@ onMounted(async () => {
             :href="`https://sadiss.net/f/${partialFileDownloadInfo.fileName}`"
             download="partials.txt"
             class="text-xl"
-            >⤓</a
-          >
+            >⤓
+          </a>
         </div>
       </div>
       <div class="my-8 flex flex-row justify-between p-2">
