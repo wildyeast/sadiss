@@ -36,7 +36,7 @@ exports.login = async (req: Request, res: Response) => {
 exports.register = async (req: Request, res: Response) => {
   try {
     const { username, password } = req.body
-    const existingUser: UserDocument | null = await User.findOne({ username: username })
+    const existingUser = await User.findOne({ username: username })
     if (existingUser) {
       return res.status(409).json({ message: 'Username already exists' })
     }
