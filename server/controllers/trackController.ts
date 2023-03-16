@@ -245,3 +245,7 @@ exports.get_voices_and_languages = async (req: express.Request, res: express.Res
     res.status(500).json({ Error: 'Failed fetching voices and languages.' })
   }
 }
+
+exports.get_own_tracks = (req: express.Request, res: express.Response) => {
+  res.json({ message: 'hi', user: req.user })
+}

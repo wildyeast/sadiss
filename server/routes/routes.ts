@@ -1,5 +1,6 @@
 import express from 'express'
 import passport from 'passport'
+import { authenticateToken } from '../auth'
 
 const track_controller = require('../controllers/trackController')
 
@@ -50,4 +51,6 @@ router.post('/login', passport.authenticate('local', { session: false }), auth_c
 // Register
 router.post('/register', auth_controller.register)
 
+// Protected Test Route
+router.get('/protected', authenticateToken, track_controller.get_own_tracks)
 module.exports = router
