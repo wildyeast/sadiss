@@ -86,11 +86,12 @@ export function usePlayer() {
     }
   }
 
+  let outputLatencyOffset = 0
   const setBreakpoints = (oscNode: OscillatorNode, gainNode: GainNode, breakpoints: Breakpoint[], chunkEndTime: number) => {
     oscNode.stop(chunkEndTime)
     for (const bp of breakpoints) {
-      oscNode.frequency.setValueAtTime(bp.freq, currentChunkStartTimeInCtxTime.value + bp.time)
-      gainNode.gain.setValueAtTime(bp.amp, currentChunkStartTimeInCtxTime.value + bp.time)
+      oscNode.frequency.setValueAtTime(bp.freq, currentChunkStartTimeInCtxTime.value + bp.time + outputLatencyOffset)
+      gainNode.gain.setValueAtTime(bp.amp, currentChunkStartTimeInCtxTime.value + bp.time + outputLatencyOffset)
     }
   }
 
@@ -129,6 +130,8 @@ export function usePlayer() {
     ttsRate = +rate
   }
 
+  const setOutputLatencyOffset = (offset: number) => (outputLatencyOffset = offset)
+
   const getDebugData = () => {
     const ctxTime = ctx ? ctx.currentTime : undefined
     return {
@@ -148,6 +151,7 @@ export function usePlayer() {
     setTrackSettings,
     getDebugData,
     stopPlayback,
-    setOffset
+    setOffset,
+    setOutputLatencyOffset
   }
 }

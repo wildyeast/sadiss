@@ -26,8 +26,8 @@ import './theme/variables.css'
 /* Tailwind */
 import './theme/tailwind.css'
 
-/* Ionic specific CSS helper classes */
-import './theme/ionic.css'
+/* Main CSS File */
+import './theme/main.css'
 
 const app = createApp(App).use(IonicVue, { swipeBackEnabled: false }).use(router)
 
