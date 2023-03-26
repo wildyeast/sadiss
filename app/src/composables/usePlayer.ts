@@ -137,29 +137,6 @@ export function usePlayer() {
     }
   }
 
-  let continuousOscObj: Omit<OscillatorObject, 'index'> | null
-  const playContinuousSound = () => {
-    if (!ctx) return
-
-    const osc = ctx.createOscillator()
-    osc.frequency.setValueAtTime(440, ctx.currentTime)
-    const gain = ctx.createGain()
-    gain.gain.setValueAtTime(0.05, ctx.currentTime)
-    osc.connect(gain)
-    gain.connect(ctx.destination)
-    continuousOscObj = {
-      oscillator: osc,
-      gain
-    }
-    osc.start()
-  }
-
-  const stopContinuousSound = () => {
-    if (!continuousOscObj) return
-    continuousOscObj.oscillator.stop()
-    continuousOscObj = null
-  }
-
   return {
     handleChunkData,
     initialSetup,
@@ -171,8 +148,6 @@ export function usePlayer() {
     setTrackSettings,
     getDebugData,
     stopPlayback,
-    playContinuousSound,
-    stopContinuousSound,
     setOffset
   }
 }

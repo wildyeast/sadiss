@@ -52,22 +52,25 @@
 
         <ion-button
           v-if="!debug"
+          ref="registerButton"
           @click="register"
           :disabled="!mcorpConnected"
           class="ionic-rounded-full ionic-bg-secondary h-[60vw] w-[60vw] text-2xl font-bold"
           :class="{
-            'ionic-border-highlight text-highlight': isRegistered
+            'ionic-border-highlight text-highlight': isRegistered,
+            'ionic-border-highlight-muted': muteBorderColor
           }">
           {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
-        <!-- Duplicate button with different styling because setting height conditionally won't work -->
+        <!-- Duplicate button with different styling because setting height conditionally doesn't seem to work -->
         <ion-button
           v-else
           @click="register"
           :disabled="!mcorpConnected"
           class="ionic-bg-secondary h-[10vw] w-[60vw] text-2xl font-bold"
           :class="{
-            'ionic-border-highlight text-highlight': isRegistered
+            'ionic-border-highlight text-highlight': isRegistered,
+            'ionic-border-highlight-muted': muteBorderColor
           }">
           {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
@@ -124,7 +127,7 @@ import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar'
 const ionRouter = useIonRouter()
 
 // Development mode
-const debug = true
+const debug = false
 
 // 'env'
 const VUE_APP_MCORP_API_KEY = '8844095860530063641'
@@ -158,10 +161,21 @@ const debugData = ref<{ ctxTime: number | undefined; offset: number }>({
   offset: -1
 })
 
+const registerButton = ref()
+const muteBorderColor = ref(false)
 if (debug) {
   setInterval(() => {
     debugData.value = getDebugData()
   }, 50)
+} else {
+  let lastSwitchTimestamp = 0
+  setInterval(() => {
+    const ctxTime = getDebugData().ctxTime
+    if (ctxTime && ctxTime > lastSwitchTimestamp + 1) {
+      muteBorderColor.value = !muteBorderColor.value
+      lastSwitchTimestamp = ctxTime
+    }
+  }, 100)
 }
 
 let attemptingToRegister = false
@@ -292,8 +306,11 @@ onMounted(async () => {
   await initializeMCorp()
 })
 
-onUnmounted(() => {
+onUnmounted(async () => {
   ws.value?.close()
+  if (Capacitor.getPlatform() === 'android') {
+    await NavigationBar.show()
+  }
 })
 
 const logContainer = ref<HTMLDivElement | null>(null)
@@ -367,78 +384,4 @@ watch(
     }
   }
 )
-
-// watch(
-//   () => isRegistered.value,
-//   async (value) => {
-//     if (value) {
-//       playContinuousSound()
-//     } else {
-//       stopContinuousSound()
-//     }
-//   }
-// )
 </script>
-
-<!-- <style scoped>
-* {
-  --background: #222;
-  color: white;
-}
-
-#container {
-  text-align: center;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
-}
-
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-
-  color: #8c8c8c;
-
-  margin: 0;
-}
-
-#container a {
-  text-decoration: none;
-}
-
-.btn__register {
-  width: 160px;
-  height: 160px;
-  --border-radius: 100%;
-  font-weight: bold;
-  font-size: 1.2em;
-  --background: #444;
-}
-
-.btn__register_active {
-  --background: orange;
-}
-
-.btn__scan_barcode {
-  width: 80px;
-  height: 80px;
-  --border-radius: 100%;
-  font-weight: bold;
-  --background: #444;
-}
-
-.logContainer {
-  width: 100%;
-  height: 20%;
-  background-color: #444;
-  position: absolute;
-  bottom: 0;
-  overflow: scroll;
-}
-</style> -->
