@@ -17,7 +17,8 @@ export const convertSrtToJson = (srtFiles: { path: string; originalname: string 
     let currentTimestamp = -1
     let currentLine = ''
 
-    for (const line of lines) {
+    for (let line of lines) {
+      line = line.trim()
       const timestampDelimiter = ' --> '
 
       if (!line) {
@@ -38,7 +39,7 @@ export const convertSrtToJson = (srtFiles: { path: string; originalname: string 
     }
 
     // Write last timestamp and its lines to object
-    ttsJson = writeToObject(ttsJson, currentTimestamp, voice, lang, currentLine)
+    // ttsJson = writeToObject(ttsJson, currentTimestamp, voice, lang, currentLine)
   }
   console.log('Converted .srt to following object: ', ttsJson)
   return { ttsLangs, ttsJson }
