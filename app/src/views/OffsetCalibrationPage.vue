@@ -16,7 +16,7 @@
             @click="changeOutputLatencyOffset(-0.01)"
             >-
           </ion-button>
-          <div class="w-20 text-center text-3xl font-bold">{{ outputLatencyOffset }}</div>
+          <div class="w-28 text-center text-3xl font-bold">{{ outputLatencyOffset }}s</div>
           <ion-button
             class="button"
             @click="changeOutputLatencyOffset(0.01)"
@@ -50,4 +50,6 @@ const changeOutputLatencyOffset = (changeBy: number) => {
   outputLatencyOffset.value = +newOffset
   setOutputLatencyOffset(outputLatencyOffset.value)
 }
+
+// onMounted(() => {})
 </script>

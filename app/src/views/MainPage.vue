@@ -74,12 +74,20 @@
           }">
           {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
-        <ion-button
-          @click="ionRouter.navigate('/qr-scanner', 'root')"
-          :disabled="isRegistered"
-          class="ionic-bg-secondary mt-4 h-[60px] font-bold">
-          Re-Scan<br />QR-Code
-        </ion-button>
+        <div>
+          <ion-button
+            @click="ionRouter.navigate('/qr-scanner', 'root')"
+            :disabled="isRegistered"
+            class="ionic-bg-secondary mt-4 h-[60px] font-bold">
+            Re-Scan<br />QR-Code
+          </ion-button>
+          <ion-button
+            v-if="expertMode"
+            @click="ionRouter.navigate('/offset-calibration', 'forward', 'push')"
+            class="ionic-bg-secondary mt-4 h-[60px] font-bold">
+            Calibrate<br />Output Latency
+          </ion-button>
+        </div>
 
         <p class="text-white">v1.1.0</p>
 
@@ -279,6 +287,7 @@ const initializeMCorp = async () => {
 
 const performanceName = ref('')
 const roleName = ref('')
+const expertMode = ref(false)
 
 onMounted(async () => {
   // Load performance name from preferences
@@ -301,6 +310,11 @@ onMounted(async () => {
   const langResult = await getPreference('selectedLanguage')
   if (langResult.value) {
     ttsLanguage.value = langResult.value
+  }
+
+  const expertModeResult = await getPreference('expertMode')
+  if (expertModeResult.value) {
+    expertMode.value = expertModeResult.value === 'true' ? true : false
   }
 
   await initializeMCorp()

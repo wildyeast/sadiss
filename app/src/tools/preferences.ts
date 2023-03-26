@@ -12,3 +12,4 @@ type PreferenceKey =
   | 'selectedLanguage'
   | 'lastScanTimestamp'
   | 'qrCodeInvalidationCheckedThisSession'
+  | 'expertMode'

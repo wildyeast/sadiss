@@ -109,7 +109,10 @@ const scanCode = async () => {
     }
 
     // Export Mode
-    // TODO Not yet implemented
+    const expertMode = result.expertMode
+    if (expertMode) {
+      await setPreference('expertMode', expertMode)
+    }
 
     // Timestamp of scan
     await setPreference('lastScanTimestamp', Date.now().toString())
@@ -161,5 +164,6 @@ interface QrCodeScanResult {
   tts?: boolean
   roleName?: string
   defaultLang?: string
+  expertMode?: string
 }
 </script>
