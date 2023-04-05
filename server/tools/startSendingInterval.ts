@@ -74,7 +74,7 @@ export const startSendingInterval = (
             ttsRate: string
             chunk: { partials?: PartialChunk[]; ttsInstructions?: string }
           } = {
-            startTime: startTime,
+            startTime: startTime + 2,
             waveform,
             ttsRate,
             chunk: {}
