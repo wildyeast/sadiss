@@ -9,8 +9,12 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <div class="flex h-full flex-col items-center justify-center gap-10 bg-primary">
+      <BasePage>
         <div class="flex items-center gap-4">
+          <div class="flex flex-col items-center gap-4 text-white">
+            <h1 class="text-3xl">{{ mainStore.performanceName }}</h1>
+            <h2 class="text-2xl">{{ mainStore.roleName }}</h2>
+          </div>
           <ion-button
             class="button"
             @click="changeOutputLatencyOffset(-0.01)"
@@ -28,16 +32,18 @@
           class="ionic-rounded-full ionic-bg-secondary h-[100px] w-[100px] text-2xl">
           Done
         </ion-button>
-      </div>
+      </BasePage>
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonToolbar, useIonRouter, IonButton, IonButtons, IonBackButton } from '@ionic/vue'
-import { ref, watch, onMounted } from 'vue'
-import { getPreference, setPreference } from '@/tools/preferences'
+import { ref } from 'vue'
+import BasePage from '@/components/BasePage.vue'
 import { usePlayer } from '@/composables/usePlayer'
+import { useMainStore } from '@/stores/MainStore'
+const mainStore = useMainStore()
 
 // Router
 const ionRouter = useIonRouter()
@@ -50,6 +56,4 @@ const changeOutputLatencyOffset = (changeBy: number) => {
   outputLatencyOffset.value = +newOffset
   setOutputLatencyOffset(outputLatencyOffset.value)
 }
-
-// onMounted(() => {})
 </script>

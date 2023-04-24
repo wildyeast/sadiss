@@ -38,7 +38,10 @@ import { IonContent, IonPage, IonButton, useIonRouter } from '@ionic/vue'
 import { onDeactivated } from 'vue'
 import BasePage from '@/components/BasePage.vue'
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
-import { setPreference } from '@/tools/preferences'
+import { AvailableLanguage } from '@/types/types'
+
+import { useMainStore } from '@/stores/MainStore'
+const mainStore = useMainStore()
 
 // Router
 const ionRouter = useIonRouter()
@@ -78,54 +81,51 @@ const scanCode = async () => {
     }
 
     // Performance name
-    const performanceName = result.performanceName
-    if (performanceName) {
-      await setPreference('performanceName', performanceName)
+    const performanceNameResult = result.performanceName
+    if (performanceNameResult) {
+      mainStore.performanceName = performanceNameResult
     }
 
     // ChoirId (id of Role)
-    const choirId = result.choirId
-    if (choirId !== undefined && !Number.isNaN(+choirId)) {
-      await setPreference('choirId', String(choirId))
+    const choirIdResult = result.choirId
+    if (choirIdResult !== undefined && !Number.isNaN(+choirIdResult)) {
+      mainStore.choirId = choirIdResult
     }
     // Role Name
-    const roleName = result.roleName
-    if (roleName) {
-      await setPreference('roleName', roleName)
+    const roleNameResult = result.roleName
+    if (roleNameResult) {
+      mainStore.roleName = roleNameResult
     }
 
     // Default TTS lang
-    const defaultLang = result.defaultLang
-    if (defaultLang) {
-      await setPreference('defaultLang', defaultLang)
+    const defaultLangResult = result.defaultLang
+    if (defaultLangResult) {
+      mainStore.defaultLang = JSON.parse(defaultLangResult)
     }
 
     // Timestamp of scan
-    await setPreference('lastScanTimestamp', Date.now().toString())
+    // await setPreference('lastScanTimestamp', Date.now().toString())
 
     // TTS langs
-    const ttsLangs = result.tts
-    if (ttsLangs) {
-      if (ttsLangs.length === 1) {
-        await setPreference('selectedLanguage', ttsLangs[0])
-      } else {
-        await setPreference('availableLanguages', JSON.stringify(ttsLangs))
-      }
+    const ttsLangsResult = result.tts
+    if (ttsLangsResult) {
+      mainStore.selectedLanguage = ttsLangsResult[0].iso
+      mainStore.availableLanguages = ttsLangsResult
     }
 
     // Expert Mode and navigation
-    const expertMode = result.expertMode
-    if (!expertMode) {
-      ionRouter.navigate('/main', 'forward')
-    } else if (ttsLangs) {
-      if (ttsLangs.length === 1) {
+    const expertModeResult = result.expertMode
+    if (expertModeResult) {
+      mainStore.expertMode = expertModeResult
+      ionRouter.navigate('/offset-calibration', 'forward')
+    } else if (ttsLangsResult) {
+      if (ttsLangsResult.length === 1) {
         ionRouter.navigate('/main', 'forward')
       } else {
         ionRouter.navigate('/language-selection', 'forward')
       }
     } else {
-      await setPreference('expertMode', expertMode)
-      ionRouter.navigate('/offset-calibration', 'forward')
+      ionRouter.navigate('/main', 'forward')
     }
   }
   stopScanning()
@@ -174,9 +174,9 @@ interface Performance {
 interface QrCodeScanResult {
   performanceName: string
   choirId?: number
-  tts?: string[]
+  tts?: AvailableLanguage[]
   roleName?: string
   defaultLang?: string
-  expertMode?: string
+  expertMode?: boolean
 }
 </script>

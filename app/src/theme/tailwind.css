@@ -35,8 +35,11 @@
   }
 }
 
+* {
+  @apply text-white;
+}
+
 .button {
-  @apply ionic-border-highlight-narrow;
+  @apply ionic-border-highlight-narrow text-highlight;
   --background: clear;
-  --color: #79ea04;
 }

@@ -24,8 +24,8 @@
         <div
           v-else
           class="flex flex-col items-center gap-4 pt-10 text-white">
-          <h1 class="text-3xl">{{ performanceName }}</h1>
-          <h2 class="text-2xl">{{ roleName }}</h2>
+          <h1 class="text-3xl">{{ mainStore.performanceName }}</h1>
+          <h2 class="text-2xl">{{ mainStore.roleName }}</h2>
         </div>
         <div class="w-[80%]">
           <ion-item
@@ -35,7 +35,7 @@
             <ion-label>Choir ID:</ion-label>
             <ion-input
               type="number"
-              v-model.number="choirId" />
+              v-model.number="mainStore.choirId" />
           </ion-item>
 
           <ion-item
@@ -43,9 +43,9 @@
             class="ionic-bg-secondary mb-2 text-white"
             lines="none">
             <ion-label>TTS language:</ion-label>
-            <ion-select v-model="ttsLanguage">
-              <ion-select-option value="en-US">English</ion-select-option>
-              <ion-select-option value="de-DE">Deutsch</ion-select-option>
+            <ion-select v-model="mainStore.selectedLanguage">
+              <ion-select-option :value="{ iso: 'en-US', lang: 'English' }">English</ion-select-option>
+              <ion-select-option :value="{ iso: 'de-DE', lang: 'Deutsch' }">Deutsch</ion-select-option>
             </ion-select>
           </ion-item>
         </div>
@@ -82,7 +82,7 @@
             Re-Scan<br />QR-Code
           </ion-button>
           <ion-button
-            v-if="expertMode"
+            v-if="mainStore.expertMode"
             @click="ionRouter.navigate('/offset-calibration', 'forward', 'push')"
             class="ionic-bg-secondary mt-4 h-[60px] font-bold">
             Calibrate<br />Output Latency
@@ -124,18 +124,19 @@ import {
   IonBackButton,
   useIonRouter
 } from '@ionic/vue'
-import { ref, onMounted, watch, reactive, onUnmounted } from 'vue'
+import { ref, watch, reactive, onUnmounted } from 'vue'
 import { usePlayer } from '../composables/usePlayer'
 import { Capacitor } from '@capacitor/core'
 import { KeepAwake } from '@capacitor-community/keep-awake'
-import { getPreference, setPreference } from '@/tools/preferences'
 import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar'
+import { useMainStore } from '@/stores/MainStore'
+const mainStore = useMainStore()
 
 // Router
 const ionRouter = useIonRouter()
 
 // Development mode
-const debug = false
+const debug = true
 
 // 'env'
 const VUE_APP_MCORP_API_KEY = '8844095860530063641'
@@ -147,9 +148,6 @@ const VUE_APP_WS_LIVE_SERVER_URL = 'wss://sadiss.net/ws/'
 
 const isRegistered = ref(false)
 const ws = ref<WebSocket>()
-
-const choirId = ref(1)
-const ttsLanguage = ref('en-US')
 
 const {
   handleChunkData,
@@ -192,7 +190,7 @@ const register = () => {
   attemptingToRegister = true
   startAudioCtx()
   dLog('Audio ctx started.')
-  setTtsLanguage(ttsLanguage.value)
+  setTtsLanguage(mainStore.selectedLanguage)
 
   establishWebsocketConnection()
 }
@@ -208,8 +206,8 @@ const establishWebsocketConnection = () => {
     this.send(
       JSON.stringify({
         message: 'clientInfo',
-        clientId: choirId.value,
-        ttsLang: ttsLanguage.value
+        clientId: mainStore.choirId,
+        ttsLang: mainStore.selectedLanguage
       })
     )
   }
@@ -285,41 +283,6 @@ const initializeMCorp = async () => {
   mCorpApp.init()
 }
 
-const performanceName = ref('')
-const roleName = ref('')
-const expertMode = ref(false)
-
-onMounted(async () => {
-  // Load performance name from preferences
-  const performanceNameResult = await getPreference('performanceName')
-  if (performanceNameResult.value) {
-    performanceName.value = performanceNameResult.value
-  }
-
-  // Load role name from preferences
-  const roleNameResult = await getPreference('roleName')
-  if (roleNameResult.value) {
-    roleName.value = roleNameResult.value
-  }
-
-  const choirIdResult = await getPreference('choirId')
-  if (choirIdResult.value) {
-    choirId.value = +choirIdResult.value
-  }
-
-  const langResult = await getPreference('selectedLanguage')
-  if (langResult.value) {
-    ttsLanguage.value = langResult.value
-  }
-
-  const expertModeResult = await getPreference('expertMode')
-  if (expertModeResult.value) {
-    expertMode.value = expertModeResult.value === 'true' ? true : false
-  }
-
-  await initializeMCorp()
-})
-
 onUnmounted(async () => {
   ws.value?.close()
   if (Capacitor.getPlatform() === 'android') {
@@ -364,10 +327,10 @@ watch(
 // TODO: This is only for testing and should be commented out / removed in final version
 // since choir ids are assigned to clients via QR code and not by user
 watch(
-  () => choirId.value,
+  () => mainStore.choirId,
   async (value, oldValue) => {
     if (typeof value === 'number' && value !== oldValue) {
-      await setPreference('choirId', String(value))
+      mainStore.choirId = value
     }
   }
 )

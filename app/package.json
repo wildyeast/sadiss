@@ -28,6 +28,7 @@
     "cordova-plugin-device": "^2.1.0",
     "core-js": "^3.6.5",
     "ionicons": "^6.0.3",
+    "pinia": "^2.0.35",
     "vue": "^3.2.21",
     "vue-router": "^4.0.12"
   },

@@ -11,8 +11,8 @@
     <ion-content :fullscreen="true">
       <div class="flex h-full w-full flex-col items-center justify-around gap-8 bg-primary">
         <div class="flex flex-col items-center gap-4 text-white">
-          <h1 class="text-3xl">{{ performanceName }}</h1>
-          <h2 class="text-2xl">{{ roleName }}</h2>
+          <h1 class="text-3xl">{{ mainStore.performanceName }}</h1>
+          <h2 class="text-2xl">{{ mainStore.roleName }}</h2>
         </div>
         <ion-item
           class="ionic-bg-secondary w-[80%]"
@@ -23,10 +23,10 @@
             >Please select a language
           </ion-label>
           <ion-select
-            v-model="selectedLanguage"
+            v-model="mainStore.selectedLanguage"
             class="w-full text-white">
             <ion-select-option
-              v-for="lang of availableLanguages"
+              v-for="lang of mainStore.availableLanguages"
               :key="lang.iso"
               :value="lang.iso"
               >{{ lang.lang }}
@@ -35,7 +35,7 @@
         </ion-item>
         <ion-button
           @click="ionRouter.navigate('/main', 'forward', 'push')"
-          :disabled="!selectedLanguage"
+          :disabled="!mainStore.selectedLanguage"
           class="ionic-rounded-full ionic-bg-secondary h-[100px] w-[100px] text-2xl">
           Done
         </ion-button>
@@ -59,56 +59,17 @@ import {
   IonButtons,
   IonBackButton
 } from '@ionic/vue'
-import { ref, watch, onMounted } from 'vue'
-import { getPreference, setPreference } from '@/tools/preferences'
+import { watch } from 'vue'
+import { useMainStore } from '@/stores/MainStore'
+const mainStore = useMainStore()
 
 // Router
 const ionRouter = useIonRouter()
 
-const performanceName = ref('')
-const roleName = ref('')
-
-const availableLanguages = ref<AvailableLanguage[]>([])
-const selectedLanguage = ref<string>('')
-
-onMounted(async () => {
-  // Load performance name from preferences
-  const performanceNameResult = await getPreference('performanceName')
-  if (performanceNameResult.value) {
-    performanceName.value = performanceNameResult.value
-  }
-
-  // Load role name from preferences
-  const roleNameResult = await getPreference('roleName')
-  if (roleNameResult.value) {
-    roleName.value = roleNameResult.value
-  }
-
-  // Load available languages from preferences
-  const availableLanguagesResult = await getPreference('availableLanguages')
-  if (availableLanguagesResult.value) {
-    availableLanguages.value = await JSON.parse(availableLanguagesResult.value)
-  }
-
-  // Load default language from preferences
-  const defaultLanguageResult = await getPreference('defaultLang')
-  if (defaultLanguageResult.value) {
-    const availableLang = availableLanguages.value.find((lang: AvailableLanguage) => lang.iso === defaultLanguageResult.value)
-    if (availableLang) {
-      selectedLanguage.value = availableLang.iso
-    }
-  }
-})
-
 watch(
-  () => selectedLanguage.value,
+  () => mainStore.selectedLanguage,
   async (value) => {
-    await setPreference('selectedLanguage', value)
+    mainStore.selectedLanguage = value
   }
 )
-
-interface AvailableLanguage {
-  iso: string
-  lang: string
-}
 </script>
