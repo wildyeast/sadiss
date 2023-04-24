@@ -49,7 +49,7 @@ const corsOptions = {
 
 const app = express()
   .use(express.json())
-  //.use(cors(corsOptions))
+  // .use(cors(corsOptions))
   .use(express.urlencoded({ extended: false }))
 
 app.listen(BASE_PORT, () => console.log(`Http server listening on port ${BASE_PORT}.`))

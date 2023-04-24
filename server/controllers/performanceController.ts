@@ -215,13 +215,15 @@ exports.get_voices_and_languages = async (req: express.Request, res: express.Res
   }
 }
 */
-
 exports.get_performances = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-  res.json([{
-     date: new Date("10/3/2023"),
-     name: 'Acousmonium',
-     location: 'echoraum, Sechshauser Straße 66, 1150 Wien, Austria',
-     url: 'https://floatingsound.at/Acousmonium-2023-third'
-  }])
+  res.json([
+    {
+      date: new Date('Sat Apr 15 2023 00:00:00 GMT-0400 (Eastern Daylight Time)'),
+      name: 'Naming Names',
+      location: 'Beta-test for a piece for no audience by Simon Lee, Eve Sussman, Volkmar Klien. Crown Heights, Brooklyn.',
+      url: 'https://sadiss.net'
+    }
+  ])
 }
+
