@@ -25,7 +25,18 @@
     --border-style: solid;
   }
 
+  .ionic-border-highlight-narrow {
+    @apply ionic-border-highlight;
+    --border-width: 2px;
+  }
+
   .ionic-border-highlight-muted {
     --border-color: #79ea0488;
   }
+}
+
+.button {
+  @apply ionic-border-highlight-narrow;
+  --background: clear;
+  --color: #79ea04;
 }

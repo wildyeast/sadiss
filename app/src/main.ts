@@ -26,9 +26,6 @@ import './theme/variables.css'
 /* Tailwind */
 import './theme/tailwind.css'
 
-/* Main CSS File */
-import './theme/main.css'
-
 const app = createApp(App).use(IonicVue, { swipeBackEnabled: false }).use(router)
 
 router.isReady().then(() => {
