@@ -104,21 +104,32 @@ const scanCode = async () => {
       await setPreference('defaultLang', defaultLang)
     }
 
-    // Export Mode
-    const expertMode = result.expertMode
-    if (expertMode) {
-      await setPreference('expertMode', expertMode)
-    }
-
     // Timestamp of scan
     await setPreference('lastScanTimestamp', Date.now().toString())
 
     // TTS langs
-    if (result.tts) {
-      await setPreference('availableLanguages', JSON.stringify(result.tts))
-      ionRouter.navigate('/language-selection', 'forward', 'push')
+    const ttsLangs = result.tts
+    if (ttsLangs) {
+      if (ttsLangs.length === 1) {
+        await setPreference('selectedLanguage', ttsLangs[0])
+      } else {
+        await setPreference('availableLanguages', JSON.stringify(ttsLangs))
+      }
+    }
+
+    // Expert Mode and navigation
+    const expertMode = result.expertMode
+    if (!expertMode) {
+      ionRouter.navigate('/main', 'forward')
+    } else if (ttsLangs) {
+      if (ttsLangs.length === 1) {
+        ionRouter.navigate('/main', 'forward')
+      } else {
+        ionRouter.navigate('/language-selection', 'forward')
+      }
     } else {
-      ionRouter.navigate('/main', 'forward', 'push')
+      await setPreference('expertMode', expertMode)
+      ionRouter.navigate('/offset-calibration', 'forward')
     }
   }
   stopScanning()
@@ -167,7 +178,7 @@ interface Performance {
 interface QrCodeScanResult {
   performanceName: string
   choirId?: number
-  tts?: boolean
+  tts?: string[]
   roleName?: string
   defaultLang?: string
   expertMode?: string
