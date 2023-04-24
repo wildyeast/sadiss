@@ -117,15 +117,15 @@ const scanCode = async () => {
     const expertModeResult = result.expertMode
     if (expertModeResult) {
       mainStore.expertMode = expertModeResult
-      ionRouter.navigate('/offset-calibration', 'forward')
+      ionRouter.navigate('/offset-calibration', 'forward', 'push')
     } else if (ttsLangsResult) {
       if (ttsLangsResult.length === 1) {
-        ionRouter.navigate('/main', 'forward')
+        ionRouter.navigate('/main', 'forward', 'push')
       } else {
-        ionRouter.navigate('/language-selection', 'forward')
+        ionRouter.navigate('/language-selection', 'forward', 'push')
       }
     } else {
-      ionRouter.navigate('/main', 'forward')
+      ionRouter.navigate('/main', 'forward', 'push')
     }
   }
   stopScanning()

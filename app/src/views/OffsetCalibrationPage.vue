@@ -10,11 +10,11 @@
 
     <ion-content :fullscreen="true">
       <BasePage>
+        <div class="flex flex-col items-center gap-4 text-white">
+          <h1 class="text-3xl">{{ mainStore.performanceName }}</h1>
+          <h2 class="text-2xl">{{ mainStore.roleName }}</h2>
+        </div>
         <div class="flex items-center gap-4">
-          <div class="flex flex-col items-center gap-4 text-white">
-            <h1 class="text-3xl">{{ mainStore.performanceName }}</h1>
-            <h2 class="text-2xl">{{ mainStore.roleName }}</h2>
-          </div>
           <ion-button
             class="button"
             @click="changeOutputLatencyOffset(-0.01)"
@@ -27,8 +27,12 @@
             >+
           </ion-button>
         </div>
+        <p>
+          You should be hearing a regular click while this screen is displayed. To adjust the timing of your device to match
+          others mor closely click the arrows above. Your device will remember this setting.
+        </p>
         <ion-button
-          @click="ionRouter.navigate('/main', 'forward', 'push')"
+          @click="goForward()"
           class="ionic-rounded-full ionic-bg-secondary h-[100px] w-[100px] text-2xl">
           Done
         </ion-button>
@@ -55,5 +59,13 @@ const changeOutputLatencyOffset = (changeBy: number) => {
   const newOffset = (outputLatencyOffset.value + changeBy).toFixed(2)
   outputLatencyOffset.value = +newOffset
   setOutputLatencyOffset(outputLatencyOffset.value)
+}
+
+const goForward = () => {
+  if (mainStore.availableLanguages.length && mainStore.availableLanguages.length > 1) {
+    ionRouter.navigate('/language-selection', 'forward', 'push')
+  } else {
+    ionRouter.navigate('/main', 'forward', 'push')
+  }
 }
 </script>
