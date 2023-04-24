@@ -1,16 +1,11 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true">
-      <div class="flex min-h-full w-full flex-col items-center justify-between overflow-scroll bg-primary p-4 px-6">
-        <div class="flex flex-col items-center">
-          <img
-            src="../../public/assets/sadiss-logo.png"
-            class="my-8 w-1/2" />
-          <div
-            v-if="nextPerformance"
-            class="w-full border-b pb-4">
-            <div v-html="nextPerformance" />
-          </div>
+      <BasePage>
+        <div
+          v-if="nextPerformance"
+          class="w-full border-b pb-4">
+          <div v-html="nextPerformance" />
         </div>
         <ion-button
           @click="scanCode"
@@ -32,7 +27,7 @@
             for more information on the software system.
           </p>
         </div>
-      </div>
+      </BasePage>
     </ion-content>
   </ion-page>
 </template>
@@ -41,6 +36,7 @@
 import { ref, onMounted, computed } from 'vue'
 import { IonContent, IonPage, IonButton, useIonRouter } from '@ionic/vue'
 import { onDeactivated } from 'vue'
+import BasePage from '@/components/BasePage.vue'
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
 import { setPreference } from '@/tools/preferences'
 
