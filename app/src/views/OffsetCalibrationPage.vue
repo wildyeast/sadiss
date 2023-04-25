@@ -17,13 +17,15 @@
         <div class="flex items-center gap-4">
           <ion-button
             class="button"
-            @click="changeOutputLatencyOffset(-0.01)"
+            @mousedown="startChangingOutputLatencyOffset(-0.01)"
+            @mouseup="stopChangingOutputLatencyOffset()"
             >-
           </ion-button>
           <div class="w-28 text-center text-3xl font-bold">{{ outputLatencyOffset }}s</div>
           <ion-button
             class="button"
-            @click="changeOutputLatencyOffset(0.01)"
+            @mousedown="startChangingOutputLatencyOffset(0.01)"
+            @mouseup="stopChangingOutputLatencyOffset()"
             >+
           </ion-button>
         </div>
@@ -54,16 +56,31 @@ import { useWebsocketConnection } from '@/composables/useWebsocketConnection'
 const ionRouter = useIonRouter()
 const mainStore = useMainStore()
 const { establishWebsocketConnection } = useWebsocketConnection()
-
 const { initializeMCorp } = useMCorp()
-
 const { setOutputLatencyOffset } = usePlayer()
 
 const outputLatencyOffset = ref(0)
+const maxOutputLatencyOffset = 0.6
+const minOutputLatencyOffset = -0.6
 const changeOutputLatencyOffset = (changeBy: number) => {
-  const newOffset = (outputLatencyOffset.value + changeBy).toFixed(2)
-  outputLatencyOffset.value = +newOffset
+  const newOffset = outputLatencyOffset.value + changeBy
+  if (newOffset > maxOutputLatencyOffset || newOffset < minOutputLatencyOffset) {
+    return
+  }
+  outputLatencyOffset.value = +newOffset.toFixed(2)
   setOutputLatencyOffset(outputLatencyOffset.value)
+}
+
+let intervalId: ReturnType<typeof setInterval>
+function startChangingOutputLatencyOffset(changeBy: number) {
+  changeOutputLatencyOffset(changeBy)
+  intervalId = setInterval(() => {
+    changeOutputLatencyOffset(changeBy)
+  }, 100)
+}
+
+function stopChangingOutputLatencyOffset() {
+  clearInterval(intervalId)
 }
 
 const goForward = async () => {
