@@ -43,10 +43,12 @@
 
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonToolbar, useIonRouter, IonButton, IonButtons, IonBackButton } from '@ionic/vue'
-import { ref } from 'vue'
+import { onMounted, ref } from 'vue'
 import BasePage from '@/components/BasePage.vue'
 import { usePlayer } from '@/composables/usePlayer'
 import { useMainStore } from '@/stores/MainStore'
+import { Preferences } from '@capacitor/preferences'
+
 const mainStore = useMainStore()
 
 // Router
@@ -61,11 +63,19 @@ const changeOutputLatencyOffset = (changeBy: number) => {
   setOutputLatencyOffset(outputLatencyOffset.value)
 }
 
-const goForward = () => {
+const goForward = async () => {
+  await Preferences.set({ key: 'outputLatencyOffset', value: outputLatencyOffset.value.toString() })
   if (mainStore.availableLanguages.length && mainStore.availableLanguages.length > 1) {
     ionRouter.navigate('/language-selection', 'forward', 'push')
   } else {
     ionRouter.navigate('/main', 'forward', 'push')
   }
 }
+
+onMounted(async () => {
+  const offsetResult = await Preferences.get({ key: 'outputLatencyOffset' })
+  if (offsetResult.value) {
+    outputLatencyOffset.value = +offsetResult.value
+  }
+})
 </script>
