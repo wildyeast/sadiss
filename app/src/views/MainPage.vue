@@ -15,13 +15,9 @@
           <h2 class="text-2xl">{{ mainStore.roleName }}</h2>
         </div>
 
-        <ion-button
-          @click="register"
-          :disabled="!mcorpConnected"
-          class="ionic-rounded-full ionic-bg-secondary h-[60vw] w-[60vw] text-2xl font-bold"
-          :class="{
-            'ionic-border-highlight text-highlight': isRegistered
-          }">
+        <ion-button @click="register">
+          class="ionic-rounded-full ionic-bg-secondary h-[60vw] w-[60vw] text-2xl font-bold" :class="{ 'ionic-border-highlight
+          text-highlight': isRegistered }">
           {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
         <div>
@@ -59,7 +55,6 @@ const mainStore = useMainStore()
 const ionRouter = useIonRouter()
 
 // 'env'
-const VUE_APP_MCORP_API_KEY = '8844095860530063641'
 
 const VUE_APP_WS_SERVER_URL = '192.168.0.87'
 const VUE_APP_WS_SERVER_PORT = '443'
@@ -69,7 +64,7 @@ const VUE_APP_WS_LIVE_SERVER_URL = 'wss://sadiss.net/ws/'
 const isRegistered = ref(false)
 const ws = ref<WebSocket>()
 
-const { handleChunkData, setStartTime, setTtsLanguage, setMotionRef, setTrackSettings, stopPlayback, setOffset } = usePlayer()
+const { handleChunkData, setStartTime, setTtsLanguage, setTrackSettings, stopPlayback, setOffset } = usePlayer()
 
 let attemptingToRegister = false
 const register = () => {
@@ -135,20 +130,6 @@ const establishWebsocketConnection = () => {
       handleChunkData(data.chunk)
     }
   }
-}
-
-let motion: any
-const mcorpConnected = ref(false)
-const initializeMCorp = async () => {
-  // @ts-expect-error: Can't find name MCorp, which is added via <script> in index.html
-  // eslint-disable-next-line
-  const mCorpApp = MCorp.app(VUE_APP_MCORP_API_KEY, { anon: true })
-  mCorpApp.run = () => {
-    motion = reactive(mCorpApp.motions['shared'])
-    mcorpConnected.value = true
-    setMotionRef(motion)
-  }
-  mCorpApp.init()
 }
 
 onUnmounted(async () => {

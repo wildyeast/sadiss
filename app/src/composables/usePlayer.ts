@@ -128,14 +128,6 @@ export function usePlayer() {
 
   const setOutputLatencyOffset = (offset: number) => (outputLatencyOffset = offset)
 
-  const getDebugData = () => {
-    const ctxTime = ctx ? ctx.currentTime : undefined
-    return {
-      ctxTime,
-      offset
-    }
-  }
-
   return {
     handleChunkData,
     initialSetup,
@@ -144,7 +136,6 @@ export function usePlayer() {
     setTtsLanguage,
     setMotionRef,
     setTrackSettings,
-    getDebugData,
     stopPlayback,
     setOffset,
     setOutputLatencyOffset

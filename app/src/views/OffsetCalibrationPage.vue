@@ -48,11 +48,12 @@ import BasePage from '@/components/BasePage.vue'
 import { usePlayer } from '@/composables/usePlayer'
 import { useMainStore } from '@/stores/MainStore'
 import { Preferences } from '@capacitor/preferences'
+import { useMCorp } from '@/composables/useMCorp'
 
+const ionRouter = useIonRouter()
 const mainStore = useMainStore()
 
-// Router
-const ionRouter = useIonRouter()
+const { initializeMCorp } = useMCorp()
 
 const { setOutputLatencyOffset } = usePlayer()
 
@@ -77,5 +78,6 @@ onMounted(async () => {
   if (offsetResult.value) {
     outputLatencyOffset.value = +offsetResult.value
   }
+  await initializeMCorp()
 })
 </script>
