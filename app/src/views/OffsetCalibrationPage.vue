@@ -49,9 +49,11 @@ import { usePlayer } from '@/composables/usePlayer'
 import { useMainStore } from '@/stores/MainStore'
 import { Preferences } from '@capacitor/preferences'
 import { useMCorp } from '@/composables/useMCorp'
+import { useWebsocketConnection } from '@/composables/useWebsocketConnection'
 
 const ionRouter = useIonRouter()
 const mainStore = useMainStore()
+const { establishWebsocketConnection } = useWebsocketConnection()
 
 const { initializeMCorp } = useMCorp()
 
@@ -79,5 +81,6 @@ onMounted(async () => {
     outputLatencyOffset.value = +offsetResult.value
   }
   await initializeMCorp()
+  establishWebsocketConnection()
 })
 </script>
