@@ -39,12 +39,12 @@ import { onDeactivated } from 'vue'
 import BasePage from '@/components/BasePage.vue'
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
 import { AvailableLanguage } from '@/types/types'
-
 import { useMainStore } from '@/stores/MainStore'
-const mainStore = useMainStore()
+import { usePlayer } from '@/composables/usePlayer'
 
-// Router
 const ionRouter = useIonRouter()
+const mainStore = useMainStore()
+const { startAudioCtx } = usePlayer()
 
 const upcomingPerformances = ref([])
 
@@ -67,6 +67,9 @@ const getPerformances = async () => {
 
 const { startScan, stopScan } = useBarcodeScanner()
 const scanCode = async () => {
+  // Start audioCtx on first user interaction
+  startAudioCtx()
+
   // Make camera visible and everything else invisible in app viewport, classes defined in App.vue
   document.body.classList.add('qrscanner')
   const resultJson = await startScan()

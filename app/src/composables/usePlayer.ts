@@ -7,9 +7,6 @@ export function usePlayer() {
   const oscillators: OscillatorObject[] = []
   const currentChunkStartTimeInCtxTime = ref()
   let offset: number
-  let dlog: (text: string) => void
-
-  const setLogFunction = (logFunction: (text: string) => void) => (dlog = logFunction)
 
   const initialSetup = (partialChunks: { partials: PartialChunk[]; ttsInstructions: string }) => {
     handleChunkData(partialChunks)
@@ -20,7 +17,6 @@ export function usePlayer() {
     ctx = new AudioContext()
 
     ctx.onstatechange = () => {
-      dlog('Ctx state changed to: ' + ctx.state)
       // Resume ctx when going to sleep/background/etc preventing issue where iOS wouldn't restart playback
       // Taken from https://github.com/Tonejs/Tone.js/issues/995#issuecomment-1005082160
       // @ts-expect-error: 'interrupted' is correct here.
@@ -145,7 +141,6 @@ export function usePlayer() {
     initialSetup,
     startAudioCtx,
     setStartTime,
-    setLogFunction,
     setTtsLanguage,
     setMotionRef,
     setTrackSettings,
