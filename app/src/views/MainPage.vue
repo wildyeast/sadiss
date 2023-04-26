@@ -15,9 +15,10 @@
           <h2 class="text-2xl">{{ mainStore.roleName }}</h2>
         </div>
 
-        <ion-button @click="register">
-          class="ionic-rounded-full ionic-bg-secondary h-[60vw] w-[60vw] text-2xl font-bold" :class="{ 'ionic-border-highlight
-          text-highlight': isRegistered }">
+        <ion-button
+          @click="register"
+          class="ionic-rounded-full ionic-bg-secondary h-[60vw] w-[60vw] text-2xl font-bold"
+          :class="{ 'ionic-border-highlight text-highlight': isRegistered }">
           {{ isRegistered ? 'Registered' : 'Register' }}
         </ion-button>
         <div>

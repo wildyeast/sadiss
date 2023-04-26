@@ -14,30 +14,32 @@
           <h1 class="text-3xl">{{ mainStore.performanceName }}</h1>
           <h2 class="text-2xl">{{ mainStore.roleName }}</h2>
         </div>
-        <div class="flex items-center gap-4">
-          <ion-button
-            class="button"
+        <div class="flex w-full justify-center gap-10">
+          <button
             @mousedown="startChangingOutputLatencyOffset(-0.01)"
-            @mouseup="stopChangingOutputLatencyOffset()"
-            >-
-          </ion-button>
-          <div class="w-28 text-center text-3xl font-bold">{{ outputLatencyOffset }}s</div>
-          <ion-button
-            class="button"
+            @mouseup="stopChangingOutputLatencyOffset()">
+            <img
+              src="../../public/assets/arrow-left.svg"
+              class="h-[40px]" />
+          </button>
+          <div class="w-28 text-center text-4xl font-bold text-highlight">{{ outputLatencyOffset }}s</div>
+          <button
             @mousedown="startChangingOutputLatencyOffset(0.01)"
-            @mouseup="stopChangingOutputLatencyOffset()"
-            >+
-          </ion-button>
+            @mouseup="stopChangingOutputLatencyOffset()">
+            <img
+              src="../../public/assets/arrow-right.svg"
+              class="h-[40px]" />
+          </button>
         </div>
         <p>
           You should be hearing a regular click while this screen is displayed. To adjust the timing of your device to match
           others mor closely click the arrows above. Your device will remember this setting.
         </p>
-        <ion-button
+        <button
           @click="goForward()"
-          class="ionic-rounded-full ionic-bg-secondary h-[100px] w-[100px] text-2xl">
-          Done
-        </ion-button>
+          class="h-[80px] w-[80px] text-2xl">
+          <img src="../../public/assets/button-next.svg" />
+        </button>
       </BasePage>
     </ion-content>
   </ion-page>

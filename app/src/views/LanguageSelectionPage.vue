@@ -33,12 +33,12 @@
             </ion-select-option>
           </ion-select>
         </ion-item>
-        <ion-button
+        <button
           @click="ionRouter.navigate('/main', 'forward', 'push')"
           :disabled="!mainStore.selectedLanguage"
-          class="ionic-rounded-full ionic-bg-secondary h-[100px] w-[100px] text-2xl">
-          Done
-        </ion-button>
+          class="h-[80px] w-[80px] text-2xl">
+          <img src="../../public/assets/button-next.svg" />
+        </button>
       </BasePage>
     </ion-content>
   </ion-page>
