@@ -15,7 +15,7 @@
         <div class="h-[60vw] w-[60vw]">
           <div
             v-if="isRegistered"
-            @click="register"
+            @click="debugOnlyClick"
             class="flex h-full w-full items-center justify-center rounded-full bg-highlight text-2xl font-bold">
             <p class="text-4xl text-primary">Active</p>
           </div>
@@ -51,10 +51,17 @@ import { useWebsocketConnection } from '@/composables/useWebsocketConnection'
 import BasePage from '@/components/BasePage.vue'
 import PerformanceInformation from '@/components/PerformanceInformation.vue'
 
+import { useMCorp } from '@/composables/useMCorp'
+const { initializeMCorp } = useMCorp()
+
 const mainStore = useMainStore()
 const { establishWebsocketConnection, isRegistered } = useWebsocketConnection()
 
-const { setTtsLanguage } = usePlayer()
+const { setTtsLanguage, startAudioCtx } = usePlayer()
+
+const debugOnlyClick = () => {
+  startAudioCtx()
+}
 
 const register = () => {
   setTtsLanguage(mainStore.selectedLanguage)
@@ -66,8 +73,11 @@ useBackButton(10, () => {
   return
 })
 
-onMounted(() => {
-  register()
+onMounted(async () => {
+  if (!mainStore.expertMode) {
+    await initializeMCorp()
+    register()
+  }
 })
 
 onUnmounted(async () => {

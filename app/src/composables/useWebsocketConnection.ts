@@ -68,7 +68,7 @@ export function useWebsocketConnection() {
       // Is there a way around it though? Clients can join late. Do they need this information?
       setStartTime(data.startTime)
       setTrackSettings(data.waveform, data.ttsRate)
-      if (Object.keys(data.chunk)) {
+      if (data.chunk && Object.keys(data.chunk).length) {
         handleChunkData(data.chunk)
       }
     }

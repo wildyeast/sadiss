@@ -2,11 +2,13 @@ import { reactive, ref } from 'vue'
 import { TextToSpeech } from '@capacitor-community/text-to-speech'
 import { PartialChunk, OscillatorObject, Breakpoint } from '../types/types'
 
+let ctx: AudioContext
+let offset: number
+let motion: { pos: number } = reactive({ pos: -1 })
+
 export function usePlayer() {
-  let ctx: AudioContext
   const oscillators: OscillatorObject[] = []
   const currentChunkStartTimeInCtxTime = ref()
-  let offset: number
 
   const initialSetup = (partialChunks: { partials: PartialChunk[]; ttsInstructions: string }) => {
     handleChunkData(partialChunks)
@@ -43,6 +45,7 @@ export function usePlayer() {
 
     // TODO: Refactor this
     currentChunkStartTimeInCtxTime.value = startTimeInCtxTime
+    console.log('currentChunkStartTimeInCtxTime: ', currentChunkStartTimeInCtxTime.value)
 
     if (trackData.partials) {
       for (const partialChunk of trackData.partials) {
@@ -115,9 +118,13 @@ export function usePlayer() {
     ttsLanguage = lang
   }
 
-  let motion: { pos: number } = reactive({ pos: -1 })
   const setMotionRef = (motionRef: { pos: number }) => (motion = motionRef)
-  const setOffset = () => (offset = motion.pos - ctx.currentTime)
+
+  const setOffset = () => {
+    console.log(motion.pos, ctx.currentTime)
+    offset = motion.pos - ctx.currentTime
+    console.log('Offset: ', offset)
+  }
 
   let waveform: OscillatorType
   let ttsRate = 1
@@ -126,7 +133,7 @@ export function usePlayer() {
     ttsRate = +rate
   }
 
-  const setOutputLatencyOffset = (offset: number) => (outputLatencyOffset = offset)
+  const setOutputLatencyOffset = (newOutputLatencyOffset: number) => (outputLatencyOffset = newOutputLatencyOffset)
 
   return {
     handleChunkData,
