@@ -9,6 +9,9 @@ module.exports = {
         highlight: '#79ea04',
         danger: '#ff3d00'
       }
+    },
+    fontFamily: {
+      verdana: ['VERDANA', 'sans-serif']
     }
   },
   plugins: []

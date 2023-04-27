@@ -2,6 +2,11 @@
 @tailwind components;
 @tailwind utilities;
 
+@font-face {
+  font-family: 'VERDANA';
+  src: url('../../public/fonts/verdana.ttf');
+}
+
 @layer base {
   .ionic-rounded-full {
     --border-radius: 100%;
@@ -36,7 +41,7 @@
 }
 
 * {
-  @apply text-white;
+  @apply font-verdana text-white;
 }
 
 .button {
