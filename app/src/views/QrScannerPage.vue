@@ -8,11 +8,12 @@
           <div v-html="nextPerformance" />
         </div>
         <ion-button
+          v-if="!processing"
           @click="scanCode"
           class="button ionic-border-highlight-narrow h-[80px] w-full text-3xl">
           Scan QR code
         </ion-button>
-        <div>
+        <div v-if="!processing">
           <p class="text-sm">
             To join the performance please scan a QR code at the venue using the button above.<br />
             Once registered you will have to quit and re-start the app to leave the performance or scan a different code.
@@ -27,6 +28,11 @@
             for more information on the software system.
           </p>
         </div>
+        <div
+          v-if="processing"
+          class="flex h-full items-center justify-center">
+          <ion-spinner class="scale-[200%] text-highlight" />
+        </div>
       </BasePage>
     </ion-content>
   </ion-page>
@@ -34,7 +40,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
-import { IonContent, IonPage, IonButton, useIonRouter } from '@ionic/vue'
+import { IonContent, IonPage, IonButton, useIonRouter, IonSpinner } from '@ionic/vue'
 import { onDeactivated } from 'vue'
 import BasePage from '@/components/BasePage.vue'
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
@@ -66,6 +72,9 @@ const getPerformances = async () => {
 /* QR Code Scanning */
 
 const { startScan, stopScan } = useBarcodeScanner()
+
+const processing = ref(false)
+
 const scanCode = async () => {
   // Start audioCtx on first user interaction
   startAudioCtx()
@@ -74,6 +83,7 @@ const scanCode = async () => {
   document.body.classList.add('qrscanner')
   const resultJson = await startScan()
   if (resultJson) {
+    processing.value = true
     let result: QrCodeScanResult
     try {
       result = await JSON.parse(resultJson)
@@ -164,6 +174,7 @@ onMounted(async () => {
 onDeactivated(() => {
   document.body.classList.remove('qrscanner')
   stopScan()
+  processing.value = false
 })
 
 interface Performance {
