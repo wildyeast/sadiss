@@ -40,7 +40,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonToolbar, IonButton, IonButtons, IonBackButton, useIonRouter } from '@ionic/vue'
+import { IonContent, IonHeader, IonPage, IonToolbar, IonButton, IonButtons, IonBackButton, useBackButton } from '@ionic/vue'
 import { watch, onUnmounted, onMounted, ref } from 'vue'
 import { usePlayer } from '../composables/usePlayer'
 import { Capacitor } from '@capacitor/core'
@@ -60,6 +60,11 @@ const register = () => {
   setTtsLanguage(mainStore.selectedLanguage)
   establishWebsocketConnection()
 }
+
+// Disable hardware and NavigationBar back button on Android
+useBackButton(10, () => {
+  return
+})
 
 onMounted(() => {
   register()
