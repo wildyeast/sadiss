@@ -14,16 +14,16 @@
 
         <div class="flex w-full justify-center gap-10">
           <button
-            @mousedown="startChangingOutputLatencyOffset(-0.01)"
-            @mouseup="stopChangingOutputLatencyOffset()">
+            @touchstart="startChangingOutputLatencyOffset(-0.01)"
+            @touchend="stopChangingOutputLatencyOffset()">
             <img
               src="../../public/assets/arrow-left.svg"
               class="h-[40px]" />
           </button>
-          <div class="w-28 text-center text-4xl font-bold text-highlight">{{ outputLatencyOffset }}s</div>
+          <div class="w-32 text-center text-4xl font-bold text-highlight">{{ outputLatencyOffset }}s</div>
           <button
-            @mousedown="startChangingOutputLatencyOffset(0.01)"
-            @mouseup="stopChangingOutputLatencyOffset()">
+            @touchstart="startChangingOutputLatencyOffset(0.01)"
+            @touchend="stopChangingOutputLatencyOffset()">
             <img
               src="../../public/assets/arrow-right.svg"
               class="h-[40px]" />
@@ -72,8 +72,9 @@ const changeOutputLatencyOffset = (changeBy: number) => {
   setOutputLatencyOffset(outputLatencyOffset.value)
 }
 
-let intervalId: ReturnType<typeof setInterval>
+let intervalId: ReturnType<typeof setInterval> | null
 function startChangingOutputLatencyOffset(changeBy: number) {
+  if (intervalId) return
   changeOutputLatencyOffset(changeBy)
   intervalId = setInterval(() => {
     changeOutputLatencyOffset(changeBy)
@@ -81,11 +82,17 @@ function startChangingOutputLatencyOffset(changeBy: number) {
 }
 
 function stopChangingOutputLatencyOffset() {
+  if (!intervalId) return
   clearInterval(intervalId)
+  intervalId = null
 }
 
 const goForward = async () => {
   await Preferences.set({ key: 'outputLatencyOffset', value: outputLatencyOffset.value.toString() })
+
+  // Set output latency offset again in case user clicks through without changing it
+  setOutputLatencyOffset(outputLatencyOffset.value)
+
   if (mainStore.availableLanguages.length && mainStore.availableLanguages.length > 1) {
     ionRouter.navigate('/language-selection', 'forward', 'push')
   } else {

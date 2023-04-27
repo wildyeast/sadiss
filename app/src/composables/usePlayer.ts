@@ -5,6 +5,7 @@ import { PartialChunk, OscillatorObject, Breakpoint } from '../types/types'
 let ctx: AudioContext
 let offset: number
 let motion: { pos: number } = reactive({ pos: -1 })
+let outputLatencyOffset = 0
 
 export function usePlayer() {
   const oscillators: OscillatorObject[] = []
@@ -85,7 +86,6 @@ export function usePlayer() {
     }
   }
 
-  let outputLatencyOffset = 0
   const setBreakpoints = (oscNode: OscillatorNode, gainNode: GainNode, breakpoints: Breakpoint[], chunkEndTime: number) => {
     oscNode.stop(chunkEndTime)
     for (const bp of breakpoints) {
