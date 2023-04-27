@@ -12,26 +12,22 @@
       <BasePage>
         <PerformanceInformation />
 
-        <ion-button
-          @click="register"
-          class="ionic-rounded-full ionic-bg-secondary h-[60vw] w-[60vw] text-2xl font-bold"
-          :class="{ 'ionic-border-highlight text-highlight': isRegistered }">
-          {{ isRegistered ? 'Registered' : 'Register' }}
-        </ion-button>
-        <div>
+        <div class="h-[60vw] w-[60vw]">
+          <div
+            v-if="isRegistered"
+            @click="register"
+            class="flex h-full w-full items-center justify-center rounded-full bg-highlight text-2xl font-bold">
+            <p class="text-4xl text-primary">Active</p>
+          </div>
           <ion-button
-            @click="ionRouter.navigate('/qr-scanner', 'root')"
-            :disabled="isRegistered"
-            class="ionic-bg-secondary mt-4 h-[60px] font-bold">
-            Re-Scan<br />QR-Code
-          </ion-button>
-          <ion-button
-            v-if="mainStore.expertMode"
-            @click="ionRouter.navigate('/offset-calibration', 'forward', 'push')"
-            class="ionic-bg-secondary mt-4 h-[60px] font-bold">
-            Calibrate<br />Output Latency
+            v-else-if="wasRegisteredThisSession"
+            @click="register"
+            class="ionic-rounded-full h-full w-full rounded-full border-4 border-danger">
+            <span class="text-4xl text-danger">Rejoin</span>
           </ion-button>
         </div>
+        <p class="text-sm text-danger">Your connection seems to be broken. Please rejoin by pressing the Rejoin button above.</p>
+        <p class="text-sm">To leave the performance or scan a different code you have to quit and re-start the app.</p>
 
         <p class="text-white">v1.1.0</p>
       </BasePage>
@@ -41,7 +37,7 @@
 
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonToolbar, IonButton, IonButtons, IonBackButton, useIonRouter } from '@ionic/vue'
-import { watch, onUnmounted } from 'vue'
+import { watch, onUnmounted, onMounted, ref } from 'vue'
 import { usePlayer } from '../composables/usePlayer'
 import { Capacitor } from '@capacitor/core'
 import { KeepAwake } from '@capacitor-community/keep-awake'
@@ -51,7 +47,6 @@ import { useWebsocketConnection } from '@/composables/useWebsocketConnection'
 import BasePage from '@/components/BasePage.vue'
 import PerformanceInformation from '@/components/PerformanceInformation.vue'
 
-const ionRouter = useIonRouter()
 const mainStore = useMainStore()
 const { establishWebsocketConnection, isRegistered } = useWebsocketConnection()
 
@@ -59,9 +54,12 @@ const { setTtsLanguage } = usePlayer()
 
 const register = () => {
   setTtsLanguage(mainStore.selectedLanguage)
-
   establishWebsocketConnection()
 }
+
+onMounted(() => {
+  register()
+})
 
 onUnmounted(async () => {
   if (Capacitor.getPlatform() === 'android') {
@@ -69,10 +67,12 @@ onUnmounted(async () => {
   }
 })
 
+const wasRegisteredThisSession = ref(false)
 // Enable/Disable KeepAwake and Android Navigation Bar depending on registration status
 watch(
   () => isRegistered.value,
   async (value) => {
+    wasRegisteredThisSession.value = true
     try {
       if (Capacitor.getPlatform() !== 'web') {
         if (value) {
