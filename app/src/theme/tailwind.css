@@ -40,6 +40,6 @@
 }
 
 .button {
-  @apply ionic-border-highlight-narrow text-highlight;
+  @apply text-highlight;
   --background: clear;
 }
