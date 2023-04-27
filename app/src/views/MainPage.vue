@@ -9,11 +9,8 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <div class="flex h-full flex-col items-center justify-between overflow-y-scroll bg-primary">
-        <div class="flex flex-col items-center gap-4 pt-10 text-white">
-          <h1 class="text-3xl">{{ mainStore.performanceName }}</h1>
-          <h2 class="text-2xl">{{ mainStore.roleName }}</h2>
-        </div>
+      <BasePage>
+        <PerformanceInformation />
 
         <ion-button
           @click="register"
@@ -37,20 +34,22 @@
         </div>
 
         <p class="text-white">v1.1.0</p>
-      </div>
+      </BasePage>
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonToolbar, IonButton, IonButtons, IonBackButton, useIonRouter } from '@ionic/vue'
-import { ref, watch, reactive, onUnmounted } from 'vue'
+import { watch, onUnmounted } from 'vue'
 import { usePlayer } from '../composables/usePlayer'
 import { Capacitor } from '@capacitor/core'
 import { KeepAwake } from '@capacitor-community/keep-awake'
 import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar'
 import { useMainStore } from '@/stores/MainStore'
 import { useWebsocketConnection } from '@/composables/useWebsocketConnection'
+import BasePage from '@/components/BasePage.vue'
+import PerformanceInformation from '@/components/PerformanceInformation.vue'
 
 const ionRouter = useIonRouter()
 const mainStore = useMainStore()

@@ -10,10 +10,7 @@
 
     <ion-content :fullscreen="true">
       <BasePage>
-        <div class="flex flex-col items-center gap-4 text-white">
-          <h1 class="text-3xl">{{ mainStore.performanceName }}</h1>
-          <h2 class="text-2xl">{{ mainStore.roleName }}</h2>
-        </div>
+        <PerformanceInformation />
         <ion-item
           class="ionic-bg-secondary w-[80%]"
           lines="none">
@@ -52,7 +49,6 @@ import {
   IonToolbar,
   useIonRouter,
   IonItem,
-  IonButton,
   IonSelect,
   IonSelectOption,
   IonLabel,
@@ -62,6 +58,7 @@ import {
 import { watch } from 'vue'
 import { useMainStore } from '@/stores/MainStore'
 import BasePage from '@/components/BasePage.vue'
+import PerformanceInformation from '@/components/PerformanceInformation.vue'
 const mainStore = useMainStore()
 
 // Router

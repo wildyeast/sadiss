@@ -10,10 +10,8 @@
 
     <ion-content :fullscreen="true">
       <BasePage>
-        <div class="flex flex-col items-center gap-4 text-white">
-          <h1 class="text-3xl">{{ mainStore.performanceName }}</h1>
-          <h2 class="text-2xl">{{ mainStore.roleName }}</h2>
-        </div>
+        <PerformanceInformation />
+
         <div class="flex w-full justify-center gap-10">
           <button
             @mousedown="startChangingOutputLatencyOffset(-0.01)"
@@ -46,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonToolbar, useIonRouter, IonButton, IonButtons, IonBackButton } from '@ionic/vue'
+import { IonContent, IonHeader, IonPage, IonToolbar, useIonRouter, IonButtons, IonBackButton } from '@ionic/vue'
 import { onMounted, ref } from 'vue'
 import BasePage from '@/components/BasePage.vue'
 import { usePlayer } from '@/composables/usePlayer'
@@ -54,6 +52,7 @@ import { useMainStore } from '@/stores/MainStore'
 import { Preferences } from '@capacitor/preferences'
 import { useMCorp } from '@/composables/useMCorp'
 import { useWebsocketConnection } from '@/composables/useWebsocketConnection'
+import PerformanceInformation from '@/components/PerformanceInformation.vue'
 
 const ionRouter = useIonRouter()
 const mainStore = useMainStore()
