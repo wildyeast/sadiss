@@ -26,7 +26,11 @@
             <span class="text-4xl text-danger">Rejoin</span>
           </ion-button>
         </div>
-        <p class="text-sm text-danger">Your connection seems to be broken. Please rejoin by pressing the Rejoin button above.</p>
+        <p
+          v-if="!isRegistered && wasRegisteredThisSession"
+          class="text-sm text-danger">
+          Your connection seems to be broken. Please rejoin by pressing the Rejoin button above.
+        </p>
         <p class="text-sm">To leave the performance or scan a different code you have to quit and re-start the app.</p>
 
         <p class="text-white">v1.1.0</p>
