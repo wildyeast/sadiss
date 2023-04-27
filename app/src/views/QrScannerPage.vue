@@ -14,7 +14,7 @@
           Scan QR code
         </ion-button>
         <div v-if="!processing">
-          <p class="text-sm">
+          <p class="text-sm text-tertiary">
             To join the performance please scan a QR code at the venue using the button above.<br />
             Once registered you will have to quit and re-start the app to leave the performance or scan a different code.
           </p>

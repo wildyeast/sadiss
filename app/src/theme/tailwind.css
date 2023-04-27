@@ -17,7 +17,7 @@
   }
 
   .ionic-bg-secondary {
-    --background: #253833;
+    --background: #71ada8;
   }
 
   .ionic-bg-highlight {
@@ -33,6 +33,7 @@
   .ionic-border-highlight-narrow {
     @apply ionic-border-highlight;
     --border-width: 2px;
+    --border-radius: 10px;
   }
 
   .ionic-border-highlight-muted {

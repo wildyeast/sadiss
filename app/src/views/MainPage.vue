@@ -15,7 +15,7 @@
         <div class="h-[60vw] w-[60vw]">
           <div
             v-if="isRegistered"
-            class="flex h-full w-full items-center justify-center rounded-full bg-highlight text-2xl font-bold">
+            class="pulse flex h-full w-full items-center justify-center rounded-full bg-highlight text-2xl font-bold">
             <p class="text-4xl text-primary">Active</p>
           </div>
           <ion-button
@@ -30,9 +30,11 @@
           class="text-sm text-danger">
           Your connection seems to be broken. Please rejoin by pressing the Rejoin button above.
         </p>
-        <p class="text-sm">To leave the performance or scan a different code you have to quit and re-start the app.</p>
+        <p class="text-sm text-tertiary">
+          To leave the performance or scan a different code you have to quit and re-start the app.
+        </p>
 
-        <p class="text-white">v1.1.0</p>
+        <p>v1.1.0</p>
       </BasePage>
     </ion-content>
   </ion-page>
@@ -108,3 +110,23 @@ watch(
   }
 )
 </script>
+
+<style scoped>
+.pulse {
+  animation-name: pulse;
+  animation-duration: 2s;
+  animation-timing-function: ease-in-out;
+  animation-iteration-count: infinite;
+}
+@keyframes pulse {
+  0% {
+    @apply opacity-25;
+  }
+  50% {
+    @apply opacity-100;
+  }
+  100% {
+    @apply opacity-25;
+  }
+}
+</style>

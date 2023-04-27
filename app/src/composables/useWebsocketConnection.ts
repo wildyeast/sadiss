@@ -8,11 +8,11 @@ const VUE_APP_WS_SERVER_PORT = '443'
 
 const VUE_APP_WS_LIVE_SERVER_URL = 'wss://sadiss.net/ws/'
 
+const isRegistered = ref(false)
 export function useWebsocketConnection() {
   const mainStore = useMainStore()
   const ws = ref<WebSocket>()
 
-  const isRegistered = ref(false)
   let attemptingToRegister = false
   const establishWebsocketConnection = () => {
     if (attemptingToRegister || isRegistered.value) return
