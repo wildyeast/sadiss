@@ -9,7 +9,7 @@
         </div>
         <ion-button
           @click="scanCode"
-          class="button w-full text-3xl">
+          class="button ionic-border-highlight-narrow h-[80px] w-full text-3xl">
           Scan QR code
         </ion-button>
         <div>
@@ -22,8 +22,8 @@
             <a
               href="https://sadiss.net"
               class="text-highlight"
-              >sadiss.net</a
-            >
+              >sadiss.net
+            </a>
             for more information on the software system.
           </p>
         </div>
