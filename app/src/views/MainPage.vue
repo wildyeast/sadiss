@@ -15,7 +15,6 @@
         <div class="h-[60vw] w-[60vw]">
           <div
             v-if="isRegistered"
-            @click="debugOnlyClick"
             class="flex h-full w-full items-center justify-center rounded-full bg-highlight text-2xl font-bold">
             <p class="text-4xl text-primary">Active</p>
           </div>
@@ -58,10 +57,6 @@ const mainStore = useMainStore()
 const { establishWebsocketConnection, isRegistered } = useWebsocketConnection()
 
 const { setTtsLanguage, startAudioCtx } = usePlayer()
-
-const debugOnlyClick = () => {
-  startAudioCtx()
-}
 
 const register = () => {
   setTtsLanguage(mainStore.selectedLanguage)
