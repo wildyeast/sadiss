@@ -40,7 +40,7 @@
 
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonToolbar, useIonRouter, IonButtons, IonBackButton } from '@ionic/vue'
-import { onMounted, watch } from 'vue'
+import { watch } from 'vue'
 import { useMainStore } from '@/stores/MainStore'
 import BasePage from '@/components/BasePage.vue'
 import PerformanceInformation from '@/components/PerformanceInformation.vue'
