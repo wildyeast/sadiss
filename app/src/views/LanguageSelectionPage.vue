@@ -15,25 +15,17 @@
           <img
             src="../../public/assets/globe.svg"
             class="h-[40px]" />
-          <ion-item
-            class="ionic-bg-secondary w-[80%]"
-            lines="none">
-            <ion-label
-              position="stacked"
-              color="light"
-              >Please select a language
-            </ion-label>
-            <ion-select
-              v-model="mainStore.selectedLanguage"
-              class="w-full text-white">
-              <ion-select-option
-                v-for="lang of mainStore.availableLanguages"
-                :key="lang.iso"
-                :value="lang.iso"
-                >{{ lang.lang }}
-              </ion-select-option>
-            </ion-select>
-          </ion-item>
+          <div
+            class="flex max-h-[100px] w-full flex-col rounded-xl border-2 border-highlight py-2"
+            :class="{ 'overflow-scroll': mainStore.availableLanguages.length > 3 }">
+            <button
+              v-for="(lang, index) in mainStore.availableLanguages"
+              :key="index"
+              @click="mainStore.selectedLanguage = lang.iso"
+              :class="{ 'text-highlight': lang.iso === mainStore.selectedLanguage }">
+              {{ lang.lang }}
+            </button>
+          </div>
         </div>
         <button
           @click="ionRouter.navigate('/main', 'forward', 'push')"
@@ -47,19 +39,7 @@
 </template>
 
 <script setup lang="ts">
-import {
-  IonContent,
-  IonHeader,
-  IonPage,
-  IonToolbar,
-  useIonRouter,
-  IonItem,
-  IonSelect,
-  IonSelectOption,
-  IonLabel,
-  IonButtons,
-  IonBackButton
-} from '@ionic/vue'
+import { IonContent, IonHeader, IonPage, IonToolbar, useIonRouter, IonButtons, IonBackButton } from '@ionic/vue'
 import { watch } from 'vue'
 import { useMainStore } from '@/stores/MainStore'
 import BasePage from '@/components/BasePage.vue'
