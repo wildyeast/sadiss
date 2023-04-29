@@ -47,7 +47,6 @@
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonToolbar, IonButton, IonButtons, IonBackButton, useBackButton } from '@ionic/vue'
 import { watch, onUnmounted, onMounted, ref } from 'vue'
-import { usePlayer } from '../composables/usePlayer'
 import { Capacitor } from '@capacitor/core'
 import { KeepAwake } from '@capacitor-community/keep-awake'
 import { NavigationBar } from '@hugotomazi/capacitor-navigation-bar'
@@ -55,17 +54,13 @@ import { useMainStore } from '@/stores/MainStore'
 import { useWebsocketConnection } from '@/composables/useWebsocketConnection'
 import BasePage from '@/components/BasePage.vue'
 import PerformanceInformation from '@/components/PerformanceInformation.vue'
-
 import { useMCorp } from '@/composables/useMCorp'
-const { initializeMCorp } = useMCorp()
 
+const { initializeMCorp } = useMCorp()
 const mainStore = useMainStore()
 const { establishWebsocketConnection, isRegistered } = useWebsocketConnection()
 
-const { setTtsLanguage } = usePlayer()
-
 const register = () => {
-  setTtsLanguage(mainStore.selectedLanguage)
   establishWebsocketConnection()
 }
 

@@ -40,18 +40,22 @@
 
 <script setup lang="ts">
 import { IonContent, IonHeader, IonPage, IonToolbar, useIonRouter, IonButtons, IonBackButton } from '@ionic/vue'
-import { watch } from 'vue'
+import { onMounted, watch } from 'vue'
 import { useMainStore } from '@/stores/MainStore'
 import BasePage from '@/components/BasePage.vue'
 import PerformanceInformation from '@/components/PerformanceInformation.vue'
+import { usePlayer } from '@/composables/usePlayer'
 
 const mainStore = useMainStore()
 const ionRouter = useIonRouter()
+const { setTtsLanguage } = usePlayer()
 
 watch(
   () => mainStore.selectedLanguage,
   async (value) => {
     mainStore.selectedLanguage = value
-  }
+    setTtsLanguage(mainStore.selectedLanguage)
+  },
+  { immediate: true }
 )
 </script>
