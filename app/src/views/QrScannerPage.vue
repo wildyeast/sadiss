@@ -55,7 +55,7 @@ import { IonContent, IonPage, IonButton, useIonRouter, IonSpinner } from '@ionic
 import { onDeactivated } from 'vue'
 import BasePage from '@/components/BasePage.vue'
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
-import { AvailableLanguage } from '@/types/types'
+import { QrCodeScanResult } from '@/types/types'
 import { useMainStore } from '@/stores/MainStore'
 import { usePlayer } from '@/composables/usePlayer'
 
@@ -85,7 +85,7 @@ const getPerformances = async () => {
 
 /* QR Code Scanning */
 
-const { startScan, stopScan } = useBarcodeScanner()
+const { startScan, stopScan, processScanResult } = useBarcodeScanner()
 
 const processing = ref(false)
 
@@ -114,51 +114,6 @@ const scanCode = async () => {
     navigateToNextPage()
   }
   stopScanning()
-}
-
-const processScanResult = (result: QrCodeScanResult) => {
-  // Performance name
-  const performanceNameResult = result.performanceName
-  if (performanceNameResult) {
-    mainStore.performanceName = performanceNameResult
-  }
-
-  // ChoirId (id of Role)
-  const choirIdResult = result.choirId
-  if (choirIdResult !== undefined && !Number.isNaN(+choirIdResult)) {
-    mainStore.choirId = choirIdResult
-  }
-  // Role Name
-  const roleNameResult = result.roleName
-  if (roleNameResult) {
-    mainStore.roleName = roleNameResult
-  }
-
-  // Default TTS lang
-  const defaultLangResult = result.defaultLang
-  if (defaultLangResult) {
-    mainStore.defaultLang = defaultLangResult
-  }
-
-  // Timestamp of scan
-  // await setPreference('lastScanTimestamp', Date.now().toString())
-
-  // TTS langs
-  const ttsLangsResult = result.tts
-  if (ttsLangsResult) {
-    mainStore.availableLanguages = ttsLangsResult
-    if (defaultLangResult) {
-      mainStore.selectedLanguage = defaultLangResult
-    } else {
-      mainStore.selectedLanguage = ttsLangsResult[0].iso
-    }
-  }
-
-  // Expert Mode and navigation
-  const expertModeResult = result.expertMode
-  if (expertModeResult) {
-    mainStore.expertMode = expertModeResult
-  }
 }
 
 const navigateToNextPage = () => {
@@ -204,13 +159,4 @@ onDeactivated(() => {
   stopScan()
   processing.value = false
 })
-
-interface QrCodeScanResult {
-  performanceName: string
-  choirId?: number
-  tts?: AvailableLanguage[]
-  roleName?: string
-  defaultLang?: string
-  expertMode?: boolean
-}
 </script>

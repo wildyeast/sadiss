@@ -41,3 +41,12 @@ export interface AvailableLanguage {
   iso: string
   lang: string
 }
+
+export interface QrCodeScanResult {
+  performanceName: string
+  choirId?: number
+  tts?: AvailableLanguage[]
+  roleName?: string
+  defaultLang?: string
+  expertMode?: boolean
+}
