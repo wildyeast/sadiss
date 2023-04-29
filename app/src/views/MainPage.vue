@@ -58,7 +58,7 @@ const { initializeMCorp } = useMCorp()
 const mainStore = useMainStore()
 const { establishWebsocketConnection, isRegistered } = useWebsocketConnection()
 
-const { setTtsLanguage, startAudioCtx } = usePlayer()
+const { setTtsLanguage } = usePlayer()
 
 const register = () => {
   setTtsLanguage(mainStore.selectedLanguage)

@@ -81,7 +81,9 @@ const scanCode = async () => {
 
   // Make camera visible and everything else invisible in app viewport, classes defined in App.vue
   document.body.classList.add('qrscanner')
+
   const resultJson = await startScan()
+
   if (resultJson) {
     processing.value = true
     let result: QrCodeScanResult
