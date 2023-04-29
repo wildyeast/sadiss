@@ -1,9 +1,9 @@
 <template>
   <ion-page>
-    <ion-header>
+    <ion-header :hidden="isRegistered">
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button :hidden="isRegistered"></ion-back-button>
+          <ion-back-button></ion-back-button>
         </ion-buttons>
       </ion-toolbar>
     </ion-header>
@@ -38,7 +38,7 @@
           </div>
         </div>
 
-        <p>v1.1.0</p>
+        <p>v1.2.0</p>
       </BasePage>
     </ion-content>
   </ion-page>
