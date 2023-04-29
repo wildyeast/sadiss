@@ -5,7 +5,18 @@
         <div
           v-if="nextPerformance"
           class="w-full border-b pb-4">
-          <div v-html="nextPerformance" />
+          <p>Next performance</p>
+          <h1
+            v-html="nextPerformance.name"
+            class="text-2xl" />
+          <p v-html="nextPerformance.description" />
+          <p>{{ new Date(nextPerformance.date).toLocaleDateString() }}</p>
+          <p v-html="nextPerformance.location" />
+          <a
+            :href="nextPerformance.url"
+            class="text-highlight"
+            >More information about the piece ></a
+          >
         </div>
         <ion-button
           v-if="!processing"
@@ -48,22 +59,25 @@ import { AvailableLanguage } from '@/types/types'
 import { useMainStore } from '@/stores/MainStore'
 import { usePlayer } from '@/composables/usePlayer'
 
+interface Performance {
+  date: string
+  description: string
+  location: string
+  name: string
+  url: string
+}
+
 const ionRouter = useIonRouter()
 const mainStore = useMainStore()
 const { startAudioCtx } = usePlayer()
 
-const upcomingPerformances = ref([])
-
-const nextPerformance = computed<string>(() => {
-  return '<h2">Next Performance</h2><h1 class="text-2xl">Naming Names</h1><p>Beta-test for a piece for no audience by Simon Lee, Eve Sussman, Volkmar Klien.<p>Saturday, April 15, 7:00-9:00pm<br>Crown Heights, Brooklyn</p></p><a class="text-highlight text-sm" href="http://devropa.com">More information about the piece ></a>'
-  // return upcomingPerformances.value[0]
-})
+const nextPerformance = ref<Performance | null>()
 
 const getPerformances = async () => {
   try {
     const res = await fetch('https://sadiss.net/server/get-performances')
     const data = await res.json()
-    upcomingPerformances.value = data
+    nextPerformance.value = data[0]
   } catch (err) {
     console.log('Failed to get performances.', err)
   }
@@ -178,14 +192,6 @@ onDeactivated(() => {
   stopScan()
   processing.value = false
 })
-
-interface Performance {
-  name: string
-  artist: string
-  location: string
-  url: string
-  date: string
-}
 
 interface QrCodeScanResult {
   performanceName: string
