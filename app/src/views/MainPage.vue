@@ -12,27 +12,31 @@
       <BasePage>
         <PerformanceInformation />
 
-        <div class="h-[60vw] w-[60vw]">
-          <div
-            v-if="isRegistered"
-            class="pulse flex h-full w-full items-center justify-center rounded-full bg-highlight text-2xl font-bold">
-            <p class="text-4xl text-primary">Active</p>
+        <div class="mt-10 flex flex-1 flex-col items-center gap-10">
+          <div class="h-[60vw] w-[60vw]">
+            <div
+              v-if="isRegistered"
+              class="pulse flex h-full w-full items-center justify-center rounded-full bg-highlight text-2xl font-bold">
+              <p class="text-4xl text-primary">Active</p>
+            </div>
+            <ion-button
+              v-else-if="wasRegisteredThisSession"
+              @click="register"
+              class="ionic-rounded-full h-full w-full rounded-full border-4 border-danger">
+              <span class="text-4xl text-danger">Rejoin</span>
+            </ion-button>
           </div>
-          <ion-button
-            v-else-if="wasRegisteredThisSession"
-            @click="register"
-            class="ionic-rounded-full h-full w-full rounded-full border-4 border-danger">
-            <span class="text-4xl text-danger">Rejoin</span>
-          </ion-button>
+          <div>
+            <p
+              v-if="!isRegistered && wasRegisteredThisSession"
+              class="mb-4 text-sm text-danger">
+              Your connection seems to be broken. Please rejoin by pressing the Rejoin button above.
+            </p>
+            <p class="text-sm text-tertiary">
+              To leave the performance or scan a different code you have to quit and re-start the app.
+            </p>
+          </div>
         </div>
-        <p
-          v-if="!isRegistered && wasRegisteredThisSession"
-          class="text-sm text-danger">
-          Your connection seems to be broken. Please rejoin by pressing the Rejoin button above.
-        </p>
-        <p class="text-sm text-tertiary">
-          To leave the performance or scan a different code you have to quit and re-start the app.
-        </p>
 
         <p>v1.1.0</p>
       </BasePage>
