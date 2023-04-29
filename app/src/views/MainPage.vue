@@ -111,7 +111,8 @@ watch(
     } catch (error) {
       console.log(error)
     }
-  }
+  },
+  { immediate: true }
 )
 </script>
 
