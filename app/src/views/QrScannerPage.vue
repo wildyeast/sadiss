@@ -50,7 +50,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted } from 'vue'
 import { IonContent, IonPage, IonButton, useIonRouter, IonSpinner } from '@ionic/vue'
 import { onDeactivated } from 'vue'
 import BasePage from '@/components/BasePage.vue'
@@ -106,6 +106,7 @@ const scanCode = async () => {
     } catch (err) {
       alert('Scan failed. Please try again.')
       stopScanning()
+      processing.value = false
       return
     }
 
@@ -129,7 +130,7 @@ const scanCode = async () => {
     // Default TTS lang
     const defaultLangResult = result.defaultLang
     if (defaultLangResult) {
-      mainStore.defaultLang = JSON.parse(defaultLangResult)
+      mainStore.defaultLang = defaultLangResult
     }
 
     // Timestamp of scan
@@ -138,8 +139,12 @@ const scanCode = async () => {
     // TTS langs
     const ttsLangsResult = result.tts
     if (ttsLangsResult) {
-      mainStore.selectedLanguage = ttsLangsResult[0].iso
       mainStore.availableLanguages = ttsLangsResult
+      if (defaultLangResult) {
+        mainStore.selectedLanguage = defaultLangResult
+      } else {
+        mainStore.selectedLanguage = ttsLangsResult[0].iso
+      }
     }
 
     // Expert Mode and navigation
@@ -185,6 +190,7 @@ onMounted(async () => {
   //   await setPreference('qrCodeInvalidationCheckedThisSession', 'false')
   getPerformances()
   // }
+  processing.value = false
 })
 
 onDeactivated(() => {
