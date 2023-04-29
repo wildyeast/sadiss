@@ -59,9 +59,8 @@ import { watch } from 'vue'
 import { useMainStore } from '@/stores/MainStore'
 import BasePage from '@/components/BasePage.vue'
 import PerformanceInformation from '@/components/PerformanceInformation.vue'
-const mainStore = useMainStore()
 
-// Router
+const mainStore = useMainStore()
 const ionRouter = useIonRouter()
 
 watch(
