@@ -1,5 +1,5 @@
 interface QrCodeData {
-  choirId?: number
+  choirId?: string
   roleName?: string
   tts?: { iso: string; lang: string | undefined }[]
   defaultLang?: string
