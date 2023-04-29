@@ -1,4 +1,3 @@
-import { mount } from '@vue/test-utils'
 import { createTestingPinia } from '@pinia/testing'
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
 import { useMainStore } from '@/stores/MainStore'
