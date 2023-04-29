@@ -11,25 +11,30 @@
     <ion-content :fullscreen="true">
       <BasePage>
         <PerformanceInformation />
-        <ion-item
-          class="ionic-bg-secondary w-[80%]"
-          lines="none">
-          <ion-label
-            position="stacked"
-            color="light"
-            >Please select a language
-          </ion-label>
-          <ion-select
-            v-model="mainStore.selectedLanguage"
-            class="w-full text-white">
-            <ion-select-option
-              v-for="lang of mainStore.availableLanguages"
-              :key="lang.iso"
-              :value="lang.iso"
-              >{{ lang.lang }}
-            </ion-select-option>
-          </ion-select>
-        </ion-item>
+        <div class="mt-10 flex w-full flex-1 flex-col items-center gap-6">
+          <img
+            src="../../public/assets/globe.svg"
+            class="h-[40px]" />
+          <ion-item
+            class="ionic-bg-secondary w-[80%]"
+            lines="none">
+            <ion-label
+              position="stacked"
+              color="light"
+              >Please select a language
+            </ion-label>
+            <ion-select
+              v-model="mainStore.selectedLanguage"
+              class="w-full text-white">
+              <ion-select-option
+                v-for="lang of mainStore.availableLanguages"
+                :key="lang.iso"
+                :value="lang.iso"
+                >{{ lang.lang }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
         <button
           @click="ionRouter.navigate('/main', 'forward', 'push')"
           :disabled="!mainStore.selectedLanguage"
