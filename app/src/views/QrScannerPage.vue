@@ -21,7 +21,7 @@
         <ion-button
           v-if="!processing"
           @click="scanCode"
-          class="button ionic-border-highlight-narrow h-[80px] w-full text-3xl">
+          class="button ionic-border-highlight-narrow my-3 h-[80px] w-full text-3xl">
           Scan QR code
         </ion-button>
         <div v-if="!processing">
