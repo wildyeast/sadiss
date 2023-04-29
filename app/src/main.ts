@@ -28,7 +28,7 @@ import './theme/tailwind.css'
 
 import { createPinia } from 'pinia'
 
-const app = createApp(App).use(IonicVue, { swipeBackEnabled: false }).use(router).use(createPinia())
+const app = createApp(App).use(IonicVue, { swipeBackEnabled: false }).use(createPinia()).use(router)
 
 router.isReady().then(() => {
   app.mount('#app')

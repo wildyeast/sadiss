@@ -107,5 +107,6 @@ onMounted(async () => {
   }
   await initializeMCorp()
   establishWebsocketConnection()
+  mainStore.processing = false
 })
 </script>

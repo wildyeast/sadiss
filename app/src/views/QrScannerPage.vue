@@ -19,12 +19,12 @@
           >
         </div>
         <ion-button
-          v-if="!processing"
+          v-if="!mainStore.processing"
           @click="scanCode"
           class="button ionic-border-highlight-narrow my-3 h-[80px] w-full text-3xl">
           Scan QR code
         </ion-button>
-        <div v-if="!processing">
+        <div v-if="!mainStore.processing">
           <p class="text-sm text-tertiary">
             To join the performance please scan a QR code at the venue using the button above.<br />
             Once registered you will have to quit and re-start the app to leave the performance or scan a different code.
@@ -40,7 +40,7 @@
           </p>
         </div>
         <div
-          v-if="processing"
+          v-if="mainStore.processing"
           class="flex h-full items-center justify-center">
           <ion-spinner class="scale-[200%] text-highlight" />
         </div>
@@ -87,8 +87,6 @@ const getPerformances = async () => {
 
 const { startScan, stopScan, processScanResult } = useBarcodeScanner()
 
-const processing = ref(false)
-
 const scanCode = async () => {
   // Start audioCtx on first user interaction
   startAudioCtx()
@@ -99,14 +97,14 @@ const scanCode = async () => {
   const resultJson = await startScan()
 
   if (resultJson) {
-    processing.value = true
+    mainStore.processing = true
     let result: QrCodeScanResult
     try {
       result = await JSON.parse(resultJson)
     } catch (err) {
       alert('Scan failed. Please try again.')
       stopScanning()
-      processing.value = false
+      mainStore.processing = false
       return
     }
 
@@ -114,6 +112,7 @@ const scanCode = async () => {
     navigateToNextPage()
   }
   stopScanning()
+  ionRouter.navigate('/offset-calibration', 'forward', 'push')
 }
 
 const navigateToNextPage = () => {
@@ -124,7 +123,6 @@ const navigateToNextPage = () => {
   } else {
     ionRouter.navigate('/language-selection', 'forward', 'push')
   }
-  processing.value = false
 }
 
 const stopScanning = () => {
@@ -157,6 +155,6 @@ onMounted(async () => {
 onDeactivated(() => {
   document.body.classList.remove('qrscanner')
   stopScan()
-  processing.value = false
+  mainStore.processing = false
 })
 </script>

@@ -9,7 +9,6 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/',
     redirect: '/qr-scanner'
-    // redirect: '/language-selection'
   },
   {
     path: '/main',

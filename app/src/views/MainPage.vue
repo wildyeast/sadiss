@@ -79,6 +79,7 @@ onMounted(async () => {
     await initializeMCorp()
     register()
   }
+  mainStore.processing = false
 })
 
 onUnmounted(async () => {
