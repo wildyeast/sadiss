@@ -55,7 +55,7 @@ const { startAudioCtx } = usePlayer()
 const upcomingPerformances = ref([])
 
 const nextPerformance = computed<string>(() => {
-  return '<h2 class="font-bold">Next Performance</h2><h1 class="text-2xl">Naming Names</h1><p>Beta-test for a piece for no audience by Simon Lee, Eve Sussman, Volkmar Klien.<p>Saturday, April 15, 7:00-9:00pm<br>Crown Heights, Brooklyn</p></p><a class="text-highlight text-sm" href="http://devropa.com">More information about the piece ></a>'
+  return '<h2">Next Performance</h2><h1 class="text-2xl">Naming Names</h1><p>Beta-test for a piece for no audience by Simon Lee, Eve Sussman, Volkmar Klien.<p>Saturday, April 15, 7:00-9:00pm<br>Crown Heights, Brooklyn</p></p><a class="text-highlight text-sm" href="http://devropa.com">More information about the piece ></a>'
   // return upcomingPerformances.value[0]
 })
 
