@@ -110,59 +110,66 @@ const scanCode = async () => {
       return
     }
 
-    // Performance name
-    const performanceNameResult = result.performanceName
-    if (performanceNameResult) {
-      mainStore.performanceName = performanceNameResult
-    }
-
-    // ChoirId (id of Role)
-    const choirIdResult = result.choirId
-    if (choirIdResult !== undefined && !Number.isNaN(+choirIdResult)) {
-      mainStore.choirId = choirIdResult
-    }
-    // Role Name
-    const roleNameResult = result.roleName
-    if (roleNameResult) {
-      mainStore.roleName = roleNameResult
-    }
-
-    // Default TTS lang
-    const defaultLangResult = result.defaultLang
-    if (defaultLangResult) {
-      mainStore.defaultLang = defaultLangResult
-    }
-
-    // Timestamp of scan
-    // await setPreference('lastScanTimestamp', Date.now().toString())
-
-    // TTS langs
-    const ttsLangsResult = result.tts
-    if (ttsLangsResult) {
-      mainStore.availableLanguages = ttsLangsResult
-      if (defaultLangResult) {
-        mainStore.selectedLanguage = defaultLangResult
-      } else {
-        mainStore.selectedLanguage = ttsLangsResult[0].iso
-      }
-    }
-
-    // Expert Mode and navigation
-    const expertModeResult = result.expertMode
-    if (expertModeResult) {
-      mainStore.expertMode = expertModeResult
-      ionRouter.navigate('/offset-calibration', 'forward', 'push')
-    } else if (ttsLangsResult) {
-      if (ttsLangsResult.length === 1) {
-        ionRouter.navigate('/main', 'forward', 'push')
-      } else {
-        ionRouter.navigate('/language-selection', 'forward', 'push')
-      }
-    } else {
-      ionRouter.navigate('/main', 'forward', 'push')
-    }
+    processScanResult(result)
+    navigateToNextPage()
   }
   stopScanning()
+}
+
+const processScanResult = (result: QrCodeScanResult) => {
+  // Performance name
+  const performanceNameResult = result.performanceName
+  if (performanceNameResult) {
+    mainStore.performanceName = performanceNameResult
+  }
+
+  // ChoirId (id of Role)
+  const choirIdResult = result.choirId
+  if (choirIdResult !== undefined && !Number.isNaN(+choirIdResult)) {
+    mainStore.choirId = choirIdResult
+  }
+  // Role Name
+  const roleNameResult = result.roleName
+  if (roleNameResult) {
+    mainStore.roleName = roleNameResult
+  }
+
+  // Default TTS lang
+  const defaultLangResult = result.defaultLang
+  if (defaultLangResult) {
+    mainStore.defaultLang = defaultLangResult
+  }
+
+  // Timestamp of scan
+  // await setPreference('lastScanTimestamp', Date.now().toString())
+
+  // TTS langs
+  const ttsLangsResult = result.tts
+  if (ttsLangsResult) {
+    mainStore.availableLanguages = ttsLangsResult
+    if (defaultLangResult) {
+      mainStore.selectedLanguage = defaultLangResult
+    } else {
+      mainStore.selectedLanguage = ttsLangsResult[0].iso
+    }
+  }
+
+  // Expert Mode and navigation
+  const expertModeResult = result.expertMode
+  if (expertModeResult) {
+    mainStore.expertMode = expertModeResult
+  }
+}
+
+const navigateToNextPage = () => {
+  if (mainStore.expertMode) {
+    ionRouter.navigate('/offset-calibration', 'forward', 'push')
+  } else if (mainStore.availableLanguages.length === 1) {
+    ionRouter.navigate('/main', 'forward', 'push')
+  } else {
+    ionRouter.navigate('/language-selection', 'forward', 'push')
+  }
+  processing.value = false
 }
 
 const stopScanning = () => {
@@ -190,7 +197,6 @@ onMounted(async () => {
   //   await setPreference('qrCodeInvalidationCheckedThisSession', 'false')
   getPerformances()
   // }
-  processing.value = false
 })
 
 onDeactivated(() => {
