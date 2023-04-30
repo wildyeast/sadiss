@@ -36,7 +36,7 @@ router.post('/start-track/:id/:startTime', track_controller.start_track)
 // Stop track
 router.get('/stop-track', track_controller.stop_track)
 
-// Stop track
+// Get voices and languages
 router.get('/get-voices-and-languages', track_controller.get_voices_and_languages)
 
 // Get performances
