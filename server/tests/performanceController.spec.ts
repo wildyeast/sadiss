@@ -2,10 +2,9 @@ import { connectDB, disconnectDB } from '../database'
 
 const { app, server, wss } = require('../server')
 const supertest = require('supertest')
-
 const request = supertest(app)
 
-describe('trackController test', () => {
+describe('performanceController test', () => {
   beforeAll(async () => {
     await connectDB()
   })
@@ -18,7 +17,7 @@ describe('trackController test', () => {
 
   describe('POST /get-tracks', () => {
     it('should get tracks from DB', async () => {
-      const res = await request.get('/get-tracks')
+      const res = await request.get('/get-performances')
       expect(res.status).toBe(200)
     })
   })

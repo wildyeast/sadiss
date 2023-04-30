@@ -15,7 +15,9 @@ const session = require('express-session')
 dotenv.config()
 
 // Connect to database
-connectDB()
+if (process.env.NODE_ENV !== 'test') {
+  connectDB()
+}
 
 const BASE_URL = '127.0.0.1'
 const BASE_PORT = 3005
@@ -53,11 +55,18 @@ const app = express()
   .use(passport.initialize())
   .use(passport.session())
 
-const server = app.listen(BASE_PORT, () => console.log(`Http server listening on port ${BASE_PORT}.`))
-
 // WEBSOCKETS //
-const wss = new Server({ port: +process.env.WS_SERVER_PORT! })
-console.log(`Websocket server listening on port ${process.env.WS_SERVER_PORT}.`)
+let server
+let wss: Server
+if (process.env.NODE_ENV === 'test') {
+  wss = new Server({ port: 0 })
+  server = app.listen()
+} else {
+  wss = new Server({ port: +process.env.WS_SERVER_PORT! })
+  console.log(`Websocket server listening on port ${process.env.WS_SERVER_PORT}.`)
+  server = app.listen(BASE_PORT, () => console.log(`Http server listening on port ${BASE_PORT}.`))
+}
+
 startKeepAliveInterval(wss)
 wss.on('connection', (client) => {
   // Assign id to new connection, needed for nonChoir partial distribution

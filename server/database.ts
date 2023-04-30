@@ -16,18 +16,19 @@ let mongoURI = `mongodb+srv://${mongoUser}:${mongoPW}@${mongoHost}/test`
 let mongod: MongoMemoryServer
 
 const connectDB = async () => {
-  console.log('Connecting to MongoDB...')
-  try {
-    if (process.env.NODE_ENV === 'test') {
-      mongod = await MongoMemoryServer.create()
-      mongoURI = mongod.getUri()
+  if (mongoose.connection.readyState !== 1) {
+    try {
+      if (process.env.NODE_ENV === 'test') {
+        mongod = await MongoMemoryServer.create()
+        mongoURI = mongod.getUri()
+      }
+      mongoose.set('strictQuery', true)
+      mongoose.connect(mongoURI)
+      console.log('MongoDB connected.')
+    } catch (err) {
+      console.error(err)
+      process.exit(1)
     }
-    mongoose.set('strictQuery', true)
-    await mongoose.connect(mongoURI)
-    console.log('MongoDB connected.')
-  } catch (err) {
-    console.error(err)
-    process.exit(1)
   }
 }
 
