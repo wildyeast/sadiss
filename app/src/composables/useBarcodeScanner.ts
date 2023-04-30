@@ -31,7 +31,7 @@ export function useBarcodeScanner() {
     // ChoirId (id of Role)
     const choirIdResult = result.choirId
     if (choirIdResult !== undefined && !Number.isNaN(+choirIdResult)) {
-      mainStore.choirId = choirIdResult
+      mainStore.choirId = +choirIdResult
     }
     // Role Name
     const roleNameResult = result.roleName
@@ -62,7 +62,7 @@ export function useBarcodeScanner() {
     // Expert Mode and navigation
     const expertModeResult = result.expertMode
     if (expertModeResult) {
-      mainStore.expertMode = expertModeResult
+      mainStore.expertMode = expertModeResult === 'true'
     }
   }
 

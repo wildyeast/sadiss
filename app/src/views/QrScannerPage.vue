@@ -115,9 +115,10 @@ const scanCode = async () => {
 }
 
 const navigateToNextPage = () => {
+  console.log('Expert mode:', mainStore.expertMode, 'typeof:', typeof mainStore.expertMode)
   if (mainStore.expertMode) {
     ionRouter.navigate('/offset-calibration', 'forward', 'push')
-  } else if (mainStore.availableLanguages.length === 1) {
+  } else if (!mainStore.availableLanguages.length || mainStore.availableLanguages.length === 1) {
     ionRouter.navigate('/main', 'forward', 'push')
   } else {
     ionRouter.navigate('/language-selection', 'forward', 'push')

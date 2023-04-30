@@ -16,9 +16,9 @@ describe('processScanResult', () => {
   })
 
   it('should update the choirId in mainStore when provided in the scan result', () => {
-    const result = { performanceName: 'My Performance', choirId: 123 }
+    const result = { performanceName: 'My Performance', choirId: '123' }
     processScanResult(result)
-    expect(mainStore.choirId).toBe(result.choirId)
+    expect(mainStore.choirId).toBe(+result.choirId)
   })
 
   it('should update the role name in mainStore when provided in the scan result', () => {
@@ -70,9 +70,15 @@ describe('processScanResult', () => {
     expect(mainStore.selectedLanguage).toBe(result.tts[0].iso)
   })
 
-  it('should update the expert mode in mainStore when provided in the scan result', () => {
-    const result = { performanceName: 'My Performance', expertMode: true }
+  it('should update the expert mode to be true in mainStore when provided in the scan result', () => {
+    const result = { performanceName: 'My Performance', expertMode: 'true' }
     processScanResult(result)
-    expect(mainStore.expertMode).toBe(result.expertMode)
+    expect(mainStore.expertMode).toBe(true)
+  })
+
+  it('should update the expert mode to be false in mainStore when provided in the scan result', () => {
+    const result = { performanceName: 'My Performance', expertMode: 'false' }
+    processScanResult(result)
+    expect(mainStore.expertMode).toBe(false)
   })
 })

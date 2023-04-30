@@ -44,9 +44,9 @@ export interface AvailableLanguage {
 
 export interface QrCodeScanResult {
   performanceName: string
-  choirId?: number
+  choirId?: string
   tts?: AvailableLanguage[]
   roleName?: string
   defaultLang?: string
-  expertMode?: boolean
+  expertMode?: string
 }
