@@ -6,7 +6,7 @@
     "build": "npx tsc",
     "start": "node dist/server.js",
     "dev": "concurrently \"npx tsc --watch\" \"nodemon --delay 1000ms -q dist/server.js\"",
-    "test": "jest --coverage --watchAll"
+    "test": "NODE_ENV=test jest --coverage --watchAll --config ./jest.config.js"
   },
   "license": "MIT",
   "dependencies": {
@@ -18,10 +18,13 @@
     "express-session": "^1.17.3",
     "global": "^4.4.0",
     "jsonwebtoken": "^9.0.0",
+    "mongodb-memory-server": "^8.12.2",
     "mongoose": "^6.8.2",
     "multer": "^1.4.5-lts.1",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
+    "supertest": "^6.3.3",
+    "ts-jest": "^29.1.0",
     "uuid": "^9.0.0",
     "ws": "^8.11.0",
     "wscat": "^5.2.0"

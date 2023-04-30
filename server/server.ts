@@ -1,17 +1,13 @@
 // Code in part taken from https://www.pubnub.com/blog/nodejs-websocket-programming-examples/
-
-// HTTP SERVER //
 import express from 'express'
 import { Message } from './types/types'
 import * as dotenv from 'dotenv'
-
 import { passport } from './auth'
-
 import { Server } from 'ws'
 import { startKeepAliveInterval } from './tools/startSendingInterval'
+import { connectDB } from './database'
 
 const cors = require('cors')
-const mongoose = require('mongoose')
 const uuid = require('uuid')
 const session = require('express-session')
 
@@ -19,13 +15,7 @@ const session = require('express-session')
 dotenv.config()
 
 // Connect to database
-const mongoHost = process.env.MONGO_HOST
-const mongoUser = process.env.MONGO_USER
-const mongoPW = process.env.MONGO_PW
-const mongoDbName = process.env.MONGO_DB_NAME
-// const mongoURI = `mongodb://${mongoUser}:${mongoPW}@${mongoHost}/${mongoDbName}?directConnection=true&serverSelectionTimeoutMS=2000`
-const mongoURI = `mongodb+srv://${mongoUser}:${mongoPW}@${mongoHost}/test`
-mongoose.connect(mongoURI)
+connectDB()
 
 const BASE_URL = '127.0.0.1'
 const BASE_PORT = 3005
@@ -40,9 +30,6 @@ const whitelist = [
 const corsOptions = {
   origin: (origin: string, callback: Function) => {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
-      // TODO: Find out what exactly the following line does. Code is copy/pasted.
-      // Read this https://www.npmjs.com/package/cors#configuring-cors-asynchronously
-      // and this https://stackoverflow.com/questions/72287773/do-not-understand-the-function-with-express-and-cors
       callback(null, true)
     } else {
       callback(new Error('Not allowed by CORS.'))
@@ -66,7 +53,7 @@ const app = express()
   .use(passport.initialize())
   .use(passport.session())
 
-app.listen(BASE_PORT, () => console.log(`Http server listening on port ${BASE_PORT}.`))
+const server = app.listen(BASE_PORT, () => console.log(`Http server listening on port ${BASE_PORT}.`))
 
 // WEBSOCKETS //
 const wss = new Server({ port: +process.env.WS_SERVER_PORT! })
@@ -104,3 +91,5 @@ app.use((req, res, next) => {
 })
 app.use('/', routes)
 app.use((req, res) => res.status(404))
+
+module.exports = { app, server, wss }
