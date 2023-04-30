@@ -4,25 +4,10 @@ import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose from 'mongoose'
 import { TtsJson } from '../types/types'
 import { Server } from 'ws'
+import { trackSchema } from '../models/track'
 const fs = require('fs')
 const uuid = require('uuid')
 
-// Define track schema for db
-const trackSchema = new mongoose.Schema({
-  name: String,
-  chunks: String,
-  chunkFileName: String,
-  partialsCount: Number,
-  mode: String,
-  notes: String,
-  ttsInstructions: String,
-  ttsLangs: Array,
-  waveform: String,
-  ttsRate: String,
-  partialFile: Object,
-  ttsFiles: Array
-})
-trackSchema.set('timestamps', true)
 const Track = mongoose.model('Track', trackSchema)
 
 let wss: Server
@@ -99,7 +84,10 @@ exports.get_track = async (req: express.Request, res: express.Response) => {
 exports.upload_track = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
 
-  if (!req.files) return
+  if (!req.files) {
+    res.status(400).json({ error: 'No files were uploaded.' })
+    return
+  }
 
   try {
     const partialFile = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname === 'partialfile')[0]

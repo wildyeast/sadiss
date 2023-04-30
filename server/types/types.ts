@@ -27,3 +27,22 @@ export interface UserDocument extends Document {
   username: string
   password: string
 }
+
+export interface TrackDocument extends Document {
+  name: string
+  chunks: string
+  chunkFileName: string
+  partialsCount: number
+  mode: string
+  notes: string
+  ttsInstructions: string
+  ttsLangs: string[]
+  waveform: string
+  ttsRate: string
+  partialFile: object
+  ttsFiles: TTSFileObject[]
+}
+
+export interface TTSFileObject {
+  [voice: number]: { [lang: string]: File }
+}
