@@ -43,6 +43,8 @@ export interface TrackDocument extends Document {
   ttsRate: string
   partialFile: object
   ttsFiles: TTSFileObject[]
+  isPublic: boolean
+  userId: string
 }
 
 export interface TTSFileObject {
@@ -53,4 +55,9 @@ export interface SadissPerformanceDocument extends Document {
   name: string
   userId: string
   isPublic: boolean
+}
+
+export interface TrackPerformanceDocument extends Document {
+  trackId: TrackDocument
+  performanceId: SadissPerformanceDocument
 }

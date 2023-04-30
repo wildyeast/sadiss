@@ -30,9 +30,7 @@ exports.create_performance = async (req: express.Request, res: express.Response)
         res.status(201).json({ performance })
       }
     })
-
-    // Return success response with saved performance data
   } catch (error) {
-    res.status(500).json({ error })
+    res.status(500).json({ error: 'Server error' })
   }
 }

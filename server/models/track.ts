@@ -13,7 +13,9 @@ export const trackSchema = new Schema<TrackDocument>({
   waveform: String,
   ttsRate: String,
   partialFile: Object,
-  ttsFiles: Array<TTSFileObject>
+  ttsFiles: Array<TTSFileObject>,
+  isPublic: { type: Boolean, required: true },
+  userId: { type: String, required: true }
 })
 trackSchema.set('timestamps', true)
 
