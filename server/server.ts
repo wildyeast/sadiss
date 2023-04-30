@@ -52,7 +52,7 @@ const corsOptions = {
 
 const app = express()
   .use(express.json())
-  // .use(cors(corsOptions))
+  .use(cors(corsOptions))
   .use(express.urlencoded({ extended: false }))
   // Initialize express-session middleware
   .use(
