@@ -92,10 +92,9 @@ const scanCode = async () => {
 
     // ChoirId (id of Role)
     const choirId = result.choirId
-    if (choirId && !Number.isNaN(+choirId)) {
+    if (choirId !== undefined && !Number.isNaN(+choirId)) {
       await setPreference('choirId', String(choirId))
     }
-
     // Role Name
     const roleName = result.roleName
     if (roleName) {

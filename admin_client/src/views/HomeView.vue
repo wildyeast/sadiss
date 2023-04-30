@@ -257,7 +257,7 @@ const generateQrCodes = async () => {
   if (voiceCount.value) {
     for (let i = 0; i < voiceCount.value; i++) {
       const data: QrCodeData = {
-        choirId: i,
+        choirId: String(i),
         roleName: voiceNames.value[i],
         performanceName: performanceName.value,
         expertMode: expertMode.value

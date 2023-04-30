@@ -16,12 +16,6 @@ export const startSendingInterval = (
     return false
   }
 
-  if (keepAliveIntervalId) {
-    clearInterval(keepAliveIntervalId)
-    keepAliveIntervalId = null
-    console.log('Keep alive interval stopped.')
-  }
-
   sendingIntervalRunning = true
 
   for (const client of wss.clients) {
@@ -74,7 +68,7 @@ export const startSendingInterval = (
             ttsRate: string
             chunk: { partials?: PartialChunk[]; ttsInstructions?: string }
           } = {
-            startTime: startTime,
+            startTime: startTime + 2,
             waveform,
             ttsRate,
             chunk: {}
@@ -180,6 +174,7 @@ export const startSendingInterval = (
 
           if (dataToSend.partials?.length || dataToSend.ttsInstructions) {
             client.send(JSON.stringify({ startTime: startTime + 2, waveform, ttsRate, chunk: dataToSend }))
+            client.lastSentTime = Date.now()
           }
         }
 
@@ -226,24 +221,24 @@ export const startSendingInterval = (
     for (const client of wss.clients) {
       client.send(JSON.stringify({ stop: true }))
     }
-
-    startKeepAliveInterval(wss)
   }
 
   return true
 }
 
-let keepAliveIntervalId: NodeJS.Timer | null
 /**
- * Sends a message to all clients connnected to the websocket server every 50 seconds to keep the connection alive.
+ * Every 50s we check if connected clients have received a message in the last 5s. If they have not, we send a message to keep the connection alive.
  * @param {Server} wss The current ws websocket server instance.
  */
 export const startKeepAliveInterval = (wss: Server) => {
-  if (keepAliveIntervalId) return
-  keepAliveIntervalId = setInterval(() => {
+  setInterval(() => {
     if (wss.clients.size) {
       for (const client of wss.clients) {
-        client.send('')
+        const now = Date.now()
+        if (!client.lastSentTime || now - client.lastSentTime > 5000) {
+          client.send('')
+          client.lastSentTime = now
+        }
       }
     }
   }, 50000)
