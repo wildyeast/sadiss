@@ -100,7 +100,6 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
       partialFileToSave.fileName = partialFile.filename
     }
 
-    // @ts-ignore
     const ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes('ttsfile'))
     let ttsLangs: Set<string> | undefined
     let ttsJson: TtsJson | undefined
