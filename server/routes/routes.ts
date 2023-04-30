@@ -1,6 +1,7 @@
 import express from 'express'
 import passport from 'passport'
 import { authenticateToken } from '../auth'
+import { validatePerformanceAccess } from '../middlewares/validatePerformanceAccess'
 import { validateTrackAccess } from '../middlewares/validateTrackAccess'
 
 const track_controller = require('../controllers/trackController')
@@ -62,7 +63,7 @@ router.post('/create-performance', authenticateToken, performance_controller.cre
 /* TrackPerformance */
 router.post(
   '/add-track-to-performance',
-  [authenticateToken, validateTrackAccess],
+  [authenticateToken, validateTrackAccess, validatePerformanceAccess],
   track_performance_controller.add_track_to_performance
 )
 

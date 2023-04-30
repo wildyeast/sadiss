@@ -9,6 +9,10 @@ jest.mock('../middlewares/validateTrackAccess', () => ({
   validateTrackAccess: jest.fn((req, res, next) => next())
 }))
 
+jest.mock('../middlewares/validatePerformanceAccess', () => ({
+  validatePerformanceAccess: jest.fn((req, res, next) => next())
+}))
+
 const request = supertest(app)
 
 describe('trackPerformanceController test', () => {
