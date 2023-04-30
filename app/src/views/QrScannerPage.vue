@@ -112,7 +112,6 @@ const scanCode = async () => {
     navigateToNextPage()
   }
   stopScanning()
-  ionRouter.navigate('/offset-calibration', 'forward', 'push')
 }
 
 const navigateToNextPage = () => {
@@ -132,6 +131,7 @@ const stopScanning = () => {
 }
 
 onMounted(async () => {
+  console.log(mainStore.expertMode)
   // Currently users need to scan on every app start. To change this, uncomment the code below.
   // Leaving commented code in for now, if we ever decide to add this functionality again.
   // const INVALIDATE_SCAN_AFTER_MS = 1000 * 60 * 90 // 90 Minutes
