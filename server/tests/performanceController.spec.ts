@@ -1,7 +1,6 @@
 import { connectDB, disconnectDB } from '../database'
 import { SadissPerformance } from '../models/sadissPerformance'
 import jwt from 'jsonwebtoken'
-import { UserDocument } from '../types/types'
 
 const { app, server, wss } = require('../server')
 const supertest = require('supertest')
