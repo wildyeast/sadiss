@@ -140,17 +140,17 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
       t.ttsLangs = Array.from(ttsLangs)
     }
 
-    t.save(function (err) {
+    t.save((err) => {
       if (err) {
         console.error('Error while uploading track', err)
-        return
+        res.status(500).send(err)
+      } else {
+        res.status(201).send(JSON.stringify(t))
       }
     })
-    res.status(200).send(JSON.stringify(t))
-  } catch (e) {
-    console.log('ERR')
-    console.log(e)
-    res.status(500).send()
+  } catch (err) {
+    console.error('Error while uploading track', err)
+    res.status(500).send(err)
   }
 }
 
