@@ -69,6 +69,20 @@ describe('performanceController test', () => {
       expect(savedPerformance!.userId).toBe(mockUser.id)
     })
 
+    it('should save a new performance to the database and return the saved data if isPublic is not provided', async () => {
+      const performanceData = { name: 'Test Performance 2' }
+
+      const res = await request.post('/create-performance').set('Authorization', `Bearer ${token}`).send(performanceData)
+
+      expect(res.status).toBe(201)
+
+      const savedPerformance = await SadissPerformance.findOne({ name: 'Test Performance 2' })
+      expect(savedPerformance).toBeDefined()
+      expect(savedPerformance!.name).toBe('Test Performance 2')
+      expect(savedPerformance!.isPublic).toBe(false)
+      expect(savedPerformance!.userId).toBe(mockUser.id)
+    })
+
     it('should return a 500 error if there is a server error', async () => {
       jest.spyOn(SadissPerformance.prototype, 'save').mockImplementationOnce(() => {
         throw new Error('Server error')
