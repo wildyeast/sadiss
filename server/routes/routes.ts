@@ -53,4 +53,9 @@ router.post('/register', auth_controller.register)
 
 // Protected Test Route
 router.get('/protected', authenticateToken, track_controller.get_own_tracks)
+
+/* Performance */
+// Create performance
+router.post('/create-performance', authenticateToken, performance_controller.create_performance)
+
 module.exports = router

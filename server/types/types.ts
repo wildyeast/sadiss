@@ -26,6 +26,8 @@ export type Mode = 'choir' | 'nonChoir'
 export interface UserDocument extends Document {
   username: string
   password: string
+  id: string
+  email: string
 }
 
 export interface TrackDocument extends Document {
@@ -45,4 +47,10 @@ export interface TrackDocument extends Document {
 
 export interface TTSFileObject {
   [voice: number]: { [lang: string]: File }
+}
+
+export interface SadissPerformanceDocument extends Document {
+  name: string
+  userId: string
+  isPublic: boolean
 }

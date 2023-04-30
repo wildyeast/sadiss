@@ -145,7 +145,7 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
         console.error('Error while uploading track', err)
         res.status(500).send(err)
       } else {
-        res.status(201).send(JSON.stringify(t))
+        res.status(201).send(t)
       }
     })
   } catch (err) {
