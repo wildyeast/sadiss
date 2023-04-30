@@ -19,12 +19,12 @@ const session = require('express-session')
 dotenv.config()
 
 // Connect to database
-//const mongoURI = 'mongodb://sadiss.net:27017/sadiss'
 const mongoHost = process.env.MONGO_HOST
 const mongoUser = process.env.MONGO_USER
 const mongoPW = process.env.MONGO_PW
 const mongoDbName = process.env.MONGO_DB_NAME
-const mongoURI = `mongodb://${mongoUser}:${mongoPW}@${mongoHost}/${mongoDbName}?directConnection=true&serverSelectionTimeoutMS=2000`
+// const mongoURI = `mongodb://${mongoUser}:${mongoPW}@${mongoHost}/${mongoDbName}?directConnection=true&serverSelectionTimeoutMS=2000`
+const mongoURI = `mongodb+srv://${mongoUser}:${mongoPW}@${mongoHost}/test`
 mongoose.connect(mongoURI)
 
 const BASE_URL = '127.0.0.1'
