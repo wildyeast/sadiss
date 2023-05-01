@@ -52,6 +52,19 @@ export async function login(username: string, password: string): Promise<string>
   return token
 }
 
+export async function register(username: string, email: string, password: string): Promise<void> {
+  const response = await request<{ message: string }>('/register', {
+    method: 'POST',
+    body: JSON.stringify({ username, email, password })
+  })
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  console.log(response.data!.message)
+}
+
 // export async function getTracks() {
 //   const response = await request<{ tracks: Track[] }>('/tracks')
 

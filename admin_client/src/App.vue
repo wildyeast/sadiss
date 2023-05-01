@@ -6,7 +6,7 @@ const route = useRoute()
 
 <template>
   <div class="min-h-screen bg-primary">
-    <TopBar v-if="route.path !== '/login'" />
+    <TopBar v-if="route.path !== '/login' && route.path !== '/register'" />
     <router-view />
   </div>
 </template>
