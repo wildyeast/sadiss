@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { reactive } from 'vue'
+import { useRouter } from 'vue-router'
 import { login } from '../services/api'
+
+const router = useRouter()
 
 const formData = reactive({
   username: '',
@@ -15,6 +18,7 @@ const loginUser = async () => {
   try {
     const token = await login(formData.username, formData.password)
     console.log(`Logged in with token: ${token}`)
+    router.push({ path: '/' })
   } catch (error) {
     console.error(`Error logging in: ${error}`)
   }
