@@ -35,13 +35,13 @@ exports.login = async (req: Request, res: Response) => {
 
 exports.register = async (req: Request, res: Response) => {
   try {
-    const { username, password } = req.body
-    const existingUser = await User.findOne({ username: username })
+    const { username, password, email } = req.body
+    const existingUser = await User.findOne({ $or: [{ username: username }, { email: email }] })
     if (existingUser) {
       return res.status(409).json({ message: 'Username already exists' })
     }
     const hashedPassword = await bcrypt.hash(password, 10)
-    const user = new User({ username, password: hashedPassword })
+    const user = new User({ username, password: hashedPassword, email })
     await user.save()
     res.status(201).json({ message: 'User created successfully' })
   } catch (err) {
