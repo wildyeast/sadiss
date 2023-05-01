@@ -4,12 +4,12 @@
 
 @font-face {
   font-family: 'VERDANA';
-  src: url('../public/fonts/verdana.ttf');
+  src: url('../fonts/verdana.ttf');
 }
 
 @font-face {
   font-family: 'VERDANA-BOLD';
-  src: url('../public/fonts/verdana-bold.ttf');
+  src: url('../fonts/verdana-bold.ttf');
 }
 
 @layer base {
