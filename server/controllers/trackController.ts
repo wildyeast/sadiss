@@ -60,9 +60,12 @@ exports.delete_track = async (req: Request, res: Response) => {
 }
 
 exports.get_tracks = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+  // res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   try {
-    const allTracks = await Track.find({}, '_id name notes mode waveform ttsRate')
+    const allTracks = await Track.find(
+      { $or: [{ isPublic: true }, { userId: req.user!.id }] },
+      '_id name notes mode waveform ttsRate userId isPublic'
+    )
     res.json({ tracks: allTracks })
   } catch (err) {
     console.log('Failed getting tracks with:', err)
@@ -129,7 +132,9 @@ exports.upload_track = async (req: Request, res: Response) => {
       waveform,
       ttsRate,
       partialFile: partialFileToSave,
-      ttsFiles: ttsFiles.map((file: Express.Multer.File) => ({ origName: file.originalname, fileName: file.filename }))
+      ttsFiles: ttsFiles.map((file: Express.Multer.File) => ({ origName: file.originalname, fileName: file.filename })),
+      userId: req.user!.id,
+      isPublic: !!req.body.isPublic
     })
 
     if (mode === 'choir' && partialsCount > 0) {

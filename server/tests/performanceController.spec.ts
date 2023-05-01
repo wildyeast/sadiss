@@ -1,6 +1,6 @@
 import { connectDB, disconnectDB } from '../database'
 import { SadissPerformance } from '../models/sadissPerformance'
-import jwt from 'jsonwebtoken'
+import { authenticatedRequest } from './testUtils'
 
 const { app, server, wss } = require('../server')
 const supertest = require('supertest')
@@ -17,9 +17,9 @@ describe('performanceController test', () => {
     wss.close()
   })
 
-  describe('POST /get-performances', () => {
+  describe('POST /performances', () => {
     it('should get performances from DB', async () => {
-      const res = await request.get('/get-performances')
+      const res = await request.get('/performances')
       expect(res.status).toBe(200)
 
       const performances = JSON.parse(res.text)
@@ -33,23 +33,9 @@ describe('performanceController test', () => {
     })
   })
 
-  describe('POST /create-performance', () => {
-    let mockUser: { id: string; username: string; email: string }
-    let token: string
-    beforeAll(() => {
-      // Mock user data
-      mockUser = {
-        id: '123',
-        username: 'Test User',
-        email: 'testuser@example.com'
-      }
-
-      // Generate JWT token for mock user
-      token = jwt.sign(mockUser, process.env.JWT_SECRET!)
-    })
-
+  describe('POST /performance/create', () => {
     it('should return a 400 error if invalid data is provided', async () => {
-      const res = await request.post('/create-performance').set('Authorization', `Bearer ${token}`).send({})
+      const res = await authenticatedRequest(request, '/performance/create', 'post').send({})
 
       expect(res.status).toBe(400)
       expect(res.body).toEqual({ error: 'Invalid performance data' })
@@ -58,7 +44,7 @@ describe('performanceController test', () => {
     it('should save a new performance to the database and return the saved data', async () => {
       const performanceData = { name: 'Test Performance', isPublic: true }
 
-      const res = await request.post('/create-performance').set('Authorization', `Bearer ${token}`).send(performanceData)
+      const res = await authenticatedRequest(request, '/performance/create', 'post').send(performanceData)
 
       expect(res.status).toBe(201)
 
@@ -66,13 +52,13 @@ describe('performanceController test', () => {
       expect(savedPerformance).toBeDefined()
       expect(savedPerformance!.name).toBe('Test Performance')
       expect(savedPerformance!.isPublic).toBe(true)
-      expect(savedPerformance!.userId).toBe(mockUser.id)
+      expect(savedPerformance!.userId).toBe(global.mockUser.id)
     })
 
     it('should save a new performance to the database and return the saved data if isPublic is not provided', async () => {
       const performanceData = { name: 'Test Performance 2' }
 
-      const res = await request.post('/create-performance').set('Authorization', `Bearer ${token}`).send(performanceData)
+      const res = await authenticatedRequest(request, '/performance/create', 'post').send(performanceData)
 
       expect(res.status).toBe(201)
 
@@ -80,7 +66,7 @@ describe('performanceController test', () => {
       expect(savedPerformance).toBeDefined()
       expect(savedPerformance!.name).toBe('Test Performance 2')
       expect(savedPerformance!.isPublic).toBe(false)
-      expect(savedPerformance!.userId).toBe(mockUser.id)
+      expect(savedPerformance!.userId).toBe(global.mockUser.id)
     })
 
     it('should return a 500 error if there is a server error', async () => {
@@ -88,10 +74,7 @@ describe('performanceController test', () => {
         throw new Error('Server error')
       })
 
-      const res = await request
-        .post('/create-performance')
-        .set('Authorization', `Bearer ${token}`)
-        .send({ name: 'Test Performance' })
+      const res = await authenticatedRequest(request, '/performance/create', 'post').send({ name: 'Test Performance' })
 
       expect(res.status).toBe(500)
     })
