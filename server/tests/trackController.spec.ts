@@ -19,7 +19,7 @@ describe('trackController test', () => {
 
   describe('POST /tracks', () => {
     it('should get tracks from DB', async () => {
-      const res = await authenticatedRequest(request, '/tracks', 'get')
+      const res = await authenticatedRequest(request, '/api/tracks', 'get')
       expect(res.status).toBe(200)
     })
   })
