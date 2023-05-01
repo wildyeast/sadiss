@@ -41,9 +41,6 @@ router.get('/api/track/stop', track_controller.stop_track)
 // Get voices and languages
 router.get('/api/get-voices-and-languages', track_controller.get_voices_and_languages)
 
-// Get performances
-router.get('/api/performances', performance_controller.get_performances)
-
 // Get stats
 router.get('/api/stats', track_controller.get_stats)
 
@@ -51,10 +48,14 @@ router.get('/api/stats', track_controller.get_stats)
 router.get('/api/get-own-tracks', track_controller.get_own_tracks)
 
 /* PERFORMANCE */
+// Get performances
+router.get('/api/performances', performance_controller.get_performances)
+
 // Create performance
 router.post('/api/performance/create', performance_controller.create_performance)
 
-/* TrackPerformance */
+/* TRACK PERFORMANCE */
+// Add track to performance
 router.post(
   '/api/performance/:id/add-track',
   [validateTrackAccess, validatePerformanceAccess],
