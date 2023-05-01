@@ -1,3 +1,5 @@
 <template>
-  <button class="p-2 m-2 bg-white text-primary font-bold flex justify-center items-center rounded shadow"><slot /></button>
+  <button class="m-2 flex items-center justify-center rounded border-2 border-light p-2 px-4 font-bold text-light">
+    <slot />
+  </button>
 </template>
