@@ -25,7 +25,7 @@ router.get('/get-track/:id', track_controller.get_track)
 router.post('/delete-track/:id', track_controller.delete_track)
 
 // Start track
-router.post('/start-track/:id/:startTime', track_controller.start_track)
+router.post('/start-track/:id/:startTime/:loopTrack', track_controller.start_track)
 
 // Stop track
 router.get('/stop-track', track_controller.stop_track)

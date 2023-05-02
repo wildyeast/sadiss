@@ -151,7 +151,7 @@ const upload = async () => {
 }
 
 const startTrack = async (id: string) => {
-  await fetch(`${process.env.VUE_APP_API_URL}/start-track/${id}/${globalTime.value}`, {
+  await fetch(`${process.env.VUE_APP_API_URL}/start-track/${id}/${globalTime.value}/${loopTrack.value}`, {
     method: 'POST'
   })
     .then((res) => res.json())
@@ -326,6 +326,8 @@ const downloadPartialQrCodes = async () => {
   isQrCodeModalVisible.value = false
 }
 
+const loopTrack = ref(false)
+
 // Enforce min and max values
 watch(trackTtsRate, (newValue) => {
   if (newValue > 2) {
@@ -354,6 +356,12 @@ onMounted(async () => {
         >Upload new track</Button
       >
       <Button @click="openQrCodeModal">Generate QR codes</Button>
+      <div class="flex items-center gap-2">
+        <input
+          type="checkbox"
+          v-model="loopTrack" />
+        <label for="loopNextTrack">Loop track</label>
+      </div>
     </div>
 
     <div

@@ -9,7 +9,8 @@ export const startSendingInterval = (
   waveform: string,
   ttsRate: string,
   startTime: number,
-  wss: Server
+  wss: Server,
+  loopTrack: boolean
 ) => {
   console.log('SSI')
   if (sendingIntervalRunning) {
@@ -41,10 +42,17 @@ export const startSendingInterval = (
     }
 
     if (chunkIndex >= track.length) {
-      console.log('No more chunks. Stopping.')
-      sendingIntervalRunning = false
-      reset()
-      return
+      if (loopTrack) {
+        console.log('No more chunks. Looping.')
+        const CHUNK_LENGTH_IN_SECONDS = 0.999
+        startTime += chunkIndex * CHUNK_LENGTH_IN_SECONDS
+        chunkIndex = 0
+      } else {
+        console.log('No more chunks. Stopping.')
+        sendingIntervalRunning = false
+        reset()
+        return
+      }
     }
 
     const dt = Date.now() - expected

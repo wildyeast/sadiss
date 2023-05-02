@@ -45,8 +45,9 @@ exports.start_track = async (req: express.Request, res: express.Response) => {
         if (!chunks) {
           throw new Error('Chunks undefined')
         }
+        const loopTrack = req.params.loopTrack === 'true'
         // @ts-expect-error TODO
-        const trackStarted = startSendingInterval(chunks, t.mode, t.waveform, t.ttsRate, startTime, req.wss)
+        const trackStarted = startSendingInterval(chunks, t.mode, t.waveform, t.ttsRate, startTime, req.wss, loopTrack)
         if (trackStarted) {
           res.json({ data: 'Track started.' })
         } else {
