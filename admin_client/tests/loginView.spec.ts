@@ -1,8 +1,6 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
 import LoginView from '@/views/LoginView.vue'
-// @ts-expect-error - TS thinks there are no types for this file
-import * as api from '@/services/api'
 
 describe('LoginView', () => {
   it('should render the component', () => {
@@ -11,7 +9,12 @@ describe('LoginView', () => {
   })
 
   it('should log in with valid credentials', async () => {
-    const mockLogin = vi.spyOn(api, 'login').mockResolvedValue('mockToken')
+    const mockLogin = vi
+      .fn((a, b) => {
+        console.log('mockLogin', a, b)
+        return 'mockToken'
+      })
+      .mockResolvedValue('mockToken')
     const routerMock = {
       push: vi.fn()
     }
@@ -30,7 +33,7 @@ describe('LoginView', () => {
     await wrapper.find('[type="password"]').setValue('mockPassword')
 
     // Submitting the form
-    await wrapper.find('form').trigger('submit.prevent')
+    await wrapper.find('[type="submit"]').trigger('submit.prevent')
 
     expect(mockLogin).toHaveBeenCalledWith('mockUsername', 'mockPassword')
     expect(routerMock.push).toHaveBeenCalledWith({ path: '/' })
