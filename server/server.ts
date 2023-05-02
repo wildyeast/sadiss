@@ -22,6 +22,7 @@ const mongoUser = process.env.MONGO_USER
 const mongoPW = process.env.MONGO_PW
 const mongoDbName = process.env.MONGO_DB_NAME
 const mongoURI = `mongodb://${mongoUser}:${mongoPW}@${mongoHost}/${mongoDbName}?directConnection=true&serverSelectionTimeoutMS=2000`
+mongoose.set('strictQuery', true)
 mongoose.connect(mongoURI)
 
 const BASE_URL = '127.0.0.1'
