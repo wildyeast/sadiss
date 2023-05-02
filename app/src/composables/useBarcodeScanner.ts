@@ -59,10 +59,15 @@ export function useBarcodeScanner() {
       }
     }
 
-    // Expert Mode and navigation
+    // Expert Mode
     const expertModeResult = result.expertMode
     if (expertModeResult) {
       mainStore.expertMode = expertModeResult === 'true'
+    }
+
+    const performanceIdResult = result.performanceId
+    if (performanceIdResult) {
+      mainStore.performanceId = +performanceIdResult
     }
   }
 

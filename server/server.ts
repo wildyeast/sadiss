@@ -7,11 +7,13 @@ import * as dotenv from 'dotenv'
 
 import { Server } from 'ws'
 import { startKeepAliveInterval } from './tools/startKeepAliveInterval'
+import { ActivePerformance } from './activePerformance'
 
 const cors = require('cors')
 const mongoose = require('mongoose')
 const uuid = require('uuid')
 
+const p = new ActivePerformance(1)
 // Load .env
 dotenv.config()
 
@@ -72,7 +74,10 @@ wss.on('connection', (client) => {
     if (parsed.message === 'clientInfo') {
       client.choirId = parsed.clientId
       client.ttsLang = parsed.ttsLang
-      console.log(`Client ${client.id} registered with choir id ${client.choirId} and TTS lang ${client.ttsLang}`)
+      client.performanceId = parsed.performanceId
+      console.log(
+        `Performance ${client.performanceId}: Client ${client.id} registered with choir id ${client.choirId} and TTS lang ${client.ttsLang}`
+      )
     } else if (parsed.message === 'measure') {
       client.send('measure')
     } else if (parsed.message === 'isAdmin') {

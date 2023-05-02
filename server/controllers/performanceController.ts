@@ -1,5 +1,5 @@
 import express from 'express'
-import { chunk, startSendingInterval, stopSendingInterval } from '../tools'
+import { chunk } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose from 'mongoose'
 import { TtsJson } from '../types/types'
@@ -228,4 +228,3 @@ exports.get_performances = async (req: express.Request, res: express.Response) =
     }
   ])
 }
-

@@ -10,25 +10,25 @@ const mainStore = useMainStore()
 
 describe('processScanResult', () => {
   it('should update the performance name in mainStore when provided in the scan result', () => {
-    const result = { performanceName: 'My Performance' }
+    const result = { performanceName: 'My Performance', performanceId: '456' }
     processScanResult(result)
     expect(mainStore.performanceName).toBe(result.performanceName)
   })
 
   it('should update the choirId in mainStore when provided in the scan result', () => {
-    const result = { performanceName: 'My Performance', choirId: '123' }
+    const result = { performanceName: 'My Performance', choirId: '123', performanceId: '456' }
     processScanResult(result)
     expect(mainStore.choirId).toBe(+result.choirId)
   })
 
   it('should update the role name in mainStore when provided in the scan result', () => {
-    const result = { performanceName: 'My Performance', roleName: 'My Role' }
+    const result = { performanceName: 'My Performance', roleName: 'My Role', performanceId: '456' }
     processScanResult(result)
     expect(mainStore.roleName).toBe(result.roleName)
   })
 
   it('should update the default TTS language in mainStore when provided in the scan result', () => {
-    const result = { performanceName: 'My Performance', defaultLang: 'en' }
+    const result = { performanceName: 'My Performance', defaultLang: 'en', performanceId: '456' }
     processScanResult(result)
     expect(mainStore.defaultLang).toBe(result.defaultLang)
   })
@@ -36,6 +36,7 @@ describe('processScanResult', () => {
   it('should update the available TTS languages in mainStore when provided in the scan result', () => {
     const result = {
       performanceName: 'My Performance',
+      performanceId: '456',
       tts: [
         { iso: 'en', lang: 'English' },
         { iso: 'fr', lang: 'French' }
@@ -52,7 +53,8 @@ describe('processScanResult', () => {
         { iso: 'en', lang: 'English' },
         { iso: 'fr', lang: 'French' }
       ],
-      defaultLang: 'fr'
+      defaultLang: 'fr',
+      performanceId: '456'
     }
     processScanResult(result)
     expect(mainStore.selectedLanguage).toBe(result.defaultLang)
@@ -64,21 +66,28 @@ describe('processScanResult', () => {
       tts: [
         { iso: 'en', lang: 'English' },
         { iso: 'fr', lang: 'French' }
-      ]
+      ],
+      performanceId: '456'
     }
     processScanResult(result)
     expect(mainStore.selectedLanguage).toBe(result.tts[0].iso)
   })
 
   it('should update the expert mode to be true in mainStore when provided in the scan result', () => {
-    const result = { performanceName: 'My Performance', expertMode: 'true' }
+    const result = { performanceName: 'My Performance', expertMode: 'true', performanceId: '456' }
     processScanResult(result)
     expect(mainStore.expertMode).toBe(true)
   })
 
   it('should update the expert mode to be false in mainStore when provided in the scan result', () => {
-    const result = { performanceName: 'My Performance', expertMode: 'false' }
+    const result = { performanceName: 'My Performance', expertMode: 'false', performanceId: '456' }
     processScanResult(result)
     expect(mainStore.expertMode).toBe(false)
+  })
+
+  it('should update the performanceId in mainStore when provided in the scan result', () => {
+    const result = { performanceName: 'My Performance', performanceId: '123' }
+    processScanResult(result)
+    expect(mainStore.performanceId).toBe(+result.performanceId)
   })
 })

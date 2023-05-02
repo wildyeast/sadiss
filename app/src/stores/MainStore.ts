@@ -10,6 +10,7 @@ export const useMainStore = defineStore('main', () => {
   const selectedLanguage = ref('')
   const choirId = ref(0)
   const expertMode = ref(false)
+  const performanceId = ref(-1)
 
   const processing = ref(false)
 
@@ -23,5 +24,15 @@ export const useMainStore = defineStore('main', () => {
   // const defaultLang = ref('en-US')
   // const selectedLanguage = ref('en-US')
 
-  return { availableLanguages, roleName, choirId, performanceName, defaultLang, selectedLanguage, expertMode, processing }
+  return {
+    availableLanguages,
+    roleName,
+    choirId,
+    performanceName,
+    defaultLang,
+    selectedLanguage,
+    expertMode,
+    processing,
+    performanceId
+  }
 })

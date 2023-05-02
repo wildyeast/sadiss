@@ -25,10 +25,10 @@ router.get('/get-track/:id', track_controller.get_track)
 router.post('/delete-track/:id', track_controller.delete_track)
 
 // Start track
-router.post('/start-track/:id/:startTime/:loopTrack', track_controller.start_track)
+router.post('/start-track/:trackId/:performanceId/:startTime/:loopTrack', track_controller.start_track)
 
 // Stop track
-router.get('/stop-track', track_controller.stop_track)
+router.get('/stop-track/:performanceId', track_controller.stop_track)
 
 // Stop track
 router.get('/get-voices-and-languages', track_controller.get_voices_and_languages)

@@ -1,9 +1,10 @@
 import express from 'express'
-import { chunk, startSendingInterval, stopSendingInterval } from '../tools'
+import { chunk } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose from 'mongoose'
 import { TtsJson } from '../types/types'
 import { Server } from 'ws'
+import { ActivePerformance } from '../activePerformance'
 const fs = require('fs')
 const uuid = require('uuid')
 
@@ -27,12 +28,14 @@ const Track = mongoose.model('Track', trackSchema)
 
 let wss: Server
 
+const activePerformances: ActivePerformance[] = []
+
 // Start track
 exports.start_track = async (req: express.Request, res: express.Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   wss = req.wss
   try {
-    const t = await Track.findById(req.params.id)
+    const t = await Track.findById(req.params.trackId)
     if (t) {
       let chunks
       fs.readFile(`chunks/${t.chunkFileName}`, 'utf8', (err: any, data: string) => {
@@ -45,9 +48,27 @@ exports.start_track = async (req: express.Request, res: express.Response) => {
         if (!chunks) {
           throw new Error('Chunks undefined')
         }
+
+        const performanceId = +req.params.performanceId
+
+        // Check if performance already exists
+        let performance = activePerformances.find((p) => p.id === performanceId)
+        if (!performance) {
+          performance = new ActivePerformance(performanceId)
+          activePerformances.push(performance)
+        }
+
         const loopTrack = req.params.loopTrack === 'true'
-        // @ts-expect-error TODO
-        const trackStarted = startSendingInterval(chunks, t.mode, t.waveform, t.ttsRate, startTime, req.wss, loopTrack)
+        const trackStarted = performance.startSendingInterval(
+          chunks,
+          // @ts-ignore TODO
+          t.mode,
+          t.waveform,
+          t.ttsRate,
+          startTime,
+          req.wss,
+          loopTrack
+        )
         if (trackStarted) {
           res.json({ data: 'Track started.' })
         } else {
@@ -215,8 +236,13 @@ exports.edit_track = async (req: express.Request, res: express.Response) => {
 }
 
 exports.stop_track = (req: express.Request, res: express.Response) => {
-  stopSendingInterval()
-  res.send({ message: 'Track stopped.' })
+  const performance = activePerformances.find((p) => p.id === +req.params.performanceId)
+  if (performance) {
+    performance.stopSendingInterval()
+    res.send({ message: 'Track stopped.' })
+  } else {
+    res.status(404).send({ message: 'Performance not found.' })
+  }
 }
 
 exports.get_voices_and_languages = async (req: express.Request, res: express.Response) => {
