@@ -6,7 +6,7 @@ import { Message } from './types/types'
 import * as dotenv from 'dotenv'
 
 import { Server } from 'ws'
-import { startKeepAliveInterval } from './tools/startSendingInterval'
+import { startKeepAliveInterval } from './tools/startKeepAliveInterval'
 
 const cors = require('cors')
 const mongoose = require('mongoose')
