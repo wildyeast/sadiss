@@ -1,13 +1,13 @@
 export interface PartialChunk {
-  index: number,
-  startTime: number,
-  endTime: number,
+  index: number
+  startTime: number
+  endTime: number
   breakpoints: Breakpoint[]
 }
 
 export interface Breakpoint {
-  time: number,
-  freq: number,
+  time: number
+  freq: number
   amp: number
 }
 
@@ -22,4 +22,3 @@ export interface TtsJson {
 }
 
 export type Mode = 'choir' | 'nonChoir'
-
