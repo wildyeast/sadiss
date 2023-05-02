@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { login } from '../services/api'
 
@@ -11,8 +11,10 @@ const formData = reactive({
 })
 
 const loginUser = async () => {
+  errorMessage.value = ''
   if (!formData.username || !formData.password) {
     console.error('Username and password are required')
+    errorMessage.value = 'Username and password are required'
     return
   }
   try {
@@ -21,8 +23,11 @@ const loginUser = async () => {
     router.push({ path: '/' })
   } catch (error) {
     console.error(`Error logging in: ${error}`)
+    errorMessage.value = 'Incorrect credentials'
   }
 }
+
+const errorMessage = ref('')
 </script>
 
 <template>
@@ -32,8 +37,9 @@ const loginUser = async () => {
       class="mt-10 h-20" />
     <div class="mt-28 flex flex-col items-center">
       <h1 class="text-3xl font-bold">Login</h1>
+      <p class="error-message my-4 flex h-2 items-center justify-center text-danger">{{ errorMessage }}</p>
       <form
-        class="mt-8 flex flex-col items-center gap-4"
+        class="flex flex-col items-center gap-4"
         @submit.prevent="loginUser">
         <input
           v-model="formData.username"
