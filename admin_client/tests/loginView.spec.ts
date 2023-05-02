@@ -1,7 +1,8 @@
 import { mount } from '@vue/test-utils'
 import { describe, it, expect, vi } from 'vitest'
-import * as api from '@/services/api'
 import LoginView from '@/views/LoginView.vue'
+// @ts-expect-error - TS thinks there are no types for this file
+import * as api from '@/services/api'
 
 describe('LoginView', () => {
   it('should render the component', () => {
