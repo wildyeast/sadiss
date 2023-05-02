@@ -10,9 +10,10 @@ module.exports = {
     },
     colors: {
       primary: '#3e5b53',
-      secondary: '#253833',
+      secondary: '#71ada8',
       highlight: '#79ea04',
-      light: '#faf1f1'
+      light: '#faf1f1',
+      danger: '#ff3d00'
     }
   },
   plugins: []
