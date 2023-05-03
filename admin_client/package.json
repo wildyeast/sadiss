@@ -10,6 +10,7 @@
     "axios": "^1.2.2",
     "client-zip": "^2.3.0",
     "qrcode.vue": "^3.3.3",
+    "tslib": "^2.5.0",
     "vue": "^3.2.13",
     "vue-axios": "^3.5.2",
     "vue-class-component": "^8.0.0-0",
