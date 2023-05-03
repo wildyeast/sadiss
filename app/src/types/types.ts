@@ -50,4 +50,5 @@ export interface QrCodeScanResult {
   roleName?: string
   defaultLang?: string
   expertMode?: string
+  wsUrl: string
 }

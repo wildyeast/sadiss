@@ -4,6 +4,7 @@ import { ref, onMounted, inject, computed, watch, nextTick } from 'vue'
 import TrackTile from '@/components/TrackTile.vue'
 import { downloadZip } from 'client-zip'
 import QrcodeVue from 'qrcode.vue'
+import ServerSelect from '@/components/ServerSelect.vue'
 
 const isUploadModalVisible = ref(false)
 const axios: Axios | undefined = inject('axios')
@@ -114,7 +115,8 @@ const upload = async () => {
 
   if (!editingTrackId.value) {
     axios
-      .post(`${process.env.VUE_APP_API_URL}/upload`, data, config)
+      // @ts-expect-error TODO: TS complains about FormData
+      .post(`${selectedServer.value.httpUrl}/upload`, data, config)
       .then((response) => {
         console.log(response.data)
         // Add newly added track to tracks
@@ -127,6 +129,7 @@ const upload = async () => {
       })
   } else {
     try {
+      // @ts-expect-error TODO: TS complains about FormData
       const res = await axios.patch(`${process.env.VUE_APP_API_URL}/edit/${editingTrackId.value}`, data, config)
       console.log(res.data)
       const trackIdx = tracks.value.map((track) => track._id).indexOf(editingTrackId.value)
@@ -252,6 +255,13 @@ const openQrCodeModal = async () => {
     alert('Please enter a performance ID.')
     return
   }
+
+  localStorage.setItem('performanceId', performanceId.value)
+
+  if (!selectedServer) {
+    alert('You must select a server.')
+    return
+  }
   await getVoicesAndLanguages()
   isQrCodeModalVisible.value = true
 }
@@ -259,6 +269,10 @@ const openQrCodeModal = async () => {
 const qrCodeData: QrCodeData[] = []
 
 const generateQrCodes = async () => {
+  if (!selectedServer) {
+    alert('You must select a server.')
+    return
+  }
   if (voiceCount.value) {
     for (let i = 0; i < voiceCount.value; i++) {
       const data: QrCodeData = {
@@ -266,7 +280,8 @@ const generateQrCodes = async () => {
         roleName: voiceNames.value[i],
         performanceName: performanceName.value,
         expertMode: expertMode.value,
-        performanceId: performanceId.value
+        performanceId: performanceId.value,
+        wsUrl: selectedServer.wsUrl
       }
       if (ttsLangs.value) {
         data.tts = ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) }))
@@ -280,7 +295,8 @@ const generateQrCodes = async () => {
       performanceId: performanceId.value,
       expertMode: expertMode.value,
       defaultLang: defaultLanguage.value,
-      tts: ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) }))
+      tts: ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) })),
+      wsUrl: selectedServer.wsUrl
     })
   }
 
@@ -289,7 +305,8 @@ const generateQrCodes = async () => {
     qrCodeData.push({
       performanceId: performanceId.value,
       performanceName: performanceName.value,
-      expertMode: false
+      expertMode: false,
+      wsUrl: selectedServer.wsUrl
     })
   }
 
@@ -323,7 +340,7 @@ const downloadPartialQrCodes = async () => {
       input: svgBlob
     })
   }
-  // @ts-expect-error - Complains because of missing type from tslib.
+
   const blob = await downloadZip([...svgBlobs]).blob()
   const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)
@@ -336,6 +353,9 @@ const downloadPartialQrCodes = async () => {
 }
 
 const loopTrack = ref(false)
+let selectedServer: { wsUrl: string; httpUrl: string } | null = null
+
+const setSelectedServer = (server: { wsUrl: string; httpUrl: string }) => (selectedServer = server)
 
 // Enforce min and max values
 watch(trackTtsRate, (newValue) => {
@@ -349,6 +369,10 @@ watch(trackTtsRate, (newValue) => {
 onMounted(async () => {
   await initializeMCorp()
   await getTracks()
+  const storedPerformanceId = localStorage.getItem('performanceId')
+  if (storedPerformanceId) {
+    performanceId.value = storedPerformanceId
+  }
 })
 </script>
 <template>
@@ -377,6 +401,9 @@ onMounted(async () => {
           type="text"
           placeholder="Performance ID"
           class="p-1 text-primary" />
+      </div>
+      <div class="ml-4 flex items-center">
+        <ServerSelect @emit-selection="setSelectedServer" />
       </div>
     </div>
 

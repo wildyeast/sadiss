@@ -3,23 +3,21 @@ import { onUnmounted, ref } from 'vue'
 import { usePlayer } from './usePlayer'
 const { handleChunkData, setOffset, stopPlayback, setStartTime, setTrackSettings } = usePlayer()
 
-const VUE_APP_WS_SERVER_URL = '192.168.0.87'
-const VUE_APP_WS_SERVER_PORT = '443'
-
-const VUE_APP_WS_LIVE_SERVER_URL = 'wss://sadiss.net/ws/'
-
 const isRegistered = ref(false)
 export function useWebsocketConnection() {
   const mainStore = useMainStore()
   const ws = ref<WebSocket>()
 
   let attemptingToRegister = false
-  const establishWebsocketConnection = () => {
+  const establishWebsocketConnection = async () => {
     if (attemptingToRegister || isRegistered.value) return
     attemptingToRegister = true
-
-    // ws.value = new WebSocket(`ws://${VUE_APP_WS_SERVER_URL}:${VUE_APP_WS_SERVER_PORT}`)
-    ws.value = new WebSocket(VUE_APP_WS_LIVE_SERVER_URL)
+    while (!mainStore.wsUrl) {
+      console.log('waiting for ws url')
+      await new Promise((resolve) => setTimeout(resolve, 10))
+    }
+    console.log('ws url: ', mainStore.wsUrl)
+    ws.value = new WebSocket(mainStore.wsUrl)
 
     ws.value.onopen = function () {
       isRegistered.value = true
@@ -28,7 +26,8 @@ export function useWebsocketConnection() {
         JSON.stringify({
           message: 'clientInfo',
           clientId: mainStore.choirId,
-          ttsLang: mainStore.selectedLanguage
+          ttsLang: mainStore.selectedLanguage,
+          performanceId: mainStore.performanceId
         })
       )
     }
@@ -44,7 +43,7 @@ export function useWebsocketConnection() {
       isRegistered.value = false
       attemptingToRegister = false
       stopPlayback()
-      console.error(error)
+      console.error(JSON.stringify(error))
     }
 
     ws.value.onmessage = (event) => {

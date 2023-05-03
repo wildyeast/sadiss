@@ -6,4 +6,5 @@ interface QrCodeData {
   performanceName: string
   expertMode: boolean
   performanceId: string
+  wsUrl: string
 }

@@ -11,6 +11,7 @@ export const useMainStore = defineStore('main', () => {
   const choirId = ref(0)
   const expertMode = ref(false)
   const performanceId = ref(-1)
+  const wsUrl = ref('')
 
   const processing = ref(false)
 
@@ -33,6 +34,7 @@ export const useMainStore = defineStore('main', () => {
     selectedLanguage,
     expertMode,
     processing,
-    performanceId
+    performanceId,
+    wsUrl
   }
 })
