@@ -2,14 +2,14 @@ import { reactive, ref } from 'vue'
 import { TextToSpeech } from '@capacitor-community/text-to-speech'
 import { PartialChunk, OscillatorObject, Breakpoint } from '../types/types'
 
+let ctx: AudioContext
+let offset: number
+let motion: { pos: number } = reactive({ pos: -1 })
+let outputLatencyOffset = 0
+
 export function usePlayer() {
-  let ctx: AudioContext
   const oscillators: OscillatorObject[] = []
   const currentChunkStartTimeInCtxTime = ref()
-  let offset: number
-  let dlog: (text: string) => void
-
-  const setLogFunction = (logFunction: (text: string) => void) => (dlog = logFunction)
 
   const initialSetup = (partialChunks: { partials: PartialChunk[]; ttsInstructions: string }) => {
     handleChunkData(partialChunks)
@@ -20,7 +20,6 @@ export function usePlayer() {
     ctx = new AudioContext()
 
     ctx.onstatechange = () => {
-      dlog('Ctx state changed to: ' + ctx.state)
       // Resume ctx when going to sleep/background/etc preventing issue where iOS wouldn't restart playback
       // Taken from https://github.com/Tonejs/Tone.js/issues/995#issuecomment-1005082160
       // @ts-expect-error: 'interrupted' is correct here.
@@ -47,6 +46,7 @@ export function usePlayer() {
 
     // TODO: Refactor this
     currentChunkStartTimeInCtxTime.value = startTimeInCtxTime
+    console.log('currentChunkStartTimeInCtxTime: ', currentChunkStartTimeInCtxTime.value)
 
     if (trackData.partials) {
       for (const partialChunk of trackData.partials) {
@@ -87,10 +87,10 @@ export function usePlayer() {
   }
 
   const setBreakpoints = (oscNode: OscillatorNode, gainNode: GainNode, breakpoints: Breakpoint[], chunkEndTime: number) => {
-    oscNode.stop(chunkEndTime)
+    oscNode.stop(chunkEndTime + outputLatencyOffset)
     for (const bp of breakpoints) {
-      oscNode.frequency.setValueAtTime(bp.freq, currentChunkStartTimeInCtxTime.value + bp.time)
-      gainNode.gain.setValueAtTime(bp.amp, currentChunkStartTimeInCtxTime.value + bp.time)
+      oscNode.frequency.setValueAtTime(bp.freq, currentChunkStartTimeInCtxTime.value + bp.time + outputLatencyOffset)
+      gainNode.gain.setValueAtTime(bp.amp, currentChunkStartTimeInCtxTime.value + bp.time + outputLatencyOffset)
     }
   }
 
@@ -118,9 +118,13 @@ export function usePlayer() {
     ttsLanguage = lang
   }
 
-  let motion: { pos: number } = reactive({ pos: -1 })
   const setMotionRef = (motionRef: { pos: number }) => (motion = motionRef)
-  const setOffset = () => (offset = motion.pos - ctx.currentTime)
+
+  const setOffset = () => {
+    console.log(motion.pos, ctx.currentTime)
+    offset = motion.pos - ctx.currentTime
+    console.log('Offset: ', offset)
+  }
 
   let waveform: OscillatorType
   let ttsRate = 1
@@ -129,25 +133,18 @@ export function usePlayer() {
     ttsRate = +rate
   }
 
-  const getDebugData = () => {
-    const ctxTime = ctx ? ctx.currentTime : undefined
-    return {
-      ctxTime,
-      offset
-    }
-  }
+  const setOutputLatencyOffset = (newOutputLatencyOffset: number) => (outputLatencyOffset = newOutputLatencyOffset)
 
   return {
     handleChunkData,
     initialSetup,
     startAudioCtx,
     setStartTime,
-    setLogFunction,
     setTtsLanguage,
     setMotionRef,
     setTrackSettings,
-    getDebugData,
     stopPlayback,
-    setOffset
+    setOffset,
+    setOutputLatencyOffset
   }
 }

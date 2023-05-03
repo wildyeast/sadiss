@@ -40,6 +40,16 @@ router.get('/api/track/stop', track_controller.stop_track)
 
 // Get voices and languages
 router.get('/api/get-voices-and-languages', track_controller.get_voices_and_languages)
+router.post('/start-track/:trackId/:performanceId/:startTime/:loopTrack', track_controller.start_track)
+
+// Stop track
+router.get('/stop-track/:performanceId', track_controller.stop_track)
+
+// Stop track
+router.get('/get-voices-and-languages', track_controller.get_voices_and_languages)
+
+// Get performances
+router.get('/get-performances', performance_controller.get_performances)
 
 // Get stats
 router.get('/api/stats', track_controller.get_stats)

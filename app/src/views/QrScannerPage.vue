@@ -1,67 +1,83 @@
 <template>
   <ion-page>
     <ion-content :fullscreen="true">
-      <div class="flex min-h-full w-full flex-col items-center justify-between overflow-scroll bg-primary p-4 px-6">
-        <div class="flex flex-col items-center">
-          <img
-            src="../../public/assets/sadiss-logo.png"
-            class="my-8 w-3/5" />
-          <div
-            v-if="nextPerformance"
-            class="border border-[#f5a700] px-6 pb-6 text-lg text-[#f5a700]">
-            <h2 class="pt-2 pb-4 text-xl">Next performance</h2>
-            <h3 class="text-2xl uppercase">{{ nextPerformance.name }}</h3>
-            <p>{{ nextPerformance.location }}</p>
-            <!-- <p>Artist: {{ nextPerformance.artist }}</p> -->
-            <p>{{ new Date(nextPerformance.date).toLocaleDateString() }}</p>
-            <a :href="nextPerformance.url">[<span class="underline">open webpage</span>]</a>
-          </div>
+      <BasePage>
+        <div
+          v-if="nextPerformance"
+          class="w-full border-b pb-4">
+          <p>Next performance</p>
+          <h1
+            v-html="nextPerformance.name"
+            class="text-2xl" />
+          <p v-html="nextPerformance.description" />
+          <p>{{ new Date(nextPerformance.date).toLocaleDateString() }}</p>
+          <p v-html="nextPerformance.location" />
+          <a
+            :href="nextPerformance.url"
+            class="text-highlight"
+            >More information about the piece ></a
+          >
         </div>
         <ion-button
+          v-if="!mainStore.processing"
           @click="scanCode"
-          class="ionic-bg-secondary my-6 h-[60px] font-bold">
+          class="button ionic-border-highlight-narrow my-3 h-[80px] w-full text-3xl">
           Scan QR code
         </ion-button>
-        <div class="text-lg text-white">
-          <p>
-            SADISS bundles phones of the audience into a massive, intricate sound system with numerous distinct sound sources
-            scattered throughout the space.<br /><br />
-            Physical presence is required at a performance venue. To participate, scan the QR code provided at the venue.<br /><br />
+        <div v-if="!mainStore.processing">
+          <p class="text-sm text-tertiary">
+            To join the performance please scan a QR code at the venue using the button above.<br />
+            Once registered you will have to quit and re-start the app to leave the performance or scan a different code.
+          </p>
+          <p class="mt-10 text-center">
             Visit
             <a
-              class="text-[#f5a700]"
-              href="https://sadiss.net">
-              <u>sadiss.net</u>
+              href="https://sadiss.net"
+              class="text-highlight"
+              >sadiss.net
             </a>
-            for more information!
+            for more information on the software system.
           </p>
         </div>
-      </div>
+        <div
+          v-if="mainStore.processing"
+          class="flex h-full items-center justify-center">
+          <ion-spinner class="scale-[200%] text-highlight" />
+        </div>
+      </BasePage>
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import { IonContent, IonPage, IonButton, useIonRouter } from '@ionic/vue'
+import { ref, onMounted } from 'vue'
+import { IonContent, IonPage, IonButton, useIonRouter, IonSpinner } from '@ionic/vue'
 import { onDeactivated } from 'vue'
+import BasePage from '@/components/BasePage.vue'
 import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
-import { getPreference, setPreference } from '@/tools/preferences'
+import { QrCodeScanResult } from '@/types/types'
+import { useMainStore } from '@/stores/MainStore'
+import { usePlayer } from '@/composables/usePlayer'
 
-// Router
+interface Performance {
+  date: string
+  description: string
+  location: string
+  name: string
+  url: string
+}
+
 const ionRouter = useIonRouter()
+const mainStore = useMainStore()
+const { startAudioCtx } = usePlayer()
 
-const upcomingPerformances = ref([])
-
-const nextPerformance = computed<{ name: string; artist: string; location: string; url: string; date: string }>(() => {
-  return upcomingPerformances.value[0]
-})
+const nextPerformance = ref<Performance | null>()
 
 const getPerformances = async () => {
   try {
     const res = await fetch('https://sadiss.net/server/get-performances')
     const data = await res.json()
-    upcomingPerformances.value = data
+    nextPerformance.value = data[0]
   } catch (err) {
     console.log('Failed to get performances.', err)
   }
@@ -69,11 +85,18 @@ const getPerformances = async () => {
 
 /* QR Code Scanning */
 
-const { startScan, stopScan } = useBarcodeScanner()
+const { startScan, stopScan, processScanResult } = useBarcodeScanner()
+
 const scanCode = async () => {
+  // Start audioCtx on first user interaction
+  startAudioCtx()
+
   // Make camera visible and everything else invisible in app viewport, classes defined in App.vue
   document.body.classList.add('qrscanner')
+
+  mainStore.processing = true
   const resultJson = await startScan()
+
   if (resultJson) {
     let result: QrCodeScanResult
     try {
@@ -81,47 +104,24 @@ const scanCode = async () => {
     } catch (err) {
       alert('Scan failed. Please try again.')
       stopScanning()
+      mainStore.processing = false
       return
     }
 
-    // Performance name
-    const performanceName = result.performanceName
-    if (performanceName) {
-      await setPreference('performanceName', performanceName)
-    }
-
-    // ChoirId (id of Role)
-    const choirId = result.choirId
-    if (choirId !== undefined && !Number.isNaN(+choirId)) {
-      await setPreference('choirId', String(choirId))
-    }
-    // Role Name
-    const roleName = result.roleName
-    if (roleName) {
-      await setPreference('roleName', roleName)
-    }
-
-    // Default TTS lang
-    const defaultLang = result.defaultLang
-    if (defaultLang) {
-      await setPreference('defaultLang', defaultLang)
-    }
-
-    // Export Mode
-    // TODO Not yet implemented
-
-    // Timestamp of scan
-    await setPreference('lastScanTimestamp', Date.now().toString())
-
-    // TTS langs
-    if (result.tts) {
-      await setPreference('availableLanguages', JSON.stringify(result.tts))
-      ionRouter.navigate('/language-selection', 'forward', 'push')
-    } else {
-      ionRouter.navigate('/main', 'forward', 'push')
-    }
+    processScanResult(result)
+    navigateToNextPage()
   }
   stopScanning()
+}
+
+const navigateToNextPage = () => {
+  if (mainStore.expertMode) {
+    ionRouter.navigate('/offset-calibration', 'forward', 'push')
+  } else if (!mainStore.availableLanguages.length || mainStore.availableLanguages.length === 1) {
+    ionRouter.navigate('/main', 'forward', 'push')
+  } else {
+    ionRouter.navigate('/language-selection', 'forward', 'push')
+  }
 }
 
 const stopScanning = () => {
@@ -131,34 +131,29 @@ const stopScanning = () => {
 }
 
 onMounted(async () => {
-  const INVALIDATE_SCAN_AFTER_MS = 1000 * 60 * 90 // 90 Minutes
-  const qrCodeInvalidationCheckedThisSession = await getPreference('qrCodeInvalidationCheckedThisSession')
-  const lastScanTimestamp = await getPreference('lastScanTimestamp')
-  if (
-    qrCodeInvalidationCheckedThisSession.value === 'false' &&
-    lastScanTimestamp.value &&
-    +lastScanTimestamp.value + INVALIDATE_SCAN_AFTER_MS > Date.now()
-  ) {
-    // Skip scanning requirement if app has just started and last scan less than INVALIDATE_SCAN_AFTER_MS milliseconds ago
-    await setPreference('qrCodeInvalidationCheckedThisSession', 'true')
-    ionRouter.navigate('/main', 'root', 'replace')
-    return
-  } else {
-    await setPreference('qrCodeInvalidationCheckedThisSession', 'false')
-    getPerformances()
-  }
+  console.log(mainStore.expertMode)
+  // Currently users need to scan on every app start. To change this, uncomment the code below.
+  // Leaving commented code in for now, if we ever decide to add this functionality again.
+  // const INVALIDATE_SCAN_AFTER_MS = 1000 * 60 * 90 // 90 Minutes
+  // const qrCodeInvalidationCheckedThisSession = await getPreference('qrCodeInvalidationCheckedThisSession')
+  // const lastScanTimestamp = await getPreference('lastScanTimestamp')
+  // if (
+  //   qrCodeInvalidationCheckedThisSession.value === 'false' &&
+  //   lastScanTimestamp.value &&
+  //   +lastScanTimestamp.value + INVALIDATE_SCAN_AFTER_MS > Date.now()
+  // ) {
+  //   // Skip scanning requirement if app has just started and last scan less than INVALIDATE_SCAN_AFTER_MS milliseconds ago
+  //   await setPreference('qrCodeInvalidationCheckedThisSession', 'true')
+  //   ionRouter.navigate('/main', 'root', 'replace')
+  //   return
+  // } else {
+  //   await setPreference('qrCodeInvalidationCheckedThisSession', 'false')
+  getPerformances()
+  // }
 })
 
 onDeactivated(() => {
   document.body.classList.remove('qrscanner')
   stopScan()
 })
-
-interface QrCodeScanResult {
-  performanceName: string
-  choirId?: number
-  tts?: boolean
-  roleName?: string
-  defaultLang?: string
-}
 </script>

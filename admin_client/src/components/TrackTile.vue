@@ -1,14 +1,6 @@
 <script setup lang="ts">
 defineProps(['track'])
-defineEmits(['startTrack', 'deleteTrack', 'editTrack'])
-
-const stopTrack = async () => {
-  try {
-    await fetch(`${process.env.VUE_APP_API_URL}/stop-track`)
-  } catch (err) {
-    alert('Error when stopping track: ' + err)
-  }
-}
+defineEmits(['startTrack', 'deleteTrack', 'editTrack', 'stopTrack'])
 </script>
 
 <template>
@@ -30,7 +22,7 @@ const stopTrack = async () => {
     <p class="text-start">{{ track.notes }}</p>
     <div class="m-0 mb-2 flex self-center">
       <Button @click="$emit('startTrack')">Start</Button>
-      <Button @click="stopTrack">Stop</Button>
+      <Button @click="$emit('stopTrack')">Stop</Button>
     </div>
   </div>
 </template>

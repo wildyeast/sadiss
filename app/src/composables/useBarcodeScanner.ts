@@ -1,35 +1,84 @@
 // https://github.com/capacitor-community/barcode-scanner
 import { BarcodeScanner } from '@capacitor-community/barcode-scanner'
+import { useMainStore } from '@/stores/MainStore'
+import { QrCodeScanResult } from '@/types/types'
 
 export function useBarcodeScanner() {
   const startScan = async () => {
-    // Check camera permission
-    // This is just a simple example, check out the better checks below
-    const permissionResult = await BarcodeScanner.checkPermission({ force: true })
-    console.log('Permission granted: ', permissionResult.granted)
+    await BarcodeScanner.checkPermission({ force: true })
 
-    // make background of WebView transparent
-    // note: if you are using ionic this might not be enough, check below
     BarcodeScanner.hideBackground()
 
-    const result = await BarcodeScanner.startScan() // start scanning and wait for a result
+    const result = await BarcodeScanner.startScan()
 
-    // if the result has content
     if (result.hasContent) {
-      console.log(result.content) // log the raw scanned content
-      console.log('End of scan.')
       return result.content
     }
-
-    console.log('End of scan.')
   }
 
   const stopScan = () => {
     BarcodeScanner.stopScan()
   }
 
+  const processScanResult = (result: QrCodeScanResult) => {
+    const mainStore = useMainStore()
+    // Performance name
+    const performanceNameResult = result.performanceName
+    if (performanceNameResult) {
+      mainStore.performanceName = performanceNameResult
+    }
+
+    // ChoirId (id of Role)
+    const choirIdResult = result.choirId
+    if (choirIdResult !== undefined && !Number.isNaN(+choirIdResult)) {
+      mainStore.choirId = +choirIdResult
+    }
+    // Role Name
+    const roleNameResult = result.roleName
+    if (roleNameResult) {
+      mainStore.roleName = roleNameResult
+    }
+
+    // Default TTS lang
+    const defaultLangResult = result.defaultLang
+    if (defaultLangResult) {
+      mainStore.defaultLang = defaultLangResult
+    }
+
+    // Timestamp of scan
+    // await setPreference('lastScanTimestamp', Date.now().toString())
+
+    // TTS langs
+    const ttsLangsResult = result.tts
+    if (ttsLangsResult) {
+      mainStore.availableLanguages = ttsLangsResult
+      if (defaultLangResult) {
+        mainStore.selectedLanguage = defaultLangResult
+      } else {
+        mainStore.selectedLanguage = ttsLangsResult[0].iso
+      }
+    }
+
+    // Expert Mode
+    const expertModeResult = result.expertMode
+    if (expertModeResult) {
+      mainStore.expertMode = expertModeResult === 'true'
+    }
+
+    const performanceIdResult = result.performanceId
+    if (performanceIdResult) {
+      mainStore.performanceId = +performanceIdResult
+    }
+
+    const wsUrlResult = result.wsUrl
+    if (wsUrlResult) {
+      mainStore.wsUrl = wsUrlResult
+    }
+  }
+
   return {
     startScan,
-    stopScan
+    stopScan,
+    processScanResult
   }
 }

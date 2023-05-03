@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { Axios } from 'axios'
+import type { Axios } from 'axios'
 import { ref, onMounted, inject, computed, watch, nextTick } from 'vue'
 import TrackTile from '@/components/TrackTile.vue'
 import { downloadZip } from 'client-zip'
 import QrcodeVue from 'qrcode.vue'
+import ServerSelect from '@/components/ServerSelect.vue'
 
 const isUploadModalVisible = ref(false)
 const axios: Axios | undefined = inject('axios')
@@ -107,14 +108,15 @@ const upload = async () => {
   }
 
   const config = {
-    onUploadProgress: function (progressEvent) {
+    onUploadProgress: function (progressEvent: ProgressEvent) {
       percentCompleted.value = Math.round((progressEvent.loaded * 100) / progressEvent.total)
     }
   }
 
   if (!editingTrackId.value) {
     axios
-      .post(`${process.env.VUE_APP_API_URL}/upload`, data, config)
+      // @ts-expect-error TODO: TS complains about FormData
+      .post(`${selectedServer.value.httpUrl}/upload`, data, config)
       .then((response) => {
         console.log(response.data)
         // Add newly added track to tracks
@@ -127,6 +129,7 @@ const upload = async () => {
       })
   } else {
     try {
+      // @ts-expect-error TODO: TS complains about FormData
       const res = await axios.patch(`${process.env.VUE_APP_API_URL}/edit/${editingTrackId.value}`, data, config)
       console.log(res.data)
       const trackIdx = tracks.value.map((track) => track._id).indexOf(editingTrackId.value)
@@ -151,7 +154,11 @@ const upload = async () => {
 }
 
 const startTrack = async (id: string) => {
-  await fetch(`${process.env.VUE_APP_API_URL}/start-track/${id}/${globalTime.value}`, {
+  if (!performanceId.value) {
+    alert('You must enter a performance ID.')
+    return
+  }
+  await fetch(`${process.env.VUE_APP_API_URL}/start-track/${id}/${performanceId.value}/${globalTime.value}/${loopTrack.value}`, {
     method: 'POST'
   })
     .then((res) => res.json())
@@ -161,6 +168,18 @@ const startTrack = async (id: string) => {
         alert('Cannot start track: Already running.')
       }
     })
+}
+
+const stopTrack = async () => {
+  if (!performanceId.value) {
+    alert('You must enter a performance ID.')
+    return
+  }
+  try {
+    await fetch(`${process.env.VUE_APP_API_URL}/stop-track/${performanceId.value}`)
+  } catch (err) {
+    alert('Error when stopping track: ' + err)
+  }
 }
 
 const deleteTrack = async (id: string, name: string) => {
@@ -228,6 +247,7 @@ const startClock = () => {
 
 /* QR Codes */
 
+const performanceId = ref('')
 const performanceName = ref('Performance Name')
 const expertMode = ref(false)
 const defaultLanguage = ref('en-US')
@@ -247,6 +267,17 @@ const getVoicesAndLanguages = async () => {
 }
 
 const openQrCodeModal = async () => {
+  if (!performanceId.value) {
+    alert('Please enter a performance ID.')
+    return
+  }
+
+  localStorage.setItem('performanceId', performanceId.value)
+
+  if (!selectedServer) {
+    alert('You must select a server.')
+    return
+  }
   await getVoicesAndLanguages()
   isQrCodeModalVisible.value = true
 }
@@ -254,13 +285,19 @@ const openQrCodeModal = async () => {
 const qrCodeData: QrCodeData[] = []
 
 const generateQrCodes = async () => {
+  if (!selectedServer) {
+    alert('You must select a server.')
+    return
+  }
   if (voiceCount.value) {
     for (let i = 0; i < voiceCount.value; i++) {
       const data: QrCodeData = {
         choirId: String(i),
         roleName: voiceNames.value[i],
         performanceName: performanceName.value,
-        expertMode: expertMode.value
+        expertMode: expertMode.value,
+        performanceId: performanceId.value,
+        wsUrl: selectedServer.wsUrl
       }
       if (ttsLangs.value) {
         data.tts = ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) }))
@@ -271,17 +308,21 @@ const generateQrCodes = async () => {
   } else if (ttsLangs.value) {
     qrCodeData.push({
       performanceName: performanceName.value,
+      performanceId: performanceId.value,
       expertMode: expertMode.value,
       defaultLang: defaultLanguage.value,
-      tts: ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) }))
+      tts: ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) })),
+      wsUrl: selectedServer.wsUrl
     })
   }
 
   // If not enough data to generate QR codes, generate at least one code with performanceName and expertMode
   if (!qrCodeData.length) {
     qrCodeData.push({
+      performanceId: performanceId.value,
       performanceName: performanceName.value,
-      expertMode: false
+      expertMode: false,
+      wsUrl: selectedServer.wsUrl
     })
   }
 
@@ -315,6 +356,7 @@ const downloadPartialQrCodes = async () => {
       input: svgBlob
     })
   }
+
   const blob = await downloadZip([...svgBlobs]).blob()
   const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)
@@ -325,6 +367,11 @@ const downloadPartialQrCodes = async () => {
   areQrCodesVisible.value = false
   isQrCodeModalVisible.value = false
 }
+
+const loopTrack = ref(false)
+let selectedServer: { wsUrl: string; httpUrl: string } | null = null
+
+const setSelectedServer = (server: { wsUrl: string; httpUrl: string }) => (selectedServer = server)
 
 // Enforce min and max values
 watch(trackTtsRate, (newValue) => {
@@ -338,6 +385,10 @@ watch(trackTtsRate, (newValue) => {
 onMounted(async () => {
   await initializeMCorp()
   await getTracks()
+  const storedPerformanceId = localStorage.getItem('performanceId')
+  if (storedPerformanceId) {
+    performanceId.value = storedPerformanceId
+  }
 })
 </script>
 <template>
@@ -354,6 +405,22 @@ onMounted(async () => {
         >Upload new track</Button
       >
       <Button @click="openQrCodeModal">Generate QR codes</Button>
+      <div class="ml-2 flex items-center gap-2">
+        <input
+          type="checkbox"
+          v-model="loopTrack" />
+        <label for="loopNextTrack">Loop track</label>
+      </div>
+      <div class="ml-4 flex items-center">
+        <input
+          v-model="performanceId"
+          type="text"
+          placeholder="Performance ID"
+          class="p-1 text-primary" />
+      </div>
+      <div class="ml-4 flex items-center">
+        <ServerSelect @emit-selection="setSelectedServer" />
+      </div>
     </div>
 
     <div
@@ -365,7 +432,8 @@ onMounted(async () => {
         :track="track"
         @delete-track="deleteTrack(track._id, track.name)"
         @start-track="startTrack(track._id)"
-        @edit-track="editTrack(track._id)" />
+        @edit-track="editTrack(track._id)"
+        @stop-track="stopTrack" />
     </div>
 
     <Modal

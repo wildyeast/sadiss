@@ -1,6 +1,6 @@
 {
   "name": "sadiss_app",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
@@ -28,11 +28,13 @@
     "cordova-plugin-device": "^2.1.0",
     "core-js": "^3.6.5",
     "ionicons": "^6.0.3",
+    "pinia": "^2.0.35",
     "vue": "^3.2.21",
     "vue-router": "^4.0.12"
   },
   "devDependencies": {
     "@capacitor/cli": "4.2.0",
+    "@pinia/testing": "^0.0.16",
     "@types/jest": "^27.0.2",
     "@types/node": "^18.14.0",
     "@typescript-eslint/eslint-plugin": "^5.6.0",

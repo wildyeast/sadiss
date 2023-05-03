@@ -26,10 +26,9 @@ import './theme/variables.css'
 /* Tailwind */
 import './theme/tailwind.css'
 
-/* Ionic specific CSS helper classes */
-import './theme/ionic.css'
+import { createPinia } from 'pinia'
 
-const app = createApp(App).use(IonicVue, { swipeBackEnabled: false }).use(router)
+const app = createApp(App).use(IonicVue, { swipeBackEnabled: false }).use(createPinia()).use(router)
 
 router.isReady().then(() => {
   app.mount('#app')
