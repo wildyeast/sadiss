@@ -154,7 +154,11 @@ const upload = async () => {
 }
 
 const startTrack = async (id: string) => {
-  await fetch(`${process.env.VUE_APP_API_URL}/start-track/${id}/${globalTime.value}/${loopTrack.value}`, {
+  if (!performanceId.value) {
+    alert('You must enter a performance ID.')
+    return
+  }
+  await fetch(`${process.env.VUE_APP_API_URL}/start-track/${id}/${performanceId.value}/${globalTime.value}/${loopTrack.value}`, {
     method: 'POST'
   })
     .then((res) => res.json())
@@ -164,6 +168,18 @@ const startTrack = async (id: string) => {
         alert('Cannot start track: Already running.')
       }
     })
+}
+
+const stopTrack = async () => {
+  if (!performanceId.value) {
+    alert('You must enter a performance ID.')
+    return
+  }
+  try {
+    await fetch(`${process.env.VUE_APP_API_URL}/stop-track/${performanceId.value}`)
+  } catch (err) {
+    alert('Error when stopping track: ' + err)
+  }
 }
 
 const deleteTrack = async (id: string, name: string) => {
@@ -416,7 +432,8 @@ onMounted(async () => {
         :track="track"
         @delete-track="deleteTrack(track._id, track.name)"
         @start-track="startTrack(track._id)"
-        @edit-track="editTrack(track._id)" />
+        @edit-track="editTrack(track._id)"
+        @stop-track="stopTrack" />
     </div>
 
     <Modal
