@@ -5,7 +5,7 @@
   "scripts": {
     "build": "npx tsc",
     "start": "node dist/server.js",
-    "dev": "concurrently \"npx tsc --watch\" \"nodemon --delay 1000ms -q dist/server.js\"",
+    "dev": "concurrently \"npx tsc --watch\" \"nodemon -q dist/server.js\"",
     "test": "NODE_ENV=test jest --coverage --watchAll --config ./jest.config.js"
   },
   "license": "MIT",
