@@ -19,17 +19,27 @@ describe('performanceController test', () => {
 
   describe('POST /api/performances', () => {
     it('should get performances from DB', async () => {
+      // create a performance in the database
+      const performance = new SadissPerformance({
+        name: 'Performance 1',
+        isPublic: true,
+        userId: 'user-id'
+      })
+      await performance.save()
+
+      // save the performance id for later use
+      const performanceId = performance._id
+
       const res = await authenticatedRequest(request, '/api/performances', 'get')
       expect(res.status).toBe(200)
 
-      const performances = JSON.parse(res.text)
-      expect(Array.isArray(performances)).toBe(true)
-      expect(performances.length).toBeGreaterThan(0)
+      const data = JSON.parse(res.text)
+      expect(Array.isArray(data.performances)).toBe(true)
+      expect(data.performances.length).toBeGreaterThan(0)
 
-      for (const performance of performances) {
-        expect(performance).toHaveProperty('name')
-        expect(performance).toHaveProperty('location')
-      }
+      expect(data.performances[0]).toHaveProperty('_id')
+      expect(data.performances[0]).toHaveProperty('name')
+      expect(data.performances[0]['_id']).toBe(performanceId.toString())
     })
   })
 
