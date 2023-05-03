@@ -5,4 +5,5 @@ interface QrCodeData {
   defaultLang?: string
   performanceName: string
   expertMode: boolean
+  performanceId: string
 }

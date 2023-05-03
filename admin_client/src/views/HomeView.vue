@@ -107,7 +107,7 @@ const upload = async () => {
   }
 
   const config = {
-    onUploadProgress: function (progressEvent) {
+    onUploadProgress: function (progressEvent: ProgressEvent) {
       percentCompleted.value = Math.round((progressEvent.loaded * 100) / progressEvent.total)
     }
   }
@@ -228,6 +228,7 @@ const startClock = () => {
 
 /* QR Codes */
 
+const performanceId = ref('')
 const performanceName = ref('Performance Name')
 const expertMode = ref(false)
 const defaultLanguage = ref('en-US')
@@ -247,6 +248,10 @@ const getVoicesAndLanguages = async () => {
 }
 
 const openQrCodeModal = async () => {
+  if (!performanceId.value) {
+    alert('Please enter a performance ID.')
+    return
+  }
   await getVoicesAndLanguages()
   isQrCodeModalVisible.value = true
 }
@@ -260,7 +265,8 @@ const generateQrCodes = async () => {
         choirId: String(i),
         roleName: voiceNames.value[i],
         performanceName: performanceName.value,
-        expertMode: expertMode.value
+        expertMode: expertMode.value,
+        performanceId: performanceId.value
       }
       if (ttsLangs.value) {
         data.tts = ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) }))
@@ -271,6 +277,7 @@ const generateQrCodes = async () => {
   } else if (ttsLangs.value) {
     qrCodeData.push({
       performanceName: performanceName.value,
+      performanceId: performanceId.value,
       expertMode: expertMode.value,
       defaultLang: defaultLanguage.value,
       tts: ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) }))
@@ -280,6 +287,7 @@ const generateQrCodes = async () => {
   // If not enough data to generate QR codes, generate at least one code with performanceName and expertMode
   if (!qrCodeData.length) {
     qrCodeData.push({
+      performanceId: performanceId.value,
       performanceName: performanceName.value,
       expertMode: false
     })
@@ -315,6 +323,7 @@ const downloadPartialQrCodes = async () => {
       input: svgBlob
     })
   }
+  // @ts-expect-error - Complains because of missing type from tslib.
   const blob = await downloadZip([...svgBlobs]).blob()
   const link = document.createElement('a')
   link.href = URL.createObjectURL(blob)
@@ -356,11 +365,18 @@ onMounted(async () => {
         >Upload new track</Button
       >
       <Button @click="openQrCodeModal">Generate QR codes</Button>
-      <div class="flex items-center gap-2">
+      <div class="ml-2 flex items-center gap-2">
         <input
           type="checkbox"
           v-model="loopTrack" />
         <label for="loopNextTrack">Loop track</label>
+      </div>
+      <div class="ml-4 flex items-center">
+        <input
+          v-model="performanceId"
+          type="text"
+          placeholder="Performance ID"
+          class="p-1 text-primary" />
       </div>
     </div>
 
