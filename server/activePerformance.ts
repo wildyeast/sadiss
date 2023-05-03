@@ -25,7 +25,7 @@ export class ActivePerformance {
     this.sendingIntervalRunning = true
 
     for (const client of wss.clients) {
-      if (client.performanceId !== this.id) return
+      if (client.performanceId !== this.id) continue
       client.send(JSON.stringify({ start: true }))
     }
 
