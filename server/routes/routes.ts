@@ -33,20 +33,13 @@ router.get('/api/track/:id', track_controller.get_track)
 router.post('/api/track/delete/:id', track_controller.delete_track)
 
 // Start track
-router.post('/api/track/start/:id/:startTime', track_controller.start_track)
+router.post('/api/track/start/:trackId/:performanceId/:startTime/:loopTrack', track_controller.start_track)
 
 // Stop track
-router.get('/api/track/stop', track_controller.stop_track)
+router.get('/api/track/stop/:performanceId', track_controller.stop_track)
 
 // Get voices and languages
 router.get('/api/get-voices-and-languages', track_controller.get_voices_and_languages)
-router.post('/start-track/:trackId/:performanceId/:startTime/:loopTrack', track_controller.start_track)
-
-// Stop track
-router.get('/stop-track/:performanceId', track_controller.stop_track)
-
-// Stop track
-router.get('/get-voices-and-languages', track_controller.get_voices_and_languages)
 
 // Get performances
 router.get('/get-performances', performance_controller.get_performances)
