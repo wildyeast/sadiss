@@ -71,8 +71,8 @@ export class ActivePerformance {
         // Distribute partials among clients and send them to clients
         if (mode === 'choir') {
           // Choir mode
-          wss.clients.forEach((client) => {
-            if (client.isAdmin || client.performanceId !== this.id) return
+          for (const client of wss.clients) {
+            if (client.isAdmin || client.performanceId !== this.id) continue
 
             const dataToSend: {
               startTime: number
@@ -101,7 +101,7 @@ export class ActivePerformance {
             if (dataToSend.chunk.partials || dataToSend.chunk.ttsInstructions) {
               client.send(JSON.stringify(dataToSend))
             }
-          })
+          }
         } else {
           // nonChoir mode
 
@@ -174,7 +174,7 @@ export class ActivePerformance {
           }
 
           for (const client of wss.clients) {
-            if (client.isAdmin || client.performanceId !== this.id) return
+            if (client.isAdmin || client.performanceId !== this.id) continue
             const dataToSend: { partials: PartialChunk[]; ttsInstructions?: string } = {
               partials: allocatedPartials[client.id]
             }
