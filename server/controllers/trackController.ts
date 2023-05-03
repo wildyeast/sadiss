@@ -1,4 +1,4 @@
-import express from 'express'
+import { Request, Response } from 'express'
 import { chunk } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose from 'mongoose'
@@ -31,7 +31,7 @@ let wss: Server
 const activePerformances: ActivePerformance[] = []
 
 // Start track
-exports.start_track = async (req: express.Request, res: express.Response) => {
+exports.start_track = async (req: Request, res: Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   wss = req.wss
   try {
@@ -81,7 +81,7 @@ exports.start_track = async (req: express.Request, res: express.Response) => {
   }
 }
 
-exports.get_stats = async (req: express.Request, res: express.Response) => {
+exports.get_stats = async (req: Request, res: Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   if (!wss) {
     res.json({ error: 'WSS object undefined.' })
@@ -90,13 +90,13 @@ exports.get_stats = async (req: express.Request, res: express.Response) => {
   res.json({ clients: wss.clients.size })
 }
 
-exports.delete_track = async (req: express.Request, res: express.Response) => {
+exports.delete_track = async (req: Request, res: Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   await Track.deleteOne({ _id: req.params.id })
   res.send()
 }
 
-exports.get_tracks = async (req: express.Request, res: express.Response) => {
+exports.get_tracks = async (req: Request, res: Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   try {
     const allTracks = await Track.find({}, '_id name notes mode waveform ttsRate')
@@ -107,7 +107,7 @@ exports.get_tracks = async (req: express.Request, res: express.Response) => {
   }
 }
 
-exports.get_track = async (req: express.Request, res: express.Response) => {
+exports.get_track = async (req: Request, res: Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   try {
     const track = await Track.find({ _id: req.params.id }, '_id name notes mode waveform ttsRate partialFile ttsFiles')
@@ -118,7 +118,7 @@ exports.get_track = async (req: express.Request, res: express.Response) => {
   }
 }
 
-exports.upload_track = async (req: express.Request, res: express.Response) => {
+exports.upload_track = async (req: Request, res: Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
 
   if (!req.files) return
@@ -189,7 +189,7 @@ exports.upload_track = async (req: express.Request, res: express.Response) => {
   }
 }
 
-exports.edit_track = async (req: express.Request, res: express.Response) => {
+exports.edit_track = async (req: Request, res: Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
 
   const patch = req.body
@@ -235,7 +235,7 @@ exports.edit_track = async (req: express.Request, res: express.Response) => {
   })
 }
 
-exports.stop_track = (req: express.Request, res: express.Response) => {
+exports.stop_track = (req: Request, res: Response) => {
   const performance = activePerformances.find((p) => p.id === +req.params.performanceId)
   if (performance) {
     performance.stopSendingInterval()
@@ -245,7 +245,7 @@ exports.stop_track = (req: express.Request, res: express.Response) => {
   }
 }
 
-exports.get_voices_and_languages = async (req: express.Request, res: express.Response) => {
+exports.get_voices_and_languages = async (req: Request, res: Response) => {
   res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   try {
     let maxPartialsCount = -1
