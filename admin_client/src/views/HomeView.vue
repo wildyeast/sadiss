@@ -307,7 +307,7 @@ const generateQrCodes = async () => {
         wsUrl: selectedServer.wsUrl
       }
       if (ttsLangs.value) {
-        data.tts = ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) }))
+        data.tts = ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso) }))
         data.defaultLang = defaultLanguage.value
       }
       qrCodeData.push(data)
@@ -318,7 +318,7 @@ const generateQrCodes = async () => {
       performanceId: performanceId.value,
       expertMode: expertMode.value,
       defaultLang: defaultLanguage.value,
-      tts: ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) })),
+      tts: ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso) })),
       wsUrl: selectedServer.wsUrl
     })
   }
@@ -336,16 +336,15 @@ const generateQrCodes = async () => {
   await downloadPartialQrCodes()
 }
 
-// Adapted from https://stackoverflow.com/a/69968496/16725862
-// TODO: Returns e.g 'American English' and 'Deutsch (Deutschland)'. Ideally would return 'English' and 'Deutsch'.
-const convertIsoToLangName = (locale: string, iso: string) => {
-  const displayNames = new Intl.DisplayNames([locale], {
-    type: 'language'
-  })
-  const langName = displayNames.of(iso);
-  // Remove region if it's in parentheses
-  return langName ? langName.replace(/\s\(.+\)/, '') : 'Unknown Language';
+const languageMap: Record<string, string> = {
+  'en-US': 'English',
+  'de-DE': 'Deutsch',
+  'es-ES': 'Español',
+  'fr-FR': 'Français',
+  'it-IT': 'Italiano'
 }
+
+const convertIsoToLangName = (iso: string) =>  languageMap[iso] ?? iso
 
 const isQrCodeModalVisible = ref(false)
 
