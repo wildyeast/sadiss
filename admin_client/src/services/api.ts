@@ -65,6 +65,23 @@ export async function register(username: string, email: string, password: string
   console.log(response.data!.message)
 }
 
+export async function getPerformances() {
+  const response = await request<{ performances: Performance[] }>('/api/performances')
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.performances
+}
+
+export async function createPerformance(performance: { name: string }) {
+  const response = await request<{ performance: Performance }>('/api/performance/create', {
+    method: 'POST',
+    body: JSON.stringify(performance)
+  })
+}
+
 // export async function getTracks() {
 //   const response = await request<{ tracks: Track[] }>('/tracks')
 
