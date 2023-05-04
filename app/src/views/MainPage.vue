@@ -1,18 +1,9 @@
 <template>
   <ion-page>
-    <ion-header :hidden="isRegistered">
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-back-button></ion-back-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-
     <ion-content :fullscreen="true">
       <BasePage>
-        <PerformanceInformation />
-
-        <div class="mt-10 flex flex-1 flex-col items-center gap-10">
+        <div class="flex flex-1 flex-col items-center justify-around">
+          <PerformanceInformation :text-color-danger="wasRegisteredThisSession" />
           <div class="h-[60vw] w-[60vw]">
             <div
               v-if="isRegistered"
@@ -22,17 +13,26 @@
             <ion-button
               v-else-if="wasRegisteredThisSession"
               @click="register"
-              class="ionic-rounded-full h-full w-full rounded-full border-4 border-danger">
+              class="ionic-rounded-full h-full w-full rounded-full border-2 border-danger">
               <span class="text-4xl text-danger">Rejoin</span>
             </ion-button>
+            <div
+              v-else
+              class="flex h-full items-center justify-center">
+              <ion-spinner
+                name="circular"
+                class="scale-[200%] text-highlight" />
+            </div>
           </div>
           <div>
             <p
               v-if="!isRegistered && wasRegisteredThisSession"
-              class="mb-4 text-sm text-danger">
+              class="mb-4 text-center text-sm text-danger">
               Your connection seems to be broken. Please rejoin by pressing the Rejoin button above.
             </p>
-            <p class="text-sm text-tertiary">
+            <p
+              v-else
+              class="text-center text-sm text-tertiary">
               To leave the performance or scan a different code you have to quit and re-start the app.
             </p>
           </div>
@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonToolbar, IonButton, IonButtons, IonBackButton, useBackButton } from '@ionic/vue'
+import { IonContent, IonPage, IonButton, useBackButton, IonSpinner } from '@ionic/vue'
 import { watch, onUnmounted, onMounted, ref } from 'vue'
 import { Capacitor } from '@capacitor/core'
 import { KeepAwake } from '@capacitor-community/keep-awake'
@@ -87,7 +87,10 @@ const wasRegisteredThisSession = ref(false)
 watch(
   () => isRegistered.value,
   async (value) => {
-    wasRegisteredThisSession.value = true
+    if (value) {
+      wasRegisteredThisSession.value = true
+    }
+
     try {
       if (Capacitor.getPlatform() !== 'web') {
         if (value) {

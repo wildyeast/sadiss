@@ -29,7 +29,9 @@
         <div
           v-if="mainStore.processing"
           class="flex h-full items-center justify-center">
-          <ion-spinner class="scale-[200%] text-highlight" />
+          <ion-spinner
+            name="circular"
+            class="scale-[200%] text-highlight" />
         </div>
       </BasePage>
     </ion-content>
