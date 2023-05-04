@@ -38,7 +38,7 @@
           </div>
         </div>
 
-        <p>v1.2.0</p>
+        <p class="text-sm">v1.2.0</p>
       </BasePage>
     </ion-content>
   </ion-page>

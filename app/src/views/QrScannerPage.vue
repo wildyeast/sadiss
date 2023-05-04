@@ -17,7 +17,7 @@
             </p>
           </div>
         </div>
-        <p class="mt-10 text-center text-sm">
+        <p class="text-center text-sm">
           Visit
           <a
             href="https://sadiss.net"

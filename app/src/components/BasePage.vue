@@ -6,7 +6,7 @@
         src="../../public/assets/sadiss-logo.png"
         class="mt-6 mb-2 w-[40%]" />
     </div>
-    <main class="flex flex-grow flex-col items-center justify-between p-4 px-8">
+    <main class="flex flex-grow flex-col items-center justify-between px-8">
       <slot />
     </main>
     <img src="../../public/assets/footer-dots.svg" />

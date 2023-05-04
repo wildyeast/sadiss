@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonToolbar, useIonRouter, IonButtons, IonBackButton } from '@ionic/vue'
+import { IonContent, IonPage, useIonRouter } from '@ionic/vue'
 import { onMounted, ref } from 'vue'
 import BasePage from '@/components/BasePage.vue'
 import { usePlayer } from '@/composables/usePlayer'
