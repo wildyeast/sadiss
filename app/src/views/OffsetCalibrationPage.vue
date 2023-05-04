@@ -22,7 +22,7 @@
                 class="h-[40px]" />
             </button>
           </div>
-          <p class="text-sm">
+          <p class="text-sm leading-4">
             You should be hearing a regular click while this screen is displayed. To adjust the timing of your device to match
             others more closely click the arrows above. Your device will remember this setting.
           </p>

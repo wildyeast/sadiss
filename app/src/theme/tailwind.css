@@ -42,7 +42,11 @@
 }
 
 * {
-  @apply font-verdana text-white;
+  @apply font-verdana;
+}
+
+p {
+  @apply leading-5 text-white;
 }
 
 .button {

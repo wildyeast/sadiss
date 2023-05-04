@@ -12,9 +12,7 @@
             code
           </ion-button>
           <div v-if="!mainStore.processing">
-            <p class="text-sm">
-              Once registered you will have to quit and re-start the app to leave the performance or scan a different code.
-            </p>
+            <p>Once registered you will have to quit and re-start the app to leave the performance or scan a different code.</p>
           </div>
         </div>
         <p class="text-center text-sm">

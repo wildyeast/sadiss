@@ -5,11 +5,11 @@
         <div class="flex flex-1 flex-col items-center justify-around">
           <PerformanceInformation :text-color-danger="!isRegistered && wasRegisteredThisSession" />
           <div class="h-[60vw] w-[60vw]">
-            <div
+            <ion-button
               v-if="isRegistered"
               class="pulse flex h-full w-full items-center justify-center rounded-full bg-highlight text-2xl font-bold">
               <p class="text-4xl text-primary">Active</p>
-            </div>
+            </ion-button>
             <ion-button
               v-else-if="wasRegisteredThisSession"
               @click="register"
@@ -24,15 +24,22 @@
                 class="scale-[200%] text-highlight" />
             </div>
           </div>
-          <div>
-            <p
+          <div class="flex h-[100px] flex-col justify-center">
+            <div
               v-if="!isRegistered && wasRegisteredThisSession"
-              class="mb-4 text-center text-sm text-danger">
-              Your connection seems to be broken. Please rejoin by pressing the Rejoin button above.
-            </p>
+              class="flex flex-col gap-5">
+              <div class="flex w-full justify-center">
+                <img
+                  src="../../public/assets/broken-connection.svg"
+                  class="h-[40px]" />
+              </div>
+              <p class="text-center text-sm leading-4 text-danger">
+                Your connection seems to be broken. Please rejoin by pressing the Rejoin button above.
+              </p>
+            </div>
             <p
               v-else
-              class="text-center text-sm text-tertiary">
+              class="text-sm leading-4">
               To leave the performance or scan a different code you have to quit and re-start the app.
             </p>
           </div>
@@ -81,8 +88,8 @@ onUnmounted(async () => {
     await NavigationBar.show()
   }
 })
-
-const wasRegisteredThisSession = ref(false)
+isRegistered.value = false
+const wasRegisteredThisSession = ref(true)
 // Enable/Disable KeepAwake and Android Navigation Bar depending on registration status
 watch(
   () => isRegistered.value,
