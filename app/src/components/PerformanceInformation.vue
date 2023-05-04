@@ -5,7 +5,7 @@ const mainStore = useMainStore()
 
 <template>
   <div class="flex flex-col items-center">
-    <h1 class="text-xl text-highlight">{{ mainStore.performanceName }}</h1>
-    <h2 class="text-lg text-highlight">{{ mainStore.roleName }}</h2>
+    <h1 class="text-center text-xl text-highlight">{{ mainStore.performanceName }}</h1>
+    <h2 class="text-center text-lg text-highlight">{{ mainStore.roleName }}</h2>
   </div>
 </template>
