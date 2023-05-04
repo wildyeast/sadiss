@@ -7,7 +7,7 @@ export const useMainStore = defineStore('main', () => {
   const roleName = ref('')
   const performanceName = ref('')
   const defaultLang = ref('')
-  const selectedLanguage = ref('')
+  const selectedLanguage = ref<{ iso: string; lang: string }>({ iso: '', lang: '' })
   const choirId = ref(0)
   const expertMode = ref(false)
   const performanceId = ref(-1)
