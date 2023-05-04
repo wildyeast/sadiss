@@ -2,14 +2,6 @@
   <ion-app class="scanner-hide">
     <ion-router-outlet />
   </ion-app>
-  <div class="scanner-ui justify-center">
-    <!-- QR Scanner Interface -->
-    <ion-button
-      @click="stopScanning"
-      class="button absolute bottom-2">
-      Go back
-    </ion-button>
-  </div>
 </template>
 
 <script setup lang="ts">
