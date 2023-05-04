@@ -4,8 +4,8 @@ const mainStore = useMainStore()
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-4">
-    <h1 class="text-xl text-tertiary">{{ mainStore.performanceName }}</h1>
-    <h2 class="text-2xl text-tertiary">{{ mainStore.roleName }}</h2>
+  <div class="flex flex-col items-center">
+    <h1 class="text-xl text-highlight">{{ mainStore.performanceName }}</h1>
+    <h2 class="text-lg text-highlight">{{ mainStore.roleName }}</h2>
   </div>
 </template>
