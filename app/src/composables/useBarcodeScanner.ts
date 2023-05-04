@@ -51,12 +51,9 @@ export function useBarcodeScanner() {
     // TTS langs
     const ttsLangsResult = result.tts
     if (ttsLangsResult) {
+      const foundDefaultLang = ttsLangsResult.find((lang) => lang.iso === defaultLangResult)
       mainStore.availableLanguages = ttsLangsResult
-      if (defaultLangResult) {
-        mainStore.selectedLanguage = defaultLangResult
-      } else {
-        mainStore.selectedLanguage = ttsLangsResult[0].iso
-      }
+      mainStore.selectedLanguage = foundDefaultLang || ttsLangsResult[0]
     }
 
     // Expert Mode

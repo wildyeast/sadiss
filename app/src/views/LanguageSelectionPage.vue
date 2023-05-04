@@ -14,9 +14,9 @@
               <button
                 v-for="(lang, index) in mainStore.availableLanguages"
                 :key="index"
-                @click="mainStore.selectedLanguage = lang.iso">
+                @click="mainStore.selectedLanguage.iso = lang.iso">
                 <span
-                  v-if="lang.iso === mainStore.selectedLanguage"
+                  v-if="lang.iso === mainStore.selectedLanguage.iso"
                   class="text-highlight"
                   >&gt;&gt; {{ lang.lang }} &lt;&lt;
                 </span>
@@ -52,7 +52,7 @@ watch(
   () => mainStore.selectedLanguage,
   async (value) => {
     mainStore.selectedLanguage = value
-    setTtsLanguage(mainStore.selectedLanguage)
+    setTtsLanguage(mainStore.selectedLanguage.iso)
   },
   { immediate: true }
 )
