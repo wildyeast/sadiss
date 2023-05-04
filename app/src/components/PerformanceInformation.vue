@@ -1,6 +1,10 @@
 <script setup lang="ts">
 import { useMainStore } from '@/stores/MainStore'
+import { useRoute } from 'vue-router'
+
 const mainStore = useMainStore()
+const route = useRoute()
+console.log(route.name)
 //eslint-disable-next-line no-undef
 defineProps<{
   textColorDanger?: boolean
@@ -20,7 +24,7 @@ defineProps<{
       {{ mainStore.roleName }}
     </h2>
     <h2
-      v-if="mainStore.selectedLanguage"
+      v-if="mainStore.selectedLanguage && $route.name !== 'LanguageSelection'"
       class="text-center text-lg"
       :class="textColorDanger ? 'text-danger' : 'text-highlight'">
       Language: {{ mainStore.selectedLanguage.lang }}

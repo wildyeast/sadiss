@@ -14,7 +14,7 @@
               <button
                 v-for="(lang, index) in mainStore.availableLanguages"
                 :key="index"
-                @click="mainStore.selectedLanguage.iso = lang.iso">
+                @click="mainStore.selectedLanguage = lang">
                 <span
                   v-if="lang.iso === mainStore.selectedLanguage.iso"
                   class="text-highlight"
@@ -37,7 +37,7 @@
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonToolbar, useIonRouter, IonButtons, IonBackButton } from '@ionic/vue'
+import { IonContent, IonPage, useIonRouter } from '@ionic/vue'
 import { watch } from 'vue'
 import { useMainStore } from '@/stores/MainStore'
 import BasePage from '@/components/BasePage.vue'

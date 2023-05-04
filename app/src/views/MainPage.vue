@@ -3,7 +3,7 @@
     <ion-content :fullscreen="true">
       <BasePage>
         <div class="flex flex-1 flex-col items-center justify-around">
-          <PerformanceInformation :text-color-danger="wasRegisteredThisSession" />
+          <PerformanceInformation :text-color-danger="!isRegistered && wasRegisteredThisSession" />
           <div class="h-[60vw] w-[60vw]">
             <div
               v-if="isRegistered"
