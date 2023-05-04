@@ -88,8 +88,8 @@ onUnmounted(async () => {
     await NavigationBar.show()
   }
 })
-isRegistered.value = false
-const wasRegisteredThisSession = ref(true)
+
+const wasRegisteredThisSession = ref(false)
 // Enable/Disable KeepAwake and Android Navigation Bar depending on registration status
 watch(
   () => isRegistered.value,
