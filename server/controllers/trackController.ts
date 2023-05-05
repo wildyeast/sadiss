@@ -49,7 +49,7 @@ exports.start_track = async (req: Request, res: Response) => {
           throw new Error('Chunks undefined')
         }
 
-        const performanceId = +req.params.performanceId
+        const performanceId = req.params.performanceId
 
         // Check if performance already exists
         let performance = activePerformances.find((p) => p.id === performanceId)
@@ -75,6 +75,8 @@ exports.start_track = async (req: Request, res: Response) => {
           res.json({ data: 'Track already running.' })
         }
       })
+    } else {
+      throw new Error('Track not found.')
     }
   } catch (err) {
     res.status(500).json({ error: err })
@@ -236,7 +238,7 @@ exports.edit_track = async (req: Request, res: Response) => {
 }
 
 exports.stop_track = (req: Request, res: Response) => {
-  const performance = activePerformances.find((p) => p.id === +req.params.performanceId)
+  const performance = activePerformances.find((p) => p.id === req.params.performanceId)
   if (performance) {
     performance.stopSendingInterval()
     res.send({ message: 'Track stopped.' })

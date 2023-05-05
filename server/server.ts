@@ -7,13 +7,11 @@ import * as dotenv from 'dotenv'
 
 import { Server } from 'ws'
 import { startKeepAliveInterval } from './tools/startKeepAliveInterval'
-import { ActivePerformance } from './activePerformance'
 
 const cors = require('cors')
 const mongoose = require('mongoose')
 const uuid = require('uuid')
 
-const p = new ActivePerformance(1)
 // Load .env
 dotenv.config()
 
@@ -52,7 +50,7 @@ const corsOptions = {
 
 const app = express()
   .use(express.json())
-  // .use(cors(corsOptions))
+  .use(cors(corsOptions))
   .use(express.urlencoded({ extended: false }))
 
 app.listen(BASE_PORT, () => console.log(`Http server listening on port ${BASE_PORT}.`))
