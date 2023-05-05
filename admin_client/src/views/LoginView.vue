@@ -18,10 +18,7 @@ const loginUser = async () => {
     return
   }
   try {
-    console.log('Now calling login()')
-    const token = await login(formData.username, formData.password)
-    console.log('Called login()')
-    console.log(`Logged in with token: ${token}`)
+    await login(formData.username, formData.password)
     await router.push({ path: '/' })
   } catch (error) {
     console.error(`Error logging in: ${error}`)
