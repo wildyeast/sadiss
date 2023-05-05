@@ -1,9 +1,11 @@
 import { mount, shallowMount } from '@vue/test-utils'
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, type Mock } from 'vitest'
 
 import LoginView from '../LoginView.vue'
 import * as api from '../../services/api'
-import { createRouter, createWebHistory } from 'vue-router'
+import { useRouter } from 'vue-router'
+
+vi.mock('vue-router')
 
 describe('LoginView', () => {
   it('should render the component', () => {
@@ -13,17 +15,16 @@ describe('LoginView', () => {
 
   it('should log in with valid credentials', async () => {
     const loginSpy = vi.spyOn(api, 'login')
-    const router = createRouter({
-      history: createWebHistory(),
-      routes: [{ path: '/', component: { template: '<div></div>' } }]
+
+    useRouter.mockReturnValue({
+      push: vi.fn()
     })
+
     const wrapper = shallowMount(LoginView, {
       global: {
-        plugins: [router],
-        stubs: ['Button', 'router-link', 'router-view']
+        stubs: ['Button']
       }
     })
-    const pushSpy = vi.spyOn(router, 'push')
 
     // Setting form data
     await wrapper.find('[type="text"]').setValue('mockUsername')
@@ -33,7 +34,7 @@ describe('LoginView', () => {
     await wrapper.find('[type="submit"]').trigger('submit.prevent')
 
     expect(loginSpy).toHaveBeenCalledWith('mockUsername', 'mockPassword')
-    expect(pushSpy).toHaveBeenCalledWith({ path: '/' })
+    expect(useRouter().push).toHaveBeenCalledWith({ path: '/' })
   })
 
   it('should show an error message when no credentials are provided', async () => {
