@@ -10,7 +10,7 @@ export const useMainStore = defineStore('main', () => {
   const selectedLanguage = ref<{ iso: string; lang: string }>({ iso: '', lang: '' })
   const choirId = ref(0)
   const expertMode = ref(false)
-  const performanceId = ref(-1)
+  const performanceId = ref('')
   const wsUrl = ref('')
 
   const processing = ref(false)

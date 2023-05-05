@@ -64,7 +64,7 @@ export function useBarcodeScanner() {
 
     const performanceIdResult = result.performanceId
     if (performanceIdResult) {
-      mainStore.performanceId = +performanceIdResult
+      mainStore.performanceId = performanceIdResult
     }
 
     const wsUrlResult = result.wsUrl

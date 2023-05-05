@@ -109,7 +109,7 @@ describe('processScanResult', () => {
   it('should update the performanceId in mainStore when provided in the scan result', () => {
     const result = { performanceName: 'My Performance', performanceId: '123', wsUrl: 'ws://wsUrl.test' }
     processScanResult(result)
-    expect(mainStore.performanceId).toBe(+result.performanceId)
+    expect(mainStore.performanceId).toBe(result.performanceId)
   })
 
   it('should update the wsUrl in mainStore when provided in the scan result', () => {
