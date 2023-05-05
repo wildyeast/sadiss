@@ -89,6 +89,10 @@ const handleTtsFileUpload = async (e: Event, voice: number, lang: string) => {
 
 const percentCompleted = ref()
 const upload = async () => {
+  if (!selectedServer) {
+    alert('You must select a server.')
+    return
+  }
   if (!trackName.value) {
     alert('You must enter a track title.')
   }
@@ -116,8 +120,7 @@ const upload = async () => {
 
   if (!editingTrackId.value) {
     axios
-      // @ts-expect-error TODO: TS complains about FormData
-      .post(`${selectedServer.value.httpUrl}/upload`, data, config)
+      .post(`${selectedServer.httpUrl}/upload`, data, config)
       .then((response) => {
         console.log(response.data)
         // Add newly added track to tracks
@@ -130,7 +133,6 @@ const upload = async () => {
       })
   } else {
     try {
-      // @ts-expect-error TODO: TS complains about FormData
       const res = await axios.patch(`${process.env.VUE_APP_API_URL}/edit/${editingTrackId.value}`, data, config)
       console.log(res.data)
       const trackIdx = tracks.value.map((track) => track._id).indexOf(editingTrackId.value)
@@ -344,7 +346,7 @@ const languageMap: Record<string, string> = {
   'it-IT': 'Italiano'
 }
 
-const convertIsoToLangName = (iso: string) =>  languageMap[iso] ?? iso
+const convertIsoToLangName = (iso: string) => languageMap[iso] ?? iso
 
 const isQrCodeModalVisible = ref(false)
 
