@@ -7,6 +7,7 @@
           <div class="h-[60vw] w-[60vw]">
             <ion-button
               v-if="isRegistered"
+              :disabled="true"
               class="pulse flex h-full w-full items-center justify-center rounded-full bg-highlight text-2xl font-bold">
               <p class="text-4xl text-primary">Active</p>
             </ion-button>
