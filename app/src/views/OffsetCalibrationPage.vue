@@ -55,8 +55,8 @@ const { initializeMCorp } = useMCorp()
 const { setOutputLatencyOffset } = usePlayer()
 
 const outputLatencyOffset = ref(0)
-const maxOutputLatencyOffset = 0.6
-const minOutputLatencyOffset = -0.6
+const maxOutputLatencyOffset = 0.4
+const minOutputLatencyOffset = -0.4
 const changeOutputLatencyOffset = (changeBy: number) => {
   const newOffset = outputLatencyOffset.value + changeBy
   if (newOffset > maxOutputLatencyOffset || newOffset < minOutputLatencyOffset) {
