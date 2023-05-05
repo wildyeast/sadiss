@@ -47,7 +47,7 @@ describe('processScanResult', () => {
     expect(mainStore.availableLanguages).toEqual(result.tts)
   })
 
-  it('should update the selected TTS language in mainStore to the default language when both are provided in the scan result', () => {
+  it('should update the selected TTS language in mainStore to the default language when both are provided in the scan result and default language is in available languages', () => {
     const result = {
       performanceName: 'My Performance',
       tts: [
@@ -59,7 +59,10 @@ describe('processScanResult', () => {
       wsUrl: 'ws://wsUrl.test'
     }
     processScanResult(result)
-    expect(mainStore.selectedLanguage).toBe(result.defaultLang)
+    const foundDefaultLang = result.tts.find((lang) => lang.iso === result.defaultLang)
+    if (foundDefaultLang) {
+      expect(mainStore.selectedLanguage).toStrictEqual(foundDefaultLang)
+    }
   })
 
   it('should update the selected TTS language in mainStore to the first available language when no default language is provided in the scan result', () => {
@@ -70,10 +73,25 @@ describe('processScanResult', () => {
         { iso: 'fr', lang: 'French' }
       ],
       performanceId: '456',
+      defaultLang: 'de',
       wsUrl: 'ws://wsUrl.test'
     }
     processScanResult(result)
-    expect(mainStore.selectedLanguage).toBe(result.tts[0].iso)
+    expect(mainStore.selectedLanguage).toStrictEqual(result.tts[0])
+  })
+
+  it('should update the selected TTS language in mainStore to the first available language when default language is provided in the scan result but is not in available languages', () => {
+    const result = {
+      performanceName: 'My Performance',
+      tts: [
+        { iso: 'en', lang: 'English' },
+        { iso: 'fr', lang: 'French' }
+      ],
+      performanceId: '456',
+      wsUrl: 'ws://wsUrl.test'
+    }
+    processScanResult(result)
+    expect(mainStore.selectedLanguage).toStrictEqual(result.tts[0])
   })
 
   it('should update the expert mode to be true in mainStore when provided in the scan result', () => {

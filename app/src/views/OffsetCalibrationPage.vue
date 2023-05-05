@@ -1,50 +1,44 @@
 <template>
   <ion-page>
-    <ion-header>
-      <ion-toolbar>
-        <ion-buttons slot="start">
-          <ion-back-button></ion-back-button>
-        </ion-buttons>
-      </ion-toolbar>
-    </ion-header>
-
     <ion-content :fullscreen="true">
       <BasePage>
-        <PerformanceInformation />
+        <div class="flex h-full flex-col items-center justify-around">
+          <PerformanceInformation />
 
-        <div class="flex w-full justify-center gap-10">
+          <div class="flex w-full justify-center gap-10">
+            <button
+              @touchstart="startChangingOutputLatencyOffset(-0.01)"
+              @touchend="stopChangingOutputLatencyOffset()">
+              <img
+                src="../../public/assets/arrow-left.svg"
+                class="h-[40px]" />
+            </button>
+            <div class="w-32 whitespace-nowrap text-center text-4xl font-bold text-highlight">{{ outputLatencyOffset }}s</div>
+            <button
+              @touchstart="startChangingOutputLatencyOffset(0.01)"
+              @touchend="stopChangingOutputLatencyOffset()">
+              <img
+                src="../../public/assets/arrow-right.svg"
+                class="h-[40px]" />
+            </button>
+          </div>
+          <p class="text-sm leading-4">
+            You should be hearing a regular click while this screen is displayed. To adjust the timing of your device to match
+            others more closely click the arrows above. Your device will remember this setting.
+          </p>
           <button
-            @touchstart="startChangingOutputLatencyOffset(-0.01)"
-            @touchend="stopChangingOutputLatencyOffset()">
-            <img
-              src="../../public/assets/arrow-left.svg"
-              class="h-[40px]" />
-          </button>
-          <div class="w-32 text-center text-4xl font-bold text-highlight">{{ outputLatencyOffset }}s</div>
-          <button
-            @touchstart="startChangingOutputLatencyOffset(0.01)"
-            @touchend="stopChangingOutputLatencyOffset()">
-            <img
-              src="../../public/assets/arrow-right.svg"
-              class="h-[40px]" />
+            @click="goForward()"
+            class="h-[80px] w-[80px] text-2xl">
+            <img src="../../public/assets/button-next.svg" />
           </button>
         </div>
-        <p class="text-sm text-tertiary">
-          You should be hearing a regular click while this screen is displayed. To adjust the timing of your device to match
-          others mor closely click the arrows above. Your device will remember this setting.
-        </p>
-        <button
-          @click="goForward()"
-          class="h-[80px] w-[80px] text-2xl">
-          <img src="../../public/assets/button-next.svg" />
-        </button>
       </BasePage>
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonToolbar, useIonRouter, IonButtons, IonBackButton } from '@ionic/vue'
+import { IonContent, IonPage, useIonRouter } from '@ionic/vue'
 import { onMounted, ref } from 'vue'
 import BasePage from '@/components/BasePage.vue'
 import { usePlayer } from '@/composables/usePlayer'

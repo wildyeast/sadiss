@@ -47,6 +47,7 @@ const closeUploadModal = () => {
 const numberOfClients = ref(0)
 const maxNumberOfClients = ref(0)
 const getNumberOfClients = async () => {
+  // @ts-expect-error TS complains about process
   const data = await fetch(`${process.env.VUE_APP_API_URL}/get-stats`).then((res) => res.json())
   numberOfClients.value = data.clients
   if (data.clients > maxNumberOfClients.value) {
@@ -158,6 +159,7 @@ const startTrack = async (id: string) => {
     alert('You must enter a performance ID.')
     return
   }
+  // @ts-expect-error TS complains about process
   await fetch(`${process.env.VUE_APP_API_URL}/start-track/${id}/${performanceId.value}/${globalTime.value}/${loopTrack.value}`, {
     method: 'POST'
   })
@@ -176,6 +178,7 @@ const stopTrack = async () => {
     return
   }
   try {
+    // @ts-expect-error TS complains about process
     await fetch(`${process.env.VUE_APP_API_URL}/stop-track/${performanceId.value}`)
   } catch (err) {
     alert('Error when stopping track: ' + err)
@@ -185,6 +188,7 @@ const stopTrack = async () => {
 const deleteTrack = async (id: string, name: string) => {
   if (confirm('Do you want to delete track: ' + name + '? This cannot be reversed.')) {
     try {
+      // @ts-expect-error TS complains about process
       await fetch(`${process.env.VUE_APP_API_URL}/delete-track/${id}`, {
         method: 'POST'
       })
@@ -200,6 +204,7 @@ const ttsFileDownloadInfo = ref<{ origName: string; fileName: string }[]>()
 let editingTrackId = ref('')
 const editTrack = async (id: string) => {
   try {
+    // @ts-expect-error TS complains about process
     const data = await fetch(`${process.env.VUE_APP_API_URL}/get-track/${id}`).then((res) => res.json())
     const track = data[0]
     editingTrackId.value = track._id
@@ -221,6 +226,7 @@ const editTrack = async (id: string) => {
 
 const tracks = ref<{ _id: string; name: string; notes: string }[]>([])
 const getTracks = async () => {
+  // @ts-expect-error TS complains about process
   await fetch(`${process.env.VUE_APP_API_URL}/get-tracks`)
     .then((res) => res.json())
     .then((data) => (tracks.value = data.tracks))
@@ -257,6 +263,7 @@ const ttsLangs = ref<string>('')
 
 const getVoicesAndLanguages = async () => {
   let qrDataFromServer = <{ maxPartialsCount: number; ttsLangs: string[] }>{}
+  // @ts-expect-error TS complains about process
   await fetch(`${process.env.VUE_APP_API_URL}/get-voices-and-languages`)
     .then((res) => res.json())
     .then((data) => (qrDataFromServer = data))
@@ -300,7 +307,7 @@ const generateQrCodes = async () => {
         wsUrl: selectedServer.wsUrl
       }
       if (ttsLangs.value) {
-        data.tts = ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) }))
+        data.tts = ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso) }))
         data.defaultLang = defaultLanguage.value
       }
       qrCodeData.push(data)
@@ -311,7 +318,7 @@ const generateQrCodes = async () => {
       performanceId: performanceId.value,
       expertMode: expertMode.value,
       defaultLang: defaultLanguage.value,
-      tts: ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso.split('-')[0], iso) })),
+      tts: ttsLangs.value.split(', ').map((iso) => ({ iso, lang: convertIsoToLangName(iso) })),
       wsUrl: selectedServer.wsUrl
     })
   }
@@ -329,14 +336,15 @@ const generateQrCodes = async () => {
   await downloadPartialQrCodes()
 }
 
-// Adapted from https://stackoverflow.com/a/69968496/16725862
-// TODO: Returns e.g 'American English' and 'Deutsch (Deutschland)'. Ideally would return 'English' and 'Deutsch'.
-const convertIsoToLangName = (locale: string, iso: string) => {
-  const displayNames = new Intl.DisplayNames([locale], {
-    type: 'language'
-  })
-  return displayNames.of(iso)
+const languageMap: Record<string, string> = {
+  'en-US': 'English',
+  'de-DE': 'Deutsch',
+  'es-ES': 'Español',
+  'fr-FR': 'Français',
+  'it-IT': 'Italiano'
 }
+
+const convertIsoToLangName = (iso: string) =>  languageMap[iso] ?? iso
 
 const isQrCodeModalVisible = ref(false)
 

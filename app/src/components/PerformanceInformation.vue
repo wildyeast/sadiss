@@ -1,11 +1,33 @@
 <script setup lang="ts">
 import { useMainStore } from '@/stores/MainStore'
+import { useRoute } from 'vue-router'
+
 const mainStore = useMainStore()
+const route = useRoute()
+console.log(route.name)
+//eslint-disable-next-line no-undef
+defineProps<{
+  textColorDanger?: boolean
+}>()
 </script>
 
 <template>
-  <div class="flex flex-col items-center gap-4">
-    <h1 class="text-xl text-tertiary">{{ mainStore.performanceName }}</h1>
-    <h2 class="text-2xl text-tertiary">{{ mainStore.roleName }}</h2>
+  <div class="flex flex-col items-center">
+    <h1
+      class="text-center text-xl"
+      :class="textColorDanger ? 'text-danger' : 'text-highlight'">
+      {{ mainStore.performanceName }}
+    </h1>
+    <h2
+      class="text-center text-lg"
+      :class="textColorDanger ? 'text-danger' : 'text-highlight'">
+      {{ mainStore.roleName }}
+    </h2>
+    <h2
+      v-if="mainStore.selectedLanguage.lang && $route.name !== 'LanguageSelection'"
+      class="text-center text-lg"
+      :class="textColorDanger ? 'text-danger' : 'text-highlight'">
+      Language: {{ mainStore.selectedLanguage.lang }}
+    </h2>
   </div>
 </template>
