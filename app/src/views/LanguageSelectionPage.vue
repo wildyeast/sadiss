@@ -20,7 +20,11 @@
                   class="text-highlight"
                   >&gt;&gt; {{ lang.lang }} &lt;&lt;
                 </span>
-                <span v-else>{{ lang.lang }}</span>
+                <span
+                  v-else
+                  class="text-white"
+                  >{{ lang.lang }}</span
+                >
               </button>
             </div>
           </div>
