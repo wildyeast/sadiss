@@ -5,6 +5,7 @@ const fs = require('fs')
 export const convertSrtToJson = (srtFiles: { path: string; originalname: string }[]) => {
   let ttsJson: TtsJson = {}
   const ttsLangs = new Set<string>()
+  const TIMESTAMP_DELIMITER = ' --> '
 
   for (const file of srtFiles) {
     const data = fs.readFileSync(file.path, 'utf-8')
@@ -19,7 +20,6 @@ export const convertSrtToJson = (srtFiles: { path: string; originalname: string 
 
     for (let line of lines) {
       line = line.trim()
-      const timestampDelimiter = ' --> '
 
       if (!line) {
         ttsJson = writeToObject(ttsJson, currentTimestamp, voice, lang, currentLine)
@@ -32,8 +32,8 @@ export const convertSrtToJson = (srtFiles: { path: string; originalname: string 
         } else {
           currentLine = line
         }
-      } else if (line.includes(timestampDelimiter)) {
-        const [start, _] = line.split(timestampDelimiter)
+      } else if (line.includes(TIMESTAMP_DELIMITER)) {
+        const [start, _] = line.split(TIMESTAMP_DELIMITER)
         currentTimestamp = convertTimestampToSeconds(start)
         lastLineWasTimestamp = true
       }
