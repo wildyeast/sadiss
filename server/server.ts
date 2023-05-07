@@ -74,7 +74,7 @@ wss.on('connection', (client) => {
       client.ttsLang = parsed.ttsLang
       client.performanceId = parsed.performanceId
       console.log(
-        `Performance ${client.performanceId}: Client ${client.id} registered with choir id ${client.choirId} and TTS lang ${client.ttsLang}`
+        `Performance ${client.performanceId}: Client ${client.id} registered with choir id ${client.choirId} and TTS lang ${client.ttsLang.iso}`
       )
     } else if (parsed.message === 'measure') {
       client.send('measure')

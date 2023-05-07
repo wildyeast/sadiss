@@ -94,7 +94,7 @@ export class ActivePerformance {
             if (track[chunkIndex]?.ttsInstructions) {
               const ttsInstructionForClientId = track[chunkIndex]?.ttsInstructions[+client.choirId]
               if (ttsInstructionForClientId) {
-                dataToSend.chunk.ttsInstructions = ttsInstructionForClientId[client.ttsLang]
+                dataToSend.chunk.ttsInstructions = ttsInstructionForClientId[client.ttsLang.iso]
               }
             }
 
@@ -181,7 +181,7 @@ export class ActivePerformance {
             if (track[chunkIndex] && track[chunkIndex].ttsInstructions) {
               const ttsInstructions = Object.values(track[chunkIndex].ttsInstructions)[0]
               if (ttsInstructions) {
-                dataToSend.ttsInstructions = ttsInstructions[client.ttsLang]
+                dataToSend.ttsInstructions = ttsInstructions[client.ttsLang.iso]
               }
             }
 
