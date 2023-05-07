@@ -6,7 +6,7 @@ const performance_controller = require('../controllers/performanceController')
 
 const router = express.Router()
 
-const multer = require('multer')
+import multer from 'multer'
 const upload = multer({ dest: 'uploads/' })
 
 // Upload track
