@@ -24,7 +24,7 @@ defineProps<{
       {{ mainStore.roleName }}
     </h2>
     <h2
-      v-if="mainStore.selectedLanguage.lang && $route.name !== 'LanguageSelection'"
+      v-if="mainStore.selectedLanguage.lang && $route.name === 'Main'"
       class="text-center text-lg"
       :class="textColorDanger ? 'text-danger' : 'text-highlight'">
       Language: {{ mainStore.selectedLanguage.lang }}
