@@ -7,7 +7,7 @@
           <ion-button
             v-if="!mainStore.processing"
             @click="scanCode"
-            class="ionic-rounded-full h-[60vw] w-[60vw] rounded-full border-2 border-highlight text-3xl">
+            class="ionic-rounded-full h-[60vw] w-[60vw] rounded-full border-2 border-highlight text-3xl uppercase">
             Scan<br />QR<br />
             code
           </ion-button>

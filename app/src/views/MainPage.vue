@@ -8,13 +8,13 @@
             <ion-button
               v-if="isRegistered"
               :disabled="true"
-              class="pulse flex h-full w-full items-center justify-center rounded-full bg-highlight text-2xl font-bold">
+              class="pulse flex h-full w-full items-center justify-center rounded-full bg-highlight text-2xl font-bold uppercase">
               <p class="text-4xl text-primary">Active</p>
             </ion-button>
             <ion-button
               v-else-if="wasRegisteredThisSession"
               @click="register"
-              class="ionic-rounded-full h-full w-full rounded-full border-2 border-danger">
+              class="ionic-rounded-full h-full w-full rounded-full border-2 border-danger uppercase">
               <span class="text-4xl text-danger">Rejoin</span>
             </ion-button>
             <div
