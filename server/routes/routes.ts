@@ -51,6 +51,9 @@ router.get('/api/get-own-tracks', track_controller.get_own_tracks)
 // Get performances
 router.get('/api/performances', performance_controller.getPerformances)
 
+// Get performance
+router.get('/api/performance/:id', performance_controller.getPerformance)
+
 // Create performance
 router.post('/api/performance/create', performance_controller.create_performance)
 

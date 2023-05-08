@@ -20,6 +20,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/RegisterView.vue')
   },
   {
+    path: '/performances/:id',
+    name: 'performance',
+    component: () => import('../views/PerformanceView.vue')
+  },
+  {
     path: '/performances',
     name: 'performances',
     component: () => import('../views/PerformancesView.vue')

@@ -68,7 +68,6 @@ export async function register(username: string, email: string, password: string
 }
 
 /* PERFORMANCES */
-
 export async function getPerformances() {
   const response = await request<{ performances: SadissPerformance[] }>('/api/performances')
 
@@ -79,10 +78,22 @@ export async function getPerformances() {
   return response.data!.performances
 }
 
-export async function createPerformance(performance: { name: string }) {
+export async function getPerformance(id: string) {
+  const response = await request<{ performance: SadissPerformance }>(`/api/performance/${id}`)
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.performance
+}
+
+export async function createPerformance(name: string) {
   const response = await request<{ performance: SadissPerformance }>('/api/performance/create', {
     method: 'POST',
-    body: JSON.stringify(performance)
+    body: JSON.stringify({
+      name
+    })
   })
 }
 

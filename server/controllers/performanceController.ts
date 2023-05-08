@@ -6,7 +6,7 @@ import { User } from '../models/user'
 exports.getPerformances = async (req: Request, res: Response) => {
   try {
     // Get all performances that are public or owned by the user
-    const performances = await SadissPerformance.find({ $or: [{ isPublic: true }, { userId: req.user!.id }] }, '_id name')
+    const performances = await SadissPerformance.find({ $or: [{ isPublic: true }, { userId: req.user!.id }] }, '_id name userId')
 
     // Map performances to include username instead of user ID
     const performancesWithUsername = await Promise.all(
@@ -16,12 +16,26 @@ exports.getPerformances = async (req: Request, res: Response) => {
       })
     )
 
-    console.log(performancesWithUsername)
-
     res.json({ performances: performancesWithUsername })
   } catch (err) {
     console.log('Failed getting performances with:', err)
     res.status(500).json({ Error: 'Failed fetching performances.' })
+  }
+}
+
+exports.getPerformance = async (req: Request, res: Response) => {
+  try {
+    let performance = await SadissPerformance.findById(req.params.id)
+    let performanceWithUsername = null
+    if (performance) {
+      const user = await User.findById(performance.userId, 'username')
+      performanceWithUsername = { _id: performance._id, name: performance.name, username: user?.username }
+    }
+
+    res.json({ performance: performanceWithUsername })
+  } catch (err) {
+    console.log('Failed getting performance with:', err)
+    res.status(500).json({ Error: 'Failed fetching performance.' })
   }
 }
 
