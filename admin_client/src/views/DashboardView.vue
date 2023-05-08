@@ -1,23 +1,13 @@
 <script setup lang="ts">
-import { getPerformances, createPerformance } from '@/services/api'
-import { onMounted } from 'vue'
-
-// Create performance
-const submitPerformance = async () => {
-  try {
-    await createPerformance({ name: 'test' })
-  } catch (error) {
-    console.error(`Error creating performance: ${error}`)
-  }
-}
-
-onMounted(async () => {
-  const performances = await getPerformances()
-  console.log(performances)
-})
+import { getPerformances, deletePerformance } from '@/services/api'
+import type { SadissPerformance } from '@/types/types'
+import { onMounted, ref } from 'vue'
 </script>
 
 <template>
   <h1>Dashboard</h1>
-  <button @click="submitPerformance">Check</button>
+  <div class="mt-8 flex flex-col items-center gap-4">
+    <router-link to="/performances">Performances</router-link>
+    <router-link to="/tracks">Tracks</router-link>
+  </div>
 </template>

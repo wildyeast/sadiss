@@ -1,12 +1,24 @@
 import { Response, Request } from 'express'
 import { SadissPerformance } from '../models/sadissPerformance'
+import { User } from '../models/user'
 
 // Get all performances that are public or owned by the user
 exports.getPerformances = async (req: Request, res: Response) => {
   try {
     // Get all performances that are public or owned by the user
-    const allPerformances = await SadissPerformance.find({ $or: [{ isPublic: true }, { userId: req.user!.id }] }, '_id name')
-    res.json({ performances: allPerformances })
+    const performances = await SadissPerformance.find({ $or: [{ isPublic: true }, { userId: req.user!.id }] }, '_id name')
+
+    // Map performances to include username instead of user ID
+    const performancesWithUsername = await Promise.all(
+      performances.map(async (performance) => {
+        const user = await User.findById(performance.userId, 'username')
+        return { _id: performance._id, name: performance.name, username: user?.username }
+      })
+    )
+
+    console.log(performancesWithUsername)
+
+    res.json({ performances: performancesWithUsername })
   } catch (err) {
     console.log('Failed getting performances with:', err)
     res.status(500).json({ Error: 'Failed fetching performances.' })
@@ -31,6 +43,28 @@ exports.create_performance = async (req: Request, res: Response) => {
         res.status(201).json({ performance })
       }
     })
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' })
+  }
+}
+
+exports.delete_performance = async (req: Request, res: Response) => {
+  try {
+    const performance = await SadissPerformance.findById(req.params.id)
+
+    if (!performance) {
+      return res.status(404).json({ error: 'Performance not found' })
+    }
+
+    // Check if user owns performance
+    if (performance.userId !== req.user!.id) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    // Delete performance
+    await performance.remove()
+
+    res.status(200).json({ message: 'Performance deleted' })
   } catch (error) {
     res.status(500).json({ error: 'Server error' })
   }

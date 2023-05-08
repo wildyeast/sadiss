@@ -1,3 +1,5 @@
+import type { SadissPerformance } from '@/types/types'
+
 const BASE_URL = 'http://localhost:3005'
 
 interface RequestOptions {
@@ -65,8 +67,10 @@ export async function register(username: string, email: string, password: string
   console.log(response.data!.message)
 }
 
+/* PERFORMANCES */
+
 export async function getPerformances() {
-  const response = await request<{ performances: Performance[] }>('/api/performances')
+  const response = await request<{ performances: SadissPerformance[] }>('/api/performances')
 
   if (response.error) {
     throw new Error(response.error)
@@ -76,9 +80,16 @@ export async function getPerformances() {
 }
 
 export async function createPerformance(performance: { name: string }) {
-  const response = await request<{ performance: Performance }>('/api/performance/create', {
+  const response = await request<{ performance: SadissPerformance }>('/api/performance/create', {
     method: 'POST',
     body: JSON.stringify(performance)
+  })
+}
+
+// delete perforamnce
+export async function deletePerformance(id: string) {
+  const response = await request<{ performance: SadissPerformance }>(`/api/performance/delete/${id}`, {
+    method: 'DELETE'
   })
 }
 
