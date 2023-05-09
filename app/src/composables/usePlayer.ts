@@ -6,6 +6,7 @@ let ctx: AudioContext
 let offset: number
 let motion: { pos: number } = reactive({ pos: -1 })
 let outputLatencyOffset = 0
+let ttsLanguage: string
 
 export function usePlayer() {
   const oscillators: OscillatorObject[] = []
@@ -113,7 +114,6 @@ export function usePlayer() {
     })
   }
 
-  let ttsLanguage: string
   const setTtsLanguage = (lang: string) => {
     ttsLanguage = lang
   }
