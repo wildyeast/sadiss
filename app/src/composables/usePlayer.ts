@@ -7,6 +7,8 @@ let offset: number
 let motion: { pos: number } = reactive({ pos: -1 })
 let outputLatencyOffset = 0
 let ttsLanguage: string
+let waveform: OscillatorType
+let ttsRate = 1
 
 export function usePlayer() {
   const oscillators: OscillatorObject[] = []
@@ -126,8 +128,6 @@ export function usePlayer() {
     console.log('Offset: ', offset)
   }
 
-  let waveform: OscillatorType
-  let ttsRate = 1
   const setTrackSettings = (wf: OscillatorType, rate: string) => {
     waveform = wf
     ttsRate = +rate
