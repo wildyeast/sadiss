@@ -51,7 +51,7 @@ onMounted(async () => {
         <p class="font-bold">{{ performance.name }}</p>
         <p>Created by: {{ performance.username }}</p>
       </div>
-      <button @click="handleDeletePerformance(performance._id)">
+      <button @click.stop="handleDeletePerformance(performance._id)">
         <font-awesome-icon
           icon="fa-trash"
           class="text-danger" />
@@ -83,6 +83,7 @@ onMounted(async () => {
             class="rounded-sm border border-primary p-2" />
           <button
             type="submit"
+            formmethod="dialog"
             class="text-white rounded-sm bg-primary p-2">
             Add Performance
           </button>
