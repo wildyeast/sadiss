@@ -1,9 +1,3 @@
-<script setup lang="ts">
-import { getPerformances, deletePerformance } from '@/services/api'
-import type { SadissPerformance } from '@/types/types'
-import { onMounted, ref } from 'vue'
-</script>
-
 <template>
   <main>
     <h1>Dashboard</h1>

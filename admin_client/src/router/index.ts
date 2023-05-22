@@ -30,6 +30,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/PerformancesView.vue')
   },
   {
+    path: '/tracks',
+    name: 'tracks',
+    component: () => import('../views/TracksView.vue')
+  },
+  {
     path: '/:catchAll(.*)',
     redirect: '/'
   }

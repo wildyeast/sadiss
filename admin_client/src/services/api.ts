@@ -1,4 +1,5 @@
-import type { SadissPerformance } from '@/types/types'
+import axios from 'axios'
+import type { SadissPerformance, Track } from '@/types/types'
 
 const BASE_URL = 'http://localhost:3005'
 
@@ -15,8 +16,14 @@ interface ApiResponse<T> {
 
 async function request<T>(path: string, options?: RequestOptions): Promise<ApiResponse<T>> {
   const token = localStorage.getItem('jwt')
-  const headers: HeadersInit = {
-    'Content-Type': 'application/json'
+  const headers: HeadersInit = {}
+
+  if (options && options.body instanceof FormData) {
+    // Use 'multipart/form-data' headers for FormData
+    headers.Accept = 'application/json' // Set the accepted response format
+  } else {
+    // Use 'application/json' headers for other payloads
+    headers['Content-Type'] = 'application/json'
   }
 
   if (token) {
@@ -97,9 +104,48 @@ export async function createPerformance(name: string) {
   })
 }
 
-// delete perforamnce
 export async function deletePerformance(id: string) {
   const response = await request<{ performance: SadissPerformance }>(`/api/performance/delete/${id}`, {
+    method: 'DELETE'
+  })
+}
+
+/* TRACKS */
+export async function getTracks() {
+  const response = await request<{ tracks: Track[] }>('/api/tracks')
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.tracks
+}
+
+export async function getTrack(id: string) {
+  const response = await request<{ track: SadissPerformance }>(`/api/track/${id}`)
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.track
+}
+
+export async function createTrack(trackData: FormData) {
+  const response = await request<{ track: Track }>('/api/track/create', {
+    method: 'POST',
+    body: trackData
+  })
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.track
+}
+
+export async function deleteTrack(id: string) {
+  const response = await request<{ track: SadissPerformance }>(`/api/track/delete/${id}`, {
     method: 'DELETE'
   })
 }

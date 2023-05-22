@@ -81,7 +81,7 @@ exports.delete_track = async (req: Request, res: Response) => {
   res.send()
 }
 
-exports.get_tracks = async (req: Request, res: Response) => {
+exports.getTracks = async (req: Request, res: Response) => {
   // res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   try {
     const allTracks = await Track.find(

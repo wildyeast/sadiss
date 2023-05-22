@@ -24,7 +24,7 @@ router.post('/api/track/create', upload.array('files'), track_controller.upload_
 router.patch('/api/track/edit/:id', upload.array('files'), track_controller.edit_track)
 
 // Get tracks
-router.get('/api/tracks', track_controller.get_tracks)
+router.get('/api/tracks', track_controller.getTracks)
 
 // Get track
 router.get('/api/track/:id', track_controller.get_track)

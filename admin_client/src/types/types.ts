@@ -16,4 +16,28 @@ interface SadissPerformance {
   isPublic: boolean
 }
 
-export type { QrCodeData, SadissPerformance }
+interface Track {
+  _id: string
+  name: string
+  username: string
+  isPublic: boolean
+  notes?: string
+  mode: 'choir' | 'nonChoir'
+  waveform: Waveform
+  ttsRate?: number
+}
+
+// type UploadTrack = {
+//   numberOfVoices?: number
+//   ttsLanguages?: string
+//   partialFile?: File
+//   ttsFiles?: TtsFilesObject
+// } & Track
+
+type Waveform = 'sine' | 'square' | 'sawtooth' | 'triangle'
+
+interface TtsFilesObject {
+  [voice: number]: { [lang: string]: File }
+}
+
+export type { QrCodeData, SadissPerformance, Track, Waveform, TtsFilesObject }
