@@ -75,10 +75,26 @@ exports.get_stats = async (req: Request, res: Response) => {
   res.json({ clients: wss.clients.size })
 }
 
-exports.delete_track = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-  await Track.deleteOne({ _id: req.params.id })
-  res.send()
+exports.deleteTrack = async (req: Request, res: Response) => {
+  try {
+    const track = await Track.findById(req.params.id)
+
+    if (!track) {
+      return res.status(404).json({ error: 'Track not found' })
+    }
+
+    // Check if user owns track
+    if (track.userId !== req.user!.id) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    // Delete track
+    await track.remove()
+
+    res.status(200).json({ message: 'Track deleted' })
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' })
+  }
 }
 
 exports.getTracks = async (req: Request, res: Response) => {

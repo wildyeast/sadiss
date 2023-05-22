@@ -145,7 +145,7 @@ export async function createTrack(trackData: FormData) {
 }
 
 export async function deleteTrack(id: string) {
-  const response = await request<{ track: SadissPerformance }>(`/api/track/delete/${id}`, {
+  const response = await request<{ track: Track }>(`/api/track/delete/${id}`, {
     method: 'DELETE'
   })
 }

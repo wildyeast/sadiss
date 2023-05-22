@@ -36,7 +36,6 @@ const goToTrack = (id: string) => router.push(`/track/${id}`)
 const handleDeleteTrack = (id: string) => {
   deleteTrack(id)
   tracks.value = tracks.value.filter((track) => track._id !== id)
-  console.log(id)
 }
 
 const trackName = ref('')

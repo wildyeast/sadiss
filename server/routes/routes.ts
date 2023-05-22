@@ -30,7 +30,7 @@ router.get('/api/tracks', track_controller.getTracks)
 router.get('/api/track/:id', track_controller.get_track)
 
 // Delete track
-router.post('/api/track/delete/:id', track_controller.delete_track)
+router.delete('/api/track/delete/:id', track_controller.deleteTrack)
 
 // Start track
 router.post('/api/track/start/:trackId/:performanceId/:startTime/:loopTrack', track_controller.start_track)
