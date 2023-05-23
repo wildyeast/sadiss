@@ -75,7 +75,8 @@ onMounted(async () => {
     <Teleport to="body">
       <AddTrackModal
         ref="addTrackModal"
-        @track-created="trackCreated" />
+        @track-created="trackCreated"
+        @toggle-add-track-modal="toggleAddTrackModal" />
     </Teleport>
   </main>
 </template>

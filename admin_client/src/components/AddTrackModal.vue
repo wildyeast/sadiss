@@ -5,6 +5,7 @@ import { ref, computed } from 'vue'
 
 const emit = defineEmits<{
   (e: 'trackCreated'): void
+  (e: 'toggleAddTrackModal'): void
 }>()
 
 const trackName = ref('')
@@ -83,12 +84,26 @@ defineExpose({
   showModal: () => addTrackModal.value?.showModal(),
   close: () => addTrackModal.value?.close()
 })
+
+const closeDialogOnOutsideClick = (e: MouseEvent) => {
+  if (!addTrackModal.value) return
+  const dialogDimensions = addTrackModal.value.getBoundingClientRect()
+  if (
+    e.clientX < dialogDimensions.left ||
+    e.clientX > dialogDimensions.right ||
+    e.clientY < dialogDimensions.top ||
+    e.clientY > dialogDimensions.bottom
+  ) {
+    emit('toggleAddTrackModal')
+  }
+}
 </script>
 
 <template>
   <dialog
     ref="addTrackModal"
-    class="w-full">
+    class="w-full"
+    @click="closeDialogOnOutsideClick">
     <form
       class="flex flex-col gap-4 p-4"
       @submit.prevent="handleCreateTrack">
