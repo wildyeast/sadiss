@@ -4,6 +4,7 @@ import { getTracks, deleteTrack } from '@/services/api'
 import type { Track } from '@/types/types'
 import { onMounted, ref } from 'vue'
 import AddTrackModal from '@/components/AddTrackModal.vue'
+import AddTrackToPerformanceModal from '@/components/AddTrackToPerformanceModal.vue'
 
 const tracks = ref<Track[]>([])
 
@@ -16,6 +17,18 @@ const toggleAddTrackModal = () => {
     addTrackModal.value?.showModal()
   } else {
     addTrackModal.value?.close()
+  }
+}
+
+let isAddTrackToPerformanceModalOpen = false
+const addTrackToPerformanceModal = ref<HTMLDialogElement | null>()
+
+const toggleAddTrackToPerformanceModal = () => {
+  isAddTrackToPerformanceModalOpen = !isAddTrackToPerformanceModalOpen
+  if (isAddTrackToPerformanceModalOpen) {
+    addTrackToPerformanceModal.value?.showModal()
+  } else {
+    addTrackToPerformanceModal.value?.close()
   }
 }
 
@@ -50,7 +63,7 @@ onMounted(async () => {
         <p>Created by: {{ track.username }}</p>
       </div>
       <div class="flex gap-4">
-        <button @click.stop="handleDeleteTrack(track._id)">
+        <button @click.stop="toggleAddTrackToPerformanceModal">
           <font-awesome-icon
             icon="fa-plus"
             size="lg" />
@@ -78,6 +91,9 @@ onMounted(async () => {
         ref="addTrackModal"
         @track-created="trackCreated"
         @toggle-add-track-modal="toggleAddTrackModal" />
+      <AddTrackToPerformanceModal
+        ref="addTrackToPerformanceModal"
+        @toggle-add-track-to-performance-modal="toggleAddTrackToPerformanceModal" />
     </Teleport>
   </main>
 </template>
