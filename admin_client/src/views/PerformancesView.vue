@@ -35,7 +35,6 @@ const handleDeletePerformance = (id: string) => {
 
 onMounted(async () => {
   performances.value = await getPerformances()
-  console.log(performances.value)
 })
 </script>
 
