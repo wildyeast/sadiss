@@ -22,6 +22,7 @@ const toggleAddTrackModal = () => {
 const goToTrack = (id: string) => router.push(`/track/${id}`)
 
 const handleDeleteTrack = (id: string) => {
+  if (!confirm('Are you sure you want to delete this track?')) return
   deleteTrack(id)
   tracks.value = tracks.value.filter((track) => track._id !== id)
 }
