@@ -3,7 +3,7 @@ import { SadissPerformance } from '../models/sadissPerformance'
 
 export const validatePerformanceAccess = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const performanceId = req.params.performanceId
+    const performanceId = req.body.performanceId
     const performance = await SadissPerformance.findById(performanceId)
 
     if (!performance) {

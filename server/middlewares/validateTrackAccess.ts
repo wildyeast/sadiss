@@ -3,7 +3,7 @@ import { Track } from '../models/track'
 
 export const validateTrackAccess = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const trackId = req.params.trackId
+    const trackId = req.body.trackId
     const track = await Track.findById(trackId)
 
     if (!track) {

@@ -7,6 +7,7 @@ import { validateTrackAccess } from '../middlewares/validateTrackAccess'
 const track_controller = require('../controllers/trackController')
 const performance_controller = require('../controllers/performanceController')
 const track_performance_controller = require('../controllers/trackPerformanceController')
+const performance_view_controller = require('../controllers/performanceViewController')
 
 const auth_controller = require('../controllers/authController')
 
@@ -62,11 +63,15 @@ router.delete('/api/performance/delete/:id', performance_controller.delete_perfo
 
 /* TRACK PERFORMANCE */
 // Add track to performance
-router.post(
-  '/api/performance/:id/add-track',
+router.put(
+  '/api/add-track-to-performance',
   [validateTrackAccess, validatePerformanceAccess],
   track_performance_controller.add_track_to_performance
 )
+
+/* PERFORMANCE VIEW */
+// Get performance with tracks
+router.get('/api/performance/:id/with-tracks', performance_view_controller.getPerformanceWithTracks)
 
 /* AUTH */
 // Login

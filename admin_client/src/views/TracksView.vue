@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import router from '@/router'
-import { getTracks, deleteTrack } from '@/services/api'
+import { getTracks, deleteTrack, addTrackToPerformance } from '@/services/api'
 import type { Track } from '@/types/types'
 import { onMounted, ref } from 'vue'
 import AddTrackModal from '@/components/AddTrackModal.vue'
@@ -35,6 +35,11 @@ const trackCreated = async () => {
 
 const addTrackToPerformanceModal = ref<typeof AddTrackToPerformanceModal | null>()
 
+const handleAddTrackToPerformance = (trackId: string, performanceId: string) => {
+  addTrackToPerformanceModal.value?.closeModal()
+  addTrackToPerformance(trackId, performanceId)
+}
+
 onMounted(async () => {
   tracks.value = await getTracks()
 })
@@ -53,7 +58,7 @@ onMounted(async () => {
         <p>Created by: {{ track.username }}</p>
       </div>
       <div class="flex gap-4">
-        <button @click.stop="addTrackToPerformanceModal?.openModal">
+        <button @click.stop="addTrackToPerformanceModal?.openModal(track._id)">
           <font-awesome-icon
             icon="fa-plus"
             size="lg" />
@@ -81,7 +86,10 @@ onMounted(async () => {
         ref="addTrackModal"
         @track-created="trackCreated"
         @toggle-modal="toggleAddTrackModal" />
-      <AddTrackToPerformanceModal ref="addTrackToPerformanceModal" />
+
+      <AddTrackToPerformanceModal
+        ref="addTrackToPerformanceModal"
+        @add-track-to-performance="handleAddTrackToPerformance" />
     </Teleport>
   </main>
 </template>

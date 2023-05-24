@@ -70,8 +70,6 @@ export async function register(username: string, email: string, password: string
   if (response.error) {
     throw new Error(response.error)
   }
-
-  console.log(response.data!.message)
 }
 
 /* PERFORMANCES */
@@ -148,6 +146,36 @@ export async function deleteTrack(id: string) {
   const response = await request<{ track: Track }>(`/api/track/delete/${id}`, {
     method: 'DELETE'
   })
+}
+
+/* TRACK PERFORMANCE */
+export async function addTrackToPerformance(trackId: string, performanceId: string) {
+  const response = await request<{ trackPerformance: { performanceId: string; trackId: string } }>(
+    `/api/add-track-to-performance`,
+    {
+      method: 'PUT',
+      body: JSON.stringify({
+        trackId,
+        performanceId
+      })
+    }
+  )
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.trackPerformance
+}
+
+export async function getPerformanceWithTracks(id: string) {
+  const response = await request<{ performance: SadissPerformance }>(`/api/performance/${id}/with-tracks`)
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.performance
 }
 
 // export async function getTracks() {

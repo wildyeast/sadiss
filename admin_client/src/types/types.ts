@@ -14,6 +14,7 @@ interface SadissPerformance {
   name: string
   username: string
   isPublic: boolean
+  tracks: Track[]
 }
 
 interface Track {
