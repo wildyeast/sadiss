@@ -16,11 +16,13 @@ let wss: Server
 const activePerformances: ActivePerformance[] = []
 
 // Start track
-exports.start_track = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+exports.startTrack = async (req: Request, res: Response) => {
   wss = req.wss
+
+  const { trackId, performanceId, startTime, loop } = req.body
+
   try {
-    const t = await Track.findById(req.params.trackId)
+    const t = await Track.findById(trackId)
     if (t) {
       let chunks
       fs.readFile(`chunks/${t.chunkFileName}`, 'utf8', (err: any, data: string) => {
@@ -29,12 +31,9 @@ exports.start_track = async (req: Request, res: Response) => {
           return
         }
         chunks = JSON.parse(data)
-        const startTime = +req.params.startTime
         if (!chunks) {
           throw new Error('Chunks undefined')
         }
-
-        const performanceId = +req.params.performanceId
 
         // Check if performance already exists
         let performance = activePerformances.find((p) => p.id === performanceId)
@@ -43,7 +42,7 @@ exports.start_track = async (req: Request, res: Response) => {
           activePerformances.push(performance)
         }
 
-        const loopTrack = req.params.loopTrack === 'true'
+        const loopTrack = loop === 'true'
         const trackStarted = performance.startSendingInterval(
           chunks,
           // @ts-ignore TODO

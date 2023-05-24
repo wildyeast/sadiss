@@ -1,4 +1,3 @@
-import axios from 'axios'
 import type { SadissPerformance, Track } from '@/types/types'
 
 const BASE_URL = 'http://localhost:3005'
@@ -146,6 +145,19 @@ export async function deleteTrack(id: string) {
   const response = await request<{ track: Track }>(`/api/track/delete/${id}`, {
     method: 'DELETE'
   })
+}
+
+export async function startTrack(trackId: string, performanceId: string, startTime: number, loop = false) {
+  const response = await request<{ track: Track }>(`/api/track/start`, {
+    method: 'POST',
+    body: JSON.stringify({ trackId, performanceId, startTime, loop })
+  })
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!
 }
 
 /* TRACK PERFORMANCE */
