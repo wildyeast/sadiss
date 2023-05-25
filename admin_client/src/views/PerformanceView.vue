@@ -42,6 +42,8 @@ const isRegistered = ref(false)
 const ws = ref<WebSocket>()
 
 const playingTrackId = ref<string>('')
+const playingTrackProgress = ref<number>(0)
+
 const establishWebsocketConnection = async () => {
   if (attemptingToRegister || isRegistered.value) return
   attemptingToRegister = true
@@ -81,11 +83,14 @@ const establishWebsocketConnection = async () => {
     if (data.stop) {
       // TODO: Handle stop
       playingTrackId.value = ''
+      playingTrackProgress.value = 0
       return
     }
 
     if (data.trackId) {
       playingTrackId.value = data.trackId
+      playingTrackProgress.value = Math.floor((data.chunkIndex / data.totalChunks) * 100)
+      console.log(playingTrackProgress.value)
     }
   }
 }
@@ -109,7 +114,12 @@ onUnmounted(() => {
       <p class="mb-4">Created by: {{ performance.username }}</p>
       <div
         v-for="track in performance.tracks"
-        class="flex w-full justify-between border p-4">
+        class="relative flex w-full justify-between border p-4">
+        <!-- Track progress bar -->
+        <div
+          v-if="track._id === playingTrackId"
+          class="absolute bottom-0 left-0 h-[25%] bg-secondary bg-opacity-50"
+          :style="{ width: playingTrackProgress + '%' }" />
         <p>{{ track.name }}</p>
         <button
           v-if="track._id !== playingTrackId"
