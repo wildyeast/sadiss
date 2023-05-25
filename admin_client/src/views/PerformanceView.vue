@@ -76,7 +76,6 @@ const establishWebsocketConnection = async () => {
     }
 
     const data = JSON.parse(event.data)
-    console.log('\nReceived message: ', data)
 
     if (data.start) {
       // TODO: Handle start
@@ -133,6 +132,7 @@ onUnmounted(() => {
             {{ playingTrackCurrentChunkIndex }} / {{ playingTrackTotalChunks }}
           </p>
         </div>
+
         <p>{{ track.name }}</p>
         <button
           v-if="track._id !== playingTrackId"
