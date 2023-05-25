@@ -1,17 +1,22 @@
 <script setup lang="ts">
 import { getPerformanceWithTracks, startTrack, stopTrack } from '@/services/api'
-import type { SadissPerformance } from '@/types/types'
+import type { SadissPerformance, Track } from '@/types/types'
 import { onMounted, ref, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
+import PlayerControls from '@/components/PlayerControls.vue'
 
 // Get performance id from route
 const route = useRoute()
 const performanceId = route.params.id
 const performance = ref<SadissPerformance>()
 
-const handleStartTrack = async (trackId: string) => {
-  await startTrack(trackId, performanceId as string, globalTime.value)
-  playingTrackId.value = trackId
+const handleStartTrack = async () => {
+  if (!selectedTrack.value?._id) {
+    alert('No track selected')
+    return
+  }
+  await startTrack(selectedTrack.value?._id, performanceId as string, globalTime.value)
+  playingTrackId.value = selectedTrack.value?._id
 }
 
 const handleStopTrack = async () => {
@@ -41,6 +46,7 @@ let attemptingToRegister = false
 const isRegistered = ref(false)
 const ws = ref<WebSocket>()
 
+const selectedTrack = ref<Track>()
 const playingTrackId = ref<string>('')
 const playingTrackProgress = ref<number>(0)
 const playingTrackCurrentChunkIndex = ref<number>(0)
@@ -110,35 +116,23 @@ onUnmounted(() => {
 })
 </script>
 <template>
-  <main>
+  <main class="flex flex-col justify-between">
     <div
       v-if="performance"
       class="flex flex-col items-center gap-1 px-2">
       <h1 class="my-2 text-3xl font-bold">{{ performance.name }}</h1>
       <p class="mb-4">Created by: {{ performance.username }}</p>
-      <div
+      <button
         v-for="track in performance.tracks"
-        class="relative flex w-full justify-between border p-4">
-        <!-- Track progress bar -->
-        <div
-          v-if="track._id === playingTrackId"
-          class="absolute bottom-0 left-0 flex h-[25%] w-full items-center justify-center">
-          <div
-            class="absolute bottom-0 left-0 h-full bg-secondary bg-opacity-50"
-            :style="{ width: playingTrackProgress + '%' }" />
-          <p
-            v-if="playingTrackTotalChunks"
-            class="text-sm">
-            {{ playingTrackCurrentChunkIndex }} / {{ playingTrackTotalChunks }}
-          </p>
-        </div>
-
+        @click="selectedTrack = track"
+        class="relative flex w-full justify-between border p-4"
+        :class="{ 'bg-secondary': selectedTrack === track }">
         <p>{{ track.name }}</p>
         <button
           v-if="track._id !== playingTrackId"
-          @click.stop="handleStartTrack(track._id)">
+          @click.stop="">
           <font-awesome-icon
-            icon="fa-play"
+            icon="fa-trash"
             size="lg" />
         </button>
         <button
@@ -148,7 +142,15 @@ onUnmounted(() => {
             icon="fa-pause"
             size="lg" />
         </button>
-      </div>
+      </button>
     </div>
+    <PlayerControls
+      :isPlaying="playingTrackId !== ''"
+      :progress="playingTrackProgress"
+      :currentChunkIndex="playingTrackCurrentChunkIndex"
+      :totalChunks="playingTrackTotalChunks"
+      :selectedTrack="selectedTrack"
+      @start-track="handleStartTrack"
+      @stop-track="handleStopTrack" />
   </main>
 </template>

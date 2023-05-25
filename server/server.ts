@@ -92,7 +92,10 @@ wss.on('connection', (client) => {
       client.send('measure')
     } else if (parsed.message === 'isAdmin') {
       client.isAdmin = true
-      console.log('(this one is admin)')
+      if (parsed.performanceId) {
+        client.performanceId = parsed.performanceId
+        console.log(`Performance ${client.performanceId}: Client ${client.id} is admin`)
+      }
     }
   }
 })
