@@ -145,6 +145,7 @@ onUnmounted(() => {
       </button>
     </div>
     <PlayerControls
+      v-if="selectedTrack"
       :isPlaying="playingTrackId !== ''"
       :progress="playingTrackProgress"
       :currentChunkIndex="playingTrackCurrentChunkIndex"
