@@ -160,6 +160,19 @@ export async function startTrack(trackId: string, performanceId: string, startTi
   return response.data!
 }
 
+export async function stopTrack(performanceId: string) {
+  const response = await request<{ track: Track }>(`/api/track/stop`, {
+    method: 'POST',
+    body: JSON.stringify({ performanceId })
+  })
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!
+}
+
 /* TRACK PERFORMANCE */
 export async function addTrackToPerformance(trackId: string, performanceId: string) {
   const response = await request<{ trackPerformance: { performanceId: string; trackId: string } }>(

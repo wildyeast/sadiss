@@ -37,7 +37,7 @@ router.delete('/api/track/delete/:id', track_controller.deleteTrack)
 router.post('/api/track/start', track_controller.startTrack)
 
 // Stop track
-router.get('/api/track/stop/:performanceId', track_controller.stop_track)
+router.post('/api/track/stop', track_controller.stopTrack)
 
 // Get voices and languages
 router.get('/api/get-voices-and-languages', track_controller.get_voices_and_languages)

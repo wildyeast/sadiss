@@ -51,7 +51,8 @@ exports.startTrack = async (req: Request, res: Response) => {
           t.ttsRate,
           startTime,
           req.wss,
-          loopTrack
+          loopTrack,
+          trackId
         )
         if (trackStarted) {
           res.json({ data: 'Track started.' })
@@ -242,8 +243,8 @@ exports.edit_track = async (req: Request, res: Response) => {
   })
 }
 
-exports.stop_track = (req: Request, res: Response) => {
-  const performance = activePerformances.find((p) => p.id === +req.params.performanceId)
+exports.stopTrack = (req: Request, res: Response) => {
+  const performance = activePerformances.find((p) => p.id === req.body.performanceId)
   if (performance) {
     performance.stopSendingInterval()
     res.send({ message: 'Track stopped.' })
