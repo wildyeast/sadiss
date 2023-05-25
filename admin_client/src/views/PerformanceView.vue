@@ -43,6 +43,8 @@ const ws = ref<WebSocket>()
 
 const playingTrackId = ref<string>('')
 const playingTrackProgress = ref<number>(0)
+const playingTrackCurrentChunkIndex = ref<number>(0)
+const playingTrackTotalChunks = ref<number>(0)
 
 const establishWebsocketConnection = async () => {
   if (attemptingToRegister || isRegistered.value) return
@@ -84,13 +86,16 @@ const establishWebsocketConnection = async () => {
       // TODO: Handle stop
       playingTrackId.value = ''
       playingTrackProgress.value = 0
+      playingTrackCurrentChunkIndex.value = 0
+      playingTrackTotalChunks.value = 0
       return
     }
 
     if (data.trackId) {
       playingTrackId.value = data.trackId
       playingTrackProgress.value = Math.floor((data.chunkIndex / data.totalChunks) * 100)
-      console.log(playingTrackProgress.value)
+      playingTrackCurrentChunkIndex.value = data.chunkIndex
+      playingTrackTotalChunks.value = data.totalChunks
     }
   }
 }
@@ -118,8 +123,16 @@ onUnmounted(() => {
         <!-- Track progress bar -->
         <div
           v-if="track._id === playingTrackId"
-          class="absolute bottom-0 left-0 h-[25%] bg-secondary bg-opacity-50"
-          :style="{ width: playingTrackProgress + '%' }" />
+          class="absolute bottom-0 left-0 flex h-[25%] w-full items-center justify-center">
+          <div
+            class="absolute bottom-0 left-0 h-full bg-secondary bg-opacity-50"
+            :style="{ width: playingTrackProgress + '%' }" />
+          <p
+            v-if="playingTrackTotalChunks"
+            class="text-sm">
+            {{ playingTrackCurrentChunkIndex }} / {{ playingTrackTotalChunks }}
+          </p>
+        </div>
         <p>{{ track.name }}</p>
         <button
           v-if="track._id !== playingTrackId"
