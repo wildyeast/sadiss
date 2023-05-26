@@ -6,9 +6,20 @@ import Modal from './components/Modal.vue'
 import './style.css'
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faTrash, faPlusCircle, faPlus, faPlay, faPause, faPlayCircle, faStopCircle, faRepeat, faForwardFast } from '@fortawesome/free-solid-svg-icons'
+import {
+  faTrash,
+  faPlusCircle,
+  faPlus,
+  faPlay,
+  faPause,
+  faPlayCircle,
+  faStopCircle,
+  faRepeat,
+  faForwardFast,
+  faQrcode
+} from '@fortawesome/free-solid-svg-icons'
 
-library.add(faTrash, faPlusCircle, faPlus, faPlay, faPause, faPlayCircle, faStopCircle, faRepeat, faForwardFast)
+library.add(faTrash, faPlusCircle, faPlus, faPlay, faPause, faPlayCircle, faStopCircle, faRepeat, faForwardFast, faQrcode)
 
 const app = createApp(App).use(router)
 app.component('Button', Button)

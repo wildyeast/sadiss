@@ -17,7 +17,6 @@ let file: File | undefined
 const numberOfVoices = ref(2)
 const ttsLanguages = ref('en-US, de-DE')
 const editingTrackId = ref()
-const expertMode = ref(false)
 
 const handleCreateTrack = async () => {
   try {
@@ -221,14 +220,6 @@ watch(trackTtsRate, (newValue) => {
               v-model="trackTtsRate" />
           </div>
         </div>
-      </div>
-      <!-- Expert mode checkbox -->
-      <div class="flex flex-col">
-        <div>Expert mode</div>
-        <input
-          type="checkbox"
-          v-model="expertMode"
-          class="w-3/4" />
       </div>
       <!-- Notes -->
       <div class="flex flex-col">

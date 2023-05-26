@@ -15,6 +15,8 @@ const close = () => {
   modal.value?.close()
 }
 
+// TODO: While this works, it's not ideal, since it forces us to use click.stop on every click
+// event that opens a modal.
 const closeDialogOnOutsideClick = (e: MouseEvent) => {
   if (!modal.value) return
   const dialogDimensions = modal.value.getBoundingClientRect()
