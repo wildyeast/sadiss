@@ -8,17 +8,7 @@ import AddTrackToPerformanceModal from '@/components/AddTrackToPerformanceModal.
 
 const tracks = ref<Track[]>([])
 
-let isAddTrackModalOpen = false
-const addTrackModal = ref<HTMLDialogElement | null>()
-
-const toggleAddTrackModal = () => {
-  isAddTrackModalOpen = !isAddTrackModalOpen
-  if (isAddTrackModalOpen) {
-    addTrackModal.value?.showModal()
-  } else {
-    addTrackModal.value?.close()
-  }
-}
+const addTrackModal = ref<typeof AddTrackModal | null>()
 
 const goToTrack = (id: string) => router.push(`/track/${id}`)
 
@@ -29,7 +19,7 @@ const handleDeleteTrack = (id: string) => {
 }
 
 const trackCreated = async () => {
-  toggleAddTrackModal()
+  addTrackModal?.value?.close()
   tracks.value = await getTracks()
 }
 
@@ -74,7 +64,7 @@ onMounted(async () => {
     <!-- Open add track modal -->
     <button
       class="text-white absolute bottom-8 right-10 mt-4 rounded-sm bg-primary"
-      @click="toggleAddTrackModal">
+      @click="addTrackModal?.openModal">
       <font-awesome-icon
         icon="fa-plus-circle"
         class="scale-[300%]" />
@@ -84,8 +74,7 @@ onMounted(async () => {
     <Teleport to="body">
       <AddTrackModal
         ref="addTrackModal"
-        @track-created="trackCreated"
-        @toggle-modal="toggleAddTrackModal" />
+        @track-created="trackCreated" />
 
       <AddTrackToPerformanceModal
         ref="addTrackToPerformanceModal"

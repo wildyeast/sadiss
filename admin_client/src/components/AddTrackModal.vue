@@ -2,6 +2,14 @@
 import { createTrack } from '@/services/api'
 import type { TtsFilesObject, Waveform } from '@/types/types'
 import { ref, computed, watch } from 'vue'
+import BaseModal from './BaseModal.vue'
+import { useModal } from '@/composables/useModal'
+
+const { closeModal, openModal, modal } = useModal()
+defineExpose({
+  openModal,
+  closeModal
+})
 
 const emit = defineEmits<{
   (e: 'trackCreated'): void
@@ -77,26 +85,6 @@ const voiceLangCombinations = computed(() => {
   return combinations
 })
 
-const addTrackModal = ref<HTMLDialogElement | null>()
-
-defineExpose({
-  showModal: () => addTrackModal.value?.showModal(),
-  close: () => addTrackModal.value?.close()
-})
-
-const closeDialogOnOutsideClick = (e: MouseEvent) => {
-  if (!addTrackModal.value) return
-  const dialogDimensions = addTrackModal.value.getBoundingClientRect()
-  if (
-    e.clientX < dialogDimensions.left ||
-    e.clientX > dialogDimensions.right ||
-    e.clientY < dialogDimensions.top ||
-    e.clientY > dialogDimensions.bottom
-  ) {
-    emit('toggleAddTrackModal')
-  }
-}
-
 // Enforce min and max values
 watch(trackTtsRate, (newValue) => {
   if (newValue > 2) {
@@ -108,10 +96,9 @@ watch(trackTtsRate, (newValue) => {
 </script>
 
 <template>
-  <dialog
-    ref="addTrackModal"
-    class="w-full"
-    @click="closeDialogOnOutsideClick">
+  <BaseModal
+    ref="modal"
+    @close-modal="closeModal">
     <form
       class="flex flex-col gap-4 p-4"
       @submit.prevent="handleCreateTrack">
@@ -229,18 +216,18 @@ watch(trackTtsRate, (newValue) => {
           class="w-3/4" />
       </div>
       <!-- <div class="flex w-full flex-row justify-center">
-            <div v-if="percentCompleted">Uploading... ({{ percentCompleted }}%)</div>
-            <Button
-              v-else-if="editingTrackId"
-              @click="upload"
-              >Save</Button
-            >
-            <Button
-              v-else
-              @click="upload"
-              >Upload</Button
-            >
-          </div> -->
+              <div v-if="percentCompleted">Uploading... ({{ percentCompleted }}%)</div>
+              <Button
+                v-else-if="editingTrackId"
+                @click="upload"
+                >Save</Button
+              >
+              <Button
+                v-else
+                @click="upload"
+                >Upload</Button
+              >
+            </div> -->
       <button
         type="submit"
         formmethod="dialog"
@@ -248,5 +235,5 @@ watch(trackTtsRate, (newValue) => {
         Add Track
       </button>
     </form>
-  </dialog>
+  </BaseModal>
 </template>
