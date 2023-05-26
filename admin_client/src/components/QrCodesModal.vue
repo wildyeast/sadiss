@@ -1,19 +1,11 @@
 <script setup lang="ts">
-import { nextTick, onMounted, ref } from 'vue'
+import { nextTick, ref } from 'vue'
 import BaseModal from './BaseModal.vue'
 import { useQrCodeGenerator } from '@/composables/useQrCodeGenerator'
 import QrcodeVue from 'qrcode.vue'
+import { useModal } from '@/composables/useModal'
 
-const modal = ref<HTMLDialogElement | null>()
-
-const openModal = () => {
-  modal.value?.showModal()
-}
-
-const closeModal = () => {
-  modal.value?.close()
-}
-
+const { closeModal, openModal, modal } = useModal()
 defineExpose({
   openModal,
   closeModal
