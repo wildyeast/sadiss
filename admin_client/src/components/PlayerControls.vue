@@ -6,6 +6,11 @@ import { startTrack, stopTrack } from '@/services/api'
 const props = defineProps<{
   performanceId: string
   selectedTrack: Track
+  nextTrack?: Track
+}>()
+
+const emit = defineEmits<{
+  (e: 'nextTrackStarted'): void
 }>()
 
 let motion: any
@@ -28,9 +33,9 @@ const startClock = () => {
 
 const playingTrackId = ref<string>('')
 
-const handleStartTrack = async () => {
-  await startTrack(props.selectedTrack._id, props.performanceId, globalTime.value, shouldLoop.value)
-  playingTrackId.value = props.selectedTrack._id
+const handleStartTrack = async (trackId: string) => {
+  await startTrack(trackId, props.performanceId, globalTime.value, shouldLoop.value)
+  playingTrackId.value = trackId
 }
 
 const handleStopTrack = async () => {
@@ -97,7 +102,12 @@ const establishWebsocketConnection = async () => {
 
     if (data.stop) {
       // TODO: Handle stop
-      playingTrackId.value = ''
+      if (shouldGoToNextTrack.value && props.nextTrack) {
+        handleStartTrack(props.nextTrack._id)
+        emit('nextTrackStarted')
+      } else {
+        playingTrackId.value = ''
+      }
       progress.value = 0
       currentChunkIndex.value = 0
       totalChunks.value = 0
@@ -138,7 +148,7 @@ onUnmounted(() => {
       </button>
       <button
         v-if="!playingTrackId"
-        @click="handleStartTrack">
+        @click="handleStartTrack(selectedTrack._id)">
         <font-awesome-icon
           icon="fa-play-circle"
           size="2x" />
