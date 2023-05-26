@@ -11,6 +11,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'nextTrackStarted'): void
+  (e: 'setCurrentTrack', trackId: string): void
 }>()
 
 let motion: any
@@ -119,6 +120,11 @@ const establishWebsocketConnection = async () => {
       progress.value = Math.floor((data.chunkIndex / data.totalChunks) * 100)
       currentChunkIndex.value = data.chunkIndex
       totalChunks.value = data.totalChunks
+      shouldLoop.value = data.loop
+
+      if (playingTrackId.value !== props.selectedTrack._id) {
+        emit('setCurrentTrack', playingTrackId.value)
+      }
     }
   }
 }

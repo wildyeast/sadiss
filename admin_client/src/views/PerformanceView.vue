@@ -26,6 +26,12 @@ const selectTrack = (trackIndex: number) => (selectedTrackIndex.value = trackInd
 
 const nextTrackStarted = () => selectedTrackIndex.value++
 
+const setCurrentTrack = (trackId: string) => {
+  const trackIndex = performance.value?.tracks.findIndex((track) => track._id === trackId)
+  if (trackIndex === undefined) return
+  selectedTrackIndex.value = trackIndex
+}
+
 onMounted(async () => {
   performance.value = await getPerformanceWithTracks(performanceId as string)
 })
@@ -50,6 +56,7 @@ onMounted(async () => {
       :performance-id="(performanceId as string)"
       :selectedTrack="selectedTrack"
       :next-track="nextTrack"
-      @nextTrackStarted="nextTrackStarted" />
+      @nextTrackStarted="nextTrackStarted"
+      @set-current-track="setCurrentTrack" />
   </main>
 </template>
