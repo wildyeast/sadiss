@@ -42,7 +42,6 @@ exports.startTrack = async (req: Request, res: Response) => {
           activePerformances.push(performance)
         }
 
-        const loopTrack = loop === 'true'
         const trackStarted = performance.startSendingInterval(
           chunks,
           // @ts-ignore TODO
@@ -51,7 +50,7 @@ exports.startTrack = async (req: Request, res: Response) => {
           t.ttsRate,
           startTime,
           req.wss,
-          loopTrack,
+          loop,
           trackId
         )
         if (trackStarted) {
