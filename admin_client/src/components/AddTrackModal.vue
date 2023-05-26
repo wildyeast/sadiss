@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { createTrack } from '@/services/api'
 import type { TtsFilesObject, Waveform } from '@/types/types'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 
 const emit = defineEmits<{
   (e: 'trackCreated'): void
@@ -97,6 +97,15 @@ const closeDialogOnOutsideClick = (e: MouseEvent) => {
     emit('toggleAddTrackModal')
   }
 }
+
+// Enforce min and max values
+watch(trackTtsRate, (newValue) => {
+  if (newValue > 2) {
+    trackTtsRate.value = 2
+  } else if (newValue < 0.5) {
+    trackTtsRate.value = 0.5
+  }
+})
 </script>
 
 <template>
