@@ -4,6 +4,9 @@ import { onMounted, ref } from 'vue'
 import type { SadissPerformance } from '@/types/types'
 import { getPerformances } from '@/services/api'
 
+// Here, the logic concerning opening/closing of the modal can't easily be replaced with
+// a composable, since we need to set the selected track id when opening the modal.
+// TODO: Find a sane way to handle this.
 const modal = ref<HTMLDialogElement | null>()
 
 const selectedTrackId = ref('')
