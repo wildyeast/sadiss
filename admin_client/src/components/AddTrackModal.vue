@@ -5,7 +5,7 @@ import { ref, computed, watch } from 'vue'
 import BaseModal from './BaseModal.vue'
 import { useModal } from '@/composables/useModal'
 
-const { closeModal, modal } = useModal()
+const { modal } = useModal()
 
 const openModal = (track?: Track) => {
   if (track?._id) {
@@ -20,6 +20,19 @@ const openModal = (track?: Track) => {
     ttsFileDownloadInfo.value = track.ttsFiles
   }
   modal.value?.showModal()
+}
+
+const closeModal = () => {
+  trackName.value = ''
+  trackNotes.value = ''
+  trackIsChoir.value = false
+  trackWaveform.value = 'sine'
+  trackTtsRate.value = 1
+  isEditingTrack.value = false
+  trackId = ''
+  partialFileDownloadInfo.value = undefined
+  ttsFileDownloadInfo.value = undefined
+  modal.value?.close()
 }
 
 defineExpose({
@@ -123,7 +136,10 @@ watch(trackTtsRate, (newValue) => {
     <form
       class="flex flex-col gap-4 p-4"
       @submit.prevent="handleCreateTrack">
-      <h1 class="text-center text-3xl font-bold text-primary">Add Track</h1>
+      <h1 class="text-center text-3xl font-bold text-primary">
+        <span v-if="!isEditingTrack">Add Track</span>
+        <span v-else>Edit Track</span>
+      </h1>
       <!-- Track name -->
       <div class="flex flex-col justify-between p-2">
         <div>Title</div>
@@ -252,7 +268,8 @@ watch(trackTtsRate, (newValue) => {
         type="submit"
         formmethod="dialog"
         class="text-white rounded-sm bg-primary p-2">
-        Add Track
+        <span v-if="!isEditingTrack">Add Track</span>
+        <span v-else>Edit Track</span>
       </button>
     </form>
   </BaseModal>
