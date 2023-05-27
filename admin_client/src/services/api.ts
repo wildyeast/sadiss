@@ -141,6 +141,19 @@ export async function createTrack(trackData: FormData) {
   return response.data!.track
 }
 
+export async function editTrack(trackId: string, trackData: FormData) {
+  const response = await request<{ track: Track }>(`/api/track/edit/${trackId}`, {
+    method: 'PATCH',
+    body: trackData
+  })
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.track
+}
+
 export async function deleteTrack(id: string) {
   const response = await request<{ track: Track }>(`/api/track/delete/${id}`, {
     method: 'DELETE'

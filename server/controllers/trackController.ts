@@ -122,7 +122,7 @@ exports.get_track = async (req: Request, res: Response) => {
 }
 
 exports.upload_track = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+  // res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
 
   if (!req.files) {
     res.status(400).json({ error: 'No files were uploaded.' })
@@ -196,8 +196,8 @@ exports.upload_track = async (req: Request, res: Response) => {
   }
 }
 
-exports.edit_track = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+exports.editTrack = async (req: Request, res: Response) => {
+  // res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
 
   const patch = req.body
 

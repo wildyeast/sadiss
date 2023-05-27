@@ -1,19 +1,22 @@
 <script setup lang="ts">
-import { createTrack } from '@/services/api'
+import { createTrack, editTrack } from '@/services/api'
 import type { TtsFilesObject, Waveform, Track } from '@/types/types'
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, computed, watch } from 'vue'
 import BaseModal from './BaseModal.vue'
 import { useModal } from '@/composables/useModal'
 
 const { closeModal, modal } = useModal()
 
-const openModal = (track: Track) => {
-  trackName.value = track.name
-  trackNotes.value = track.notes ? track.notes : ''
-  trackIsChoir.value = track.mode === 'choir'
-  trackWaveform.value = track.waveform
-  trackTtsRate.value = track.ttsRate ? track.ttsRate : 1
-  editingTrackId.value = track._id
+const openModal = (track?: Track) => {
+  if (track?._id) {
+    trackName.value = track.name
+    trackNotes.value = track.notes ? track.notes : ''
+    trackIsChoir.value = track.mode === 'choir'
+    trackWaveform.value = track.waveform
+    trackTtsRate.value = track.ttsRate ? track.ttsRate : 1
+    isEditingTrack.value = true
+    trackId = track._id
+  }
   modal.value?.showModal()
 }
 
@@ -35,12 +38,17 @@ const trackTtsRate = ref<number>(1)
 let file: File | undefined
 const numberOfVoices = ref(2)
 const ttsLanguages = ref('en-US, de-DE')
-const editingTrackId = ref()
+const isEditingTrack = ref(false)
+let trackId = ''
 
 const handleCreateTrack = async () => {
   try {
     const trackData = createTrackData()
-    await createTrack(trackData)
+    if (isEditingTrack.value) {
+      await editTrack(trackId, trackData)
+    } else {
+      await createTrack(trackData)
+    }
   } catch (err) {
     alert(err)
     return

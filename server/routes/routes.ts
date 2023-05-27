@@ -22,7 +22,7 @@ router.use('/api', authenticateToken)
 router.post('/api/track/create', upload.array('files'), track_controller.upload_track)
 
 // Edit track
-router.patch('/api/track/edit/:id', upload.array('files'), track_controller.edit_track)
+router.patch('/api/track/edit/:id', upload.array('files'), track_controller.editTrack)
 
 // Get tracks
 router.get('/api/tracks', track_controller.getTracks)
