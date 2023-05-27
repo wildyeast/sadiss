@@ -41,10 +41,11 @@ onMounted(async () => {
     @close-modal="closeModal">
     <h1 class="text-center text-3xl font-bold text-primary">Add Track to Performance</h1>
     <main>
+      <p class="text-primary">Click on the performance you want to add the track to.</p>
       <button
         v-for="performance of performances"
         :key="performance._id"
-        class="flex justify-between rounded-sm border border-primary p-4"
+        class="flex justify-between rounded-sm text-lg hover:bg-secondary"
         @click="$emit('addTrackToPerformance', selectedTrackId, performance._id)">
         <div class="flex flex-col">
           <p class="font-bold text-primary">{{ performance.name }}</p>
