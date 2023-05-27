@@ -26,6 +26,8 @@ interface Track {
   mode: 'choir' | 'nonChoir'
   waveform: Waveform
   ttsRate?: number
+  partialFile?: string
+  ttsFiles?: { origName: string; fileName: string }[]
 }
 
 // type UploadTrack = {

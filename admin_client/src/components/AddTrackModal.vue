@@ -1,11 +1,22 @@
 <script setup lang="ts">
 import { createTrack } from '@/services/api'
-import type { TtsFilesObject, Waveform } from '@/types/types'
-import { ref, computed, watch } from 'vue'
+import type { TtsFilesObject, Waveform, Track } from '@/types/types'
+import { ref, computed, watch, onMounted } from 'vue'
 import BaseModal from './BaseModal.vue'
 import { useModal } from '@/composables/useModal'
 
-const { closeModal, openModal, modal } = useModal()
+const { closeModal, modal } = useModal()
+
+const openModal = (track: Track) => {
+  trackName.value = track.name
+  trackNotes.value = track.notes ? track.notes : ''
+  trackIsChoir.value = track.mode === 'choir'
+  trackWaveform.value = track.waveform
+  trackTtsRate.value = track.ttsRate ? track.ttsRate : 1
+  editingTrackId.value = track._id
+  modal.value?.showModal()
+}
+
 defineExpose({
   openModal,
   closeModal
@@ -17,10 +28,10 @@ const emit = defineEmits<{
 }>()
 
 const trackName = ref('')
-const trackNotes = ref('')
+const trackNotes = ref<string>('')
 const trackIsChoir = ref(false)
 const trackWaveform = ref<Waveform>('sine')
-const trackTtsRate = ref(1)
+const trackTtsRate = ref<number>(1)
 let file: File | undefined
 const numberOfVoices = ref(2)
 const ttsLanguages = ref('en-US, de-DE')

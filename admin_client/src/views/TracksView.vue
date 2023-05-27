@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import router from '@/router'
 import { getTracks, deleteTrack, addTrackToPerformance } from '@/services/api'
 import type { Track } from '@/types/types'
 import { onMounted, ref } from 'vue'
@@ -10,8 +9,6 @@ const tracks = ref<Track[]>([])
 
 const addTrackModal = ref<typeof AddTrackModal | null>()
 
-const goToTrack = (id: string) => router.push(`/track/${id}`)
-
 const handleDeleteTrack = (id: string) => {
   if (!confirm('Are you sure you want to delete this track?')) return
   deleteTrack(id)
@@ -19,7 +16,7 @@ const handleDeleteTrack = (id: string) => {
 }
 
 const trackCreated = async () => {
-  addTrackModal?.value?.close()
+  addTrackModal?.value?.closeModal()
   tracks.value = await getTracks()
 }
 
@@ -32,6 +29,7 @@ const handleAddTrackToPerformance = (trackId: string, performanceId: string) => 
 
 onMounted(async () => {
   tracks.value = await getTracks()
+  console.log(tracks.value)
 })
 </script>
 
@@ -39,7 +37,7 @@ onMounted(async () => {
   <main class="relative mt-3 space-y-1 px-2">
     <h1 class="text-center text-3xl font-bold">Tracks</h1>
     <button
-      @click="goToTrack(track._id)"
+      @click="addTrackModal?.openModal(track)"
       v-for="track of tracks"
       :key="track._id"
       class="flex w-full justify-between rounded-sm border border-light p-4">
@@ -64,7 +62,7 @@ onMounted(async () => {
     <!-- Open add track modal -->
     <button
       class="text-white absolute bottom-8 right-10 mt-4 rounded-sm bg-primary"
-      @click="addTrackModal?.openModal">
+      @click.stop="addTrackModal?.openModal">
       <font-awesome-icon
         icon="fa-plus-circle"
         class="scale-[300%]" />
