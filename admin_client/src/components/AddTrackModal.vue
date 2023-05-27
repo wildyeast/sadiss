@@ -132,14 +132,13 @@ watch(trackTtsRate, (newValue) => {
           class="w-3/4" />
       </div>
       <!-- Partial File Upload -->
-      <div>
+      <div class="lg:flex lg:flex-row">
         <div class="flex flex-col justify-between p-2">
           <div>Partials file</div>
           <input
             type="file"
             @change="handleFileUpload($event)"
-            accept="*.txt"
-            class="w-3/4" />
+            accept="*.txt" />
         </div>
         <div
           v-if="partialFileDownloadInfo"
@@ -162,7 +161,7 @@ watch(trackTtsRate, (newValue) => {
           class="w-3/4" />
       </div>
       <!-- SRT file upload -->
-      <div>
+      <div class="lg:flex lg:flex-col">
         <div class="flex flex-col">
           <div>Subtitle files</div>
           <div class="w-3/4">
