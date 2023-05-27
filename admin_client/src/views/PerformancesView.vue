@@ -24,9 +24,6 @@ const handlePerformanceCreated = async () => {
 
 onMounted(async () => {
   performances.value = await getPerformances()
-  for (let i = 0; i < 4; i++) {
-    performances.value = performances.value.concat(performances.value)
-  }
 })
 </script>
 
