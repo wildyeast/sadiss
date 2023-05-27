@@ -45,7 +45,7 @@ onMounted(async () => {
     <div
       v-if="performance"
       class="flex flex-col items-center gap-1 px-2">
-      <h1 class="my-2 text-3xl font-bold">{{ performance.name }}</h1>
+      <h1 class="mb-2 text-3xl font-bold">{{ performance.name }}</h1>
       <p class="mb-4">Created by: {{ performance.username }}</p>
       <div class="flex w-full justify-between">
         <button @click.stop="qrCodesModal?.openModal()">

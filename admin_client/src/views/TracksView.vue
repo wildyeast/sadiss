@@ -38,11 +38,11 @@ onMounted(async () => {
 <template>
   <main class="relative mt-3 space-y-1 px-2">
     <h1 class="text-center text-3xl font-bold">Tracks</h1>
-    <div
+    <button
       @click="goToTrack(track._id)"
       v-for="track of tracks"
       :key="track._id"
-      class="flex justify-between rounded-sm border border-light p-4">
+      class="flex w-full justify-between rounded-sm border border-light p-4">
       <div class="flex flex-col">
         <p class="font-bold">{{ track.name }}</p>
         <p>Created by: {{ track.username }}</p>
@@ -59,7 +59,7 @@ onMounted(async () => {
             class="text-danger" />
         </button>
       </div>
-    </div>
+    </button>
 
     <!-- Open add track modal -->
     <button

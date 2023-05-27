@@ -5,8 +5,10 @@ const route = useRoute()
 </script>
 
 <template>
-  <div class="flex h-screen flex-col bg-primary">
-    <TopBar v-if="route.path !== '/login' && route.path !== '/register'" />
-    <router-view class="flex-1 lg:mx-10" />
+  <div class="relative flex h-screen flex-col bg-primary">
+    <TopBar
+      v-if="route.path !== '/login' && route.path !== '/register'"
+      class="absolute z-10 lg:px-10" />
+    <router-view class="h-full flex-1 px-2 pb-2 pt-[100px] lg:px-10" />
   </div>
 </template>
