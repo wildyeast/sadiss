@@ -47,7 +47,7 @@ defineExpose({
 <template>
   <dialog
     ref="modal"
-    class="w-full">
+    class="w-full lg:w-2/3">
     <slot></slot>
   </dialog>
 </template>
