@@ -101,7 +101,7 @@ exports.getTracks = async (req: Request, res: Response) => {
   try {
     const allTracks = await Track.find(
       { $or: [{ isPublic: true }, { userId: req.user!.id }] },
-      '_id name notes mode waveform ttsRate userId isPublic'
+      '_id name notes mode waveform ttsRate userId isPublic partialFile ttsFiles'
     )
     res.json({ tracks: allTracks })
   } catch (err) {

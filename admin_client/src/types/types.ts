@@ -26,7 +26,7 @@ interface Track {
   mode: 'choir' | 'nonChoir'
   waveform: Waveform
   ttsRate?: number
-  partialFile?: string
+  partialFile?: { origName: string; fileName: string }
   ttsFiles?: { origName: string; fileName: string }[]
 }
 

@@ -16,6 +16,8 @@ const openModal = (track?: Track) => {
     trackTtsRate.value = track.ttsRate ? track.ttsRate : 1
     isEditingTrack.value = true
     trackId = track._id
+    partialFileDownloadInfo.value = track.partialFile
+    ttsFileDownloadInfo.value = track.ttsFiles
   }
   modal.value?.showModal()
 }
