@@ -16,10 +16,11 @@ import {
   faStopCircle,
   faRepeat,
   faForwardFast,
-  faQrcode
+  faQrcode,
+  faUser
 } from '@fortawesome/free-solid-svg-icons'
 
-library.add(faTrash, faPlusCircle, faPlus, faPlay, faPause, faPlayCircle, faStopCircle, faRepeat, faForwardFast, faQrcode)
+library.add(faTrash, faPlusCircle, faPlus, faPlay, faPause, faPlayCircle, faStopCircle, faRepeat, faForwardFast, faQrcode, faUser)
 
 const app = createApp(App).use(router)
 app.component('Button', Button)
