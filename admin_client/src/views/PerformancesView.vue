@@ -28,9 +28,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="flex h-full flex-col space-y-1">
+  <main>
     <h1 class="text-center text-3xl font-bold">Performances</h1>
-    <div class="flex-1 space-y-2 overflow-y-scroll">
+    <div class="mt-6 flex-1 space-y-2 overflow-y-scroll">
       <button
         @click="goToPerformance(performance._id)"
         v-for="performance of performances"

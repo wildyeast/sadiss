@@ -34,30 +34,34 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="relative mt-3 space-y-1 px-2">
-    <h1 class="text-center text-3xl font-bold">Tracks</h1>
-    <button
-      @click="addTrackModal?.openModal(track)"
-      v-for="track of tracks"
-      :key="track._id"
-      class="flex w-full justify-between rounded-sm border border-light p-4">
-      <div class="flex flex-col">
-        <p class="font-bold">{{ track.name }}</p>
-        <p>Created by: {{ track.username }}</p>
-      </div>
-      <div class="flex gap-4">
-        <button @click.stop="addTrackToPerformanceModal?.openModal(track._id)">
-          <font-awesome-icon
-            icon="fa-plus"
-            size="lg" />
-        </button>
-        <button @click.stop="handleDeleteTrack(track._id)">
-          <font-awesome-icon
-            icon="fa-trash"
-            class="text-danger" />
-        </button>
-      </div>
-    </button>
+  <main class="relative px-2">
+    <h1 class="mb-6 text-center text-3xl font-bold">Tracks</h1>
+    <div class="mt-6 flex-1 space-y-2 overflow-y-scroll">
+      <button
+        @click="addTrackModal?.openModal(track)"
+        v-for="track of tracks"
+        :key="track._id"
+        class="flex w-full justify-between rounded-sm border border-light p-4">
+        <div class="flex flex-col">
+          <p class="font-bold">{{ track.name }}</p>
+          <div>
+            <span>Created by: {{ track.username }}</span>
+          </div>
+        </div>
+        <div class="flex gap-4">
+          <button @click.stop="addTrackToPerformanceModal?.openModal(track._id)">
+            <font-awesome-icon
+              icon="fa-plus"
+              size="lg" />
+          </button>
+          <button @click.stop="handleDeleteTrack(track._id)">
+            <font-awesome-icon
+              icon="fa-trash"
+              class="text-danger" />
+          </button>
+        </div>
+      </button>
+    </div>
 
     <!-- Open add track modal -->
     <button
