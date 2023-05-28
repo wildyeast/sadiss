@@ -28,7 +28,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main>
+  <main class="flex flex-col">
     <h1 class="text-center text-3xl font-bold">Performances</h1>
     <div class="mt-6 flex-1 space-y-2 overflow-y-scroll">
       <button

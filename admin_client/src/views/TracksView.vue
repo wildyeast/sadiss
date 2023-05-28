@@ -34,9 +34,20 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="relative px-2">
-    <h1 class="mb-6 text-center text-3xl font-bold">Tracks</h1>
-    <div class="mt-6 flex-1 space-y-2 overflow-y-scroll">
+  <main class="flex flex-col">
+    <div class="fixed left-0 right-0 bg-primary px-2 py-4 lg:px-10">
+      <h1 class="text-center text-3xl font-bold">Tracks</h1>
+      <div class="flex flex-row-reverse">
+        <!-- Open add track modal -->
+        <button
+          class="rounded-sm bg-light px-4 py-2 font-bold text-primary"
+          @click.stop="addTrackModal?.openModal">
+          Add track
+        </button>
+      </div>
+    </div>
+
+    <div class="mt-12 space-y-2 overflow-y-auto pt-16">
       <button
         @click="addTrackModal?.openModal(track)"
         v-for="track of tracks"
@@ -62,15 +73,6 @@ onMounted(async () => {
         </div>
       </button>
     </div>
-
-    <!-- Open add track modal -->
-    <button
-      class="text-white absolute bottom-8 right-10 mt-4 rounded-sm bg-primary"
-      @click.stop="addTrackModal?.openModal">
-      <font-awesome-icon
-        icon="fa-plus-circle"
-        class="scale-[300%]" />
-    </button>
 
     <!-- Add track modal -->
     <Teleport to="body">

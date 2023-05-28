@@ -54,7 +54,7 @@ onUnmounted(() => {
 })
 </script>
 <template>
-  <div class="absolute z-10 flex h-[80px] w-full items-center justify-between border-b border-light px-2 lg:px-10">
+  <header class="z-10 flex h-[80px] w-full items-center justify-between border-b border-light bg-primary px-2 lg:px-10">
     <router-link to="/">
       <img
         src="https://sadiss.net/wp-content/uploads/2022/07/Sadiss-Logo.png"
@@ -76,5 +76,5 @@ onUnmounted(() => {
         </button>
       </dialog>
     </nav>
-  </div>
+  </header>
 </template>
