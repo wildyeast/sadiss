@@ -4,6 +4,7 @@ import type { Track } from '@/types/types'
 import { onMounted, ref } from 'vue'
 import AddTrackModal from '@/components/AddTrackModal.vue'
 import AddTrackToPerformanceModal from '@/components/AddTrackToPerformanceModal.vue'
+import FixedViewHeader from '@/components/FixedViewHeader.vue'
 
 const tracks = ref<Track[]>([])
 
@@ -29,14 +30,15 @@ const handleAddTrackToPerformance = (trackId: string, performanceId: string) => 
 
 onMounted(async () => {
   tracks.value = await getTracks()
-  console.log(tracks.value)
+  for (let i = 0; i < 4; i++) {
+    tracks.value = tracks.value.concat(tracks.value)
+  }
 })
 </script>
 
 <template>
   <main class="flex flex-col">
-    <div class="fixed left-0 right-0 bg-primary px-2 py-4 lg:px-10">
-      <h1 class="text-center text-3xl font-bold">Tracks</h1>
+    <FixedViewHeader title="Tracks">
       <div class="flex flex-row-reverse">
         <!-- Open add track modal -->
         <button
@@ -45,7 +47,7 @@ onMounted(async () => {
           Add track
         </button>
       </div>
-    </div>
+    </FixedViewHeader>
 
     <div class="mt-12 space-y-2 overflow-y-auto pt-16">
       <button

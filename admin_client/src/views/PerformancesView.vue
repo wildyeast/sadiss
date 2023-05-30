@@ -4,6 +4,7 @@ import { getPerformances, deletePerformance } from '@/services/api'
 import type { SadissPerformance } from '@/types/types'
 import { onMounted, ref } from 'vue'
 import AddPerformanceModal from '@/components/AddPerformanceModal.vue'
+import FixedViewHeader from '@/components/FixedViewHeader.vue'
 
 const performances = ref<SadissPerformance[]>([])
 
@@ -24,13 +25,25 @@ const handlePerformanceCreated = async () => {
 
 onMounted(async () => {
   performances.value = await getPerformances()
+  for (let i = 0; i < 4; i++) {
+    performances.value = performances.value.concat(performances.value)
+  }
 })
 </script>
 
 <template>
   <main class="flex flex-col">
-    <h1 class="text-center text-3xl font-bold">Performances</h1>
-    <div class="mt-6 flex-1 space-y-2 overflow-y-scroll">
+    <FixedViewHeader title="Performances">
+      <div class="flex flex-row-reverse">
+        <!-- Open add performance modal -->
+        <button
+          class="rounded-sm bg-light px-4 py-2 font-bold text-primary"
+          @click.stop="addPerformanceModal?.openModal">
+          Add performance
+        </button>
+      </div>
+    </FixedViewHeader>
+    <div class="mt-12 flex-1 space-y-2 overflow-y-scroll pt-16">
       <button
         @click="goToPerformance(performance._id)"
         v-for="performance of performances"
@@ -47,15 +60,6 @@ onMounted(async () => {
         </button>
       </button>
     </div>
-
-    <!-- Open add performance modal -->
-    <button
-      class="text-white absolute bottom-8 right-10 mt-4 rounded-sm bg-primary"
-      @click.stop="addPerformanceModal?.openModal()">
-      <font-awesome-icon
-        icon="fa-plus-circle"
-        class="scale-[300%]" />
-    </button>
 
     <!-- Add performance modal -->
     <Teleport to="body">

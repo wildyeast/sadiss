@@ -1,7 +1,10 @@
+<script setup lang="ts">
+import FixedViewHeader from '@/components/FixedViewHeader.vue'
+</script>
 <template>
   <main>
-    <h1 class="text-center text-3xl font-bold">Dashboard</h1>
-    <div class="mt-6 flex items-center gap-4 px-2 lg:flex-col">
+    <FixedViewHeader title="Dashboard" />
+    <div class="mt-12 flex items-center gap-4 px-2 pt-16 lg:flex-col">
       <router-link
         to="/performances"
         class="w-1/2 border p-6 text-center text-lg"

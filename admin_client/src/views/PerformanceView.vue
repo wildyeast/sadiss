@@ -5,6 +5,7 @@ import { onMounted, ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import PlayerControls from '@/components/PlayerControls.vue'
 import QrCodesModal from '@/components/QrCodesModal.vue'
+import FixedViewHeader from '@/components/FixedViewHeader.vue'
 
 // Get performance id from route
 const route = useRoute()
@@ -45,20 +46,18 @@ onMounted(async () => {
     <div
       v-if="performance"
       class="flex flex-col">
-      <div class="flex flex-col items-center">
-        <h1 class="mb-2 text-3xl font-bold">{{ performance.name }}</h1>
-        <p class="mb-4">Created by: {{ performance.username }}</p>
-      </div>
+      <FixedViewHeader :title="performance.name">
+        <div class="flex justify-between">
+          <p class="mb-4">Created by: {{ performance.username }}</p>
+          <button @click.stop="qrCodesModal?.openModal()">
+            <font-awesome-icon
+              icon="fa-qrcode"
+              size="xl" />
+          </button>
+        </div>
+      </FixedViewHeader>
 
-      <div class="my-2 flex w-full flex-row-reverse">
-        <button @click.stop="qrCodesModal?.openModal()">
-          <font-awesome-icon
-            icon="fa-qrcode"
-            size="xl" />
-        </button>
-      </div>
-
-      <div class="flex-1 space-y-2 overflow-y-scroll">
+      <div class="mt-12 flex-1 space-y-2 overflow-y-scroll pt-16">
         <button
           v-for="(track, index) in performance.tracks"
           @click="selectTrack(index)"
