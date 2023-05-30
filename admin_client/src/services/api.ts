@@ -92,11 +92,12 @@ export async function getPerformance(id: string) {
   return response.data!.performance
 }
 
-export async function createPerformance(name: string) {
+export async function createPerformance(name: string, isPublic: boolean) {
   const response = await request<{ performance: SadissPerformance }>('/api/performance/create', {
     method: 'POST',
     body: JSON.stringify({
-      name
+      name,
+      isPublic
     })
   })
 }

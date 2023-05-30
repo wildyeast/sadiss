@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BaseModal from './BaseModal.vue'
 import { ref } from 'vue'
-import { createPerformance, getPerformances } from '@/services/api'
+import { createPerformance } from '@/services/api'
 import { useModal } from '@/composables/useModal'
 
 const { modal, openModal, closeModal } = useModal()
@@ -15,8 +15,9 @@ const emit = defineEmits<{
 }>()
 
 const performanceName = ref('')
+const isPublic = ref(false)
 const handleCreatePerformance = async () => {
-  await createPerformance(performanceName.value)
+  await createPerformance(performanceName.value, isPublic.value)
   emit('performanceCreated')
 }
 </script>
@@ -35,6 +36,15 @@ const handleCreatePerformance = async () => {
           type="text"
           placeholder="Name"
           class="rounded-sm border border-primary p-2" />
+        <div class="flex items-center gap-2">
+          <input
+            v-model="isPublic"
+            type="checkbox"
+            id="isPublic"
+            name="isPublic"
+            class="h-5 w-5 rounded-sm border border-primary p-2" />
+          <label for="isPublic">Public</label>
+        </div>
         <button
           type="submit"
           formmethod="dialog"

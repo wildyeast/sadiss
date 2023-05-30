@@ -6,13 +6,16 @@ import { User } from '../models/user'
 exports.getPerformances = async (req: Request, res: Response) => {
   try {
     // Get all performances that are public or owned by the user
-    const performances = await SadissPerformance.find({ $or: [{ isPublic: true }, { userId: req.user!.id }] }, '_id name userId')
+    const performances = await SadissPerformance.find(
+      { $or: [{ isPublic: true }, { userId: req.user!.id }] },
+      '_id name userId isPublic'
+    )
 
     // Map performances to include username instead of user ID
     const performancesWithUsername = await Promise.all(
       performances.map(async (performance) => {
         const user = await User.findById(performance.userId, 'username')
-        return { _id: performance._id, name: performance.name, username: user?.username }
+        return { _id: performance._id, name: performance.name, username: user?.username, isPublic: performance.isPublic }
       })
     )
 
@@ -29,7 +32,12 @@ exports.getPerformance = async (req: Request, res: Response) => {
     let performanceWithUsername = null
     if (performance) {
       const user = await User.findById(performance.userId, 'username')
-      performanceWithUsername = { _id: performance._id, name: performance.name, username: user?.username }
+      performanceWithUsername = {
+        _id: performance._id,
+        name: performance.name,
+        username: user?.username,
+        isPublic: performance.isPublic
+      }
     }
 
     res.json({ performance: performanceWithUsername })
@@ -39,7 +47,7 @@ exports.getPerformance = async (req: Request, res: Response) => {
   }
 }
 
-exports.create_performance = async (req: Request, res: Response) => {
+exports.createPerformance = async (req: Request, res: Response) => {
   try {
     const { name, isPublic } = req.body
 

@@ -56,7 +56,7 @@ router.get('/api/performances', performance_controller.getPerformances)
 router.get('/api/performance/:id', performance_controller.getPerformance)
 
 // Create performance
-router.post('/api/performance/create', performance_controller.create_performance)
+router.post('/api/performance/create', performance_controller.createPerformance)
 
 // Delete performance
 router.delete('/api/performance/delete/:id', performance_controller.delete_performance)

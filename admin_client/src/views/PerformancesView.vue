@@ -25,9 +25,6 @@ const handlePerformanceCreated = async () => {
 
 onMounted(async () => {
   performances.value = await getPerformances()
-  for (let i = 0; i < 4; i++) {
-    performances.value = performances.value.concat(performances.value)
-  }
 })
 </script>
 
@@ -50,7 +47,12 @@ onMounted(async () => {
         :key="performance._id"
         class="flex w-full justify-between rounded-sm border border-light p-4">
         <div class="text-start">
-          <p class="font-bold">{{ performance.name }}</p>
+          <div class="flex gap-2">
+            <p class="font-bold">{{ performance.name }}</p>
+            <span v-if="performance.isPublic">
+              <font-awesome-icon icon="fa-user-group" />
+            </span>
+          </div>
           <p>Created by: {{ performance.username }}</p>
         </div>
         <button @click.stop="handleDeletePerformance(performance._id)">

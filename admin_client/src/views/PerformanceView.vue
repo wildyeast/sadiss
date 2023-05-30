@@ -57,7 +57,9 @@ onMounted(async () => {
         </div>
       </FixedViewHeader>
 
-      <div class="mt-12 flex-1 space-y-2 overflow-y-scroll pt-16">
+      <div
+        v-if="performance.tracks.length"
+        class="mt-12 flex-1 space-y-2 overflow-y-scroll pt-16">
         <button
           v-for="(track, index) in performance.tracks"
           @click="selectTrack(index)"
@@ -65,6 +67,16 @@ onMounted(async () => {
           :class="{ 'bg-secondary': selectedTrack === track }">
           <p>{{ track.name }}</p>
         </button>
+      </div>
+      <div
+        v-else
+        class="bg-red mt-12 flex h-full flex-col items-center justify-center pt-16">
+        <p>No tracks yet.</p>
+        <router-link
+          to="/tracks"
+          class="mt-4 rounded-md bg-light p-4 text-primary"
+          >Go to tracks and add some
+        </router-link>
       </div>
     </div>
 
