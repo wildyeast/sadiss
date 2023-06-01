@@ -29,9 +29,7 @@ describe('trackPerformanceController test', () => {
   describe('add_track_to_performance function', () => {
     it('should return a 201 status and the saved TrackPerformance data on success', async () => {
       const trackPerformanceData = { trackId: '000000000000', performanceId: '111111111111' }
-      const res = await authenticatedRequest(request, '/api/performance/111111111111/add-track', 'post').send(
-        trackPerformanceData
-      )
+      const res = await authenticatedRequest(request, '/api/add-track-to-performance', 'post').send(trackPerformanceData)
 
       expect(res.status).toBe(201)
 
@@ -45,9 +43,7 @@ describe('trackPerformanceController test', () => {
       })
 
       const trackPerformanceData = { trackId: '000000000000', performanceId: '111111111111' }
-      const res = await authenticatedRequest(request, '/api/performance/111111111111/add-track', 'post').send(
-        trackPerformanceData
-      )
+      const res = await authenticatedRequest(request, '/api/add-track-to-performance', 'post').send(trackPerformanceData)
 
       expect(res.status).toBe(500)
     })

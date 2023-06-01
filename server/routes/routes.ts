@@ -63,7 +63,7 @@ router.delete('/api/performance/delete/:id', performance_controller.delete_perfo
 
 /* TRACK PERFORMANCE */
 // Add track to performance
-router.put(
+router.post(
   '/api/add-track-to-performance',
   [validateTrackAccess, validatePerformanceAccess],
   track_performance_controller.add_track_to_performance
