@@ -23,7 +23,7 @@ describe('performanceController test', () => {
       const performance = new SadissPerformance({
         name: 'Performance 1',
         isPublic: true,
-        userId: 'user-id'
+        userId: '123456789012'
       })
       await performance.save()
 
