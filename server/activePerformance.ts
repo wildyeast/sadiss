@@ -48,8 +48,7 @@ export class ActivePerformance {
       if (chunkIndex >= track.length) {
         if (loopTrack) {
           console.log('No more chunks. Looping.')
-          const CHUNK_LENGTH_IN_SECONDS = 0.999
-          startTime += chunkIndex * CHUNK_LENGTH_IN_SECONDS
+          startTime += track.length
           chunkIndex = 0
         } else {
           console.log('No more chunks. Stopping.')
