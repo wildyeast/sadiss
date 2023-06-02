@@ -5,3 +5,9 @@ export const authenticatedRequest = (request: any, route: string, method: 'get' 
     return request.post(route).set('Authorization', `Bearer ${global.token}`)
   }
 }
+/**
+ * This is a mock id that is used in tests.
+ * It is 12 characters long, which is the length of a MongoDB ObjectId.
+ *
+ * @constant {string} */
+export const mockId = '012345678901'
