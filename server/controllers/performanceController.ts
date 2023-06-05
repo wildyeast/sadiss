@@ -21,7 +21,6 @@ exports.getPerformances = async (req: Request, res: Response) => {
 
     res.json({ performances: performancesWithUsername })
   } catch (err) {
-    console.log('Failed getting performances with:', err)
     res.status(500).json({ Error: 'Failed fetching performances.' })
   }
 }
@@ -42,7 +41,6 @@ exports.getPerformance = async (req: Request, res: Response) => {
 
     res.json({ performance: performanceWithUsername })
   } catch (err) {
-    console.log('Failed getting performance with:', err)
     res.status(500).json({ Error: 'Failed fetching performance.' })
   }
 }
@@ -59,7 +57,6 @@ exports.createPerformance = async (req: Request, res: Response) => {
     const performance = new SadissPerformance({ name, isPublic: !!isPublic, userId: req.user!.id })
     performance.save((err) => {
       if (err) {
-        console.error('Error while creating performance', err)
         res.status(500).send(err)
       } else {
         res.status(201).json({ performance })

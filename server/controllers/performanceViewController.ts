@@ -22,7 +22,6 @@ exports.getPerformanceWithTracks = async (req: Request, res: Response) => {
 
     res.json({ performance: performanceWithUsernameAndTracks })
   } catch (err) {
-    console.log('Failed getting performance with:', err)
     res.status(500).json({ Error: 'Failed fetching performance.' })
   }
 }
