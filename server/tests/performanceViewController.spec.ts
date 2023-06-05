@@ -1,6 +1,6 @@
 import { connectDB, disconnectDB } from '../database'
 import { SadissPerformance, User, TrackPerformance, Track } from '../models'
-import { authenticatedRequest, mockId } from './testUtils'
+import { authenticatedRequest, mockId, generateMockId } from './testUtils'
 
 const { app, server, wss } = require('../server')
 const supertest = require('supertest')
@@ -18,88 +18,80 @@ describe('getPerformanceWithTracks', () => {
   })
 
   it('should return performance data with associated tracks', async () => {
-    //   // Mock the data and queries
-    //   const mockPerformanceId = 'mock-performance-id'
-    //   const mockUserId = 'mock-user-id'
-    //   const mockUsername = 'mock-username'
-    //   const mockTrackId1 = 'mock-track-id-1'
-    //   const mockTrackId2 = 'mock-track-id-2'
-    //   const mockPerformance = {
-    //     _id: mockPerformanceId,
-    //     name: 'Performance 1',
-    //     userId: mockUserId
-    //   }
-    //   const mockUser = {
-    //     _id: mockUserId,
-    //     username: mockUsername
-    //   }
-    //   const mockTrackPerformances = [{ trackId: mockTrackId1 }, { trackId: mockTrackId2 }]
-    //   const mockTracks = [
-    //     {
-    //       _id: mockTrackId1,
-    //       name: 'Track 1',
-    //       notes: 'Notes 1',
-    //       mode: 'Mode 1',
-    //       waveform: 'Waveform 1',
-    //       ttsRate: 1.5,
-    //       userId: mockUserId,
-    //       isPublic: true
-    //     },
-    //     {
-    //       _id: mockTrackId2,
-    //       name: 'Track 2',
-    //       notes: 'Notes 2',
-    //       mode: 'Mode 2',
-    //       waveform: 'Waveform 2',
-    //       ttsRate: 2.0,
-    //       userId: mockUserId,
-    //       isPublic: false
-    //     }
-    //   ]
-    //   // Mock the database queries
-    //   SadissPerformance.findById = jest.fn().mockResolvedValue(mockPerformance)
-    //   User.findById = jest.fn().mockResolvedValue(mockUser)
-    //   TrackPerformance.find = jest.fn().mockResolvedValue(mockTrackPerformances)
-    //   Track.findById.mockImplementation((trackId: string) => {
-    //     const foundTrack = mockTracks.find((track) => track._id === trackId)
-    //     return Promise.resolve(foundTrack)
-    //   })
-    //   // Make the request to the route handler
-    //   const response = await request(app).get(`/performance/${mockPerformanceId}`).expect(200)
-    //   // Verify the response
-    //   expect(response.body.performance).toEqual({
-    //     _id: mockPerformanceId,
-    //     name: 'Performance 1',
-    //     username: mockUsername,
-    //     tracks: [
-    //       {
-    //         _id: mockTrackId1,
-    //         name: 'Track 1',
-    //         notes: 'Notes 1',
-    //         mode: 'Mode 1',
-    //         waveform: 'Waveform 1',
-    //         ttsRate: 1.5,
-    //         userId: mockUserId,
-    //         isPublic: true
-    //       },
-    //       {
-    //         _id: mockTrackId2,
-    //         name: 'Track 2',
-    //         notes: 'Notes 2',
-    //         mode: 'Mode 2',
-    //         waveform: 'Waveform 2',
-    //         ttsRate: 2.0,
-    //         userId: mockUserId,
-    //         isPublic: false
-    //       }
-    //     ]
-    //   })
-    //   // Verify that the database queries were called correctly
-    //   expect(SadissPerformance.findById).toHaveBeenCalledWith(mockPerformanceId)
-    //   expect(User.findById).toHaveBeenCalledWith(mockUserId, 'username')
-    //   expect(TrackPerformance.find).toHaveBeenCalledWith({ performanceId: mockPerformanceId }, 'trackId')
-    //   expect(Track.findById).toHaveBeenCalledWith(mockTrackId1, '_id name notes mode waveform ttsRate userId isPublic')
-    //   expect(Track.findById).toHaveBeenCalledWith(mockTrackId2, '_id name notes mode waveform ttsRate userId isPublic')
+    const testUser = new User({
+      username: 'test-username',
+      password: 'test-password',
+      email: 'test@email.com'
+    })
+    await testUser.save()
+
+    const testPerformance = new SadissPerformance({
+      name: 'Performance 1',
+      userId: testUser._id,
+      isPublic: true
+    })
+    await testPerformance.save()
+
+    const testTrack1 = new Track({
+      name: 'Track 1',
+      mode: 'choir',
+      waveform: 'sine',
+      ttsRate: 1.5,
+      userId: testUser._id,
+      isPublic: true
+    })
+    await testTrack1.save()
+
+    const trackPerformance = new TrackPerformance({
+      trackId: testTrack1._id,
+      performanceId: testPerformance._id
+    })
+    await trackPerformance.save()
+
+    const testTrack2 = new Track({
+      name: 'Track 2',
+      mode: 'choir',
+      waveform: 'sine',
+      ttsRate: '1',
+      userId: testUser._id,
+      isPublic: false,
+      notes: 'test-notes'
+    })
+    await testTrack2.save()
+
+    const trackPerformance2 = new TrackPerformance({
+      trackId: testTrack2._id,
+      performanceId: testPerformance._id
+    })
+    await trackPerformance2.save()
+
+    const res = await authenticatedRequest(request, `/api/performance/${testPerformance._id}/with-tracks`, 'get').expect(200)
+    expect(res.body.performance).toEqual({
+      _id: testPerformance._id.toString(),
+      name: 'Performance 1',
+      username: 'test-username',
+      tracks: [
+        {
+          _id: testTrack1._id.toString(),
+          name: 'Track 1',
+          mode: 'choir',
+          waveform: 'sine',
+          ttsRate: '1.5',
+          userId: testUser._id.toString(),
+          isPublic: true
+        },
+        {
+          _id: testTrack2._id.toString(),
+          name: 'Track 2',
+          mode: 'choir',
+          waveform: 'sine',
+          ttsRate: '1',
+          userId: testUser._id.toString(),
+          isPublic: false,
+          notes: 'test-notes'
+        }
+      ]
+    })
   })
 
   it('should return error response if fetching performance fails', async () => {

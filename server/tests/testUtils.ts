@@ -11,3 +11,8 @@ export const authenticatedRequest = (request: any, route: string, method: 'get' 
  *
  * @constant {string} */
 export const mockId = '012345678901'
+
+/**
+ * Returns a string of length 12, which is the length of a MongoDB ObjectId.
+ */
+export const generateMockId = () => Math.random().toString(36).substring(2, 14)
