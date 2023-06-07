@@ -122,7 +122,6 @@ exports.get_track = async (req: Request, res: Response) => {
 }
 
 exports.uploadTrack = async (req: Request, res: Response) => {
-  console.log('files', req.files)
   if (!req.files || !req.files.length) {
     res.status(400).json({ error: 'No files were uploaded.' })
     return
