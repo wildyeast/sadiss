@@ -86,8 +86,7 @@ export const chunk = async (path: string, ttsInstructions?: TtsJson) => {
     chunks.push(chunk)
   }
 
-  console.log('Created', chunks.length, 'chunks')
-
+  
   // Insert TTS data into chunks
   if (ttsInstructions) {
     for (const ttsTime in ttsInstructions) {
@@ -106,6 +105,8 @@ export const chunk = async (path: string, ttsInstructions?: TtsJson) => {
       }
     }
   }
+  
+  console.log('Created', chunks.length, 'chunks')
 
   return { partialsCount, chunks }
 }
