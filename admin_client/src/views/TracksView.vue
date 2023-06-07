@@ -30,9 +30,6 @@ const handleAddTrackToPerformance = (trackId: string, performanceId: string) => 
 
 onMounted(async () => {
   tracks.value = await getTracks()
-  for (let i = 0; i < 4; i++) {
-    tracks.value = tracks.value.concat(tracks.value)
-  }
 })
 </script>
 
