@@ -90,12 +90,18 @@ export class ActivePerformance {
               dataToSend.chunk.partials = [partialById]
             }
 
+	    	console.log('Chunk index: ', chunkIndex)
+		console.log('all tts instructions: ', track[chunkIndex]?.ttsInstructions)
+
             if (track[chunkIndex]?.ttsInstructions) {
-              const ttsInstructionForClientId = track[chunkIndex]?.ttsInstructions[+client.choirId]
+              const ttsInstructionForClientId = track[chunkIndex]?.ttsInstructions[client.choirId]
               if (ttsInstructionForClientId) {
                 dataToSend.chunk.ttsInstructions = ttsInstructionForClientId[client.ttsLang.iso]
               }
             }
+		
+		console.log('Data to send: ', dataToSend)	    
+
 
             if (dataToSend.chunk.partials || dataToSend.chunk.ttsInstructions) {
               client.send(JSON.stringify(dataToSend))
