@@ -41,7 +41,10 @@ export interface TrackDocument extends Document {
   ttsLangs: string[]
   waveform: string
   ttsRate: string
-  partialFile: object
+  partialFile: {
+    origName: string
+    fileName: string
+  }
   ttsFiles: TTSFileObject[]
   isPublic: boolean
   userId: string

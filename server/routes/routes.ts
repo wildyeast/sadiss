@@ -19,7 +19,7 @@ const upload = multer({ dest: 'uploads/' })
 router.use('/api', authenticateToken)
 
 // Upload track
-router.post('/api/track/create', upload.array('files'), track_controller.upload_track)
+router.post('/api/track/create', upload.array('files'), track_controller.uploadTrack)
 
 // Edit track
 router.patch('/api/track/edit/:id', upload.array('files'), track_controller.editTrack)

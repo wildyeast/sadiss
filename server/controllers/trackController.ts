@@ -121,22 +121,39 @@ exports.get_track = async (req: Request, res: Response) => {
   }
 }
 
-exports.upload_track = async (req: Request, res: Response) => {
-  // res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-
-  if (!req.files) {
+exports.uploadTrack = async (req: Request, res: Response) => {
+  console.log('files', req.files)
+  if (!req.files || !req.files.length) {
     res.status(400).json({ error: 'No files were uploaded.' })
     return
   }
 
+  if (!req.body.name) {
+    res.status(400).json({ error: 'No name provided.' })
+    return
+  }
+
+  if (!req.body.mode) {
+    res.status(400).json({ error: 'No mode provided.' })
+    return
+  }
+
+  if (!req.body.waveform) {
+    res.status(400).json({ error: 'No waveform provided.' })
+    return
+  }
+
   try {
-    const partialFile = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname === 'partialfile')[0]
+    const partialFile: Express.Multer.File = Object.values(req.files).filter((file: Express.Multer.File) =>
+      file.originalname.includes('partialfile')
+    )[0]
     let path
     const partialFileToSave = <{ origName: string; fileName: string }>{}
 
     if (partialFile) {
       path = partialFile.path
-      partialFileToSave.origName = partialFile.originalname
+      const originalFileName = partialFile.originalname.replace('partialfile-', '')
+      partialFileToSave.origName = originalFileName
       partialFileToSave.fileName = partialFile.filename
     }
 
@@ -184,21 +201,19 @@ exports.upload_track = async (req: Request, res: Response) => {
 
     t.save((err) => {
       if (err) {
-        console.error('Error while uploading track', err)
+        console.log('Failed uploading track with:', err)
         res.status(500).send(err)
       } else {
         res.status(201).send(t)
       }
     })
   } catch (err) {
-    console.error('Error while uploading track', err)
+    console.log('Failed uploading track with:', err)
     res.status(500).send(err)
   }
 }
 
 exports.editTrack = async (req: Request, res: Response) => {
-  // res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-
   const patch = req.body
 
   if (req.files) {

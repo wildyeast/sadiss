@@ -80,7 +80,8 @@ const createTrackData = () => {
   data.append('ttsRate', trackTtsRate.value.toString())
 
   if (file) {
-    data.append('files', file, 'partialfile')
+    const fileNameWithoutExtension = file.name.slice(0, '.txt'.length * -1)
+    data.append('files', file, `partialfile-${fileNameWithoutExtension}`)
   }
   for (const voice in ttsFiles) {
     for (const lang in ttsFiles[voice]) {
