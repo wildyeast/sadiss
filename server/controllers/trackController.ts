@@ -110,10 +110,13 @@ exports.getTracks = async (req: Request, res: Response) => {
   }
 }
 
-exports.get_track = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+exports.getTrack = async (req: Request, res: Response) => {
   try {
     const track = await Track.find({ _id: req.params.id }, '_id name notes mode waveform ttsRate partialFile ttsFiles')
+    if (!track.length) {
+      res.status(404).json({ error: 'Track not found' })
+      return
+    }
     res.json(track)
   } catch (err) {
     console.log('Failed getting track with:', err)
@@ -143,24 +146,30 @@ exports.uploadTrack = async (req: Request, res: Response) => {
   }
 
   try {
+    const partialFilePrefix = 'partialfile_'
     const partialFile: Express.Multer.File = Object.values(req.files).filter((file: Express.Multer.File) =>
-      file.originalname.includes('partialfile')
+      file.originalname.includes(partialFilePrefix)
     )[0]
     let path
     const partialFileToSave = <{ origName: string; fileName: string }>{}
 
     if (partialFile) {
       path = partialFile.path
-      const originalFileName = partialFile.originalname.replace('partialfile-', '')
+      const originalFileName = partialFile.originalname.replace(partialFilePrefix, '')
       partialFileToSave.origName = originalFileName
       partialFileToSave.fileName = partialFile.filename
     }
 
-    const ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes('ttsfile'))
+    const ttsFilePrefix = 'ttsfile_'
+    let ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes(ttsFilePrefix))
     let ttsLangs: Set<string> | undefined
     let ttsJson: TtsJson | undefined
     if (ttsFiles.length) {
       ;({ ttsLangs, ttsJson } = convertSrtToJson(ttsFiles))
+      ttsFiles = ttsFiles.map((file: Express.Multer.File) => ({
+        origName: file.originalname.split('_').reverse()[0], // Remove prefix, voice and lang
+        fileName: file.filename
+      }))
     }
 
     const filename = uuid.v4()
@@ -185,7 +194,7 @@ exports.uploadTrack = async (req: Request, res: Response) => {
       waveform,
       ttsRate,
       partialFile: partialFileToSave,
-      ttsFiles: ttsFiles.map((file: Express.Multer.File) => ({ origName: file.originalname, fileName: file.filename })),
+      ttsFiles,
       userId: req.user!.id,
       isPublic: !!req.body.isPublic
     })

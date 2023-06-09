@@ -15,4 +15,15 @@ export const mockId = '012345678901'
 /**
  * Returns a string of length 12, which is the length of a MongoDB ObjectId.
  */
-export const generateMockId = () => Math.random().toString(36).substring(2, 14)
+export const generateMockId = () => {
+  const desiredLength = 12
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+  let result = ''
+
+  for (let i = 0; i < desiredLength; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length)
+    result += characters.charAt(randomIndex)
+  }
+
+  return result
+}

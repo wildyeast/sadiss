@@ -81,11 +81,13 @@ const createTrackData = () => {
 
   if (file) {
     const fileNameWithoutExtension = file.name.slice(0, '.txt'.length * -1)
-    data.append('files', file, `partialfile-${fileNameWithoutExtension}`)
+    data.append('files', file, `partialfile_${fileNameWithoutExtension}`)
   }
   for (const voice in ttsFiles) {
     for (const lang in ttsFiles[voice]) {
-      data.append('files', ttsFiles[voice][lang], `ttsfile_${voice}_${lang}`)
+      const ttsFile = ttsFiles[voice][lang]
+      const fileNameWithoutExtension = ttsFile.name.slice(0, '.txt'.length * -1)
+      data.append('files', ttsFile, `ttsfile_${voice}_${lang}_${fileNameWithoutExtension}`)
     }
   }
   return data

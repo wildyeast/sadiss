@@ -28,7 +28,7 @@ router.patch('/api/track/edit/:id', upload.array('files'), track_controller.edit
 router.get('/api/tracks', track_controller.getTracks)
 
 // Get track
-router.get('/api/track/:id', track_controller.get_track)
+router.get('/api/track/:id', track_controller.getTrack)
 
 // Delete track
 router.delete('/api/track/delete/:id', track_controller.deleteTrack)
