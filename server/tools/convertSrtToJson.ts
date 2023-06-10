@@ -42,7 +42,7 @@ export const convertSrtToJson = (srtFiles: { path: string; originalname: string 
     // Write last timestamp and its lines to object
     ttsJson = writeToObject(ttsJson, currentTimestamp, voice, lang, currentLine)
   }
-  console.log('Converted .srt to following object: ', ttsJson)
+  // console.log('Converted .srt to following object: ', ttsJson)
   return { ttsLangs, ttsJson }
 }
 
