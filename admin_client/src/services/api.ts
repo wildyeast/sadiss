@@ -144,7 +144,7 @@ export async function createTrack(trackData: FormData) {
 
 export async function editTrack(trackId: string, trackData: FormData) {
   const response = await request<{ track: Track }>(`/api/track/edit/${trackId}`, {
-    method: 'PATCH',
+    method: 'POST',
     body: trackData
   })
 
