@@ -156,7 +156,7 @@ exports.uploadTrack = async (req: Request, res: Response) => {
     if (partialFile) {
       path = partialFile.path
       const originalFileName = partialFile.originalname.replace(partialFilePrefix, '')
-      partialFileToSave.origName = originalFileName
+      partialFileToSave.origName = originalFileName + '.txt'
       partialFileToSave.fileName = partialFile.filename
     }
 
@@ -167,7 +167,7 @@ exports.uploadTrack = async (req: Request, res: Response) => {
     if (ttsFiles.length) {
       ;({ ttsLangs, ttsJson } = convertSrtToJson(ttsFiles))
       ttsFiles = ttsFiles.map((file: Express.Multer.File) => ({
-        origName: file.originalname.split('_').reverse()[0], // Remove prefix, voice and lang
+        origName: file.originalname.split('_').reverse()[0] + '.txt', // Remove prefix, voice and lang, add .txt (even if original was .srt)
         fileName: file.filename
       }))
     }

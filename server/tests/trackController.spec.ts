@@ -36,7 +36,7 @@ describe('trackController test', () => {
         waveform: 'sine'
       }
       await authenticatedRequest(request, '/api/track/create', 'post')
-        .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile-testPartialFile.txt')
+        .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile-testPartialFile')
         .field('name', testTrack.name)
         .field('mode', testTrack.mode)
         .field('waveform', testTrack.waveform)
@@ -64,7 +64,7 @@ describe('trackController test', () => {
         waveform: 'sine'
       }
       const resCreate = await authenticatedRequest(request, '/api/track/create', 'post')
-        .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile_testPartialFile.txt')
+        .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile_testPartialFile')
         .field('name', testTrack.name)
         .field('mode', testTrack.mode)
         .field('waveform', testTrack.waveform)
@@ -88,7 +88,7 @@ describe('trackController test', () => {
         waveform: 'sine'
       }
       const res = await authenticatedRequest(request, '/api/track/create', 'post')
-        .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile_testPartialFile.txt')
+        .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile_testPartialFile')
         .field('name', testTrack.name)
         .field('mode', testTrack.mode)
         .field('waveform', testTrack.waveform)
@@ -108,7 +108,7 @@ describe('trackController test', () => {
       }
 
       const res = await authenticatedRequest(request, '/api/track/create', 'post')
-        .attach('files', 'tests/testFiles/testSrtFile.srt', 'ttsfile_0_en-US_testSrtFile.srt')
+        .attach('files', 'tests/testFiles/testSrtFile.srt', 'ttsfile_0_en-US_testSrtFile')
         .field('name', testTrack.name)
         .field('mode', testTrack.mode)
         .field('waveform', testTrack.waveform)
@@ -117,7 +117,7 @@ describe('trackController test', () => {
       expect(res.body.name).toBe(testTrack.name)
       expect(res.body.mode).toBe(testTrack.mode)
       expect(res.body.waveform).toBe(testTrack.waveform)
-      expect(res.body.ttsFiles[0].origName).toBe('testSrtFile.srt')
+      expect(res.body.ttsFiles[0].origName).toBe('testSrtFile.txt')
     })
 
     it('should create track if TTS .txt file and necessary fields provided', async () => {
@@ -128,7 +128,7 @@ describe('trackController test', () => {
       }
 
       const res = await authenticatedRequest(request, '/api/track/create', 'post')
-        .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_0_en-US_testSrtFile.txt')
+        .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_0_en-US_testSrtFile')
         .field('name', testTrack.name)
         .field('mode', testTrack.mode)
         .field('waveform', testTrack.waveform)
@@ -142,7 +142,7 @@ describe('trackController test', () => {
 
     it('should not create track if no name provided', async () => {
       const res = await authenticatedRequest(request, '/api/track/create', 'post')
-        .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile-testPartialFile.txt')
+        .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile-testPartialFile')
         .expect(400)
       expect(res.body.error).toBe('No name provided.')
     })
@@ -158,7 +158,7 @@ describe('trackController test', () => {
 
     it('should not create track if no mode provided', async () => {
       const res = await authenticatedRequest(request, '/api/track/create', 'post')
-        .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile-testPartialFile.txt')
+        .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile-testPartialFile')
         .field('name', 'test track')
         .expect(400)
       expect(res.body.error).toBe('No mode provided.')
@@ -166,7 +166,7 @@ describe('trackController test', () => {
 
     it('should not create track if no waveform provided', async () => {
       const res = await authenticatedRequest(request, '/api/track/create', 'post')
-        .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile-testPartialFile.txt')
+        .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile-testPartialFile')
         .field('name', 'test track')
         .field('mode', 'choir')
         .expect(400)
