@@ -4,6 +4,7 @@ import type { TtsFilesObject, Waveform, Track } from '@/types/types'
 import { ref, computed, watch } from 'vue'
 import BaseModal from './BaseModal.vue'
 import { useModal } from '@/composables/useModal'
+import { VITE_APP_API_URL } from '@/constants'
 
 const { modal } = useModal()
 
@@ -162,10 +163,10 @@ watch(trackTtsRate, (newValue) => {
         <div
           v-if="partialFileDownloadInfo"
           class="flex items-center justify-center gap-2">
-          <span>partials.txt</span>
+          <span>{{ partialFileDownloadInfo.origName }}</span>
           <a
-            :href="`https://sadiss.net/f/${partialFileDownloadInfo.fileName}`"
-            download="partials.txt"
+            :href="`${VITE_APP_API_URL}/f/${partialFileDownloadInfo.fileName}`"
+            :download="partialFileDownloadInfo.origName"
             class="text-xl"
             >⤓
           </a>
