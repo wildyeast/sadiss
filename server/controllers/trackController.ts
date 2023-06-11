@@ -1,4 +1,8 @@
 import { Request, Response } from 'express'
+// The following is a hack to get the types to work.
+// See https://github.com/DefinitelyTyped/DefinitelyTyped/issues/47780#issuecomment-790684085
+import { Multer } from 'multer'
+type File = Express.Multer.File
 import { chunk } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose from 'mongoose'
@@ -6,6 +10,7 @@ import { TtsJson } from '../types/types'
 import { Server } from 'ws'
 import { trackSchema } from '../models/track'
 import { ActivePerformance } from '../activePerformance'
+
 const fs = require('fs')
 const uuid = require('uuid')
 
@@ -146,31 +151,9 @@ exports.uploadTrack = async (req: Request, res: Response) => {
   }
 
   try {
-    const partialFilePrefix = 'partialfile_'
-    const partialFile: Express.Multer.File = Object.values(req.files).filter((file: Express.Multer.File) =>
-      file.originalname.includes(partialFilePrefix)
-    )[0]
-    let path
-    const partialFileToSave = <{ origName: string; fileName: string }>{}
+    const { path, partialFileToSave } = handleUploadedPartialFile(<File[]>req.files)
 
-    if (partialFile) {
-      path = partialFile.path
-      const originalFileName = partialFile.originalname.replace(partialFilePrefix, '')
-      partialFileToSave.origName = originalFileName + '.txt'
-      partialFileToSave.fileName = partialFile.filename
-    }
-
-    const ttsFilePrefix = 'ttsfile_'
-    let ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes(ttsFilePrefix))
-    let ttsLangs: Set<string> | undefined
-    let ttsJson: TtsJson | undefined
-    if (ttsFiles.length) {
-      ;({ ttsLangs, ttsJson } = convertSrtToJson(ttsFiles))
-      ttsFiles = ttsFiles.map((file: Express.Multer.File) => ({
-        origName: file.originalname.split('_').reverse()[0] + '.txt', // Remove prefix, voice and lang, add .txt (even if original was .srt)
-        fileName: file.filename
-      }))
-    }
+    const { ttsFilesToSave, ttsLangs, ttsJson } = handleUploadedTtsFiles(<File[]>req.files)
 
     const filename = uuid.v4()
     const { partialsCount, chunks } = await chunk(path, ttsJson)
@@ -194,7 +177,7 @@ exports.uploadTrack = async (req: Request, res: Response) => {
       waveform,
       ttsRate,
       partialFile: partialFileToSave,
-      ttsFiles,
+      ttsFiles: ttsFilesToSave,
       userId: req.user!.id,
       isPublic: !!req.body.isPublic
     })
@@ -224,37 +207,35 @@ exports.uploadTrack = async (req: Request, res: Response) => {
 exports.editTrack = async (req: Request, res: Response) => {
   const patch = req.body
 
-  if (req.files) {
-    const partialFile = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname === 'partialfile')[0]
-    let path
-    if (partialFile) {
-      path = partialFile.path
-      patch.partialFile = {
-        origName: partialFile.originalname,
-        fileName: partialFile.filename
-      }
-    }
-
-    const ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes('ttsfile'))
-    let ttsLangs: Set<string> | undefined
-    let ttsJson: TtsJson | undefined
-    if (ttsFiles.length) {
-      ;({ ttsLangs, ttsJson } = convertSrtToJson(ttsFiles))
-      patch.ttsFiles = Object.values(req.files).map((file: Express.Multer.File) => ({
-        origName: file.originalname,
-        fileName: file.filename
-      }))
-      patch.ttsLangs = Array.from(ttsLangs)
-    }
-
-    const { partialsCount, chunks } = await chunk(path, ttsJson)
-
-    if (partialsCount > 0) {
-      patch.partialsCount = partialsCount
-    }
-
-    patch.chunks = JSON.stringify(chunks)
+  const { path, partialFileToSave } = handleUploadedPartialFile(<File[]>req.files)
+  if (Object.keys(partialFileToSave).length) {
+    patch.partialFile = partialFileToSave
   }
+
+  const { ttsFilesToSave, ttsLangs, ttsJson } = handleUploadedTtsFiles(<File[]>req.files)
+  if (ttsFilesToSave.length && ttsLangs) {
+    patch.ttsFiles = ttsFilesToSave
+    patch.ttsLangs = Array.from(ttsLangs)
+  }
+
+  const { partialsCount, chunks } = await chunk(path, ttsJson)
+
+  if (Object.keys(chunks)) {
+    const filename = uuid.v4()
+    fs.writeFile(`chunks/${filename}`, JSON.stringify(chunks), (err: any) => {
+      if (err) {
+        console.error(err)
+      }
+    })
+  }
+
+  if (partialsCount > 0 && patch.mode === 'choir') {
+    patch.partialsCount = partialsCount
+  } else {
+    patch.partialsCount = undefined
+  }
+
+  patch.chunks = JSON.stringify(chunks)
 
   Track.findByIdAndUpdate(req.params.id, patch, { new: true }, (err, track) => {
     if (err) {
@@ -305,4 +286,36 @@ exports.get_voices_and_languages = async (req: Request, res: Response) => {
 
 exports.get_own_tracks = (req: Request, res: Response) => {
   res.json({ message: 'hi', user: req.user })
+}
+
+const handleUploadedPartialFile = (files: File[]) => {
+  const partialFilePrefix = 'partialfile_'
+  const partialFile: File = Object.values(files).filter((file: File) => file.originalname.includes(partialFilePrefix))[0]
+  let path
+  const partialFileToSave = <{ origName: string; fileName: string }>{}
+
+  if (partialFile) {
+    path = partialFile.path
+    const originalFileName = partialFile.originalname.replace(partialFilePrefix, '')
+    partialFileToSave.origName = originalFileName + '.txt'
+    partialFileToSave.fileName = partialFile.filename
+  }
+
+  return { path, partialFileToSave }
+}
+
+const handleUploadedTtsFiles = (files: File[]) => {
+  const ttsFilePrefix = 'ttsfile_'
+  const ttsFiles = Object.values(files).filter((file: File) => file.originalname.includes(ttsFilePrefix))
+  let ttsLangs: Set<string> | undefined
+  let ttsJson: TtsJson | undefined
+  let ttsFilesToSave: { origName: string; fileName: string }[] = []
+  if (ttsFiles.length) {
+    ;({ ttsLangs, ttsJson } = convertSrtToJson(ttsFiles))
+    ttsFilesToSave = ttsFiles.map((file: File) => ({
+      origName: file.originalname.split('_').reverse()[0] + '.txt', // Remove prefix, voice and lang, add .txt (even if original was .srt)
+      fileName: file.filename
+    }))
+  }
+  return { ttsFilesToSave, ttsLangs, ttsJson }
 }

@@ -1,4 +1,3 @@
-import exp from 'constants'
 import { connectDB, disconnectDB } from '../database'
 import { authenticatedRequest } from './testUtils'
 import { generateMockId } from './testUtils'
@@ -172,6 +171,110 @@ describe('trackController test', () => {
         .expect(400)
       expect(res.body.error).toBe('No waveform provided.')
     })
+  })
+
+  describe('POST /api/track/edit/:id', () => {
+    let testTrackId = ''
+    afterEach(async () => {
+      testTrackId = ''
+    })
+
+    it('should edit partial+tts track if partialfile, srt file and necessary fields provided', async () => {
+      await createTestTrack('partialsAndTts')
+      const resEdit = await authenticatedRequest(request, `/api/track/edit/${testTrackId}`, 'post')
+        .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile_testPartialFile')
+        .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_0_en-US_testSrtFile')
+        .field('name', 'test track edited')
+        .field('mode', 'nonChoir')
+        .field('waveform', 'square')
+        .expect(200)
+
+      expect(resEdit.body.name).toBe('test track edited')
+      expect(resEdit.body.mode).toBe('nonChoir')
+      expect(resEdit.body.waveform).toBe('square')
+      expect(resEdit.body.partialFile.origName).toBe('testPartialFile.txt')
+      expect(resEdit.body.ttsFiles[0].origName).toBe('testSrtFile.txt')
+
+      const resGet = await authenticatedRequest(request, `/api/track/${testTrackId}`, 'get').expect(200)
+      expect(resGet.body[0].name).toBe('test track edited')
+      expect(resGet.body[0].mode).toBe('nonChoir')
+      expect(resGet.body[0].waveform).toBe('square')
+      expect(resGet.body[0].partialFile.origName).toBe('testPartialFile.txt')
+      expect(resGet.body[0].ttsFiles[0].origName).toBe('testSrtFile.txt')
+    })
+
+    it('should edit partial track to partial+tts track if srt file and necessary fields provided', async () => {
+      await createTestTrack('partials')
+      const resEdit = await authenticatedRequest(request, `/api/track/edit/${testTrackId}`, 'post')
+        .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_0_en-US_testSrtFile')
+        .field('name', 'test track edited')
+        .field('mode', 'nonChoir')
+        .field('waveform', 'square')
+        .expect(200)
+
+      expect(resEdit.body.name).toBe('test track edited')
+      expect(resEdit.body.mode).toBe('nonChoir')
+      expect(resEdit.body.waveform).toBe('square')
+      expect(resEdit.body.partialFile.origName).toBe('testPartialFile.txt')
+      expect(resEdit.body.ttsFiles[0].origName).toBe('testSrtFile.txt')
+
+      const resGet = await authenticatedRequest(request, `/api/track/${testTrackId}`, 'get').expect(200)
+      expect(resGet.body[0].name).toBe('test track edited')
+      expect(resGet.body[0].mode).toBe('nonChoir')
+      expect(resGet.body[0].waveform).toBe('square')
+      expect(resEdit.body.partialFile.origName).toBe('testPartialFile.txt')
+      expect(resGet.body[0].ttsFiles[0].origName).toBe('testSrtFile.txt')
+    })
+
+    it('should edit partial track to partial+tts track if partial file and necessary fields provided', async () => {
+      await createTestTrack('tts')
+      const resEdit = await authenticatedRequest(request, `/api/track/edit/${testTrackId}`, 'post')
+        .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile_testPartialFile')
+        .field('name', 'test track edited')
+        .field('mode', 'nonChoir')
+        .field('waveform', 'square')
+        .expect(200)
+
+      expect(resEdit.body.name).toBe('test track edited')
+      expect(resEdit.body.mode).toBe('nonChoir')
+      expect(resEdit.body.waveform).toBe('square')
+      expect(resEdit.body.partialFile.origName).toBe('testPartialFile.txt')
+      expect(resEdit.body.ttsFiles[0].origName).toBe('testSrtFile.txt')
+
+      const resGet = await authenticatedRequest(request, `/api/track/${testTrackId}`, 'get').expect(200)
+      expect(resGet.body[0].name).toBe('test track edited')
+      expect(resGet.body[0].mode).toBe('nonChoir')
+      expect(resGet.body[0].waveform).toBe('square')
+      expect(resEdit.body.partialFile.origName).toBe('testPartialFile.txt')
+      expect(resGet.body[0].ttsFiles[0].origName).toBe('testSrtFile.txt')
+    })
+
+    const createTestTrack = async (trackType: 'partials' | 'tts' | 'partialsAndTts' = 'partialsAndTts') => {
+      const testTrack = {
+        name: 'test track',
+        mode: 'choir',
+        waveform: 'sine'
+      }
+
+      const req = authenticatedRequest(request, '/api/track/create', 'post')
+        .field('name', testTrack.name)
+        .field('mode', testTrack.mode)
+        .field('waveform', testTrack.waveform)
+
+      if (trackType === 'partials') {
+        req.attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile_testPartialFile')
+      } else if (trackType === 'tts') {
+        req.attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_0_en-US_testSrtFile')
+      } else if (trackType === 'partialsAndTts') {
+        req
+          .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile_testPartialFile')
+          .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_0_en-US_testSrtFile')
+      }
+
+      const resCreate = await req.expect(201)
+
+      testTrackId = resCreate.body._id
+    }
   })
 })
 
