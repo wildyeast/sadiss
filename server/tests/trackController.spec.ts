@@ -117,6 +117,8 @@ describe('trackController test', () => {
       expect(res.body.mode).toBe(testTrack.mode)
       expect(res.body.waveform).toBe(testTrack.waveform)
       expect(res.body.ttsFiles[0].origName).toBe('testSrtFile.txt')
+      expect(res.body.ttsFiles[0].voice).toBe('0')
+      expect(res.body.ttsFiles[0].lang).toBe('en-US')
     })
 
     it('should create track if TTS .txt file and necessary fields provided', async () => {
@@ -183,7 +185,7 @@ describe('trackController test', () => {
       await createTestTrack('partialsAndTts')
       const resEdit = await authenticatedRequest(request, `/api/track/edit/${testTrackId}`, 'post')
         .attach('files', 'tests/testFiles/testPartialFile2.txt', 'partialfile_testPartialFile2')
-        .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_0_en-US_testSrtFile')
+        .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_1_de-DE_testSrtFile')
         .field('name', 'test track edited')
         .field('mode', 'nonChoir')
         .field('waveform', 'square')
@@ -201,6 +203,8 @@ describe('trackController test', () => {
       expect(resGet.body[0].waveform).toBe('square')
       expect(resGet.body[0].partialFile.origName).toBe('testPartialFile2.txt')
       expect(resGet.body[0].ttsFiles[0].origName).toBe('testSrtFile.txt')
+      expect(resGet.body[0].ttsFiles[0].voice).toBe('1')
+      expect(resGet.body[0].ttsFiles[0].lang).toBe('de-DE')
     })
 
     it('should edit partial track to partial+tts track if srt file and necessary fields provided', async () => {
@@ -241,7 +245,6 @@ describe('trackController test', () => {
       expect(resEdit.body.ttsFiles[0].origName).toBe('testSrtFile.txt')
 
       const resGet = await authenticatedRequest(request, `/api/track/${testTrackId}`, 'get').expect(200)
-      console.log(resGet.body)
       expect(resGet.body[0].name).toBe('test track edited')
       expect(resGet.body[0].mode).toBe('choir')
       expect(resGet.body[0].waveform).toBe('square')
@@ -249,6 +252,23 @@ describe('trackController test', () => {
       expect(resGet.body[0].ttsFiles[0].origName).toBe('testSrtFile.txt')
     })
 
+    it('should add tts file to existing tts files', async () => {
+      await createTestTrack('tts')
+      const resEdit = await authenticatedRequest(request, `/api/track/edit/${testTrackId}`, 'post')
+        .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_0_en-US_testSrtFile')
+        .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_1_de-DE_testSrtFile')
+        .expect(200)
+
+      const resGet = await authenticatedRequest(request, `/api/track/${testTrackId}`, 'get').expect(200)
+      expect(resGet.body[0].ttsFiles[0].origName).toBe('testSrtFile.txt')
+      expect(resGet.body[0].ttsFiles[0].voice).toBe('0')
+      expect(resGet.body[0].ttsFiles[0].lang).toBe('en-US')
+      expect(resGet.body[0].ttsFiles[1].origName).toBe('testSrtFile.txt')
+      expect(resGet.body[0].ttsFiles[1].voice).toBe('1')
+      expect(resGet.body[0].ttsFiles[1].lang).toBe('de-DE')
+    })
+
+    // Helpers
     const createTestTrack = async (trackType: 'partials' | 'tts' | 'partialsAndTts' = 'partialsAndTts') => {
       const testTrack = {
         name: 'test track',

@@ -312,10 +312,15 @@ const handleUploadedTtsFiles = (files: File[]) => {
   let ttsFilesToSave: { origName: string; fileName: string }[] = []
   if (ttsFiles.length) {
     ;({ ttsLangs, ttsJson } = convertSrtToJson(ttsFiles))
-    ttsFilesToSave = ttsFiles.map((file: File) => ({
-      origName: file.originalname.split('_').reverse()[0] + '.txt', // Remove prefix, voice and lang, add .txt (even if original was .srt)
-      fileName: file.filename
-    }))
+    ttsFilesToSave = ttsFiles.map((file: File) => {
+      const [_, voice, lang, origName] = file.originalname.split('_')
+      return {
+        voice,
+        lang,
+        origName: origName + '.txt', // Add .txt even if original was .srt
+        fileName: file.filename
+      }
+    })
   }
   return { ttsFilesToSave, ttsLangs, ttsJson }
 }
