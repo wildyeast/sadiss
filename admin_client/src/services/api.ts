@@ -192,7 +192,7 @@ export async function addTrackToPerformance(trackId: string, performanceId: stri
   const response = await request<{ trackPerformance: { performanceId: string; trackId: string } }>(
     `/api/add-track-to-performance`,
     {
-      method: 'PUT',
+      method: 'POST',
       body: JSON.stringify({
         trackId,
         performanceId

@@ -27,7 +27,14 @@ interface Track {
   waveform: Waveform
   ttsRate?: number
   partialFile?: { origName: string; fileName: string }
-  ttsFiles?: { origName: string; fileName: string }[]
+  ttsFiles?: TtsFileDownloadInformation[]
+}
+
+interface TtsFileDownloadInformation {
+  origName: string
+  fileName: string
+  lang: string
+  voice: string
 }
 
 // type UploadTrack = {
@@ -43,4 +50,4 @@ interface TtsFilesObject {
   [voice: number]: { [lang: string]: File }
 }
 
-export type { QrCodeData, SadissPerformance, Track, Waveform, TtsFilesObject }
+export type { QrCodeData, SadissPerformance, Track, Waveform, TtsFilesObject, TtsFileDownloadInformation }

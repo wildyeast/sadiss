@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { createTrack, editTrack } from '@/services/api'
-import type { TtsFilesObject, Waveform, Track } from '@/types/types'
+import type { TtsFilesObject, Waveform, Track, TtsFileDownloadInformation } from '@/types/types'
 import { ref, computed, watch } from 'vue'
 import BaseModal from './BaseModal.vue'
 import { useModal } from '@/composables/useModal'
@@ -18,7 +18,10 @@ const openModal = (track?: Track) => {
     isEditingTrack.value = true
     trackId = track._id
     partialFileDownloadInfo.value = track.partialFile
-    ttsFileDownloadInfo.value = track.ttsFiles
+    if (track.ttsFiles) {
+      ttsFileDownloadInfo.value = track.ttsFiles
+      numberOfVoices.value = track.ttsFiles.length / ttsLanguages.value.split(',').length
+    }
   }
   modal.value?.showModal()
 }
@@ -109,7 +112,7 @@ const handleTtsFileUpload = async (e: Event, voice: number, lang: string) => {
 }
 
 const partialFileDownloadInfo = ref()
-const ttsFileDownloadInfo = ref<{ origName: string; fileName: string }[]>()
+const ttsFileDownloadInfo = ref<TtsFileDownloadInformation[]>()
 
 const voiceLangCombinations = computed(() => {
   // If nonChoir, only allow 1 voice
@@ -117,9 +120,24 @@ const voiceLangCombinations = computed(() => {
   const combinations = []
   for (let i = 0; i < allowedNumberOfVoices; i++) {
     for (const lang of ttsLanguages.value.split(',')) {
-      combinations.push([i, lang.trim()])
+      const combination = <{ voice: number; lang: string; file?: TtsFileDownloadInformation }>{
+        voice: i,
+        lang: lang.trim()
+      }
+
+      // If editing track, add file information to combination for display
+      if (ttsFileDownloadInfo.value) {
+        console.log(i, lang.trim(), ttsFileDownloadInfo.value)
+        const file = ttsFileDownloadInfo.value.find((file) => +file.voice === i && file.lang === lang.trim())
+        if (file) {
+          combination.file = file
+        }
+      }
+
+      combinations.push(combination)
     }
   }
+
   return combinations
 })
 
@@ -180,44 +198,44 @@ watch(trackTtsRate, (newValue) => {
           v-model="trackIsChoir"
           class="w-3/4" />
       </div>
-      <!-- SRT file upload -->
+
+      <!-- TTS (.srt or .txt) file upload -->
       <div class="lg:flex lg:flex-col">
         <div class="flex flex-col">
           <div>Subtitle files</div>
           <div class="w-3/4">
             <div class="mb-2 flex gap-2">
+              <!-- Number of voices -->
               <input
                 type="number"
                 v-model.number="numberOfVoices"
                 v-show="trackIsChoir" />
+              <!-- Languages -->
               <input
                 type="text"
                 placeholder="e.g. en-US, de-DE"
                 v-model="ttsLanguages" />
             </div>
+
             <div
               v-for="voiceLang of voiceLangCombinations"
               class="flex justify-between gap-2">
-              <label class="w-1/4">{{ voiceLang[0] }} {{ voiceLang[1] }}</label>
+              <label class="w-1/4">{{ voiceLang.voice }} {{ voiceLang.lang }}</label>
               <input
                 type="file"
-                @change="handleTtsFileUpload($event, +voiceLang[0], voiceLang[1].toString())"
+                @change="handleTtsFileUpload($event, voiceLang.voice, voiceLang.lang)"
                 accept="*.txt"
                 class="w-3/4" />
+              <div v-if="voiceLang.file">
+                <span>{{ voiceLang.file.origName }}</span>
+                <a
+                  :href="`https://sadiss.net/f/${voiceLang.file.fileName}`"
+                  :download="`${voiceLang.file.origName}.txt`"
+                  class="text-xl"
+                  >⤓
+                </a>
+              </div>
             </div>
-          </div>
-        </div>
-        <div v-if="ttsFileDownloadInfo">
-          <div
-            v-for="file of ttsFileDownloadInfo"
-            class="flex items-center justify-center gap-2">
-            <span>{{ file.origName }}</span>
-            <a
-              :href="`https://sadiss.net/f/${file.fileName}`"
-              :download="`${file.origName}.txt`"
-              class="text-xl"
-              >⤓
-            </a>
           </div>
         </div>
       </div>
