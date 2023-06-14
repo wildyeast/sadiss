@@ -50,7 +50,6 @@ exports.startTrack = async (req: Request, res: Response) => {
 
         const trackStarted = performance.startSendingInterval(
           chunks,
-          // @ts-ignore TODO
           t.mode,
           t.waveform,
           t.ttsRate,
