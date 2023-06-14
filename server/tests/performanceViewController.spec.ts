@@ -66,7 +66,7 @@ describe('getPerformanceWithTracks', () => {
     await trackPerformance2.save()
 
     const res = await authenticatedRequest(request, `/api/performance/${testPerformance._id}/with-tracks`, 'get').expect(200)
-    expect(res.body.performance).toEqual({
+    expect(res.body).toEqual({
       _id: testPerformance._id.toString(),
       name: 'Performance 1',
       username: 'test-username',

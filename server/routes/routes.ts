@@ -31,7 +31,7 @@ router.get('/api/tracks', track_controller.getTracks)
 router.get('/api/track/:id', track_controller.getTrack)
 
 // Delete track
-router.delete('/api/track/delete/:id', track_controller.deleteTrack)
+router.post('/api/track/delete/:id', track_controller.deleteTrack)
 
 // Start track
 router.post('/api/track/start', track_controller.startTrack)
@@ -66,7 +66,7 @@ router.delete('/api/performance/delete/:id', performance_controller.delete_perfo
 router.post(
   '/api/add-track-to-performance',
   [validateTrackAccess, validatePerformanceAccess],
-  track_performance_controller.add_track_to_performance
+  track_performance_controller.addTrackToPerformance
 )
 
 /* PERFORMANCE VIEW */

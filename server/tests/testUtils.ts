@@ -1,8 +1,9 @@
-export const authenticatedRequest = (request: any, route: string, method: 'get' | 'post') => {
+export const authenticatedRequest = (request: any, route: string, method: 'get' | 'post', unauthorized = false) => {
+  const token = unauthorized ? global.unauthorizedToken : global.token
   if (method === 'get') {
-    return request.get(route).set('Authorization', `Bearer ${global.token}`)
+    return request.get(route).set('Authorization', `Bearer ${token}`)
   } else if (method === 'post') {
-    return request.post(route).set('Authorization', `Bearer ${global.token}`)
+    return request.post(route).set('Authorization', `Bearer ${token}`)
   }
 }
 /**

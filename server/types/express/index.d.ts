@@ -16,4 +16,5 @@ declare global {
   }
   var token: string // Used in server/tests/setupTests.ts
   var mockUser: { username: string; id: string; email: string } // Used in server/tests/setupTests.ts
+  var unauthorizedToken: string // Used in server/tests/setupTests.ts
 }

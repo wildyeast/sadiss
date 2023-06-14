@@ -10,6 +10,7 @@ import { TtsJson } from '../types/types'
 import { Server } from 'ws'
 import { trackSchema } from '../models/track'
 import { ActivePerformance } from '../activePerformance'
+import { TrackPerformance } from '../models'
 
 const fs = require('fs')
 const uuid = require('uuid')
@@ -90,6 +91,12 @@ exports.deleteTrack = async (req: Request, res: Response) => {
     // Check if user owns track
     if (track.userId !== req.user!.id) {
       return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    // Delete TrackPerformances, if any
+    const trackPerformances = await TrackPerformance.find({ trackId: track._id })
+    for (const trackPerformance of trackPerformances) {
+      await trackPerformance.remove()
     }
 
     // Delete track

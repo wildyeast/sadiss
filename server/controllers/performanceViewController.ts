@@ -20,7 +20,7 @@ exports.getPerformanceWithTracks = async (req: Request, res: Response) => {
       performanceWithUsernameAndTracks = { _id: performance._id, name: performance.name, username: user?.username, tracks }
     }
 
-    res.json({ performance: performanceWithUsernameAndTracks })
+    res.json(performanceWithUsernameAndTracks)
   } catch (err) {
     res.status(500).json({ Error: 'Failed fetching performance.' })
   }

@@ -26,7 +26,7 @@ describe('trackPerformanceController test', () => {
     wss.close()
   })
 
-  describe('add_track_to_performance function', () => {
+  describe('addTrackToPerformance function', () => {
     it('should return a 201 status and the saved TrackPerformance data on success', async () => {
       const trackPerformanceData = { trackId: '000000000000', performanceId: '111111111111' }
       const res = await authenticatedRequest(request, '/api/add-track-to-performance', 'post').send(trackPerformanceData)

@@ -59,7 +59,7 @@ exports.createPerformance = async (req: Request, res: Response) => {
       if (err) {
         res.status(500).send(err)
       } else {
-        res.status(201).json({ performance })
+        res.status(201).json(performance)
       }
     })
   } catch (error) {

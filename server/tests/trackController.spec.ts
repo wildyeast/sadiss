@@ -1,4 +1,5 @@
 import { connectDB, disconnectDB } from '../database'
+import { Track } from '../models'
 import { authenticatedRequest } from './testUtils'
 import { generateMockId } from './testUtils'
 
@@ -176,10 +177,7 @@ describe('trackController test', () => {
   })
 
   describe('POST /api/track/edit/:id', () => {
-    let testTrackId = ''
-    afterEach(async () => {
-      testTrackId = ''
-    })
+    afterEach(async () => resetTestIds())
 
     it('should edit partial+tts track if partialfile, srt file and necessary fields provided', async () => {
       await createTestTrack('partialsAndTts')
@@ -267,35 +265,118 @@ describe('trackController test', () => {
       expect(resGet.body[0].ttsFiles[1].voice).toBe('1')
       expect(resGet.body[0].ttsFiles[1].lang).toBe('de-DE')
     })
-
-    // Helpers
-    const createTestTrack = async (trackType: 'partials' | 'tts' | 'partialsAndTts' = 'partialsAndTts') => {
-      const testTrack = {
-        name: 'test track',
-        mode: 'choir',
-        waveform: 'sine'
-      }
-
-      const req = authenticatedRequest(request, '/api/track/create', 'post')
-        .field('name', testTrack.name)
-        .field('mode', testTrack.mode)
-        .field('waveform', testTrack.waveform)
-
-      if (trackType === 'partials') {
-        req.attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile_testPartialFile')
-      } else if (trackType === 'tts') {
-        req.attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_0_en-US_testSrtFile')
-      } else if (trackType === 'partialsAndTts') {
-        req
-          .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile_testPartialFile')
-          .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_0_en-US_testSrtFile')
-      }
-
-      const resCreate = await req.expect(201)
-
-      testTrackId = resCreate.body._id
-    }
   })
+
+  describe('POST /api/track/delete/:id', () => {
+    it('should delete track and trackperformance (if any) if track found', async () => {
+      await createTestTrackPerformance()
+
+      let performanceWithTracksResGet = await authenticatedRequest(
+        request,
+        `/api/performance/${testPerformanceId}/with-tracks`,
+        'get'
+      ).expect(200)
+
+      expect(performanceWithTracksResGet.body.tracks.length).toBe(1)
+
+      const resDelete = await authenticatedRequest(request, `/api/track/delete/${testTrackId}`, 'post').expect(200)
+      expect(resDelete.body.message).toBe('Track deleted')
+
+      const trackResGet = await authenticatedRequest(request, `/api/track/${testTrackId}`, 'get').expect(404)
+      expect(trackResGet.body.error).toBe('Track not found')
+
+      performanceWithTracksResGet = await authenticatedRequest(
+        request,
+        `/api/performance/${testPerformanceId}/with-tracks`,
+        'get'
+      ).expect(200)
+
+      expect(performanceWithTracksResGet.body.tracks.length).toBe(0)
+    })
+
+    it('should return 404 if track not found', async () => {
+      const nonExistantTrackId = generateMockId()
+      const resDelete = await authenticatedRequest(request, `/api/track/delete/${nonExistantTrackId}`, 'post').expect(404)
+      expect(resDelete.body.error).toBe('Track not found')
+    })
+
+    it('should return 401 if user is not owner of track', async () => {
+      await createTestTrack()
+      const resDelete = await authenticatedRequest(request, `/api/track/delete/${testTrackId}`, 'post', true).expect(401)
+      expect(resDelete.body.error).toBe('Unauthorized')
+    })
+
+    it('should return 500 if trackperformance delete fails', async () => {
+      Track.findById = jest.fn().mockImplementationOnce(() => {
+        throw new Error('Server error')
+      })
+
+      const resDelete = await authenticatedRequest(request, `/api/track/delete/${testTrackId}`, 'post').expect(500)
+      expect(resDelete.body.error).toBe('Server error')
+    })
+  })
+
+  // Helpers
+  let testTrackId = ''
+  const createTestTrack = async (trackType: 'partials' | 'tts' | 'partialsAndTts' = 'partialsAndTts') => {
+    const testTrack = {
+      name: 'test track',
+      mode: 'choir',
+      waveform: 'sine'
+    }
+
+    const req = authenticatedRequest(request, '/api/track/create', 'post')
+      .field('name', testTrack.name)
+      .field('mode', testTrack.mode)
+      .field('waveform', testTrack.waveform)
+
+    if (trackType === 'partials') {
+      req.attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile_testPartialFile')
+    } else if (trackType === 'tts') {
+      req.attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_0_en-US_testSrtFile')
+    } else if (trackType === 'partialsAndTts') {
+      req
+        .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile_testPartialFile')
+        .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_0_en-US_testSrtFile')
+    }
+
+    const resCreate = await req.expect(201)
+
+    testTrackId = resCreate.body._id
+  }
+
+  let testPerformanceId = ''
+  const createTestPerformance = async () => {
+    const testPerformance = {
+      name: 'test performance',
+      isPublic: true
+    }
+
+    const resCreate = await authenticatedRequest(request, '/api/performance/create', 'post').send(testPerformance).expect(201)
+
+    testPerformanceId = resCreate.body._id
+  }
+
+  let testTrackPerformanceId = ''
+  const createTestTrackPerformance = async () => {
+    await createTestTrack()
+    await createTestPerformance()
+
+    const resAddTrackToPerformance = await authenticatedRequest(request, '/api/add-track-to-performance', 'post')
+      .send({
+        trackId: testTrackId,
+        performanceId: testPerformanceId
+      })
+      .expect(201)
+
+    testTrackPerformanceId = resAddTrackToPerformance.body.trackPerformance._id
+  }
+
+  const resetTestIds = () => {
+    testTrackId = ''
+    testPerformanceId = ''
+    testTrackPerformanceId = ''
+  }
 })
 
 export {}

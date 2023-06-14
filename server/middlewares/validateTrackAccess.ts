@@ -16,7 +16,6 @@ export const validateTrackAccess = async (req: Request, res: Response, next: Nex
 
     next()
   } catch (error) {
-    console.error(error)
     res.status(500).json({ error: 'Server error' })
   }
 }

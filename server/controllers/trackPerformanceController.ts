@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { TrackPerformance } from '../models/trackPerformance'
 
-exports.add_track_to_performance = async (req: Request, res: Response) => {
+exports.addTrackToPerformance = async (req: Request, res: Response) => {
   try {
     const { trackId, performanceId } = req.body
 
