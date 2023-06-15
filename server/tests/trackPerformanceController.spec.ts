@@ -1,6 +1,6 @@
 import { connectDB, disconnectDB } from '../database'
 import { TrackPerformance } from '../models/trackPerformance'
-import { authenticatedRequest } from './testUtils'
+import { authenticatedRequest, generateMockId } from './testUtils'
 
 const { app, server, wss } = require('../server')
 const supertest = require('supertest')
@@ -28,12 +28,15 @@ describe('trackPerformanceController test', () => {
 
   describe('addTrackToPerformance function', () => {
     it('should return a 201 status and the saved TrackPerformance data on success', async () => {
-      const trackPerformanceData = { trackId: '000000000000', performanceId: '111111111111' }
+      const mockTrackId = generateMockId()
+      const mockPerformanceId = generateMockId()
+
+      const trackPerformanceData = { trackId: mockTrackId, performanceId: mockPerformanceId }
       const res = await authenticatedRequest(request, '/api/add-track-to-performance', 'post').send(trackPerformanceData)
 
       expect(res.status).toBe(201)
 
-      const savedTrackPerformance = await TrackPerformance.findOne({ trackId: '000000000000', performanceId: '111111111111' })
+      const savedTrackPerformance = await TrackPerformance.findOne({ trackId: mockTrackId, performanceId: mockPerformanceId })
       expect(savedTrackPerformance).toBeDefined()
     })
 
@@ -42,7 +45,7 @@ describe('trackPerformanceController test', () => {
         throw new Error('Server error')
       })
 
-      const trackPerformanceData = { trackId: '000000000000', performanceId: '111111111111' }
+      const trackPerformanceData = { trackId: generateMockId(), performanceId: generateMockId() }
       const res = await authenticatedRequest(request, '/api/add-track-to-performance', 'post').send(trackPerformanceData)
 
       expect(res.status).toBe(500)
