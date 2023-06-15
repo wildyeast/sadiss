@@ -1,5 +1,6 @@
 import { Request, Response } from 'express'
 import { TrackPerformance } from '../models/trackPerformance'
+import { SadissPerformance, Track } from '../models'
 
 exports.addTrackToPerformance = async (req: Request, res: Response) => {
   try {
@@ -8,6 +9,15 @@ exports.addTrackToPerformance = async (req: Request, res: Response) => {
     // Check if the provided IDs are valid
     if (!trackId || !performanceId) {
       return res.status(400).json({ error: 'Invalid input data' })
+    }
+
+    // If performance is public check if the track is public
+    const performance = await SadissPerformance.findById(performanceId)
+    if (performance && performance.isPublic) {
+      const track = await Track.findById(trackId)
+      if (track && !track.isPublic) {
+        return res.status(400).json({ error: 'Cannot add private track to public performance' })
+      }
     }
 
     // Create a new TrackPerformance record and save it to the database

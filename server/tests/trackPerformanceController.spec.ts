@@ -1,4 +1,5 @@
 import { connectDB, disconnectDB } from '../database'
+import { SadissPerformance, Track } from '../models'
 import { TrackPerformance } from '../models/trackPerformance'
 import { authenticatedRequest, generateMockId } from './testUtils'
 
@@ -38,6 +39,35 @@ describe('trackPerformanceController test', () => {
 
       const savedTrackPerformance = await TrackPerformance.findOne({ trackId: mockTrackId, performanceId: mockPerformanceId })
       expect(savedTrackPerformance).toBeDefined()
+    })
+
+    it('should return a 400 error if no trackId is provided', async () => {
+      const trackPerformanceData = { trackId: generateMockId() }
+      const res = await authenticatedRequest(request, '/api/add-track-to-performance', 'post').send(trackPerformanceData)
+      expect(res.status).toBe(400)
+      expect(res.body.error).toBe('Invalid input data')
+    })
+
+    it('should return a 400 error if no performanceId is provided', async () => {
+      const trackPerformanceData = { performanceId: generateMockId() }
+      const res = await authenticatedRequest(request, '/api/add-track-to-performance', 'post').send(trackPerformanceData)
+      expect(res.status).toBe(400)
+      expect(res.body.error).toBe('Invalid input data')
+    })
+
+    it('should return a 400 error if a non-public track is added to a public performance', async () => {
+      const performance = await SadissPerformance.create({ name: 'Test performance', isPublic: true, userId: generateMockId() })
+      const track = await Track.create({
+        name: 'Test track',
+        isPublic: false,
+        userId: generateMockId(),
+        mode: 'choir',
+        waveform: 'sine'
+      })
+      const trackPerformanceData = { trackId: track._id, performanceId: performance._id }
+      const res = await authenticatedRequest(request, '/api/add-track-to-performance', 'post').send(trackPerformanceData)
+      expect(res.status).toBe(400)
+      expect(res.body.error).toBe('Cannot add private track to public performance')
     })
 
     it('should return a 500 error if there is an error while creating a TrackPerformance record', async () => {

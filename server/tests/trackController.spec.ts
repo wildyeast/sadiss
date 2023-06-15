@@ -322,13 +322,15 @@ describe('trackController test', () => {
     const testTrack = {
       name: 'test track',
       mode: 'choir',
-      waveform: 'sine'
+      waveform: 'sine',
+      isPublic: true
     }
 
     const req = authenticatedRequest(request, '/api/track/create', 'post')
       .field('name', testTrack.name)
       .field('mode', testTrack.mode)
       .field('waveform', testTrack.waveform)
+      .field('isPublic', testTrack.isPublic)
 
     if (trackType === 'partials') {
       req.attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile_testPartialFile')
