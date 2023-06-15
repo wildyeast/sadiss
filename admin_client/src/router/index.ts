@@ -22,17 +22,26 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/performances/:id',
     name: 'performance',
-    component: () => import('../views/PerformanceView.vue')
+    component: () => import('../views/PerformanceView.vue'),
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/performances',
     name: 'performances',
-    component: () => import('../views/PerformancesView.vue')
+    component: () => import('../views/PerformancesView.vue'),
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/tracks',
     name: 'tracks',
-    component: () => import('../views/TracksView.vue')
+    component: () => import('../views/TracksView.vue'),
+    meta: {
+      requiresAuth: true
+    }
   },
   {
     path: '/:catchAll(.*)',
