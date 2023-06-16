@@ -1,11 +1,13 @@
 export const authenticatedRequest = (request: any, route: string, method: 'get' | 'post', unauthorized = false) => {
   const token = unauthorized ? global.unauthorizedToken : global.token
+
   if (method === 'get') {
-    return request.get(route).set('Authorization', `Bearer ${token}`)
+    return request.get(route).set('Cookie', `jwt=${token}`)
   } else if (method === 'post') {
-    return request.post(route).set('Authorization', `Bearer ${token}`)
+    return request.post(route).set('Cookie', `jwt=${token}`)
   }
 }
+
 /**
  * This is a mock id that is used in tests.
  * It is 12 characters long, which is the length of a MongoDB ObjectId.
