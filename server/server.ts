@@ -11,6 +11,7 @@ import { ActivePerformance } from './activePerformance'
 const cors = require('cors')
 const uuid = require('uuid')
 const session = require('express-session')
+const cookieParser = require('cookie-parser')
 
 const p = new ActivePerformance(1)
 // Load .env
@@ -39,7 +40,8 @@ const corsOptions = {
     } else {
       callback(new Error('Not allowed by CORS.'))
     }
-  }
+  },
+  credentials: true
 }
 
 const app = express()
@@ -57,6 +59,7 @@ const app = express()
   // Initialize Passport and restore authentication state, if any, from the session.
   .use(passport.initialize())
   .use(passport.session())
+  .use(cookieParser())
 
 // WEBSOCKETS //
 let server

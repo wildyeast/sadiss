@@ -14,24 +14,20 @@ interface ApiResponse<T> {
 }
 
 async function request<T>(path: string, options?: RequestOptions): Promise<ApiResponse<T>> {
-  const token = localStorage.getItem('jwt')
   const headers: HeadersInit = {}
 
   if (options && options.body instanceof FormData) {
     // Use 'multipart/form-data' headers for FormData
-    headers.Accept = 'application/json' // Set the accepted response format
+    headers.Accept = 'application/json'
   } else {
     // Use 'application/json' headers for other payloads
     headers['Content-Type'] = 'application/json'
   }
 
-  if (token) {
-    headers.Authorization = `Bearer ${token}`
-  }
-
   const response = await fetch(`${BASE_URL}${path}`, {
     ...options,
-    headers
+    headers,
+    credentials: 'include'
   })
 
   const data = await response.json()

@@ -27,7 +27,17 @@ exports.login = async (req: Request, res: Response) => {
 
     // Generate and send JWT token
     const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET!)
-    res.json({ token: token })
+
+    const secureOption = process.env.NODE_ENV === 'production'
+
+    // Set token as an HTTP-only cookie
+    res.cookie('jwt', token, {
+      httpOnly: true,
+      secure: secureOption,
+      sameSite: 'strict'
+    })
+
+    res.json({ message: 'Login successful' })
   } catch (err) {
     res.status(500).json({ message: 'Failed to login' })
   }

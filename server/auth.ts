@@ -33,8 +33,7 @@ passport.use(
 
 // TODO: Return more specific error messages
 const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers['authorization']
-  const token = authHeader && authHeader.split(' ')[1]
+  const token = req.cookies.jwt
   if (!token) return res.sendStatus(401)
 
   jwt.verify(token, process.env.JWT_SECRET!, (err: any, user: any) => {
