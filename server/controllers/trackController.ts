@@ -108,7 +108,6 @@ exports.deleteTrack = async (req: Request, res: Response) => {
 }
 
 exports.getTracks = async (req: Request, res: Response) => {
-  // res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
   try {
     const allTracks = await Track.find(
       { $or: [{ isPublic: true }, { userId: req.user!.id }] },
