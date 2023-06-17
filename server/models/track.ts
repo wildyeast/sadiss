@@ -15,7 +15,7 @@ export const trackSchema = new Schema<TrackDocument>({
   partialFile: Object,
   ttsFiles: Array<TTSFileObject>,
   isPublic: { type: Boolean, required: true },
-  userId: { type: String, required: true }
+  userId: { type: Schema.Types.ObjectId, required: true, ref: 'User' }
 })
 trackSchema.set('timestamps', true)
 

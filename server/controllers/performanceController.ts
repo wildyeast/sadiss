@@ -1,4 +1,5 @@
 import { Response, Request } from 'express'
+import { isValidObjectId } from 'mongoose'
 import { SadissPerformance } from '../models/sadissPerformance'
 import { User } from '../models/user'
 
@@ -27,16 +28,23 @@ exports.getPerformances = async (req: Request, res: Response) => {
 
 exports.getPerformance = async (req: Request, res: Response) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ error: 'Invalid performance ID' })
+    }
+
     let performance = await SadissPerformance.findById(req.params.id)
-    let performanceWithUsername = null
-    if (performance) {
-      const user = await User.findById(performance.userId, 'username')
-      performanceWithUsername = {
-        _id: performance._id,
-        name: performance.name,
-        username: user?.username,
-        isPublic: performance.isPublic
-      }
+
+    if (!performance) {
+      return res.status(404).json({ error: 'Performance not found' })
+    }
+
+    let performanceWithUsername
+    const user = await User.findById(performance.userId, 'username').lean()
+    performanceWithUsername = {
+      _id: performance._id,
+      name: performance.name,
+      username: user?.username,
+      isPublic: performance.isPublic
     }
 
     res.json({ performance: performanceWithUsername })

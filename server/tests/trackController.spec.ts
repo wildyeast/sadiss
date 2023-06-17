@@ -21,7 +21,15 @@ describe('trackController test', () => {
 
   describe('GET /api/tracks', () => {
     it('should get tracks from DB', async () => {
+      await createTestTrack()
       const res = await authenticatedRequest(request, '/api/tracks', 'get').expect(200)
+      expect(res.body.tracks.length).toBe(1)
+      expect(res.body.tracks[0].name).toBe('test track')
+      expect(res.body.tracks[0].mode).toBe('choir')
+      expect(res.body.tracks[0].waveform).toBe('sine')
+      expect(res.body.tracks[0].partialFile.origName).toBe('testPartialFile.txt')
+      console.log('userId', res.body.tracks[0].userId)
+      expect(res.body.tracks[0].userId).toBe(mockUser.username)
     })
 
     it('should return an empty array if no tracks in DB', async () => {

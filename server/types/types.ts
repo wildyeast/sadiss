@@ -1,3 +1,5 @@
+import { Types } from 'mongoose'
+
 export interface PartialChunk {
   index: number
   startTime: number
@@ -47,7 +49,7 @@ export interface TrackDocument extends Document {
   }
   ttsFiles: TTSFileObject[]
   isPublic: boolean
-  userId: string
+  userId: Types.ObjectId
 }
 
 export interface TTSFileObject {
@@ -56,7 +58,7 @@ export interface TTSFileObject {
 
 export interface SadissPerformanceDocument extends Document {
   name: string
-  userId: string
+  userId: Types.ObjectId
   isPublic: boolean
 }
 

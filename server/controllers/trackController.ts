@@ -5,7 +5,7 @@ import { Multer } from 'multer'
 type File = Express.Multer.File
 import { chunk } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
-import mongoose from 'mongoose'
+import mongoose, { isValidObjectId } from 'mongoose'
 import { TtsJson } from '../types/types'
 import { Server } from 'ws'
 import { trackSchema } from '../models/track'
@@ -113,9 +113,11 @@ exports.getTracks = async (req: Request, res: Response) => {
       { $or: [{ isPublic: true }, { userId: req.user!.id }] },
       '_id name notes mode waveform ttsRate userId isPublic partialFile ttsFiles'
     )
+      .populate('userId', 'username') // Populate the 'userId' field with 'username'
+      .lean()
+
     res.json({ tracks: allTracks })
   } catch (err) {
-    console.log('Failed getting tracks with:', err)
     res.status(500).json({ Error: 'Failed fetching tracks.' })
   }
 }

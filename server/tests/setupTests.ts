@@ -1,6 +1,7 @@
 import jwt from 'jsonwebtoken'
 import * as dotenv from 'dotenv'
 import { generateMockId } from './testUtils'
+import { User } from '../models'
 
 dotenv.config()
 
@@ -9,6 +10,13 @@ const mockUser = {
   username: 'Test User',
   email: 'testuser@example.com'
 }
+
+// beforeAll(async () => {
+//   await connect(); // Connect to the in-memory database
+//   // Create a user in the in-memory database
+//   const user = new User({ username: 'Test User', email: 'testuser@example.com', password: 'testpassword' });
+//   await user.save();
+// });
 
 // Mock user with no access to most resources created by mockUser
 const unauthorizedMockUser = {

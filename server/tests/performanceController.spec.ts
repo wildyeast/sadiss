@@ -62,7 +62,7 @@ describe('performanceController test', () => {
       expect(savedPerformance).toBeDefined()
       expect(savedPerformance!.name).toBe('Test Performance')
       expect(savedPerformance!.isPublic).toBe(true)
-      expect(savedPerformance!.userId).toBe(global.mockUser.id)
+      expect(savedPerformance!.userId.toString()).toEqual(global.mockUser.id.toString())
     })
 
     it('should save a new performance to the database and return the saved data if isPublic is not provided', async () => {
@@ -76,7 +76,7 @@ describe('performanceController test', () => {
       expect(savedPerformance).toBeDefined()
       expect(savedPerformance!.name).toBe('Test Performance 2')
       expect(savedPerformance!.isPublic).toBe(false)
-      expect(savedPerformance!.userId).toBe(global.mockUser.id)
+      expect(savedPerformance!.userId.toString()).toEqual(global.mockUser.id.toString())
     })
 
     it('should return a 500 error if there is a server error', async () => {

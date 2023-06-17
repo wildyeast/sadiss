@@ -1,6 +1,7 @@
 // From https://blog.logrocket.com/extend-express-request-object-typescript/
 
-import { UserDocument } from '../types'
+import { TypeExpressionOperatorReturningObjectId } from 'mongoose'
+import { ObjectId, Types } from 'mongoose'
 
 export {}
 
@@ -8,13 +9,14 @@ declare global {
   namespace Express {
     export interface Request {
       wss?: any
-      user?: any
+      user?: User | undefined
     }
     interface User {
-      id: string
+      id: Types.ObjectId
+      password: string
     }
   }
   var token: string // Used in server/tests/setupTests.ts
-  var mockUser: { username: string; id: string; email: string } // Used in server/tests/setupTests.ts
+  var mockUser: { username: string; id: Types.ObjectId; email: string } // Used in server/tests/setupTests.ts
   var unauthorizedToken: string // Used in server/tests/setupTests.ts
 }

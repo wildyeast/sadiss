@@ -1,6 +1,6 @@
 import { connectDB, disconnectDB } from '../database'
 import { SadissPerformance, User, TrackPerformance, Track } from '../models'
-import { authenticatedRequest, mockId, generateMockId } from './testUtils'
+import { authenticatedRequest, generateMockId } from './testUtils'
 
 const { app, server, wss } = require('../server')
 const supertest = require('supertest')
@@ -98,6 +98,9 @@ describe('getPerformanceWithTracks', () => {
     SadissPerformance.findById = jest.fn().mockImplementationOnce(() => {
       throw new Error('Server error')
     })
+
+    const mockId = generateMockId()
+
     const res = await authenticatedRequest(request, `/api/performance/${mockId}`, 'get').expect(500)
     expect(res.body).toEqual({ Error: 'Failed fetching performance.' })
     expect(SadissPerformance.findById).toHaveBeenCalledWith(mockId)
