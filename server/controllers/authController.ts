@@ -3,6 +3,7 @@ import { Request, Response } from 'express'
 import { UserDocument } from '../types/types'
 import { User } from '../models/user'
 import * as dotenv from 'dotenv'
+import { env } from 'process'
 
 const bcrypt = require('bcryptjs')
 
@@ -53,7 +54,11 @@ exports.register = async (req: Request, res: Response) => {
     const hashedPassword = await bcrypt.hash(password, 10)
     const user = new User({ username, password: hashedPassword, email })
     await user.save()
-    res.status(201).json({ message: 'User created successfully' })
+    if (env.NODE_ENV === 'test') {
+      return res.status(201).json(user)
+    } else {
+      res.status(201).json({ message: 'User created successfully' })
+    }
   } catch (err) {
     res.status(500).json({ message: 'Failed to create user' })
   }

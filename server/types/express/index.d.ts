@@ -2,6 +2,7 @@
 
 import { TypeExpressionOperatorReturningObjectId } from 'mongoose'
 import { ObjectId, Types } from 'mongoose'
+import { SuperAgentTest } from 'supertest'
 
 export {}
 
@@ -19,4 +20,5 @@ declare global {
   var token: string // Used in server/tests/setupTests.ts
   var mockUser: { username: string; id: Types.ObjectId; email: string } // Used in server/tests/setupTests.ts
   var unauthorizedToken: string // Used in server/tests/setupTests.ts
+  var agent: SuperAgentTest
 }

@@ -1,22 +1,7 @@
-import { connectDB, disconnectDB } from '../database'
 import { SadissPerformance, User, TrackPerformance, Track } from '../models'
 import { authenticatedRequest, generateMockId } from './testUtils'
 
-const { app, server, wss } = require('../server')
-const supertest = require('supertest')
-const request = supertest(app)
-
 describe('getPerformanceWithTracks', () => {
-  beforeAll(async () => {
-    await connectDB()
-  })
-
-  afterAll(async () => {
-    await disconnectDB()
-    server.close()
-    wss.close()
-  })
-
   it('should return performance data with associated tracks', async () => {
     const testUser = new User({
       username: 'test-username',
@@ -65,7 +50,7 @@ describe('getPerformanceWithTracks', () => {
     })
     await trackPerformance2.save()
 
-    const res = await authenticatedRequest(request, `/api/performance/${testPerformance._id}/with-tracks`, 'get').expect(200)
+    const res = await authenticatedRequest(`/api/performance/${testPerformance._id}/with-tracks`, 'get')!.expect(200)
     expect(res.body).toEqual({
       _id: testPerformance._id.toString(),
       name: 'Performance 1',
@@ -101,8 +86,8 @@ describe('getPerformanceWithTracks', () => {
 
     const mockId = generateMockId()
 
-    const res = await authenticatedRequest(request, `/api/performance/${mockId}`, 'get').expect(500)
+    const res = await authenticatedRequest(`/api/performance/${mockId}`, 'get')!.expect(500)
     expect(res.body).toEqual({ Error: 'Failed fetching performance.' })
-    expect(SadissPerformance.findById).toHaveBeenCalledWith(mockId)
+    expect(SadissPerformance.findById).toHaveBeenCalledWith(mockId.toString())
   })
 })

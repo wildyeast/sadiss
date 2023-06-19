@@ -10,7 +10,7 @@ import { TtsJson } from '../types/types'
 import { Server } from 'ws'
 import { trackSchema } from '../models/track'
 import { ActivePerformance } from '../activePerformance'
-import { TrackPerformance } from '../models'
+import { TrackPerformance, User } from '../models'
 
 const fs = require('fs')
 const uuid = require('uuid')
@@ -88,7 +88,7 @@ exports.deleteTrack = async (req: Request, res: Response) => {
     }
 
     // Check if user owns track
-    if (track.userId !== req.user!.id) {
+    if (track.userId.toString() !== req.user!.id.toString()) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
@@ -109,6 +109,8 @@ exports.deleteTrack = async (req: Request, res: Response) => {
 
 exports.getTracks = async (req: Request, res: Response) => {
   try {
+    const user = await User.find({}, 'username').lean()
+
     const allTracks = await Track.find(
       { $or: [{ isPublic: true }, { userId: req.user!.id }] },
       '_id name notes mode waveform ttsRate userId isPublic partialFile ttsFiles'

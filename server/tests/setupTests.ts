@@ -2,21 +2,45 @@ import jwt from 'jsonwebtoken'
 import * as dotenv from 'dotenv'
 import { generateMockId } from './testUtils'
 import { User } from '../models'
+import { connectDB, disconnectDB } from '../database'
+import request from 'supertest'
 
 dotenv.config()
 
-const mockUser = {
-  id: generateMockId(),
-  username: 'Test User',
-  email: 'testuser@example.com'
-}
+const { app, server, wss } = require('../server')
 
-// beforeAll(async () => {
-//   await connect(); // Connect to the in-memory database
-//   // Create a user in the in-memory database
-//   const user = new User({ username: 'Test User', email: 'testuser@example.com', password: 'testpassword' });
-//   await user.save();
-// });
+const agent = request.agent(app)
+global.agent = agent
+
+beforeAll(async () => {
+  // Connect to the in-memory database
+  await connectDB()
+  // Register a user to be user for testing
+  const mockUser = {
+    username: 'Test User',
+    email: 'testuser@example.com',
+    password: 'testpassword'
+  }
+
+  const registerRes = await agent.post('/register').send(mockUser)
+  global.mockUser = {
+    id: registerRes.body._id,
+    username: registerRes.body.username,
+    email: registerRes.body.email
+  }
+
+  // Login with created user and save JWT token
+  await agent.post('/login').send({
+    username: mockUser.username,
+    password: mockUser.password
+  })
+})
+
+afterAll(async () => {
+  await disconnectDB()
+  server.close()
+  wss.close()
+})
 
 // Mock user with no access to most resources created by mockUser
 const unauthorizedMockUser = {
@@ -26,6 +50,4 @@ const unauthorizedMockUser = {
 }
 
 // Generate JWT token for mock user and set it on the global object
-global.mockUser = mockUser
-global.token = jwt.sign(mockUser, process.env.JWT_SECRET!)
 global.unauthorizedToken = jwt.sign(unauthorizedMockUser, process.env.JWT_SECRET!)

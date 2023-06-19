@@ -6,16 +6,21 @@ exports.addTrackToPerformance = async (req: Request, res: Response) => {
   try {
     const { trackId, performanceId } = req.body
 
-    // Check if the provided IDs are valid
-    if (!trackId || !performanceId) {
-      return res.status(400).json({ error: 'Invalid input data' })
+    const performance = await SadissPerformance.findById(performanceId)
+
+    if (!performance) {
+      return res.status(404).json({ error: 'Performance not found' })
     }
 
     // If performance is public check if the track is public
-    const performance = await SadissPerformance.findById(performanceId)
-    if (performance && performance.isPublic) {
+    if (performance.isPublic) {
       const track = await Track.findById(trackId)
-      if (track && !track.isPublic) {
+
+      if (!track) {
+        return res.status(404).json({ error: 'Track not found' })
+      }
+
+      if (!track.isPublic) {
         return res.status(400).json({ error: 'Cannot add private track to public performance' })
       }
     }
