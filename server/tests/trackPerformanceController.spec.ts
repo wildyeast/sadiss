@@ -20,7 +20,7 @@ describe('trackPerformanceController test', () => {
       await createTestPerformance()
 
       const trackPerformanceData = { trackId: testTrackId, performanceId: testPerformanceId }
-      const res = await authenticatedRequest('/api/add-track-to-performance', 'post')!.send(trackPerformanceData).expect(201)
+      const res = await agent.post('/api/add-track-to-performance').send(trackPerformanceData).expect(201)
 
       const savedTrackPerformance = await TrackPerformance.findOne({ trackId: testTrackId, performanceId: testPerformanceId })
       expect(savedTrackPerformance).toBeDefined()
@@ -29,7 +29,7 @@ describe('trackPerformanceController test', () => {
     it('should return a 400 error if no performanceId is provided', async () => {
       await createTestTrack()
       const trackPerformanceData = { trackId: testTrackId }
-      const res = await authenticatedRequest('/api/add-track-to-performance', 'post')!.send(trackPerformanceData)
+      const res = await agent.post('/api/add-track-to-performance').send(trackPerformanceData)
       expect(res.status).toBe(400)
       expect(res.body.error).toBe('Invalid input data')
     })
@@ -37,7 +37,7 @@ describe('trackPerformanceController test', () => {
     it('should return a 400 error if no trackId is provided', async () => {
       await createTestPerformance()
       const trackPerformanceData = { performanceId: testPerformanceId }
-      const res = await authenticatedRequest('/api/add-track-to-performance', 'post')!.send(trackPerformanceData)
+      const res = await agent.post('/api/add-track-to-performance').send(trackPerformanceData)
       expect(res.status).toBe(400)
       expect(res.body.error).toBe('Invalid input data')
     })
@@ -52,7 +52,7 @@ describe('trackPerformanceController test', () => {
         waveform: 'sine'
       })
       const trackPerformanceData = { trackId: track._id, performanceId: performance._id }
-      const res = await authenticatedRequest('/api/add-track-to-performance', 'post')!.send(trackPerformanceData)
+      const res = await agent.post('/api/add-track-to-performance').send(trackPerformanceData)
       expect(res.status).toBe(400)
       expect(res.body.error).toBe('Cannot add private track to public performance')
     })
@@ -66,7 +66,7 @@ describe('trackPerformanceController test', () => {
       await createTestPerformance()
 
       const trackPerformanceData = { trackId: testTrackId, performanceId: testPerformanceId }
-      const res = await authenticatedRequest('/api/add-track-to-performance', 'post')!.send(trackPerformanceData)
+      const res = await agent.post('/api/add-track-to-performance').send(trackPerformanceData)
 
       expect(res.status).toBe(500)
     })

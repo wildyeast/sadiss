@@ -1,5 +1,5 @@
 import { SadissPerformance, User, TrackPerformance, Track } from '../models'
-import { authenticatedRequest, generateMockId } from './testUtils'
+import { generateMockId } from './testUtils'
 
 describe('getPerformanceWithTracks', () => {
   it('should return performance data with associated tracks', async () => {
@@ -50,7 +50,7 @@ describe('getPerformanceWithTracks', () => {
     })
     await trackPerformance2.save()
 
-    const res = await authenticatedRequest(`/api/performance/${testPerformance._id}/with-tracks`, 'get')!.expect(200)
+    const res = await agent.get(`/api/performance/${testPerformance._id}/with-tracks`).expect(200)
     expect(res.body).toEqual({
       _id: testPerformance._id.toString(),
       name: 'Performance 1',
@@ -86,7 +86,7 @@ describe('getPerformanceWithTracks', () => {
 
     const mockId = generateMockId()
 
-    const res = await authenticatedRequest(`/api/performance/${mockId}`, 'get')!.expect(500)
+    const res = await agent.get(`/api/performance/${mockId}`).expect(500)
     expect(res.body).toEqual({ Error: 'Failed fetching performance.' })
     expect(SadissPerformance.findById).toHaveBeenCalledWith(mockId.toString())
   })
