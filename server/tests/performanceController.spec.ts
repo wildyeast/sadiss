@@ -1,4 +1,5 @@
 import { SadissPerformance } from '../models/sadissPerformance'
+import { createTestPerformance, testPerformanceId } from './testUtils'
 
 describe('performanceController test', () => {
   describe('POST /api/performances', () => {
@@ -70,6 +71,43 @@ describe('performanceController test', () => {
       const res = await agent.post('/api/performance/create').send({ name: 'Test Performance' })
 
       expect(res.status).toBe(500)
+    })
+  })
+
+  describe('DELETE /api/performance/delete/:id', () => {
+    it('should return a 400 error if invalid id is provided', async () => {
+      const res = await agent.delete('/api/performance/delete/123').send()
+
+      expect(res.status).toBe(400)
+      expect(res.body).toEqual({ error: 'Invalid performance ID' })
+    })
+
+    it('should return a 404 error if performance is not found', async () => {
+      const res = await agent.delete('/api/performance/delete/123456789012').send()
+
+      expect(res.status).toBe(404)
+      expect(res.body).toEqual({ error: 'Performance not found' })
+    })
+
+    it('should return a 500 error if there is a server error', async () => {
+      jest.spyOn(SadissPerformance, 'findById').mockImplementationOnce(() => {
+        throw new Error('Server error')
+      })
+
+      const res = await agent.delete('/api/performance/delete/123456789012').send()
+
+      expect(res.status).toBe(500)
+    })
+
+    it('should delete a performance from the database', async () => {
+      await createTestPerformance()
+
+      const res = await agent.delete(`/api/performance/delete/${testPerformanceId}`).send()
+
+      expect(res.status).toBe(200)
+
+      const deletedPerformance = await SadissPerformance.findById(testPerformanceId)
+      expect(deletedPerformance).toBeNull()
     })
   })
 })

@@ -67,8 +67,12 @@ exports.createPerformance = async (req: Request, res: Response) => {
   }
 }
 
-exports.delete_performance = async (req: Request, res: Response) => {
+exports.deletePerformance = async (req: Request, res: Response) => {
   try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ error: 'Invalid performance ID' })
+    }
+
     const performance = await SadissPerformance.findById(req.params.id)
 
     if (!performance) {
@@ -76,7 +80,7 @@ exports.delete_performance = async (req: Request, res: Response) => {
     }
 
     // Check if user owns performance
-    if (performance.creator !== req.user!.id) {
+    if (performance.creator.toString() !== req.user!.id.toString()) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
