@@ -4,9 +4,7 @@ import jwt from 'jsonwebtoken'
 import { Request, Response, NextFunction } from 'express'
 import { User } from './models/user'
 import * as dotenv from 'dotenv'
-import { UserDocument } from './types/types'
-
-const bcrypt = require('bcryptjs')
+import { compare } from 'bcryptjs'
 
 // Load .env
 dotenv.config()
@@ -19,11 +17,10 @@ passport.use(
         return done(null, false)
       }
 
-      const match = await bcrypt.compare(password, user.password)
+      const match = await compare(password, user.password)
       if (!match) {
         return done(null, false)
       }
-
       return done(null, user)
     } catch (err) {
       return done(err)
@@ -34,7 +31,7 @@ passport.use(
 // TODO: Return more specific error messages
 const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
   const token = req.cookies.jwt
-  if (!token) return res.sendStatus(401)
+  if (!token) return res.json({ message: 'No token' }).status(401)
 
   jwt.verify(token, process.env.JWT_SECRET!, (err: any, user: any) => {
     if (err) return res.sendStatus(403)
