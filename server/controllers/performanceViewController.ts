@@ -1,7 +1,6 @@
 import { Request, Response } from 'express'
 import { SadissPerformance } from '../models/sadissPerformance'
 import { TrackPerformance } from '../models/trackPerformance'
-import { Track } from '../models/track'
 
 exports.getPerformanceWithTracks = async (req: Request, res: Response) => {
   try {
