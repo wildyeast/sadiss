@@ -55,7 +55,7 @@ onMounted(async () => {
         <div class="flex flex-col">
           <p class="font-bold">{{ track.name }}</p>
           <div>
-            <span>Created by: {{ track.username }}</span>
+            <span>Created by: {{ track.creator.username }}</span>
           </div>
         </div>
         <div class="flex gap-4">

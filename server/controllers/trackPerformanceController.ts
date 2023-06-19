@@ -26,7 +26,7 @@ exports.addTrackToPerformance = async (req: Request, res: Response) => {
     }
 
     // Create a new TrackPerformance record and save it to the database
-    const trackPerformance = new TrackPerformance({ trackId, performanceId })
+    const trackPerformance = new TrackPerformance({ track: trackId, performance: performanceId })
     trackPerformance.save((err) => {
       if (err) {
         console.error('Error while creating performance', err)
@@ -58,7 +58,7 @@ exports.getTracksOfPerformance = async (req: Request, res: Response) => {
     }
 
     // Get the tracks of the found TrackPerformance records
-    const tracks = trackPerformances.map((trackPerformance) => trackPerformance.trackId)
+    const tracks = trackPerformances.map((trackPerformance) => trackPerformance.track)
 
     // Return the found TrackPerformance records
     res.status(200).json({ tracks })

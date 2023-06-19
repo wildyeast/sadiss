@@ -88,7 +88,7 @@ exports.deleteTrack = async (req: Request, res: Response) => {
     }
 
     // Check if user owns track
-    if (track.userId.toString() !== req.user!.id.toString()) {
+    if (track.creator.toString() !== req.user!.id.toString()) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
@@ -109,13 +109,11 @@ exports.deleteTrack = async (req: Request, res: Response) => {
 
 exports.getTracks = async (req: Request, res: Response) => {
   try {
-    const user = await User.find({}, 'username').lean()
-
     const allTracks = await Track.find(
-      { $or: [{ isPublic: true }, { userId: req.user!.id }] },
-      '_id name notes mode waveform ttsRate userId isPublic partialFile ttsFiles'
+      { $or: [{ isPublic: true }, { creator: req.user!.id }] },
+      '_id name notes mode waveform ttsRate creator isPublic partialFile ttsFiles'
     )
-      .populate('userId', 'username') // Populate the 'userId' field with 'username'
+      .populate('creator', 'username') // Populate the 'creator' field with 'username'
       .lean()
 
     res.json({ tracks: allTracks })
@@ -187,7 +185,7 @@ exports.uploadTrack = async (req: Request, res: Response) => {
       ttsRate,
       partialFile: partialFileToSave,
       ttsFiles: ttsFilesToSave,
-      userId: req.user!.id,
+      creator: req.user!.id,
       isPublic: !!req.body.isPublic
     })
 

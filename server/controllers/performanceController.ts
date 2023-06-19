@@ -8,19 +8,11 @@ exports.getPerformances = async (req: Request, res: Response) => {
   try {
     // Get all performances that are public or owned by the user
     const performances = await SadissPerformance.find(
-      { $or: [{ isPublic: true }, { userId: req.user!.id }] },
-      '_id name userId isPublic'
-    )
+      { $or: [{ isPublic: true }, { creator: req.user!.id }] },
+      '_id name creator isPublic'
+    ).populate('creator', 'username')
 
-    // Map performances to include username instead of user ID
-    const performancesWithUsername = await Promise.all(
-      performances.map(async (performance) => {
-        const user = await User.findById(performance.userId, 'username')
-        return { _id: performance._id, name: performance.name, username: user?.username, isPublic: performance.isPublic }
-      })
-    )
-
-    res.json({ performances: performancesWithUsername })
+    res.json({ performances })
   } catch (err) {
     res.status(500).json({ Error: 'Failed fetching performances.' })
   }
@@ -39,7 +31,7 @@ exports.getPerformance = async (req: Request, res: Response) => {
     }
 
     let performanceWithUsername
-    const user = await User.findById(performance.userId, 'username').lean()
+    const user = await User.findById(performance.creator, 'username').lean()
     performanceWithUsername = {
       _id: performance._id,
       name: performance.name,
@@ -62,7 +54,7 @@ exports.createPerformance = async (req: Request, res: Response) => {
     }
 
     // Save new performance to database
-    const performance = new SadissPerformance({ name, isPublic: !!isPublic, userId: req.user!.id })
+    const performance = new SadissPerformance({ name, isPublic: !!isPublic, creator: req.user!.id })
     performance.save((err) => {
       if (err) {
         res.status(500).send(err)
@@ -84,7 +76,7 @@ exports.delete_performance = async (req: Request, res: Response) => {
     }
 
     // Check if user owns performance
-    if (performance.userId !== req.user!.id) {
+    if (performance.creator !== req.user!.id) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 

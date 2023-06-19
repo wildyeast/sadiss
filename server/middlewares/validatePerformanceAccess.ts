@@ -16,7 +16,7 @@ export const validatePerformanceAccess = async (req: Request, res: Response, nex
       return res.status(404).json({ error: 'Performance not found' })
     }
 
-    if (performance.userId.toString() !== req.user!.id.toString()) {
+    if (performance.creator.toString() !== req.user!.id.toString()) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 

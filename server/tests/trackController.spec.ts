@@ -12,7 +12,7 @@ describe('trackController test', () => {
       expect(res.body.tracks[0].mode).toBe('choir')
       expect(res.body.tracks[0].waveform).toBe('sine')
       expect(res.body.tracks[0].partialFile.origName).toBe('testPartialFile.txt')
-      expect(res.body.tracks[0].userId.username).toBe(mockUser.username)
+      expect(res.body.tracks[0].creator.username).toBe(mockUser.username)
       await Track.findByIdAndDelete(testTrackId)
     })
 
@@ -277,7 +277,7 @@ describe('trackController test', () => {
 
       let performanceWithTracksResGet = await agent.get(`/api/performance/${testPerformanceId}/with-tracks`).expect(200)
 
-      expect(performanceWithTracksResGet.body.tracks.length).toBe(1)
+      expect(performanceWithTracksResGet.body.performance.tracks.length).toBe(1)
 
       const resDelete = await agent.post(`/api/track/delete/${testTrackId}`).expect(200)
       expect(resDelete.body.message).toBe('Track deleted')
@@ -287,7 +287,7 @@ describe('trackController test', () => {
 
       performanceWithTracksResGet = await agent.get(`/api/performance/${testPerformanceId}/with-tracks`).expect(200)
 
-      expect(performanceWithTracksResGet.body.tracks.length).toBe(0)
+      expect(performanceWithTracksResGet.body.performance.tracks.length).toBe(0)
     })
 
     it('should return 404 if track not found', async () => {
@@ -302,7 +302,7 @@ describe('trackController test', () => {
         name: 'test track',
         mode: 'choir',
         waveform: 'sine',
-        userId: generateMockId(),
+        creator: generateMockId(),
         isPublic: true
       }).save()
 

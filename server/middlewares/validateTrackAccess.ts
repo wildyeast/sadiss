@@ -16,7 +16,7 @@ export const validateTrackAccess = async (req: Request, res: Response, next: Nex
       return res.status(404).json({ error: 'Track not found' })
     }
 
-    if (!track.isPublic && track.userId.toString() !== req.user!.id.toString()) {
+    if (!track.isPublic && track.creator.toString() !== req.user!.id.toString()) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 

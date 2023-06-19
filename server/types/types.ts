@@ -49,7 +49,7 @@ export interface TrackDocument extends Document {
   }
   ttsFiles: TTSFileObject[]
   isPublic: boolean
-  userId: Types.ObjectId
+  creator: Types.ObjectId
 }
 
 export interface TTSFileObject {
@@ -58,11 +58,11 @@ export interface TTSFileObject {
 
 export interface SadissPerformanceDocument extends Document {
   name: string
-  userId: Types.ObjectId
+  creator: Types.ObjectId
   isPublic: boolean
 }
 
 export interface TrackPerformanceDocument extends Document {
-  trackId: TrackDocument
-  performanceId: SadissPerformanceDocument
+  track: TrackDocument
+  performance: SadissPerformanceDocument
 }

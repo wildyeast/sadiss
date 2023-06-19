@@ -1,26 +1,23 @@
 import { Request, Response } from 'express'
 import { SadissPerformance } from '../models/sadissPerformance'
-import { User } from '../models/user'
 import { TrackPerformance } from '../models/trackPerformance'
 import { Track } from '../models/track'
 
 exports.getPerformanceWithTracks = async (req: Request, res: Response) => {
   try {
-    let performance = await SadissPerformance.findById(req.params.id)
-    let performanceWithUsernameAndTracks = null
-    if (performance) {
-      const user = await User.findById(performance.userId, 'username')
-      const trackPerformances = await TrackPerformance.find({ performanceId: performance._id }, 'trackId')
-      const tracks = await Promise.all(
-        trackPerformances.map(async (t) => {
-          return await Track.findById(t.trackId, '_id name notes mode waveform ttsRate userId isPublic')
-        })
-      )
+    const performance = await SadissPerformance.findById(req.params.id, 'name creator tracks')
+      .populate('creator', 'username -_id')
+      .lean()
 
-      performanceWithUsernameAndTracks = { _id: performance._id, name: performance.name, username: user?.username, tracks }
+    if (!performance) {
+      return res.status(404).json({ error: 'Performance not found' })
     }
 
-    res.json(performanceWithUsernameAndTracks)
+    let trackPerformances
+    trackPerformances = await TrackPerformance.find({ performance: performance._id }, 'track -_id')
+      .populate('track', 'name notes mode waveform ttsRate creator isPublic')
+      .lean()
+    res.json({ performance: { ...performance, tracks: trackPerformances } })
   } catch (err) {
     res.status(500).json({ Error: 'Failed fetching performance.' })
   }

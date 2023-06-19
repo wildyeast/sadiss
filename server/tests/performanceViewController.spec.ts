@@ -12,7 +12,7 @@ describe('getPerformanceWithTracks', () => {
 
     const testPerformance = new SadissPerformance({
       name: 'Performance 1',
-      userId: testUser._id,
+      creator: testUser._id,
       isPublic: true
     })
     await testPerformance.save()
@@ -22,14 +22,14 @@ describe('getPerformanceWithTracks', () => {
       mode: 'choir',
       waveform: 'sine',
       ttsRate: 1.5,
-      userId: testUser._id,
+      creator: testUser._id,
       isPublic: true
     })
     await testTrack1.save()
 
     const trackPerformance = new TrackPerformance({
-      trackId: testTrack1._id,
-      performanceId: testPerformance._id
+      track: testTrack1._id,
+      performance: testPerformance._id
     })
     await trackPerformance.save()
 
@@ -38,44 +38,51 @@ describe('getPerformanceWithTracks', () => {
       mode: 'choir',
       waveform: 'sine',
       ttsRate: '1',
-      userId: testUser._id,
+      creator: testUser._id,
       isPublic: false,
       notes: 'test-notes'
     })
     await testTrack2.save()
 
     const trackPerformance2 = new TrackPerformance({
-      trackId: testTrack2._id,
-      performanceId: testPerformance._id
+      track: testTrack2._id,
+      performance: testPerformance._id
     })
     await trackPerformance2.save()
 
     const res = await agent.get(`/api/performance/${testPerformance._id}/with-tracks`).expect(200)
+
     expect(res.body).toEqual({
-      _id: testPerformance._id.toString(),
-      name: 'Performance 1',
-      username: 'test-username',
-      tracks: [
-        {
-          _id: testTrack1._id.toString(),
-          name: 'Track 1',
-          mode: 'choir',
-          waveform: 'sine',
-          ttsRate: '1.5',
-          userId: testUser._id.toString(),
-          isPublic: true
-        },
-        {
-          _id: testTrack2._id.toString(),
-          name: 'Track 2',
-          mode: 'choir',
-          waveform: 'sine',
-          ttsRate: '1',
-          userId: testUser._id.toString(),
-          isPublic: false,
-          notes: 'test-notes'
-        }
-      ]
+      performance: {
+        _id: testPerformance._id.toString(),
+        name: 'Performance 1',
+        creator: { username: 'test-username' },
+        tracks: [
+          {
+            track: {
+              _id: testTrack1._id.toString(),
+              name: 'Track 1',
+              mode: 'choir',
+              waveform: 'sine',
+              ttsRate: '1.5',
+              creator: testUser._id.toString(),
+              isPublic: true
+            }
+          },
+          {
+            track: {
+              _id: testTrack2._id.toString(),
+              name: 'Track 2',
+              mode: 'choir',
+              waveform: 'sine',
+              ttsRate: '1',
+              creator: testUser._id.toString(),
+              isPublic: false,
+              notes: 'test-notes'
+            }
+          }
+        ]
+      }
     })
   })
 

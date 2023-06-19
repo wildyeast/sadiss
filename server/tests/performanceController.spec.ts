@@ -7,15 +7,14 @@ describe('performanceController test', () => {
       const performance = new SadissPerformance({
         name: 'Performance 1',
         isPublic: true,
-        userId: '123456789012'
+        creator: '123456789012'
       })
       await performance.save()
 
       // save the performance id for later use
       const performanceId = performance._id
 
-      const res = await agent.get('/api/performances')
-      expect(res.status).toBe(200)
+      const res = await agent.get('/api/performances').expect(200)
 
       const data = JSON.parse(res.text)
       expect(Array.isArray(data.performances)).toBe(true)
@@ -46,7 +45,7 @@ describe('performanceController test', () => {
       expect(savedPerformance).toBeDefined()
       expect(savedPerformance!.name).toBe('Test Performance')
       expect(savedPerformance!.isPublic).toBe(true)
-      expect(savedPerformance!.userId.toString()).toEqual(global.mockUser.id.toString())
+      expect(savedPerformance!.creator.toString()).toEqual(global.mockUser.id.toString())
     })
 
     it('should save a new performance to the database and return the saved data if isPublic is not provided', async () => {
@@ -60,7 +59,7 @@ describe('performanceController test', () => {
       expect(savedPerformance).toBeDefined()
       expect(savedPerformance!.name).toBe('Test Performance 2')
       expect(savedPerformance!.isPublic).toBe(false)
-      expect(savedPerformance!.userId.toString()).toEqual(global.mockUser.id.toString())
+      expect(savedPerformance!.creator.toString()).toEqual(global.mockUser.id.toString())
     })
 
     it('should return a 500 error if there is a server error', async () => {
