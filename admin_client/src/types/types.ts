@@ -12,7 +12,7 @@ interface QrCodeData {
 interface SadissPerformance {
   _id: string
   name: string
-  username: string
+  creator: { _id: string; username: string }
   isPublic: boolean
   tracks: Track[]
 }

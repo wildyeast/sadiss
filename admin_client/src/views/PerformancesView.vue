@@ -53,7 +53,7 @@ onMounted(async () => {
               <font-awesome-icon icon="fa-user-group" />
             </span>
           </div>
-          <p>Created by: {{ performance.username }}</p>
+          <p>Created by: {{ performance.creator.username }}</p>
         </div>
         <button @click.stop="handleDeletePerformance(performance._id)">
           <font-awesome-icon
