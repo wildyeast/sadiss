@@ -129,9 +129,15 @@ export async function createPerformance(name: string, isPublic: boolean) {
 }
 
 export async function deletePerformance(id: string) {
-  const response = await request<{ performance: SadissPerformance }>(`/api/performance/delete/${id}`, {
-    method: 'DELETE'
+  const response = await request<{ message: string }>(`/api/performance/delete/${id}`, {
+    method: 'POST'
   })
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.message
 }
 
 /* TRACKS */
@@ -182,9 +188,15 @@ export async function editTrack(trackId: string, trackData: FormData) {
 }
 
 export async function deleteTrack(id: string) {
-  const response = await request<{ track: Track }>(`/api/track/delete/${id}`, {
-    method: 'DELETE'
+  const response = await request<{ message: string }>(`/api/track/delete/${id}`, {
+    method: 'POST'
   })
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.message
 }
 
 export async function startTrack(trackId: string, performanceId: string, startTime: number, loop = false) {
