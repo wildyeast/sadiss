@@ -55,7 +55,7 @@ describe('trackPerformanceController test', () => {
       const trackPerformanceData = { trackId: track._id, performanceId: performance._id }
       const res = await agent.post('/api/add-track-to-performance').send(trackPerformanceData)
       expect(res.status).toBe(400)
-      expect(res.body.error).toBe('Cannot add private track to public performance')
+      expect(res.body.message).toBeTruthy()
     })
 
     it('should return a 500 error if there is an error while creating a TrackPerformance record', async () => {

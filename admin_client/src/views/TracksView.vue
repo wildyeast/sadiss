@@ -23,9 +23,13 @@ const trackCreated = async () => {
 
 const addTrackToPerformanceModal = ref<typeof AddTrackToPerformanceModal | null>()
 
-const handleAddTrackToPerformance = (trackId: string, performanceId: string) => {
-  addTrackToPerformanceModal.value?.closeModal()
-  addTrackToPerformance(trackId, performanceId)
+const handleAddTrackToPerformance = async (trackId: string, performanceId: string) => {
+  try {
+    await addTrackToPerformance(trackId, performanceId)
+    addTrackToPerformanceModal.value?.closeModal()
+  } catch (err) {
+    alert(err)
+  }
 }
 
 onMounted(async () => {

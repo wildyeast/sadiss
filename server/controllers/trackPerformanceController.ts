@@ -21,7 +21,7 @@ exports.addTrackToPerformance = async (req: Request, res: Response) => {
       }
 
       if (!track.isPublic) {
-        return res.status(400).json({ error: 'Cannot add private track to public performance' })
+        return res.status(400).send({ message: 'Cannot add private track to public performance' })
       }
     }
 
