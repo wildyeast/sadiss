@@ -18,6 +18,20 @@ exports.getPerformances = async (req: Request, res: Response) => {
   }
 }
 
+// Get performances owned by requesting user
+exports.getOwnPerformances = async (req: Request, res: Response) => {
+  try {
+    const performances = await SadissPerformance.find({ creator: req.user!.id }, '_id name creator isPublic').populate(
+      'creator',
+      'username'
+    )
+
+    res.json({ performances })
+  } catch (err) {
+    res.status(500).json({ Error: 'Failed fetching performances.' })
+  }
+}
+
 exports.getPerformance = async (req: Request, res: Response) => {
   try {
     if (!isValidObjectId(req.params.id)) {

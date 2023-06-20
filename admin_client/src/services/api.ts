@@ -98,6 +98,16 @@ export async function getPerformances() {
   return response.data!.performances
 }
 
+export async function getOwnPerformances() {
+  const response = await request<{ performances: SadissPerformance[] }>('/api/own-performances')
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.performances
+}
+
 export async function getPerformance(id: string) {
   const response = await request<{ performance: SadissPerformance }>(`/api/performance/${id}`)
 

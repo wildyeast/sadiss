@@ -2,7 +2,7 @@
 import BaseModal from './BaseModal.vue'
 import { onMounted, ref } from 'vue'
 import type { SadissPerformance } from '@/types/types'
-import { getPerformances } from '@/services/api'
+import { getOwnPerformances, getPerformances } from '@/services/api'
 
 // Here, the logic concerning opening/closing of the modal can't easily be replaced with
 // a composable, since we need to set the selected track id when opening the modal.
@@ -31,7 +31,7 @@ defineEmits<{
 const performances = ref<SadissPerformance[]>([])
 
 onMounted(async () => {
-  performances.value = await getPerformances()
+  performances.value = await getOwnPerformances()
 })
 </script>
 
@@ -40,7 +40,7 @@ onMounted(async () => {
     ref="modal"
     @close-modal="closeModal">
     <h1 class="text-center text-3xl font-bold text-primary">Add Track to Performance</h1>
-    <main>
+    <main v-if="performances.length">
       <p class="text-primary">Click on the performance you want to add the track to.</p>
       <button
         v-for="performance of performances"
@@ -52,5 +52,10 @@ onMounted(async () => {
         </div>
       </button>
     </main>
+    <div
+      v-else
+      class="flex justify-center text-lg">
+      <p class="text-primary">You don't have any performances yet.</p>
+    </div>
   </BaseModal>
 </template>
