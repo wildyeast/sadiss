@@ -39,6 +39,7 @@ async function request<T>(path: string, options?: RequestOptions): Promise<ApiRe
   return { data }
 }
 
+/* AUTH */
 export async function login(username: string, password: string): Promise<string> {
   const response = await request<{ token: string }>('/login', {
     method: 'POST',
@@ -50,8 +51,6 @@ export async function login(username: string, password: string): Promise<string>
   }
 
   const { token } = response.data!
-
-  localStorage.setItem('jwt', token)
 
   return token
 }
@@ -65,6 +64,27 @@ export async function register(username: string, email: string, password: string
   if (response.error) {
     throw new Error(response.error)
   }
+}
+
+// isLoggedIn
+export async function isUserLoggedIn() {
+  const response = await request<{ message: string }>('/is-logged-in')
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.message === 'Logged in'
+}
+
+export async function logout() {
+  const response = await request<{ message: string }>('/logout')
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.message === 'Logged out'
 }
 
 /* PERFORMANCES */

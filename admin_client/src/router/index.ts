@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
+import { isUserLoggedIn } from '../services/api'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -54,14 +55,11 @@ const router = createRouter({
   routes
 })
 
+// Before each route, check if the user is logged in
 router.beforeEach(async (to, from, next) => {
-  if (to.meta.requiresAuth) {
-    const token = localStorage.getItem('jwt')
-    if (!token) {
-      next({ name: 'login' })
-    } else {
-      next()
-    }
+  const isLoggedIn = await isUserLoggedIn()
+  if (to.matched.some((record) => record.meta.requiresAuth) && !isLoggedIn) {
+    next('/login')
   } else {
     next()
   }

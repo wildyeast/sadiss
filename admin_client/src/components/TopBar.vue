@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
+import { logout } from '@/services/api'
 
 const router = useRouter()
 
@@ -24,8 +25,8 @@ const toggleUserMenu = (event: MouseEvent) => {
   }
 }
 
-const logout = () => {
-  localStorage.removeItem('jwt')
+const handleLougout = async () => {
+  await logout()
   router.push('/login')
 }
 
@@ -70,7 +71,7 @@ onUnmounted(() => {
         ref="userMenuDialog"
         class="fixed">
         <button
-          @click="logout"
+          @click="handleLougout"
           class="text-primary">
           Logout
         </button>

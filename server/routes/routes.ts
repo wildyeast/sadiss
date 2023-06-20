@@ -80,4 +80,10 @@ router.post('/login', passport.authenticate('local', { session: false }), auth_c
 // Register
 router.post('/register', auth_controller.register)
 
+// Is logged in
+router.get('/is-logged-in', auth_controller.isLoggedIn)
+
+// Logout
+router.get('/logout', auth_controller.logout)
+
 module.exports = router
