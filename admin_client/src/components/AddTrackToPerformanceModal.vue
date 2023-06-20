@@ -54,8 +54,13 @@ onMounted(async () => {
     </main>
     <div
       v-else
-      class="flex justify-center text-lg">
+      class="flex flex-col items-center text-lg">
       <p class="text-primary">You don't have any performances yet.</p>
+      <button
+        class="font-bold text-primary hover:underline"
+        @click="$router.push('/performances')">
+        Create one
+      </button>
     </div>
   </BaseModal>
 </template>
