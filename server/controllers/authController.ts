@@ -69,10 +69,13 @@ exports.isLoggedIn = async (req: Request, res: Response) => {
     const token = req.cookies.jwt
     if (!token) return res.json({ message: 'No token' }).status(401)
 
-    jwt.verify(token, process.env.JWT_SECRET!, (err: any, user: any) => {
+    jwt.verify(token, process.env.JWT_SECRET!, async (err: any, user: any) => {
       if (err) return res.sendStatus(403)
       req.user = user
-      res.json({ message: 'Logged in' })
+
+      const userDocument = await User.findById(req.user!.id, 'username -_id')
+
+      res.json({ message: 'Logged in', user: userDocument })
     })
   } catch (err) {
     res.status(500).json({ message: 'Failed to check login status' })

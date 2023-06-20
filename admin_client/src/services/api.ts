@@ -68,13 +68,13 @@ export async function register(username: string, email: string, password: string
 
 // isLoggedIn
 export async function isUserLoggedIn() {
-  const response = await request<{ message: string }>('/is-logged-in')
+  const response = await request<{ message: string; user?: { username: string } }>('/is-logged-in')
 
   if (response.error) {
     throw new Error(response.error)
   }
 
-  return response.data!.message === 'Logged in'
+  return response.data!.user
 }
 
 export async function logout() {

@@ -2,6 +2,9 @@
 import { onMounted, onUnmounted, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { logout } from '@/services/api'
+import { useStore } from '@/stores/store'
+
+const store = useStore()
 
 const router = useRouter()
 
@@ -64,7 +67,10 @@ onUnmounted(() => {
     <nav class="relative flex gap-8">
       <router-link to="/tracks">Tracks</router-link>
       <router-link to="/performances">Performances</router-link>
-      <button @click="toggleUserMenu">
+      <button
+        @click="toggleUserMenu"
+        class="flex items-center gap-3">
+        {{ store.userName }}
         <font-awesome-icon icon="fa-user" />
       </button>
       <dialog

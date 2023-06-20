@@ -20,6 +20,7 @@ import {
   faUser,
   faUserGroup
 } from '@fortawesome/free-solid-svg-icons'
+import { createPinia } from 'pinia'
 
 library.add(
   faTrash,
@@ -36,7 +37,9 @@ library.add(
   faUserGroup
 )
 
-const app = createApp(App).use(router)
+const pinia = createPinia()
+
+const app = createApp(App).use(router).use(pinia)
 app.component('Button', Button)
 app.component('Modal', Modal)
 app.component('font-awesome-icon', FontAwesomeIcon)

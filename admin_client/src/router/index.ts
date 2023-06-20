@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory, type RouteRecordRaw } from 'vue-router'
 import { isUserLoggedIn } from '../services/api'
+import { useStore } from '../stores/store'
 
 const routes: Array<RouteRecordRaw> = [
   {
@@ -57,8 +58,13 @@ const router = createRouter({
 
 // Before each route, check if the user is logged in
 router.beforeEach(async (to, from, next) => {
-  const isLoggedIn = await isUserLoggedIn()
-  if (to.matched.some((record) => record.meta.requiresAuth) && !isLoggedIn) {
+  const user = await isUserLoggedIn()
+  if (user) {
+    const store = useStore()
+    store.userName = user!.username
+  }
+
+  if (to.matched.some((record) => record.meta.requiresAuth) && !user) {
     next('/login')
   } else {
     next()
