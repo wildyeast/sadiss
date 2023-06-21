@@ -14,18 +14,20 @@ exports.login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body
 
-    console.log(email, password)
+    if (!email || !password) {
+      return res.status(400).send({ message: 'Please provide an email and password' })
+    }
 
     // Find user by email
     const user = await User.findOne({ email })
     if (!user) {
-      return res.status(401).json({ message: 'Invalid email or password' })
+      return res.status(401).send({ message: 'Invalid email or password' })
     }
 
     // Compare hashed password
     const isPasswordMatched = await bcrypt.compare(password, user.password)
     if (!isPasswordMatched) {
-      return res.status(401).json({ message: 'Invalid email or password' })
+      return res.status(401).send({ message: 'Invalid email or password' })
     }
 
     // Generate and send JWT token
@@ -42,7 +44,7 @@ exports.login = async (req: Request, res: Response) => {
 
     res.json({ message: 'Login successful' })
   } catch (err) {
-    res.status(500).json({ message: 'Failed to login' })
+    res.status(500).send({ message: 'Failed to login' })
   }
 }
 
@@ -51,25 +53,25 @@ exports.register = async (req: Request, res: Response) => {
     const { username, password, email } = req.body
     const existingUser = await User.findOne({ $or: [{ username: username }, { email: email }] })
     if (existingUser) {
-      return res.status(409).json({ message: 'Username already exists' })
+      return res.status(409).send({ message: 'Username already exists' })
     }
     const hashedPassword = await bcrypt.hash(password, 10)
     const user = new User({ username, password: hashedPassword, email })
     await user.save()
     if (env.NODE_ENV === 'test') {
-      return res.status(201).json(user)
+      return res.status(201).send(user)
     } else {
-      res.status(201).json({ message: 'User created successfully' })
+      res.status(201).send({ message: 'User created successfully' })
     }
   } catch (err) {
-    res.status(500).json({ message: 'Failed to create user' })
+    res.status(500).send({ message: 'Failed to create user' })
   }
 }
 
 exports.isLoggedIn = async (req: Request, res: Response) => {
   try {
     const token = req.cookies.jwt
-    if (!token) return res.json({ message: 'No token' }).status(401)
+    if (!token) return res.send({ message: 'No token' }).status(401)
 
     jwt.verify(token, process.env.JWT_SECRET!, async (err: any, user: any) => {
       if (err) return res.sendStatus(403)
