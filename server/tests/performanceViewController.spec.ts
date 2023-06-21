@@ -59,27 +59,23 @@ describe('getPerformanceWithTracks', () => {
         creator: { username: 'test-username' },
         tracks: [
           {
-            track: {
-              _id: testTrack1._id.toString(),
-              name: 'Track 1',
-              mode: 'choir',
-              waveform: 'sine',
-              ttsRate: '1.5',
-              creator: testUser._id.toString(),
-              isPublic: true
-            }
+            _id: testTrack1._id.toString(),
+            name: 'Track 1',
+            mode: 'choir',
+            waveform: 'sine',
+            ttsRate: '1.5',
+            creator: testUser._id.toString(),
+            isPublic: true
           },
           {
-            track: {
-              _id: testTrack2._id.toString(),
-              name: 'Track 2',
-              mode: 'choir',
-              waveform: 'sine',
-              ttsRate: '1',
-              creator: testUser._id.toString(),
-              isPublic: false,
-              notes: 'test-notes'
-            }
+            _id: testTrack2._id.toString(),
+            name: 'Track 2',
+            mode: 'choir',
+            waveform: 'sine',
+            ttsRate: '1',
+            creator: testUser._id.toString(),
+            isPublic: false,
+            notes: 'test-notes'
           }
         ]
       }
