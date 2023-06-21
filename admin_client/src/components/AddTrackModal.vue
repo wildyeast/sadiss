@@ -50,6 +50,7 @@ const emit = defineEmits<{
 }>()
 
 const trackName = ref('')
+const isPublic = ref(false)
 const trackNotes = ref<string>('')
 const trackIsChoir = ref(false)
 const trackWaveform = ref<Waveform>('sine')
@@ -82,6 +83,7 @@ const createTrackData = () => {
   data.append('mode', trackIsChoir.value ? 'choir' : 'nonChoir')
   data.append('waveform', trackWaveform.value)
   data.append('ttsRate', trackTtsRate.value.toString())
+  data.append('isPublic', isPublic.value.toString())
 
   if (file) {
     const fileNameWithoutExtension = file.name.slice(0, '.txt'.length * -1)
@@ -168,6 +170,16 @@ watch(trackTtsRate, (newValue) => {
         <input
           v-model="trackName"
           class="w-3/4" />
+      </div>
+      <!-- Public or Private -->
+      <div class="flex items-center gap-2">
+        <input
+          v-model="isPublic"
+          type="checkbox"
+          id="isPublic"
+          name="isPublic"
+          class="h-5 w-5 rounded-sm border border-primary p-2" />
+        <label for="isPublic">Public</label>
       </div>
       <!-- Partial File Upload -->
       <div class="lg:flex lg:flex-row">

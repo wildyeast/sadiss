@@ -175,6 +175,7 @@ exports.uploadTrack = async (req: Request, res: Response) => {
     const mode = req.body.mode
     const waveform = req.body.waveform
     const ttsRate = req.body.ttsRate
+    const isPublic = req.body.isPublic === 'true'
     // Save track to DB
     const t = new Track({
       name,
@@ -186,7 +187,7 @@ exports.uploadTrack = async (req: Request, res: Response) => {
       partialFile: partialFileToSave,
       ttsFiles: ttsFilesToSave,
       creator: req.user!.id,
-      isPublic: !!req.body.isPublic
+      isPublic
     })
 
     if (mode === 'choir' && partialsCount > 0) {
