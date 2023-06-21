@@ -43,7 +43,12 @@ const handlePerformanceCreated = async () => {
 
 onMounted(async () => {
   performances.value = await getPerformances()
-  filterPerformancesBy.value = localStorage.getItem('filterPerformancesBy') as 'all' | 'own' | 'public'
+  const filterPerformancesByFromLocalStorage = localStorage.getItem('filterPerformancesBy')
+  if (filterPerformancesByFromLocalStorage) {
+    filterPerformancesBy.value = filterPerformancesByFromLocalStorage as 'all' | 'own' | 'public'
+  } else {
+    filterPerformancesBy.value = 'all'
+  }
 })
 </script>
 

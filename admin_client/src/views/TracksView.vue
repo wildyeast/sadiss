@@ -1,12 +1,30 @@
 <script setup lang="ts">
 import { getTracks, deleteTrack, addTrackToPerformance } from '@/services/api'
 import type { Track } from '@/types/types'
-import { onMounted, ref } from 'vue'
+import { onMounted, ref, computed } from 'vue'
 import AddTrackModal from '@/components/AddTrackModal.vue'
 import AddTrackToPerformanceModal from '@/components/AddTrackToPerformanceModal.vue'
 import FixedViewHeader from '@/components/FixedViewHeader.vue'
+import { useStore } from '@/stores/store'
+
+const store = useStore()
 
 const tracks = ref<Track[]>([])
+const filterTracksBy = ref<'all' | 'own' | 'public'>()
+
+const tracksToDisplay = computed(() => {
+  switch (filterTracksBy.value) {
+    case 'all':
+      localStorage.setItem('filterTracksBy', 'all')
+      return tracks.value
+    case 'own':
+      localStorage.setItem('filterTracksBy', 'own')
+      return tracks.value.filter((track) => track.creator.username === store.userName)
+    case 'public':
+      localStorage.setItem('filterTracksBy', 'public')
+      return tracks.value.filter((track) => track.isPublic)
+  }
+})
 
 const addTrackModal = ref<typeof AddTrackModal | null>()
 
@@ -34,33 +52,49 @@ const handleAddTrackToPerformance = async (trackId: string, performanceId: strin
 
 onMounted(async () => {
   tracks.value = await getTracks()
+  const filterTracksByFromLocalStorage = localStorage.getItem('filterTracksBy')
+  if (filterTracksByFromLocalStorage) {
+    filterTracksBy.value = filterTracksByFromLocalStorage as 'all' | 'own' | 'public'
+  } else {
+    filterTracksBy.value = 'all'
+  }
 })
 </script>
 
 <template>
   <main class="flex flex-col">
     <FixedViewHeader title="Tracks">
-      <div class="flex flex-row-reverse">
+      <div class="flex flex-row-reverse gap-2">
         <!-- Open add track modal -->
         <button
           class="rounded-sm bg-light px-4 py-2 font-bold text-primary"
           @click.stop="addTrackModal?.openModal">
           Add track
         </button>
+        <select
+          v-model="filterTracksBy"
+          class="rounded-sm bg-light px-4 py-2 font-bold text-primary">
+          <option value="all">All tracks</option>
+          <option value="own">Own tracks</option>
+          <option value="public">Public tracks</option>
+        </select>
       </div>
     </FixedViewHeader>
 
     <div class="mt-12 space-y-2 overflow-y-auto pt-16">
       <button
         @click="addTrackModal?.openModal(track)"
-        v-for="track of tracks"
+        v-for="track of tracksToDisplay"
         :key="track._id"
         class="flex w-full justify-between rounded-sm border border-light p-4">
-        <div class="flex flex-col">
-          <p class="font-bold">{{ track.name }}</p>
-          <div>
-            <span>Created by: {{ track.creator.username }}</span>
+        <div class="flex flex-col items-start">
+          <div class="flex gap-2">
+            <p class="font-bold">{{ track.name }}</p>
+            <span v-if="track.isPublic">
+              <font-awesome-icon icon="fa-user-group" />
+            </span>
           </div>
+          <span>Created by: {{ track.creator.username }}</span>
         </div>
         <div class="flex gap-4">
           <button @click.stop="addTrackToPerformanceModal?.openModal(track._id)">
@@ -68,7 +102,9 @@ onMounted(async () => {
               icon="fa-plus"
               size="lg" />
           </button>
-          <button @click.stop="handleDeleteTrack(track._id)">
+          <button
+            v-if="track.creator.username === store.userName"
+            @click.stop="handleDeleteTrack(track._id)">
             <font-awesome-icon
               icon="fa-trash"
               class="text-danger" />
