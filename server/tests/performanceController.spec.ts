@@ -74,16 +74,16 @@ describe('performanceController test', () => {
     })
   })
 
-  describe('DELETE /api/performance/delete/:id', () => {
+  describe('POST /api/performance/delete/:id', () => {
     it('should return a 400 error if invalid id is provided', async () => {
-      const res = await agent.delete('/api/performance/delete/123').send()
+      const res = await agent.post('/api/performance/delete/123').send()
 
       expect(res.status).toBe(400)
       expect(res.body).toEqual({ error: 'Invalid performance ID' })
     })
 
     it('should return a 404 error if performance is not found', async () => {
-      const res = await agent.delete('/api/performance/delete/123456789012').send()
+      const res = await agent.post('/api/performance/delete/123456789012').send()
 
       expect(res.status).toBe(404)
       expect(res.body).toEqual({ error: 'Performance not found' })
@@ -94,7 +94,7 @@ describe('performanceController test', () => {
         throw new Error('Server error')
       })
 
-      const res = await agent.delete('/api/performance/delete/123456789012').send()
+      const res = await agent.post('/api/performance/delete/123456789012').send()
 
       expect(res.status).toBe(500)
     })
@@ -102,7 +102,7 @@ describe('performanceController test', () => {
     it('should delete a performance from the database', async () => {
       await createTestPerformance()
 
-      const res = await agent.delete(`/api/performance/delete/${testPerformanceId}`).send()
+      const res = await agent.post(`/api/performance/delete/${testPerformanceId}`).send()
 
       expect(res.status).toBe(200)
 
