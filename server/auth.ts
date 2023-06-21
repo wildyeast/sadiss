@@ -12,7 +12,7 @@ dotenv.config()
 passport.use(
   new LocalStrategy(async function (username, password, done) {
     try {
-      const user: Express.User | null = await User.findOne({ username: username })
+      const user: Express.User | null = await User.findOne({ username })
       if (!user) {
         return done(null, false)
       }
