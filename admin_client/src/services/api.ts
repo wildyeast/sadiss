@@ -40,10 +40,10 @@ async function request<T>(path: string, options?: RequestOptions): Promise<ApiRe
 }
 
 /* AUTH */
-export async function login(username: string, password: string): Promise<string> {
+export async function login(email: string, password: string): Promise<string> {
   const response = await request<{ token: string }>('/login', {
     method: 'POST',
-    body: JSON.stringify({ username, password })
+    body: JSON.stringify({ email, password })
   })
 
   if (response.error) {

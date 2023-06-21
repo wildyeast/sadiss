@@ -10,9 +10,9 @@ import { compare } from 'bcryptjs'
 dotenv.config()
 
 passport.use(
-  new LocalStrategy(async function (username, password, done) {
+  new LocalStrategy({ usernameField: 'email' }, async function (email, password, done) {
     try {
-      const user: Express.User | null = await User.findOne({ username })
+      const user: Express.User | null = await User.findOne({ email })
       if (!user) {
         return done(null, false)
       }

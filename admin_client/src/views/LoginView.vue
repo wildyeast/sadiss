@@ -6,19 +6,19 @@ import { login } from '../services/api'
 const router = useRouter()
 
 const formData = reactive({
-  username: '',
+  email: '',
   password: ''
 })
 
 const loginUser = async () => {
   errorMessage.value = ''
-  if (!formData.username || !formData.password) {
-    console.error('Username and password are required')
-    errorMessage.value = 'Username and password are required'
+  if (!formData.email || !formData.password) {
+    console.error('Email and password are required')
+    errorMessage.value = 'Email and password are required'
     return
   }
   try {
-    await login(formData.username, formData.password)
+    await login(formData.email, formData.password)
     await router.push({ path: '/' })
   } catch (error) {
     console.error(`Error logging in: ${error}`)
@@ -41,9 +41,9 @@ const errorMessage = ref('')
         class="flex flex-col items-center gap-4"
         @submit.prevent="loginUser">
         <input
-          v-model="formData.username"
+          v-model="formData.email"
           type="text"
-          placeholder="Username"
+          placeholder="Email"
           class="w-60 rounded-md border px-4 py-2" />
         <input
           v-model="formData.password"

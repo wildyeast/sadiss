@@ -31,7 +31,7 @@ beforeAll(async () => {
 
   // Login with created user and save JWT token
   await agent.post('/login').send({
-    username: mockUser.username,
+    email: mockUser.email,
     password: mockUser.password
   })
 })

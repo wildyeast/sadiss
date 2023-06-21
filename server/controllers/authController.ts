@@ -12,18 +12,20 @@ dotenv.config()
 
 exports.login = async (req: Request, res: Response) => {
   try {
-    const { username, password } = req.body
+    const { email, password } = req.body
 
-    // Find user by username
-    const user = await User.findOne({ username })
+    console.log(email, password)
+
+    // Find user by email
+    const user = await User.findOne({ email })
     if (!user) {
-      return res.status(401).json({ message: 'Invalid username or password' })
+      return res.status(401).json({ message: 'Invalid email or password' })
     }
 
     // Compare hashed password
     const isPasswordMatched = await bcrypt.compare(password, user.password)
     if (!isPasswordMatched) {
-      return res.status(401).json({ message: 'Invalid username or password' })
+      return res.status(401).json({ message: 'Invalid email or password' })
     }
 
     // Generate and send JWT token
