@@ -25,14 +25,17 @@ if (process.env.NODE_ENV !== 'test') {
 const BASE_URL = '127.0.0.1'
 const BASE_PORT = 3005
 
-const whitelist = [
-  `http://${BASE_URL}:${BASE_PORT}`,
-  'http://127.0.0.1:5173',
-  'http://localhost:5173',
-  'http://localhost:8081',
-  'http://localhost:8080',
-  'https://sadiss.net' /** other domains if any */
-]
+let whitelist = [`http://${BASE_URL}:${BASE_PORT}`, `https://${BASE_URL}:${BASE_PORT}`, 'https://sadiss.net']
+
+if (process.env.NODE_ENV === 'development') {
+  whitelist = whitelist.concat([
+    'http://127.0.0.1:5173',
+    'http://localhost:5173',
+    'http://localhost:8081',
+    'http://localhost:8080'
+  ])
+}
+
 const corsOptions = {
   origin: (origin: string, callback: Function) => {
     if (whitelist.indexOf(origin) !== -1 || !origin) {
