@@ -77,15 +77,15 @@ onMounted(async () => {
         v-for="performance of performancesToDisplay"
         :key="performance._id"
         class="flex w-full justify-between rounded-sm border border-light p-4">
-        <div class="text-start">
-          <div class="flex gap-2">
+        <span class="text-start">
+          <span class="flex gap-2">
             <p class="font-bold">{{ performance.name }}</p>
             <span v-if="performance.isPublic">
               <font-awesome-icon icon="fa-user-group" />
             </span>
-          </div>
+          </span>
           <p>Created by: {{ performance.creator.username }}</p>
-        </div>
+        </span>
         <button
           v-if="performance.creator.username === store.userName"
           @click.stop="handleDeletePerformance(performance._id)">
