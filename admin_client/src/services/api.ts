@@ -66,7 +66,6 @@ export async function register(username: string, email: string, password: string
   }
 }
 
-// isLoggedIn
 export async function isUserLoggedIn() {
   const response = await request<{ message: string; user?: { username: string } }>('/is-logged-in')
 
@@ -138,6 +137,18 @@ export async function deletePerformance(id: string) {
   }
 
   return response.data!.message
+}
+
+export async function getClientCountPerChoirId(performanceId: string) {
+  const response = await request<{ clientCountPerChoirId: { [key: string]: number } }>(
+    `/api/client-count-per-choir-id/${performanceId}`
+  )
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.clientCountPerChoirId
 }
 
 /* TRACKS */

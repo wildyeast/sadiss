@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getPerformanceWithTracks } from '@/services/api'
+import { getPerformanceWithTracks, getClientCountPerChoirId } from '@/services/api'
 import type { SadissPerformance } from '@/types/types'
 import { onMounted, ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
@@ -37,8 +37,15 @@ const setCurrentTrack = (trackId: string) => {
 
 const qrCodesModal = ref<typeof QrCodesModal | null>()
 
+const connectedClients = ref<{ [choirId: string]: number }>({})
+
 onMounted(async () => {
   performance.value = await getPerformanceWithTracks(performanceId as string)
+
+  // // Periodically update connected clients
+  setInterval(async () => {
+    connectedClients.value = await getClientCountPerChoirId(performanceId as string)
+  }, 1000)
 })
 </script>
 <template>
@@ -57,9 +64,23 @@ onMounted(async () => {
         </div>
       </FixedViewHeader>
 
+      <!-- Spacer for pushing content below down so it is visible below the fixed header
+        TODO: Maybe do away with the fixed header or think of a less annoying way of doing this. -->
+      <div class="mt-12 pt-16"></div>
+
+      <div
+        v-if="Object.keys(connectedClients).length"
+        class="flex gap-4">
+        <span v-for="choirId of Object.keys(connectedClients)">
+          <font-awesome-icon
+            icon="fa-qrcode"
+            class="mr-1" />{{ choirId }}: {{ connectedClients[choirId] }}</span
+        >
+      </div>
+
       <div
         v-if="performance.tracks.length"
-        class="mt-12 flex-1 space-y-2 overflow-y-scroll pt-16">
+        class="mt-4 flex-1 space-y-2 overflow-y-scroll">
         <button
           v-for="(track, index) in performance.tracks"
           @click="selectTrack(index)"
