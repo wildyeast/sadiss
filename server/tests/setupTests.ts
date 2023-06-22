@@ -48,6 +48,3 @@ const unauthorizedMockUser = {
   username: 'Unauthorized Test User',
   email: 'testuser2@example.com'
 }
-
-// Generate JWT token for mock user and set it on the global object
-global.unauthorizedToken = jwt.sign(unauthorizedMockUser, process.env.JWT_SECRET!)
