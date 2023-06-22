@@ -75,42 +75,53 @@ onMounted(async () => {
           v-model="filterTracksBy"
           class="rounded-sm bg-light px-4 py-2 font-bold text-primary">
           <option value="all">All tracks</option>
-          <option value="own">Own tracks</option>
+          <option value="own">My tracks</option>
           <option value="public">Public tracks</option>
         </select>
       </div>
     </FixedViewHeader>
 
     <div class="mt-12 space-y-2 overflow-y-auto pt-16">
-      <button
-        @click="addTrackModal?.openModal(track)"
+      <!-- Tracks -->
+      <div
         v-for="track of tracksToDisplay"
         :key="track._id"
         class="flex w-full justify-between rounded-sm border border-light p-4">
         <div class="flex flex-col items-start">
           <div class="flex gap-2">
             <p class="font-bold">{{ track.name }}</p>
-            <span v-if="track.isPublic">
+            <span
+              v-if="track.isPublic"
+              title="Track is public">
               <font-awesome-icon icon="fa-user-group" />
             </span>
           </div>
           <span>Created by: {{ track.creator.username }}</span>
         </div>
         <div class="flex gap-4">
-          <button @click.stop="addTrackToPerformanceModal?.openModal(track._id)">
+          <button
+            @click.stop="addTrackToPerformanceModal?.openModal(track._id)"
+            title="Add track to performance">
             <font-awesome-icon
               icon="fa-plus"
               size="lg" />
           </button>
           <button
             v-if="track.creator.username === store.userName"
-            @click.stop="handleDeleteTrack(track._id)">
+            @click.stop="handleDeleteTrack(track._id)"
+            title="Delete track">
             <font-awesome-icon
               icon="fa-trash"
               class="text-danger" />
           </button>
+          <button
+            v-if="track.creator.username === store.userName"
+            @click.stop="addTrackModal?.openModal(track)"
+            title="Edit track">
+            <font-awesome-icon icon="fa-edit" />
+          </button>
         </div>
-      </button>
+      </div>
     </div>
 
     <!-- Add track modal -->

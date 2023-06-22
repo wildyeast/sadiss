@@ -66,7 +66,7 @@ onMounted(async () => {
           v-model="filterPerformancesBy"
           class="rounded-sm bg-light px-4 py-2 font-bold text-primary">
           <option value="all">All performances</option>
-          <option value="own">Own performances</option>
+          <option value="own">My performances</option>
           <option value="public">Public performances</option>
         </select>
       </div>
