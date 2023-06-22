@@ -18,6 +18,7 @@ const openModal = (track?: Track) => {
     isEditingTrack.value = true
     trackId = track._id
     partialFileDownloadInfo.value = track.partialFile
+    isPublic.value = track.isPublic
     if (track.ttsFiles) {
       ttsFileDownloadInfo.value = track.ttsFiles
       numberOfVoices.value = track.ttsFiles.length / ttsLanguages.value.split(',').length
@@ -110,7 +111,6 @@ const handleTtsFileUpload = async (e: Event, voice: number, lang: string) => {
     ttsFiles[voice] = {}
   }
   ttsFiles[voice][lang] = (<HTMLInputElement>e.target).files![0]
-  console.log(`Added to ttsFiles: Voice: ${voice}, lang: ${lang}, file: ${ttsFiles[voice][lang]}`)
 }
 
 const partialFileDownloadInfo = ref()
@@ -129,7 +129,6 @@ const voiceLangCombinations = computed(() => {
 
       // If editing track, add file information to combination for display
       if (ttsFileDownloadInfo.value) {
-        console.log(i, lang.trim(), ttsFileDownloadInfo.value)
         const file = ttsFileDownloadInfo.value.find((file) => +file.voice === i && file.lang === lang.trim())
         if (file) {
           combination.file = file
