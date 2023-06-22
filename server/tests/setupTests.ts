@@ -1,7 +1,5 @@
-import jwt from 'jsonwebtoken'
 import * as dotenv from 'dotenv'
 import { generateMockId } from './testUtils'
-import { User } from '../models'
 import { connectDB, disconnectDB } from '../database'
 import request from 'supertest'
 
