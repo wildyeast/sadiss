@@ -1,8 +1,8 @@
 // From https://blog.logrocket.com/extend-express-request-object-typescript/
 
-import { TypeExpressionOperatorReturningObjectId } from 'mongoose'
-import { ObjectId, Types } from 'mongoose'
+import { Types } from 'mongoose'
 import { SuperAgentTest } from 'supertest'
+import { Server } from 'ws'
 
 export {}
 
@@ -19,4 +19,5 @@ declare global {
   }
   var mockUser: { username: string; id: Types.ObjectId; email: string }
   var agent: SuperAgentTest
+  var testWss: Server // Websocket server for testing
 }

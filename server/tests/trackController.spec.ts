@@ -1,5 +1,12 @@
 import { Track } from '../models'
-import { createTestTrack, createTestTrackPerformance, resetTestIds, testPerformanceId, testTrackId } from './testUtils'
+import {
+  createTestPerformance,
+  createTestTrack,
+  createTestTrackPerformance,
+  resetTestIds,
+  testPerformanceId,
+  testTrackId
+} from './testUtils'
 import { generateMockId } from './testUtils'
 
 describe('trackController test', () => {
@@ -317,6 +324,37 @@ describe('trackController test', () => {
 
       const resDelete = await agent.post(`/api/track/delete/${testTrackId}`).expect(500)
       expect(resDelete.body.error).toBe('Server error')
+    })
+  })
+
+  describe('GET /api/get-client-count-per-choir-id', () => {
+    it('should return an object with choirIds and respective counts', async () => {
+      const performanceId = await createTestPerformance()
+      const mockClientId = generateMockId()
+      testWss.clients.add({
+        id: mockClientId,
+        performanceId,
+        choirId: 0,
+        readyState: 1
+      } as any)
+      testWss.clients.add({
+        id: mockClientId,
+        performanceId,
+        choirId: 0,
+        readyState: 1
+      } as any)
+      testWss.clients.add({
+        id: mockClientId,
+        performanceId,
+        choirId: 1,
+        readyState: 1
+      } as any)
+
+      const res = await agent.get('/api/client-count-per-choir-id').send({ performanceId }).expect(200)
+      expect(res.body.clients).toEqual({
+        0: 2,
+        1: 1
+      })
     })
   })
 })

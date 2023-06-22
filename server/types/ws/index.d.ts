@@ -8,6 +8,6 @@ declare module 'ws' {
     ttsLang: string
     isAdmin: boolean
     lastSentTime: number
-    performanceId: number
+    performanceId: string
   }
 }

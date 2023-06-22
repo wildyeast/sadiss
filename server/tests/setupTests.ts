@@ -13,6 +13,10 @@ global.agent = agent
 beforeAll(async () => {
   // Connect to the in-memory database
   await connectDB()
+
+  // Make wss available globally
+  global.testWss = wss
+
   // Register a user to be used for testing
   const mockUser = {
     username: 'Test User',

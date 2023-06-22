@@ -43,7 +43,7 @@ router.post('/api/track/stop', track_controller.stopTrack)
 router.get('/api/get-voices-and-languages', track_controller.get_voices_and_languages)
 
 // Get stats
-router.get('/api/stats', track_controller.get_stats)
+router.get('/api/client-count-per-choir-id', track_controller.getClientCountPerChoirId)
 
 // Protected Test Route
 router.get('/api/get-own-tracks', track_controller.get_own_tracks)

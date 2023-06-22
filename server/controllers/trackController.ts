@@ -1,30 +1,25 @@
 import { Request, Response } from 'express'
 // The following is a hack to get the types to work.
 // See https://github.com/DefinitelyTyped/DefinitelyTyped/issues/47780#issuecomment-790684085
-import { Multer } from 'multer'
+import { Multer } from 'multer' // Don't remove this line
 type File = Express.Multer.File
 import { chunk } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose, { isValidObjectId } from 'mongoose'
 import { TtsJson } from '../types/types'
-import { Server } from 'ws'
 import { trackSchema } from '../models/track'
 import { ActivePerformance } from '../activePerformance'
-import { TrackPerformance, User } from '../models'
+import { TrackPerformance } from '../models'
 
 const fs = require('fs')
 const uuid = require('uuid')
 
 const Track = mongoose.model('Track', trackSchema)
 
-let wss: Server
-
 const activePerformances: ActivePerformance[] = []
 
 // Start track
 exports.startTrack = async (req: Request, res: Response) => {
-  wss = req.wss
-
   const { trackId, performanceId, startTime, loop } = req.body
 
   try {
@@ -70,13 +65,36 @@ exports.startTrack = async (req: Request, res: Response) => {
   }
 }
 
-exports.get_stats = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-  if (!wss) {
+exports.getClientCountPerChoirId = async (req: Request, res: Response) => {
+  if (!req.wss) {
     res.json({ error: 'WSS object undefined.' })
     return
   }
-  res.json({ clients: wss.clients.size })
+
+  const performanceId = req.body.performanceId
+
+  if (!isValidObjectId(performanceId)) {
+    res.json({ error: 'Invalid performanceId.' })
+    return
+  }
+
+  const clients: { [key: string]: number } = {}
+
+  for (const client of req.wss.clients) {
+    if (client.performanceId !== performanceId) continue
+
+    if (client.readyState === 1) {
+      const choirId = client.choirId
+      if (choirId !== undefined) {
+        if (!clients[choirId]) {
+          clients[choirId] = 0
+        }
+        clients[choirId] += 1
+      }
+    }
+  }
+
+  res.json({ clients })
 }
 
 exports.deleteTrack = async (req: Request, res: Response) => {

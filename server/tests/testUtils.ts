@@ -47,6 +47,7 @@ export const createTestPerformance = async () => {
   const resCreate = await agent.post('/api/performance/create')!.send(testPerformance).expect(201)
 
   testPerformanceId = resCreate.body._id
+  return resCreate.body._id
 }
 
 export let testTrackPerformanceId = ''
