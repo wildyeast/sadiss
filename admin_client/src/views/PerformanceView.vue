@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { getPerformanceWithTracks, getClientCountPerChoirId } from '@/services/api'
 import type { SadissPerformance } from '@/types/types'
-import { onMounted, ref, computed } from 'vue'
+import { onMounted, ref, computed, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import PlayerControls from '@/components/PlayerControls.vue'
 import QrCodesModal from '@/components/QrCodesModal.vue'
@@ -39,13 +39,18 @@ const qrCodesModal = ref<typeof QrCodesModal | null>()
 
 const connectedClients = ref<{ [choirId: string]: number }>({})
 
+let getClientsInterval: number
 onMounted(async () => {
   performance.value = await getPerformanceWithTracks(performanceId as string)
 
   // // Periodically update connected clients
-  setInterval(async () => {
+  getClientsInterval = setInterval(async () => {
     connectedClients.value = await getClientCountPerChoirId(performanceId as string)
   }, 1000)
+})
+
+onUnmounted(() => {
+  clearInterval(getClientsInterval)
 })
 </script>
 <template>
