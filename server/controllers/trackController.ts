@@ -65,39 +65,6 @@ exports.startTrack = async (req: Request, res: Response) => {
   }
 }
 
-exports.getClientCountPerChoirId = async (req: Request, res: Response) => {
-  if (!req.wss) {
-    res.json({ error: 'WSS object undefined.' })
-    return
-  }
-
-  const performanceId = req.body.performanceId
-  console.log('performanceId', performanceId)
-
-  if (!performanceId || !isValidObjectId(performanceId)) {
-    res.status(400).send({ message: 'Invalid performanceId' })
-    return
-  }
-
-  const clients: { [key: string]: number } = {}
-
-  for (const client of req.wss.clients) {
-    if (client.performanceId !== performanceId) continue
-
-    if (client.readyState === 1) {
-      const choirId = client.choirId
-      if (choirId !== undefined) {
-        if (!clients[choirId]) {
-          clients[choirId] = 0
-        }
-        clients[choirId] += 1
-      }
-    }
-  }
-
-  res.json({ clients })
-}
-
 exports.deleteTrack = async (req: Request, res: Response) => {
   try {
     const track = await Track.findById(req.params.id)

@@ -327,47 +327,6 @@ describe('trackController test', () => {
       expect(resDelete.body.error).toBe('Server error')
     })
   })
-
-  describe('GET /api/get-client-count-per-choir-id', () => {
-    it('should return an object with choirIds and respective counts', async () => {
-      const performanceId = await createTestPerformance()
-      createMockWsClient(performanceId, 0)
-      createMockWsClient(performanceId, 0)
-      createMockWsClient(performanceId, 1)
-
-      const res = await agent.get('/api/client-count-per-choir-id').send({ performanceId }).expect(200)
-      expect(res.body.clients).toEqual({
-        0: 2,
-        1: 1
-      })
-    })
-
-    it('should return an empty object if no clients connected', async () => {
-      const performanceId = await createTestPerformance()
-      const res = await agent.get('/api/client-count-per-choir-id').send({ performanceId }).expect(200)
-      expect(res.body.clients).toEqual({})
-    })
-
-    it('should return 400 if no performanceId provided', async () => {
-      await agent.get('/api/client-count-per-choir-id').expect(400)
-    })
-
-    it('should return 400 if performanceId is not a valid ObjectId', async () => {
-      await agent.get('/api/client-count-per-choir-id').send({ performanceId: 'invalidId' }).expect(400)
-    })
-
-    // Helper
-    const createMockWsClient = (performanceId: Types.ObjectId, choirId: number) => {
-      const mockClientId = generateMockId()
-      testWss.clients.add({
-        id: mockClientId,
-        readyState: 1,
-        performanceId,
-        choirId
-      } as any)
-      return mockClientId
-    }
-  })
 })
 
 export {}

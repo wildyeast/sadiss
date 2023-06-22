@@ -42,9 +42,6 @@ router.post('/api/track/stop', track_controller.stopTrack)
 // Get voices and languages
 router.get('/api/get-voices-and-languages', track_controller.get_voices_and_languages)
 
-// Get stats
-router.get('/api/client-count-per-choir-id', track_controller.getClientCountPerChoirId)
-
 // Protected Test Route
 router.get('/api/get-own-tracks', track_controller.get_own_tracks)
 
@@ -63,6 +60,9 @@ router.post('/api/performance/create', performance_controller.createPerformance)
 
 // Delete performance
 router.post('/api/performance/delete/:id', performance_controller.deletePerformance)
+
+// Get clients per choir id
+router.get('/api/client-count-per-choir-id/:performanceId', performance_controller.getClientCountPerChoirId)
 
 /* TRACK PERFORMANCE */
 // Add track to performance
