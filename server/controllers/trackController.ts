@@ -72,9 +72,10 @@ exports.getClientCountPerChoirId = async (req: Request, res: Response) => {
   }
 
   const performanceId = req.body.performanceId
+  console.log('performanceId', performanceId)
 
-  if (!isValidObjectId(performanceId)) {
-    res.json({ error: 'Invalid performanceId.' })
+  if (!performanceId || !isValidObjectId(performanceId)) {
+    res.status(400).send({ message: 'Invalid performanceId' })
     return
   }
 
