@@ -6,14 +6,12 @@ import { passport } from './auth'
 import { Server } from 'ws'
 import { connectDB } from './database'
 import { startKeepAliveInterval } from './tools/startKeepAliveInterval'
-import { ActivePerformance } from './activePerformance'
 
 const cors = require('cors')
 const uuid = require('uuid')
 const session = require('express-session')
 const cookieParser = require('cookie-parser')
 
-const p = new ActivePerformance(1)
 // Load .env
 dotenv.config()
 
