@@ -6,6 +6,9 @@ import { useRoute } from 'vue-router'
 import PlayerControls from '@/components/PlayerControls.vue'
 import QrCodesModal from '@/components/QrCodesModal.vue'
 import FixedViewHeader from '@/components/FixedViewHeader.vue'
+import { useStore } from '@/stores/store'
+
+const store = useStore()
 
 // Get performance id from route
 const route = useRoute()
@@ -95,14 +98,22 @@ onUnmounted(() => {
         </button>
       </div>
       <div
-        v-else
-        class="bg-red mt-12 flex h-full flex-col items-center justify-center pt-16">
+        v-else-if="store.userName === performance.creator.username"
+        class="bg-red flex h-full flex-col items-center">
         <p>No tracks yet.</p>
         <router-link
           to="/tracks"
-          class="mt-4 rounded-md bg-light p-4 text-primary"
+          class="font-bold underline"
           >Go to tracks and add some
         </router-link>
+      </div>
+      <div
+        v-else
+        class="bg-red flex h-full flex-col items-center">
+        <p>No tracks yet.</p>
+        <p>
+          Ask <span class="font-bold">{{ performance.creator.username }}</span> to add some.
+        </p>
       </div>
     </div>
 
