@@ -15,7 +15,7 @@ global.agent = agent
 beforeAll(async () => {
   // Connect to the in-memory database
   await connectDB()
-  // Register a user to be user for testing
+  // Register a user to be used for testing
   const mockUser = {
     username: 'Test User',
     email: 'testuser@example.com',
