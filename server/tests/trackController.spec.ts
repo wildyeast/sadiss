@@ -277,6 +277,28 @@ describe('trackController test', () => {
       expect(resGet.body[0].ttsFiles[1].voice).toBe('1')
       expect(resGet.body[0].ttsFiles[1].lang).toBe('de-DE')
     })
+
+    it('should return 403 if user is not owner of track', async () => {
+      // Create track with different user
+      const track = await new Track({
+        name: 'test track',
+        mode: 'choir',
+        waveform: 'sine',
+        creator: generateMockId(),
+        isPublic: true
+      }).save()
+
+      await agent.post(`/api/track/edit/${track._id}`).field('name', 'test track edited').expect(403)
+    })
+
+    it('should return 404 if track not found', async () => {
+      const nonExistantTrackId = generateMockId()
+      await agent.post(`/api/track/edit/${nonExistantTrackId}`).expect(404)
+    })
+
+    it('should return 400 if invalid track id provided', async () => {
+      await agent.post(`/api/track/edit/invalidId`).expect(400)
+    })
   })
 
   describe('POST /api/track/delete/:id', () => {

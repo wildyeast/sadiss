@@ -199,6 +199,22 @@ exports.uploadTrack = async (req: Request, res: Response) => {
 }
 
 exports.editTrack = async (req: Request, res: Response) => {
+  if (!isValidObjectId(req.params.id)) {
+    res.status(400).send({ error: 'Invalid track id.' })
+    return
+  }
+
+  const track = await Track.findById(req.params.id)
+  if (!track) {
+    res.status(404).send({ error: 'Track not found.' })
+    return
+  }
+
+  if (track.creator.toString() !== req.user!.id.toString()) {
+    res.status(403).send({ error: 'Forbidden.' })
+    return
+  }
+
   const patch = req.body
 
   const { path, partialFileToSave } = handleUploadedPartialFile(<File[]>req.files)
@@ -231,12 +247,14 @@ exports.editTrack = async (req: Request, res: Response) => {
 
   patch.chunks = JSON.stringify(chunks)
 
-  Track.findByIdAndUpdate(req.params.id, patch, { new: true }, (err, track) => {
+  track.set(patch)
+
+  track.save((err, updatedTrack) => {
     if (err) {
-      res.status(500).json({ error: err.message })
-    } else {
-      res.json(track)
+      return res.status(500).json({ error: err.message })
     }
+
+    res.json(updatedTrack)
   })
 }
 
