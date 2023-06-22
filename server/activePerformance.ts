@@ -5,7 +5,7 @@ import { PartialChunk } from './types/types'
 export class ActivePerformance {
   private sendingIntervalRunning = false
 
-  constructor(readonly id: number) {}
+  constructor(readonly id: string) {}
 
   // More or less accurate timer taken from https://stackoverflow.com/a/29972322/16725862
   startSendingInterval = (
