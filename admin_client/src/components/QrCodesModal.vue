@@ -47,8 +47,10 @@ const handleGenerateQrCodes = async () => {
   <BaseModal
     ref="modal"
     @close-modal="closeModal">
-    <h1 class="text-center text-3xl font-bold text-primary">Generate QR Codes</h1>
-    <main>
+    <form
+      @submit.prevent="handleGenerateQrCodes"
+      class="flex flex-col gap-4 p-4">
+      <h1 class="text-center text-3xl font-bold text-primary">Generate QR Codes</h1>
       <div class="mt-8 flex flex-row justify-between p-2">
         <div>Voice count</div>
         <input
@@ -86,8 +88,13 @@ const handleGenerateQrCodes = async () => {
           v-model="expertMode"
           class="w-3/4" />
       </div>
-      <button @click="handleGenerateQrCodes">Generate</button>
-    </main>
+      <button
+        type="submit"
+        formmethod="dialog"
+        class="text-white rounded-sm bg-primary p-2">
+        Generate
+      </button>
+    </form>
     <!-- QR Codes (not visible to user) -->
     <div
       class="flex flex-wrap gap-2"
