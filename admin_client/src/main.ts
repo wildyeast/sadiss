@@ -19,7 +19,10 @@ import {
   faQrcode,
   faUser,
   faUserGroup,
-  faEdit
+  faEdit,
+  faPeopleGroup,
+  faMusic,
+  faComments
 } from '@fortawesome/free-solid-svg-icons'
 import { createPinia } from 'pinia'
 
@@ -36,7 +39,10 @@ library.add(
   faQrcode,
   faUser,
   faUserGroup,
-  faEdit
+  faEdit,
+  faPeopleGroup,
+  faMusic,
+  faComments
 )
 
 const pinia = createPinia()

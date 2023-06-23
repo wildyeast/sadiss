@@ -87,16 +87,40 @@ onMounted(async () => {
         v-for="track of tracksToDisplay"
         :key="track._id"
         class="flex w-full justify-between rounded-sm border border-light p-4">
-        <div class="flex flex-col items-start">
+        <div class="flex flex-col items-start gap-2">
           <div class="flex gap-2">
             <p class="font-bold">{{ track.name }}</p>
             <span
               v-if="track.isPublic"
               title="Track is public">
-              <font-awesome-icon icon="fa-user-group" />
+              <font-awesome-icon icon="fa-user-group" /> |
+            </span>
+            <span
+              v-if="track.mode === 'choir'"
+              title="Track is for choirs">
+              <font-awesome-icon icon="fa-people-group" />
+            </span>
+            <span
+              v-if="track.partialFile"
+              title="Track has partials">
+              <font-awesome-icon icon="fa-music" />
+            </span>
+            <span v-if="track.partialFile">
+              {{ track.waveform }}
+            </span>
+            <span
+              v-if="track.ttsFiles?.length"
+              title="Track has TTS">
+              <font-awesome-icon icon="fa-comments" />
+            </span>
+            <span
+              v-if="track.ttsFiles?.length"
+              title="Track has TTS Rate of">
+              {{ track.ttsRate }}
             </span>
           </div>
           <span>Created by: {{ track.creator.username }}</span>
+          <span v-if="track.notes">{{ track.notes }}</span>
         </div>
         <div class="flex gap-4">
           <button
@@ -104,7 +128,7 @@ onMounted(async () => {
             title="Add track to performance">
             <font-awesome-icon
               icon="fa-plus"
-              size="lg" />
+              size="xl" />
           </button>
           <button
             v-if="track.creator.username === store.userName"
@@ -112,13 +136,16 @@ onMounted(async () => {
             title="Delete track">
             <font-awesome-icon
               icon="fa-trash"
-              class="text-danger" />
+              class="text-danger"
+              size="lg" />
           </button>
           <button
             v-if="track.creator.username === store.userName"
             @click.stop="addTrackModal?.openModal(track)"
             title="Edit track">
-            <font-awesome-icon icon="fa-edit" />
+            <font-awesome-icon
+              icon="fa-edit"
+              size="lg" />
           </button>
         </div>
       </div>

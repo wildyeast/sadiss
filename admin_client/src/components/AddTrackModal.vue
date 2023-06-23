@@ -256,9 +256,11 @@ watch(trackTtsRate, (newValue) => {
         <div class="flex w-3/4 flex-col items-start gap-2">
           <div class="flex gap-4">
             <label for="waveform">Waveform</label>
+            <!-- @click.stop is necessary here, otherwise the modal closes because of closeDialogOnOutsideClick. Not ideal. -->
             <select
               name="waveform"
-              v-model="trackWaveform">
+              v-model="trackWaveform"
+              @click.stop="">
               <option value="sine">Sine</option>
               <option value="square">Square</option>
               <option value="triangle">Triangle</option>
@@ -279,7 +281,7 @@ watch(trackTtsRate, (newValue) => {
       </div>
       <!-- Notes -->
       <div class="flex flex-col">
-        <div>Private notes</div>
+        <div>Notes</div>
         <textarea
           v-model="trackNotes"
           class="w-3/4" />
