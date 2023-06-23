@@ -51,42 +51,58 @@ const handleGenerateQrCodes = async () => {
       @submit.prevent="handleGenerateQrCodes"
       class="flex flex-col gap-4 p-4">
       <h1 class="text-center text-3xl font-bold text-primary">Generate QR Codes</h1>
-      <div class="mt-8 flex flex-row justify-between p-2">
-        <div>Voice count</div>
+      <div class="flex flex-row items-center gap-4">
+        <label for="voiceCount">Voice count</label>
         <input
           v-model="voiceCount"
+          class="w-[60px] rounded-sm border p-1"
           type="number"
-          class="w-3/4" />
+          name="voiceCount" />
       </div>
       <div
         v-for="voice in voiceCount"
-        class="flex flex-row justify-between p-2">
-        <div>Name for voice {{ voice - 1 }}</div>
+        class="flex flex-row items-center gap-2">
+        <label>Name for voice {{ voice - 1 }}</label>
         <input
           v-model="voiceNames[voice - 1]"
-          class="w-3/4" />
+          class="rounded-sm border p-1" />
       </div>
-      <div class="mt-8 flex flex-row justify-between p-2">
-        <div>TTS languages</div>
+
+      <hr />
+
+      <!-- TTS languages -->
+      <div class="flex flex-row items-center gap-4">
+        <label for="ttsLangs">TTS languages</label>
         <input
           v-model="ttsLangs"
           type="text"
-          class="w-3/4" />
+          name="ttsLangs"
+          class="rounded-sm border p-1"
+          placeholder="en-US, de-DE" />
       </div>
-      <div class="mt-8 flex flex-row justify-between p-2">
-        <div>Default lang</div>
+      <div
+        v-if="ttsLangs.length"
+        class="flex flex-row items-center gap-2">
+        <div for="defaultLang">Default lang</div>
         <input
           v-model="defaultLanguage"
           type="text"
-          class="w-3/4" />
+          name="defaultLang"
+          class="rounded-sm border p-1"
+          placeholder="en-US" />
       </div>
+
+      <hr />
+
       <!-- Expert mode checkbox -->
-      <div class="flex flex-col">
-        <div>Expert mode</div>
+      <div class="flex items-center gap-2">
         <input
-          type="checkbox"
           v-model="expertMode"
-          class="w-3/4" />
+          type="checkbox"
+          id="expertMode"
+          name="expertMode"
+          class="h-5 w-5 rounded-sm border border-primary p-2" />
+        <label for="expertMode">Expert mode</label>
       </div>
       <button
         type="submit"
