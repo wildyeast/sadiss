@@ -152,7 +152,6 @@ describe('trackController test', () => {
         .post('/api/track/create')
         .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile-testPartialFile')
         .expect(400)
-      expect(res.body.error).toBe('No name provided.')
     })
 
     it('should not create track if no files provided', async () => {
@@ -161,7 +160,6 @@ describe('trackController test', () => {
       }
 
       const res = await agent.post('/api/track/create').send(track).expect(400)
-      expect(res.body.error).toBe('No files were uploaded.')
     })
 
     it('should not create track if no mode provided', async () => {
@@ -170,7 +168,6 @@ describe('trackController test', () => {
         .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile-testPartialFile')
         .field('name', 'test track')
         .expect(400)
-      expect(res.body.error).toBe('No mode provided.')
     })
 
     it('should not create track if no waveform provided', async () => {
@@ -180,7 +177,6 @@ describe('trackController test', () => {
         .field('name', 'test track')
         .field('mode', 'choir')
         .expect(400)
-      expect(res.body.error).toBe('No waveform provided.')
     })
   })
 

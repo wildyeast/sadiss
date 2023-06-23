@@ -124,22 +124,22 @@ exports.getTrack = async (req: Request, res: Response) => {
 
 exports.uploadTrack = async (req: Request, res: Response) => {
   if (!req.files || !req.files.length) {
-    res.status(400).json({ error: 'No files were uploaded.' })
+    res.status(400).send({ message: 'No files were uploaded.' })
     return
   }
 
   if (!req.body.name) {
-    res.status(400).json({ error: 'No name provided.' })
+    res.status(400).send({ message: 'No name provided.' })
     return
   }
 
   if (!req.body.mode) {
-    res.status(400).json({ error: 'No mode provided.' })
+    res.status(400).send({ message: 'No mode provided.' })
     return
   }
 
   if (!req.body.waveform) {
-    res.status(400).json({ error: 'No waveform provided.' })
+    res.status(400).send({ message: 'No waveform provided.' })
     return
   }
 

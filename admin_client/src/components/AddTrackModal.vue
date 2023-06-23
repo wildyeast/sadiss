@@ -67,6 +67,9 @@ let trackId = ''
 const handleCreateTrack = async () => {
   try {
     const trackData = createTrackData()
+
+    if (!trackData) return
+
     if (isEditingTrack.value) {
       await editTrack(trackId, trackData)
     } else {
