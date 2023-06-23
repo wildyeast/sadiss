@@ -36,11 +36,6 @@ exports.startTrack = async (req: Request, res: Response) => {
           throw new Error('Chunks undefined')
         }
 
-<<<<<<< HEAD
-        const performanceId = req.params.performanceId
-
-=======
->>>>>>> feature/add-auth
         // Check if performance already exists
         let performance = activePerformances.find((p) => p.id === performanceId)
         if (!performance) {
@@ -265,13 +260,8 @@ exports.editTrack = async (req: Request, res: Response) => {
   })
 }
 
-<<<<<<< HEAD
-exports.stop_track = (req: Request, res: Response) => {
-  const performance = activePerformances.find((p) => p.id === req.params.performanceId)
-=======
 exports.stopTrack = (req: Request, res: Response) => {
   const performance = activePerformances.find((p) => p.id === req.body.performanceId)
->>>>>>> feature/add-auth
   if (performance) {
     performance.stopSendingInterval()
     res.send({ message: 'Track stopped.' })
