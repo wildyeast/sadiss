@@ -10,7 +10,7 @@ const mongoHost = process.env.MONGO_HOST
 const mongoUser = process.env.MONGO_USER
 const mongoPW = process.env.MONGO_PW
 const mongoDbName = process.env.MONGO_DB_NAME
-// const mongoURI = `mongodb://${mongoUser}:${mongoPW}@${mongoHost}/${mongoDbName}?directConnection=true&serverSelectionTimeoutMS=2000`
+// let mongoURI = `mongodb://${mongoUser}:${mongoPW}@${mongoHost}/${mongoDbName}?directConnection=true&serverSelectionTimeoutMS=2000`
 let mongoURI = `mongodb+srv://${mongoUser}:${mongoPW}@${mongoHost}/test`
 
 let mongod: MongoMemoryServer

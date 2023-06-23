@@ -62,8 +62,8 @@ onUnmounted(() => {
       v-if="performance"
       class="flex flex-col">
       <FixedViewHeader :title="performance.name">
-        <div class="flex justify-between">
-          <p class="mb-4">Created by: {{ performance.creator.username }}</p>
+        <div class="flex items-center justify-between">
+          <p>Created by: {{ performance.creator.username }}</p>
           <button @click.stop="qrCodesModal?.openModal()">
             <font-awesome-icon
               icon="fa-qrcode"

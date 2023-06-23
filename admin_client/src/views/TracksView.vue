@@ -90,6 +90,7 @@ onMounted(async () => {
         <div class="flex flex-col items-start gap-2">
           <div class="flex gap-2">
             <p class="font-bold">{{ track.name }}</p>
+            |
             <span
               v-if="track.isPublic"
               title="Track is public">
