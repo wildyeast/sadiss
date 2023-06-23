@@ -124,13 +124,6 @@ onMounted(async () => {
         </div>
         <div class="flex gap-4">
           <button
-            @click.stop="addTrackToPerformanceModal?.openModal(track._id)"
-            title="Add track to performance">
-            <font-awesome-icon
-              icon="fa-plus"
-              size="xl" />
-          </button>
-          <button
             v-if="track.creator.username === store.userName"
             @click.stop="handleDeleteTrack(track._id)"
             title="Delete track">
@@ -146,6 +139,13 @@ onMounted(async () => {
             <font-awesome-icon
               icon="fa-edit"
               size="lg" />
+          </button>
+          <button
+            @click.stop="addTrackToPerformanceModal?.openModal(track._id)"
+            title="Add track to performance">
+            <font-awesome-icon
+              icon="fa-plus"
+              size="xl" />
           </button>
         </div>
       </div>
