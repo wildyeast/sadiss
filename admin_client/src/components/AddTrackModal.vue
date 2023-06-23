@@ -37,6 +37,8 @@ const closeModal = () => {
   trackId = ''
   partialFileDownloadInfo.value = undefined
   ttsFileDownloadInfo.value = undefined
+  file.value = undefined
+  ttsFiles.value = {}
   modal.value?.close()
 }
 
@@ -56,7 +58,7 @@ const trackNotes = ref<string>('')
 const trackIsChoir = ref(false)
 const trackWaveform = ref<Waveform>('sine')
 const trackTtsRate = ref<number>(1)
-let file: File | undefined
+const file = ref<File | undefined>()
 const numberOfVoices = ref(2)
 const ttsLanguages = ref('en-US, de-DE')
 const isEditingTrack = ref(false)
@@ -86,13 +88,13 @@ const createTrackData = () => {
   data.append('ttsRate', trackTtsRate.value.toString())
   data.append('isPublic', isPublic.value.toString())
 
-  if (file) {
-    const fileNameWithoutExtension = file.name.slice(0, '.txt'.length * -1)
-    data.append('files', file, `partialfile_${fileNameWithoutExtension}`)
+  if (file.value) {
+    const fileNameWithoutExtension = file.value.name.slice(0, '.txt'.length * -1)
+    data.append('files', file.value, `partialfile_${fileNameWithoutExtension}`)
   }
-  for (const voice in ttsFiles) {
-    for (const lang in ttsFiles[voice]) {
-      const ttsFile = ttsFiles[voice][lang]
+  for (const voice in ttsFiles.value) {
+    for (const lang in ttsFiles.value[voice]) {
+      const ttsFile = ttsFiles.value[voice][lang]
       const fileNameWithoutExtension = ttsFile.name.slice(0, '.txt'.length * -1)
       data.append('files', ttsFile, `ttsfile_${voice}_${lang}_${fileNameWithoutExtension}`)
     }
@@ -100,17 +102,14 @@ const createTrackData = () => {
   return data
 }
 
-const handleFileUpload = async (e: Event) => {
-  // TODO: Refactor this so we don't use non-null assertion
-  file = (<HTMLInputElement>e.target).files![0]
-}
+const handleFileUpload = async (e: Event) => (file.value = (<HTMLInputElement>e.target).files![0])
 
-const ttsFiles: TtsFilesObject = {}
+const ttsFiles = ref<TtsFilesObject>({})
 const handleTtsFileUpload = async (e: Event, voice: number, lang: string) => {
-  if (!ttsFiles[voice]) {
-    ttsFiles[voice] = {}
+  if (!ttsFiles.value[voice]) {
+    ttsFiles.value[voice] = {}
   }
-  ttsFiles[voice][lang] = (<HTMLInputElement>e.target).files![0]
+  ttsFiles.value[voice][lang] = (<HTMLInputElement>e.target).files![0]
 }
 
 const partialFileDownloadInfo = ref()
@@ -164,13 +163,14 @@ watch(trackTtsRate, (newValue) => {
         <span v-else>Edit Track</span>
       </h1>
       <!-- Track name -->
-      <div class="flex flex-col justify-between p-2">
+      <div class="flex items-center gap-4">
         <div>Title</div>
         <input
           v-model="trackName"
-          class="w-3/4" />
+          class="w-full rounded-sm border p-1"
+          placeholder="My new track" />
       </div>
-      <!-- Public or Private -->
+      <!-- Public or Private checkbox -->
       <div class="flex items-center gap-2">
         <input
           v-model="isPublic"
@@ -178,11 +178,25 @@ watch(trackTtsRate, (newValue) => {
           id="isPublic"
           name="isPublic"
           class="h-5 w-5 rounded-sm border border-primary p-2" />
-        <label for="isPublic">Public</label>
+        <label for="isPublic">Publish track to be visible to and usable by anybody</label>
       </div>
+
+      <!-- Choir checkbox -->
+      <div class="flex items-center gap-2">
+        <input
+          v-model="trackIsChoir"
+          type="checkbox"
+          id="trackIsChoir"
+          name="trackIsChoir"
+          class="h-5 w-5 rounded-sm border border-primary p-2" />
+        <label for="trackIsChoir">Track is for choirs</label>
+      </div>
+
+      <hr />
+
       <!-- Partial File Upload -->
       <div class="lg:flex lg:flex-row">
-        <div class="flex flex-col justify-between p-2">
+        <div class="flex justify-between gap-2">
           <div>Partials file</div>
           <input
             type="file"
@@ -201,42 +215,61 @@ watch(trackTtsRate, (newValue) => {
           </a>
         </div>
       </div>
-      <!-- Choir checkbox -->
-      <div class="flex flex-col">
-        <div>Choir</div>
-        <input
-          type="checkbox"
-          v-model="trackIsChoir"
-          class="w-3/4" />
+      <div
+        v-if="file || partialFileDownloadInfo"
+        class="flex items-center gap-4">
+        <label for="waveform">Waveform</label>
+        <!-- @click.stop is necessary here, otherwise the modal closes because of closeDialogOnOutsideClick. Not ideal. -->
+        <select
+          name="waveform"
+          v-model="trackWaveform"
+          @click.stop=""
+          class="rounded-sm px-2 py-1">
+          <option value="sine">Sine</option>
+          <option value="square">Square</option>
+          <option value="triangle">Triangle</option>
+          <option value="sawtooth">Sawtooth</option>
+        </select>
       </div>
+
+      <hr />
 
       <!-- TTS (.srt or .txt) file upload -->
       <div class="lg:flex lg:flex-col">
         <div class="flex flex-col">
           <div>Subtitle files</div>
-          <div class="w-3/4">
-            <div class="mb-2 flex gap-2">
+          <div>
+            <div class="mb-2 flex gap-6">
               <!-- Number of voices -->
-              <input
-                type="number"
-                v-model.number="numberOfVoices"
-                v-show="trackIsChoir" />
+              <div
+                v-show="trackIsChoir"
+                class="flex items-center gap-2">
+                <label for="numberOfVoices">Number of voices</label>
+                <input
+                  v-model.number="numberOfVoices"
+                  name="numberOfVoices"
+                  type="number"
+                  class="w-[80px] rounded-sm border p-1 text-center" />
+              </div>
               <!-- Languages -->
-              <input
-                type="text"
-                placeholder="e.g. en-US, de-DE"
-                v-model="ttsLanguages" />
+              <div class="flex items-center gap-2">
+                <label for="numberOfVoices">Languages</label>
+                <input
+                  v-model="ttsLanguages"
+                  type="text"
+                  placeholder="e.g. en-US, de-DE"
+                  class="rounded-sm border p-1" />
+              </div>
             </div>
 
             <div
               v-for="voiceLang of voiceLangCombinations"
-              class="flex justify-between gap-2">
-              <label class="w-1/4">{{ voiceLang.voice }} {{ voiceLang.lang }}</label>
+              class="mb-1 flex w-full gap-4">
+              <label>Voice {{ voiceLang.voice }}, Lang {{ voiceLang.lang }}:</label>
               <input
                 type="file"
                 @change="handleTtsFileUpload($event, voiceLang.voice, voiceLang.lang)"
-                accept="*.txt"
-                class="w-3/4" />
+                accept="*.txt" />
               <div v-if="voiceLang.file">
                 <span>{{ voiceLang.file.origName }}</span>
                 <a
@@ -250,41 +283,32 @@ watch(trackTtsRate, (newValue) => {
           </div>
         </div>
       </div>
-      <!-- Waveform and TTS rate -->
-      <div class="flex flex-col">
-        <h2>Settings</h2>
-        <div class="flex w-3/4 flex-col items-start gap-2">
-          <div class="flex gap-4">
-            <label for="waveform">Waveform</label>
-            <!-- @click.stop is necessary here, otherwise the modal closes because of closeDialogOnOutsideClick. Not ideal. -->
-            <select
-              name="waveform"
-              v-model="trackWaveform"
-              @click.stop="">
-              <option value="sine">Sine</option>
-              <option value="square">Square</option>
-              <option value="triangle">Triangle</option>
-              <option value="sawtooth">Sawtooth</option>
-            </select>
-          </div>
-          <div class="flex gap-4">
-            <label for="ttsRate">TTS Rate</label>
-            <input
-              name="ttsRate"
-              type="number"
-              step="0.1"
-              min="0.5"
-              max="2"
-              v-model="trackTtsRate" />
-          </div>
+      <!-- TTS rate -->
+      <div
+        v-if="Object.keys(ttsFiles).length || ttsFileDownloadInfo?.length"
+        class="flex w-3/4 flex-col items-start gap-2">
+        <div class="flex items-center gap-4">
+          <label for="ttsRate">TTS Rate</label>
+          <input
+            name="ttsRate"
+            type="number"
+            step="0.1"
+            min="0.5"
+            max="2"
+            v-model="trackTtsRate"
+            class="rounded-sm border p-1" />
         </div>
       </div>
+
+      <hr />
+
       <!-- Notes -->
-      <div class="flex flex-col">
+      <div class="flex items-center gap-4">
         <div>Notes</div>
         <textarea
           v-model="trackNotes"
-          class="w-3/4" />
+          class="w-full rounded-sm border p-2"
+          placeholder="My notes" />
       </div>
       <!-- <div class="flex w-full flex-row justify-center">
               <div v-if="percentCompleted">Uploading... ({{ percentCompleted }}%)</div>
