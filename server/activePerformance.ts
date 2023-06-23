@@ -15,7 +15,8 @@ export class ActivePerformance {
     ttsRate: string,
     startTime: number,
     wss: Server,
-    loopTrack: boolean
+    loopTrack: boolean,
+    trackId: string
   ) => {
     console.log('SSI')
     if (this.sendingIntervalRunning) {
@@ -195,6 +196,11 @@ export class ActivePerformance {
         }
       } else {
         console.log('No clients to distribute to.')
+      }
+
+      const admins = Array.from(wss.clients).filter((client) => client.isAdmin && client.performanceId === this.id)
+      for (const admin of admins) {
+        admin.send(JSON.stringify({ chunkIndex: chunkIndex, totalChunks: track.length, trackId, loop: loopTrack }))
       }
 
       chunkIndex++

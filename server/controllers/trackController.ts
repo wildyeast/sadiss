@@ -1,41 +1,29 @@
 import { Request, Response } from 'express'
+// The following is a hack to get the types to work.
+// See https://github.com/DefinitelyTyped/DefinitelyTyped/issues/47780#issuecomment-790684085
+import { Multer } from 'multer' // Don't remove this line
+type File = Express.Multer.File
 import { chunk } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
-import mongoose from 'mongoose'
+import mongoose, { isValidObjectId } from 'mongoose'
 import { TtsJson } from '../types/types'
-import { Server } from 'ws'
+import { trackSchema } from '../models/track'
 import { ActivePerformance } from '../activePerformance'
+import { TrackPerformance } from '../models'
+
 const fs = require('fs')
 const uuid = require('uuid')
 
-// Define track schema for db
-const trackSchema = new mongoose.Schema({
-  name: String,
-  chunks: String,
-  chunkFileName: String,
-  partialsCount: Number,
-  mode: String,
-  notes: String,
-  ttsInstructions: String,
-  ttsLangs: Array,
-  waveform: String,
-  ttsRate: String,
-  partialFile: Object,
-  ttsFiles: Array
-})
-trackSchema.set('timestamps', true)
 const Track = mongoose.model('Track', trackSchema)
-
-let wss: Server
 
 const activePerformances: ActivePerformance[] = []
 
 // Start track
-exports.start_track = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-  wss = req.wss
+exports.startTrack = async (req: Request, res: Response) => {
+  const { trackId, performanceId, startTime, loop } = req.body
+
   try {
-    const t = await Track.findById(req.params.trackId)
+    const t = await Track.findById(trackId)
     if (t) {
       let chunks
       fs.readFile(`chunks/${t.chunkFileName}`, 'utf8', (err: any, data: string) => {
@@ -44,13 +32,15 @@ exports.start_track = async (req: Request, res: Response) => {
           return
         }
         chunks = JSON.parse(data)
-        const startTime = +req.params.startTime
         if (!chunks) {
           throw new Error('Chunks undefined')
         }
 
+<<<<<<< HEAD
         const performanceId = req.params.performanceId
 
+=======
+>>>>>>> feature/add-auth
         // Check if performance already exists
         let performance = activePerformances.find((p) => p.id === performanceId)
         if (!performance) {
@@ -58,16 +48,15 @@ exports.start_track = async (req: Request, res: Response) => {
           activePerformances.push(performance)
         }
 
-        const loopTrack = req.params.loopTrack === 'true'
         const trackStarted = performance.startSendingInterval(
           chunks,
-          // @ts-ignore TODO
           t.mode,
           t.waveform,
           t.ttsRate,
           startTime,
           req.wss,
-          loopTrack
+          loop,
+          trackId
         )
         if (trackStarted) {
           res.json({ data: 'Track started.' })
@@ -83,36 +72,56 @@ exports.start_track = async (req: Request, res: Response) => {
   }
 }
 
-exports.get_stats = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-  if (!wss) {
-    res.json({ error: 'WSS object undefined.' })
-    return
-  }
-  res.json({ clients: wss.clients.size })
-}
-
-exports.delete_track = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-  await Track.deleteOne({ _id: req.params.id })
-  res.send()
-}
-
-exports.get_tracks = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+exports.deleteTrack = async (req: Request, res: Response) => {
   try {
-    const allTracks = await Track.find({}, '_id name notes mode waveform ttsRate')
+    const track = await Track.findById(req.params.id)
+
+    if (!track) {
+      return res.status(404).json({ error: 'Track not found' })
+    }
+
+    // Check if user owns track
+    if (track.creator.toString() !== req.user!.id.toString()) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    // Delete TrackPerformances, if any
+    const trackPerformances = await TrackPerformance.find({ trackId: track._id })
+    for (const trackPerformance of trackPerformances) {
+      await trackPerformance.remove()
+    }
+
+    // Delete track
+    await track.remove()
+
+    res.status(200).json({ message: 'Track deleted' })
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' })
+  }
+}
+
+exports.getTracks = async (req: Request, res: Response) => {
+  try {
+    const allTracks = await Track.find(
+      { $or: [{ isPublic: true }, { creator: req.user!.id }] },
+      '_id name notes mode waveform ttsRate creator isPublic partialFile ttsFiles'
+    )
+      .populate('creator', 'username') // Populate the 'creator' field with 'username'
+      .lean()
+
     res.json({ tracks: allTracks })
   } catch (err) {
-    console.log('Failed getting tracks with:', err)
     res.status(500).json({ Error: 'Failed fetching tracks.' })
   }
 }
 
-exports.get_track = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+exports.getTrack = async (req: Request, res: Response) => {
   try {
     const track = await Track.find({ _id: req.params.id }, '_id name notes mode waveform ttsRate partialFile ttsFiles')
+    if (!track.length) {
+      res.status(404).json({ error: 'Track not found' })
+      return
+    }
     res.json(track)
   } catch (err) {
     console.log('Failed getting track with:', err)
@@ -120,29 +129,31 @@ exports.get_track = async (req: Request, res: Response) => {
   }
 }
 
-exports.upload_track = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+exports.uploadTrack = async (req: Request, res: Response) => {
+  if (!req.files || !req.files.length) {
+    res.status(400).send({ message: 'No files were uploaded.' })
+    return
+  }
 
-  if (!req.files) return
+  if (!req.body.name) {
+    res.status(400).send({ message: 'No name provided.' })
+    return
+  }
+
+  if (!req.body.mode) {
+    res.status(400).send({ message: 'No mode provided.' })
+    return
+  }
+
+  if (!req.body.waveform) {
+    res.status(400).send({ message: 'No waveform provided.' })
+    return
+  }
 
   try {
-    const partialFile = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname === 'partialfile')[0]
-    let path
-    const partialFileToSave = <{ origName: string; fileName: string }>{}
+    const { path, partialFileToSave } = handleUploadedPartialFile(<File[]>req.files)
 
-    if (partialFile) {
-      path = partialFile.path
-      partialFileToSave.origName = partialFile.originalname
-      partialFileToSave.fileName = partialFile.filename
-    }
-
-    // @ts-ignore
-    const ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes('ttsfile'))
-    let ttsLangs: Set<string> | undefined
-    let ttsJson: TtsJson | undefined
-    if (ttsFiles.length) {
-      ;({ ttsLangs, ttsJson } = convertSrtToJson(ttsFiles))
-    }
+    const { ttsFilesToSave, ttsLangs, ttsJson } = handleUploadedTtsFiles(<File[]>req.files)
 
     const filename = uuid.v4()
     const { partialsCount, chunks } = await chunk(path, ttsJson)
@@ -157,6 +168,7 @@ exports.upload_track = async (req: Request, res: Response) => {
     const mode = req.body.mode
     const waveform = req.body.waveform
     const ttsRate = req.body.ttsRate
+    const isPublic = req.body.isPublic === 'true'
     // Save track to DB
     const t = new Track({
       name,
@@ -166,7 +178,9 @@ exports.upload_track = async (req: Request, res: Response) => {
       waveform,
       ttsRate,
       partialFile: partialFileToSave,
-      ttsFiles: ttsFiles.map((file: Express.Multer.File) => ({ origName: file.originalname, fileName: file.filename }))
+      ttsFiles: ttsFilesToSave,
+      creator: req.user!.id,
+      isPublic
     })
 
     if (mode === 'choir' && partialsCount > 0) {
@@ -177,68 +191,87 @@ exports.upload_track = async (req: Request, res: Response) => {
       t.ttsLangs = Array.from(ttsLangs)
     }
 
-    t.save(function (err) {
+    t.save((err) => {
       if (err) {
-        console.error('Error while uploading track', err)
-        return
+        console.log('Failed uploading track with:', err)
+        res.status(500).send(err)
+      } else {
+        res.status(201).send(t)
       }
     })
-    res.status(200).send(JSON.stringify(t))
-  } catch (e) {
-    console.log('ERR')
-    console.log(e)
-    res.status(500).send()
+  } catch (err) {
+    console.log('Failed uploading track with:', err)
+    res.status(500).send(err)
   }
 }
 
-exports.edit_track = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+exports.editTrack = async (req: Request, res: Response) => {
+  if (!isValidObjectId(req.params.id)) {
+    res.status(400).send({ error: 'Invalid track id.' })
+    return
+  }
+
+  const track = await Track.findById(req.params.id)
+  if (!track) {
+    res.status(404).send({ error: 'Track not found.' })
+    return
+  }
+
+  if (track.creator.toString() !== req.user!.id.toString()) {
+    res.status(403).send({ error: 'Forbidden.' })
+    return
+  }
 
   const patch = req.body
 
-  if (req.files) {
-    const partialFile = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname === 'partialfile')[0]
-    let path
-    if (partialFile) {
-      path = partialFile.path
-      patch.partialFile = {
-        origName: partialFile.originalname,
-        fileName: partialFile.filename
-      }
-    }
-
-    const ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes('ttsfile'))
-    let ttsLangs: Set<string> | undefined
-    let ttsJson: TtsJson | undefined
-    if (ttsFiles.length) {
-      ;({ ttsLangs, ttsJson } = convertSrtToJson(ttsFiles))
-      patch.ttsFiles = Object.values(req.files).map((file: Express.Multer.File) => ({
-        origName: file.originalname,
-        fileName: file.filename
-      }))
-      patch.ttsLangs = Array.from(ttsLangs)
-    }
-
-    const { partialsCount, chunks } = await chunk(path, ttsJson)
-
-    if (partialsCount > 0) {
-      patch.partialsCount = partialsCount
-    }
-
-    patch.chunks = JSON.stringify(chunks)
+  const { path, partialFileToSave } = handleUploadedPartialFile(<File[]>req.files)
+  if (Object.keys(partialFileToSave).length) {
+    patch.partialFile = partialFileToSave
   }
 
-  Track.findByIdAndUpdate(req.params.id, patch, { new: true }, (err, track) => {
+  const { ttsFilesToSave, ttsLangs, ttsJson } = handleUploadedTtsFiles(<File[]>req.files)
+  if (ttsFilesToSave.length && ttsLangs) {
+    patch.ttsFiles = ttsFilesToSave
+    patch.ttsLangs = Array.from(ttsLangs)
+  }
+
+  const { partialsCount, chunks } = await chunk(path, ttsJson)
+
+  if (Object.keys(chunks)) {
+    const filename = uuid.v4()
+    fs.writeFile(`chunks/${filename}`, JSON.stringify(chunks), (err: any) => {
+      if (err) {
+        console.error(err)
+      }
+    })
+  }
+
+  if (partialsCount > 0 && patch.mode === 'choir') {
+    patch.partialsCount = partialsCount
+  } else {
+    patch.partialsCount = undefined
+  }
+
+  patch.chunks = JSON.stringify(chunks)
+
+  track.set(patch)
+
+  track.save((err, updatedTrack) => {
     if (err) {
-      res.status(500).json({ error: err.message })
-    } else {
-      res.json(track)
+      return res.status(500).json({ error: err.message })
     }
+
+    res.json(updatedTrack)
   })
 }
 
+<<<<<<< HEAD
 exports.stop_track = (req: Request, res: Response) => {
   const performance = activePerformances.find((p) => p.id === req.params.performanceId)
+=======
+exports.stopTrack = (req: Request, res: Response) => {
+  const performance = activePerformances.find((p) => p.id === req.body.performanceId)
+>>>>>>> feature/add-auth
   if (performance) {
     performance.stopSendingInterval()
     res.send({ message: 'Track stopped.' })
@@ -273,4 +306,45 @@ exports.get_voices_and_languages = async (req: Request, res: Response) => {
     console.log('Failed getting voices and languages with:', err)
     res.status(500).json({ Error: 'Failed fetching voices and languages.' })
   }
+}
+
+exports.get_own_tracks = (req: Request, res: Response) => {
+  res.json({ message: 'hi', user: req.user })
+}
+
+const handleUploadedPartialFile = (files: File[]) => {
+  const partialFilePrefix = 'partialfile_'
+  const partialFile: File = Object.values(files).filter((file: File) => file.originalname.includes(partialFilePrefix))[0]
+  let path
+  const partialFileToSave = <{ origName: string; fileName: string }>{}
+
+  if (partialFile) {
+    path = partialFile.path
+    const originalFileName = partialFile.originalname.replace(partialFilePrefix, '')
+    partialFileToSave.origName = originalFileName + '.txt'
+    partialFileToSave.fileName = partialFile.filename
+  }
+
+  return { path, partialFileToSave }
+}
+
+const handleUploadedTtsFiles = (files: File[]) => {
+  const ttsFilePrefix = 'ttsfile_'
+  const ttsFiles = Object.values(files).filter((file: File) => file.originalname.includes(ttsFilePrefix))
+  let ttsLangs: Set<string> | undefined
+  let ttsJson: TtsJson | undefined
+  let ttsFilesToSave: { origName: string; fileName: string }[] = []
+  if (ttsFiles.length) {
+    ;({ ttsLangs, ttsJson } = convertSrtToJson(ttsFiles))
+    ttsFilesToSave = ttsFiles.map((file: File) => {
+      const [_, voice, lang, origName] = file.originalname.split('_')
+      return {
+        voice,
+        lang,
+        origName: origName + '.txt', // Add .txt even if original was .srt
+        fileName: file.filename
+      }
+    })
+  }
+  return { ttsFilesToSave, ttsLangs, ttsJson }
 }

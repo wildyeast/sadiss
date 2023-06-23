@@ -6,7 +6,7 @@ const emit = defineEmits(['emitSelection'])
 
 const selectedServer = ref<{ wsUrl: string; httpUrl: string; name: string }[]>([])
 const serverOptions = ref<{ wsUrl: string; httpUrl: string; name: string }[]>([
-  { wsUrl: 'wss://sadiss.net/ws/', httpUrl: process.env.VUE_APP_API_URL, name: 'Sadiss Live' },
+  { wsUrl: 'wss://sadiss.net/ws/', httpUrl: import.meta.env.VITE_APP_API_URL, name: 'Sadiss Live' },
   { wsUrl: 'ws://192.168.0.87:443', httpUrl: 'localhost:3005', name: 'Localhost' }
 ])
 

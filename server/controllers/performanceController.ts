@@ -1,230 +1,175 @@
-import express from 'express'
-import { chunk } from '../tools'
-import { convertSrtToJson } from '../tools/convertSrtToJson'
-import mongoose from 'mongoose'
-import { TtsJson } from '../types/types'
+import { Response, Request } from 'express'
+import { isValidObjectId } from 'mongoose'
+import { SadissPerformance } from '../models/sadissPerformance'
+import { User } from '../models/user'
 
-/*
-// Define track schema for db
-const trackSchema = new mongoose.Schema({
-  name: String,
-  chunks: String,
-  partialsCount: Number,
-  mode: String,
-  notes: String,
-  ttsInstructions: String,
-  ttsLangs: Array,
-  waveform: String,
-  ttsRate: String,
-  partialFile: Object,
-  ttsFiles: Array
-})
-trackSchema.set('timestamps', true)
-const Track = mongoose.model('Track', trackSchema)
-
-// Start track
-exports.start_track = async (req: express.Request, res: express.Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+// Get all performances that are public or owned by the user
+exports.getPerformances = async (req: Request, res: Response) => {
   try {
-    const t = await Track.findById(req.params.id)
-    if (t) {
-      const track = t.chunks ? JSON.parse(t.chunks) : null
-      const startTime = +req.params.startTime
-      // @ts-expect-error TODO
-      const trackStarted = startSendingInterval(track, t.mode, t.waveform, t.ttsRate, startTime, req.wss)
-      if (trackStarted) {
-        res.json({ data: 'Track started.' })
-      } else {
-        res.json({ data: 'Track already running.' })
-      }
-    } else {
-      throw new Error('Track not found.')
-    }
+    // Get all performances that are public or owned by the user
+    const performances = await SadissPerformance.find(
+      { $or: [{ isPublic: true }, { creator: req.user!.id }] },
+      '_id name creator isPublic'
+    ).populate('creator', 'username')
+
+    res.json({ performances })
   } catch (err) {
-    res.status(500).json({ error: err })
+    res.status(500).json({ Error: 'Failed fetching performances.' })
   }
 }
 
-exports.delete_track = async (req: express.Request, res: express.Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-  await Track.deleteOne({ _id: req.params.id })
-  res.send()
-}
-
-exports.get_tracks = async (req: express.Request, res: express.Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+// Get performances owned by requesting user
+exports.getOwnPerformances = async (req: Request, res: Response) => {
   try {
-    const allTracks = await Track.find({}, '_id name notes mode waveform ttsRate')
-    res.json({ tracks: allTracks })
+    const performances = await SadissPerformance.find({ creator: req.user!.id }, '_id name creator isPublic').populate(
+      'creator',
+      'username'
+    )
+
+    res.json({ performances })
   } catch (err) {
-    console.log('Failed getting tracks with:', err)
-    res.status(500).json({ Error: 'Failed fetching tracks.' })
+    res.status(500).json({ Error: 'Failed fetching performances.' })
   }
 }
 
-exports.get_track = async (req: express.Request, res: express.Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+exports.getPerformance = async (req: Request, res: Response) => {
   try {
-    const track = await Track.find({ _id: req.params.id }, '_id name notes mode waveform ttsRate partialFile ttsFiles')
-    res.json(track)
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ error: 'Invalid performance ID' })
+    }
+
+    let performance = await SadissPerformance.findById(req.params.id)
+
+    if (!performance) {
+      return res.status(404).json({ error: 'Performance not found' })
+    }
+
+    let performanceWithUsername
+    const user = await User.findById(performance.creator, 'username').lean()
+    performanceWithUsername = {
+      _id: performance._id,
+      name: performance.name,
+      username: user?.username,
+      isPublic: performance.isPublic
+    }
+
+    res.json({ performance: performanceWithUsername })
   } catch (err) {
-    console.log('Failed getting track with:', err)
-    res.status(500).json({ Error: 'Failed fetching track.' })
+    res.status(500).json({ Error: 'Failed fetching performance.' })
   }
 }
 
-exports.upload_track = async (req: express.Request, res: express.Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-
-  if (!req.files) return
-
+exports.createPerformance = async (req: Request, res: Response) => {
   try {
-    const partialFile = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname === 'partialfile')[0]
-    let path
-    const partialFileToSave = <{ origName: string; fileName: string }>{}
-    if (partialFile) {
-      path = partialFile.path
-      partialFileToSave.origName = partialFile.originalname
-      partialFileToSave.fileName = partialFile.filename
+    const { name, isPublic } = req.body
+
+    if (!name) {
+      return res.status(400).json({ error: 'Invalid performance data' })
     }
 
-    const ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes('ttsfile'))
-    let ttsLangs: Set<string> | undefined
-    let ttsJson: TtsJson | undefined
-    if (ttsFiles.length) {
-      ;({ ttsLangs, ttsJson } = convertSrtToJson(ttsFiles))
-    }
-
-    const { partialsCount, chunks } = await chunk(path, ttsJson)
-
-    const name = req.body.name
-    const notes = req.body.notes
-    const mode = req.body.mode
-    const waveform = req.body.waveform
-    const ttsRate = req.body.ttsRate
-    // Save track to DB
-    const t = new Track({
-      name,
-      chunks: JSON.stringify(chunks),
-      notes,
-      mode,
-      waveform,
-      ttsRate,
-      partialFile: partialFileToSave,
-      ttsFiles: ttsFiles.map((file: Express.Multer.File) => ({ origName: file.originalname, fileName: file.filename }))
-    })
-
-    if (mode === 'choir' && partialsCount > 0) {
-      t.partialsCount = partialsCount
-    }
-
-    if (ttsLangs) {
-      t.ttsLangs = Array.from(ttsLangs)
-    }
-
-    t.save(function (err) {
+    // Save new performance to database
+    const performance = new SadissPerformance({ name, isPublic: !!isPublic, creator: req.user!.id })
+    performance.save((err) => {
       if (err) {
-        console.error('Error while uploading track', err)
-        return
+        res.status(500).send(err)
+      } else {
+        res.status(201).json(performance)
       }
     })
-    res.status(200).send(JSON.stringify(t))
-  } catch (e) {
-    console.log('ERR')
-    console.log(e)
-    res.status(500).send()
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' })
   }
 }
 
-exports.edit_track = async (req: express.Request, res: express.Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-
-  const patch = req.body
-
-  if (req.files) {
-    const partialFile = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname === 'partialfile')[0]
-    let path
-    if (partialFile) {
-      path = partialFile.path
-      patch.partialFile = {
-        origName: partialFile.originalname,
-        fileName: partialFile.filename
-      }
-    }
-
-    const ttsFiles = Object.values(req.files).filter((file: Express.Multer.File) => file.originalname.includes('ttsfile'))
-    let ttsLangs: Set<string> | undefined
-    let ttsJson: TtsJson | undefined
-    if (ttsFiles.length) {
-      ;({ ttsLangs, ttsJson } = convertSrtToJson(ttsFiles))
-      patch.ttsFiles = Object.values(req.files).map((file: Express.Multer.File) => ({
-        origName: file.originalname,
-        fileName: file.filename
-      }))
-      patch.ttsLangs = Array.from(ttsLangs)
-    }
-
-    const { partialsCount, chunks } = await chunk(path, ttsJson)
-
-    if (partialsCount > 0) {
-      patch.partialsCount = partialsCount
-    }
-
-    patch.chunks = JSON.stringify(chunks)
-  }
-
-  Track.findByIdAndUpdate(req.params.id, patch, { new: true }, (err, track) => {
-    if (err) {
-      res.status(500).json({ error: err.message })
-    } else {
-      res.json(track)
-    }
-  })
-}
-
-exports.stop_track = (req: express.Request, res: express.Response) => {
-  stopSendingInterval()
-  res.send({ message: 'Track stopped.' })
-}
-
-exports.get_voices_and_languages = async (req: express.Request, res: express.Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+exports.deletePerformance = async (req: Request, res: Response) => {
   try {
-    let maxPartialsCount = -1
-    let ttsLangs: string[] = []
-
-    const tracks = await Track.find({}, 'partialsCount ttsLangs mode')
-    for (const track of tracks) {
-      if (track.mode === 'choir' && track.partialsCount && track.partialsCount > maxPartialsCount) {
-        maxPartialsCount = track.partialsCount
-      }
-
-      if (track.ttsLangs.length) {
-        for (const lang of track.ttsLangs) {
-          if (!ttsLangs.includes(lang)) {
-            ttsLangs.push(lang)
-          }
-        }
-      }
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ error: 'Invalid performance ID' })
     }
 
-    res.json({ maxPartialsCount, ttsLangs })
-  } catch (err) {
-    console.log('Failed getting voices and languages with:', err)
-    res.status(500).json({ Error: 'Failed fetching voices and languages.' })
+    const performance = await SadissPerformance.findById(req.params.id)
+
+    if (!performance) {
+      return res.status(404).json({ error: 'Performance not found' })
+    }
+
+    // Check if user owns performance
+    if (performance.creator.toString() !== req.user!.id.toString()) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    // Delete performance
+    await performance.remove()
+
+    res.status(200).json({ message: 'Performance deleted' })
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' })
   }
 }
-*/
 
-exports.get_performances = async (req: express.Request, res: express.Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-  res.json([
-    {
-      date: new Date('Sat Apr 15 2023 00:00:00 GMT-0400 (Eastern Daylight Time)'),
-      name: 'Naming Names',
-      description: 'Beta-test for a piece for no audience<br>by Simon Lee, Eve Sussman, Volkmar Klien.',
-      location: 'Crown Heights, Brooklyn.',
-      url: 'https://sadiss.net'
+exports.editPerformance = async (req: Request, res: Response) => {
+  try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ error: 'Invalid performance ID' })
     }
-  ])
+
+    const performance = await SadissPerformance.findById(req.params.id)
+
+    if (!performance) {
+      return res.status(404).json({ error: 'Performance not found' })
+    }
+
+    // Check if user owns performance
+    if (performance.creator.toString() !== req.user!.id.toString()) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    const { name, isPublic } = req.body
+
+    if (name) {
+      performance.name = name
+    }
+
+    if (isPublic !== undefined) {
+      performance.isPublic = isPublic
+    }
+
+    await performance.save()
+
+    res.status(200).json({ message: 'Performance updated' })
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' })
+  }
+}
+
+exports.getClientCountPerChoirId = async (req: Request, res: Response) => {
+  if (!req.wss) {
+    res.json({ error: 'WSS object undefined.' })
+    return
+  }
+
+  const performanceId = req.params.performanceId
+
+  if (!performanceId || !isValidObjectId(performanceId)) {
+    res.status(400).send({ message: 'Invalid performanceId' })
+    return
+  }
+
+  const clientCountPerChoirId: { [key: string]: number } = {}
+
+  for (const client of req.wss.clients) {
+    if (client.performanceId !== performanceId) continue
+
+    if (client.readyState === 1) {
+      const choirId = client.choirId
+      if (choirId !== undefined) {
+        if (!clientCountPerChoirId[choirId]) {
+          clientCountPerChoirId[choirId] = 0
+        }
+        clientCountPerChoirId[choirId] += 1
+      }
+    }
+  }
+
+  res.json({ clientCountPerChoirId })
 }

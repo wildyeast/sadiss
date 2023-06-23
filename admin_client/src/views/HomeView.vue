@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { Axios } from 'axios'
+import type { Axios } from 'axios'
 import { ref, onMounted, inject, computed, watch, nextTick } from 'vue'
 import TrackTile from '@/components/TrackTile.vue'
 import { downloadZip } from 'client-zip'
@@ -473,8 +473,8 @@ onMounted(async () => {
             :href="`https://sadiss.net/f/${partialFileDownloadInfo.fileName}`"
             download="partials.txt"
             class="text-xl"
-            >⤓</a
-          >
+            >⤓
+          </a>
         </div>
       </div>
       <div class="my-8 flex flex-row justify-between p-2">
