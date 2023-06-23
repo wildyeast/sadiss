@@ -4,7 +4,7 @@ const fs = require('fs')
 const readline = require('readline')
 
 /** Takes partial path and returns chunk array */
-export const chunk = async (path: string, ttsInstructions?: TtsJson) => {
+export const chunk = async (path?: string, ttsInstructions?: TtsJson) => {
   const CHUNK_DURATION = 0.999 // float in seconds
 
   // Initialize chunks array and first chunk object
@@ -86,7 +86,6 @@ export const chunk = async (path: string, ttsInstructions?: TtsJson) => {
     chunks.push(chunk)
   }
 
-  
   // Insert TTS data into chunks
   if (ttsInstructions) {
     for (const ttsTime in ttsInstructions) {
@@ -105,7 +104,7 @@ export const chunk = async (path: string, ttsInstructions?: TtsJson) => {
       }
     }
   }
-  
+
   console.log('Created', chunks.length, 'chunks')
 
   return { partialsCount, chunks }
