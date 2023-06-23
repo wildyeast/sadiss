@@ -79,12 +79,12 @@ onMounted(async () => {
         class="flex w-full justify-between rounded-sm border border-light p-4">
         <span class="text-start">
           <span class="flex gap-2">
-            <p class="font-bold">{{ performance.name }}</p>
+            <span class="font-bold">{{ performance.name }}</span>
             <span v-if="performance.isPublic">
               <font-awesome-icon icon="fa-user-group" />
             </span>
           </span>
-          <p>Created by: {{ performance.creator.username }}</p>
+          <span>Created by: {{ performance.creator.username }}</span>
         </span>
         <button
           v-if="performance.creator.username === store.userName"
