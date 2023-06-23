@@ -86,13 +86,24 @@ onMounted(async () => {
           </span>
           <span>Created by: {{ performance.creator.username }}</span>
         </span>
-        <button
-          v-if="performance.creator.username === store.userName"
-          @click.stop="handleDeletePerformance(performance._id)">
-          <font-awesome-icon
-            icon="fa-trash"
-            class="text-danger" />
-        </button>
+        <div class="flex gap-4">
+          <button
+            v-if="performance.creator.username === store.userName"
+            @click.stop="handleDeletePerformance(performance._id)">
+            <font-awesome-icon
+              icon="fa-trash"
+              class="text-danger"
+              size="lg" />
+          </button>
+          <button
+            v-if="performance.creator.username === store.userName"
+            @click.stop="addPerformanceModal?.openModal(performance)"
+            title="Edit performance">
+            <font-awesome-icon
+              icon="fa-edit"
+              size="lg" />
+          </button>
+        </div>
       </button>
     </div>
 

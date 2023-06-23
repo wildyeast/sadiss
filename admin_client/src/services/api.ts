@@ -139,6 +139,22 @@ export async function deletePerformance(id: string) {
   return response.data!.message
 }
 
+export async function editPerformance(id: string, name: string, isPublic: boolean) {
+  const response = await request<{ performance: SadissPerformance }>(`/api/performance/edit/${id}`, {
+    method: 'POST',
+    body: JSON.stringify({
+      name,
+      isPublic
+    })
+  })
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.performance
+}
+
 export async function getClientCountPerChoirId(performanceId: string) {
   const response = await request<{ clientCountPerChoirId: { [key: string]: number } }>(
     `/api/client-count-per-choir-id/${performanceId}`

@@ -148,6 +148,44 @@ describe('performanceController test', () => {
       return mockClientId
     }
   })
+
+  describe('POST /api/performance/edit/:id', () => {
+    it('should return a 400 error if invalid id is provided', async () => {
+      const res = await agent.post('/api/performance/edit/123').send()
+
+      expect(res.status).toBe(400)
+      expect(res.body).toEqual({ error: 'Invalid performance ID' })
+    })
+
+    it('should return a 404 error if performance is not found', async () => {
+      const res = await agent.post('/api/performance/edit/123456789012').send()
+
+      expect(res.status).toBe(404)
+      expect(res.body).toEqual({ error: 'Performance not found' })
+    })
+
+    it('should return a 500 error if there is a server error', async () => {
+      jest.spyOn(SadissPerformance, 'findById').mockImplementationOnce(() => {
+        throw new Error('Server error')
+      })
+
+      const res = await agent.post('/api/performance/edit/123456789012').send()
+
+      expect(res.status).toBe(500)
+    })
+
+    it('should update a performance in the database', async () => {
+      await createTestPerformance()
+
+      const res = await agent.post(`/api/performance/edit/${testPerformanceId}`).send({ name: 'Updated Performance' })
+
+      expect(res.status).toBe(200)
+
+      const updatedPerformance = await SadissPerformance.findById(testPerformanceId)
+      expect(updatedPerformance).toBeDefined()
+      expect(updatedPerformance!.name).toBe('Updated Performance')
+    })
+  })
 })
 
 export {}

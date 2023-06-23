@@ -61,6 +61,9 @@ router.post('/api/performance/create', performance_controller.createPerformance)
 // Delete performance
 router.post('/api/performance/delete/:id', performance_controller.deletePerformance)
 
+// Edit performance
+router.post('/api/performance/edit/:id', performance_controller.editPerformance)
+
 // Get clients per choir id
 router.get('/api/client-count-per-choir-id/:performanceId', performance_controller.getClientCountPerChoirId)
 

@@ -1,10 +1,30 @@
 <script setup lang="ts">
 import BaseModal from './BaseModal.vue'
 import { ref } from 'vue'
-import { createPerformance } from '@/services/api'
+import { createPerformance, editPerformance } from '@/services/api'
 import { useModal } from '@/composables/useModal'
+import type { SadissPerformance } from '@/types/types'
 
-const { modal, openModal, closeModal } = useModal()
+const { modal } = useModal()
+
+const isEditingPerformance = ref(false)
+let performanceId = ''
+const openModal = (performance?: SadissPerformance) => {
+  if (performance?._id) {
+    performanceName.value = performance.name
+    isPublic.value = performance.isPublic
+    performanceId = performance._id
+    isEditingPerformance.value = true
+  }
+  modal.value?.showModal()
+}
+
+const closeModal = () => {
+  performanceName.value = ''
+  isPublic.value = false
+  modal.value?.close()
+}
+
 defineExpose({
   openModal,
   closeModal
@@ -17,7 +37,14 @@ const emit = defineEmits<{
 const performanceName = ref('')
 const isPublic = ref(false)
 const handleCreatePerformance = async () => {
-  await createPerformance(performanceName.value, isPublic.value)
+  if (!performanceName.value) return alert('Please enter a name for the performance')
+
+  if (isEditingPerformance.value) {
+    await editPerformance(performanceId, performanceName.value, isPublic.value)
+    isEditingPerformance.value = false
+  } else {
+    await createPerformance(performanceName.value, isPublic.value)
+  }
   emit('performanceCreated')
 }
 </script>

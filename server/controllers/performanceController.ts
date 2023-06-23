@@ -107,6 +107,41 @@ exports.deletePerformance = async (req: Request, res: Response) => {
   }
 }
 
+exports.editPerformance = async (req: Request, res: Response) => {
+  try {
+    if (!isValidObjectId(req.params.id)) {
+      return res.status(400).json({ error: 'Invalid performance ID' })
+    }
+
+    const performance = await SadissPerformance.findById(req.params.id)
+
+    if (!performance) {
+      return res.status(404).json({ error: 'Performance not found' })
+    }
+
+    // Check if user owns performance
+    if (performance.creator.toString() !== req.user!.id.toString()) {
+      return res.status(401).json({ error: 'Unauthorized' })
+    }
+
+    const { name, isPublic } = req.body
+
+    if (name) {
+      performance.name = name
+    }
+
+    if (isPublic !== undefined) {
+      performance.isPublic = isPublic
+    }
+
+    await performance.save()
+
+    res.status(200).json({ message: 'Performance updated' })
+  } catch (error) {
+    res.status(500).json({ error: 'Server error' })
+  }
+}
+
 exports.getClientCountPerChoirId = async (req: Request, res: Response) => {
   if (!req.wss) {
     res.json({ error: 'WSS object undefined.' })
