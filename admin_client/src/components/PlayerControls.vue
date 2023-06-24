@@ -147,28 +147,32 @@ onUnmounted(() => {
     <div class="flex gap-4">
       <button
         @click="toggleLoop"
-        :class="{ 'text-highlight': shouldLoop }">
+        :class="{ 'text-highlight': shouldLoop }"
+        title="Toggle loop">
         <font-awesome-icon
           icon="fa-repeat"
           size="lg" />
       </button>
       <button
         v-if="!playingTrackId"
-        @click="handleStartTrack(selectedTrack._id)">
+        @click="handleStartTrack(selectedTrack._id)"
+        title="Start track">
         <font-awesome-icon
           icon="fa-play-circle"
           size="2x" />
       </button>
       <button
         v-else
-        @click="handleStopTrack">
+        @click="handleStopTrack"
+        title="Stop track">
         <font-awesome-icon
           icon="fa-stop-circle"
           size="2x" />
       </button>
       <button
         @click="toggleShouldGoToNextTrack"
-        :class="{ 'text-highlight': shouldGoToNextTrack }">
+        :class="{ 'text-highlight': shouldGoToNextTrack }"
+        title="Start next track when current track ends">
         <font-awesome-icon
           icon="fa-forward-fast"
           size="lg" />
