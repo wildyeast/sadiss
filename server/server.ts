@@ -20,10 +20,7 @@ if (process.env.NODE_ENV !== 'test') {
   connectDB()
 }
 
-const BASE_URL = '127.0.0.1'
-const BASE_PORT = 3005
-
-let whitelist = [`http://${BASE_URL}:${BASE_PORT}`, `https://${BASE_URL}:${BASE_PORT}`, 'https://sadiss.net']
+let whitelist = ['https://sadiss.net']
 
 if (process.env.NODE_ENV === 'development') {
   whitelist = whitelist.concat([
@@ -36,7 +33,7 @@ if (process.env.NODE_ENV === 'development') {
 
 const corsOptions = {
   origin: (origin: string, callback: Function) => {
-  if (whitelist.indexOf(origin) !== -1 || !origin) {
+    if (whitelist.indexOf(origin) !== -1 || !origin) {
       callback(null, true)
     } else {
       callback(new Error('Not allowed by CORS.'))
@@ -71,7 +68,8 @@ if (process.env.NODE_ENV === 'test') {
 } else {
   wss = new Server({ port: +process.env.WS_SERVER_PORT! })
   console.log(`Websocket server listening on port ${process.env.WS_SERVER_PORT}.`)
-  server = app.listen(BASE_PORT, () => console.log(`Http server listening on port ${BASE_PORT}.`))
+
+  server = app.listen(process.env.BASE_PORT, () => console.log(`Http server listening on port ${process.env.BASE_PORT}.`))
 }
 
 startKeepAliveInterval(wss)
