@@ -172,7 +172,7 @@ onUnmounted(() => {
       <button
         @click="toggleShouldGoToNextTrack"
         :class="{ 'text-highlight': shouldGoToNextTrack }"
-        title="Start next track when current track ends">
+        title="Toogle auto-play">
         <font-awesome-icon
           icon="fa-forward-fast"
           size="lg" />
