@@ -5,13 +5,19 @@ import { MongoMemoryServer } from 'mongodb-memory-server'
 // Load .env
 dotenv.config()
 
-// Connect to database
-const mongoHost = process.env.MONGO_HOST
+let mongoURI: string
 const mongoUser = process.env.MONGO_USER
-const mongoPW = process.env.MONGO_PW
-const mongoDbName = process.env.MONGO_DB_NAME
-let mongoURI = `mongodb://${mongoUser}:${mongoPW}@${mongoHost}/${mongoDbName}?directConnection=true&serverSelectionTimeoutMS=2000`
-// let mongoURI = `mongodb+srv://${mongoUser}:${mongoPW}@${mongoHost}/test`
+if (process.env.NODE_ENV === 'production') {
+  // Connect to database
+  const mongoHost = process.env.MONGO_HOST
+  const mongoPW = process.env.MONGO_PW
+  const mongoDbName = process.env.MONGO_DB_NAME
+  mongoURI = `mongodb://${mongoUser}:${mongoPW}@${mongoHost}/${mongoDbName}?directConnection=true&serverSelectionTimeoutMS=2000`
+} else if (process.env.NODE_ENV === 'development' || process.env.NODE_ENV === 'test') {
+  const devMongoHost = process.env.DEV_MONGO_HOST
+  const devMongoPW = process.env.DEV_MONGO_PW
+  mongoURI = `mongodb+srv://${mongoUser}:${devMongoPW}@${devMongoHost}/test`
+}
 
 let mongod: MongoMemoryServer
 
