@@ -1,7 +1,5 @@
 import type { SadissPerformance, Track } from '@/types/types'
 
-const BASE_URL = import.meta.env.VITE_APP_API_URL
-
 interface RequestOptions {
   method: string
   body?: BodyInit
@@ -24,7 +22,7 @@ async function request<T>(path: string, options?: RequestOptions): Promise<ApiRe
     headers['Content-Type'] = 'application/json'
   }
 
-  const response = await fetch(`${BASE_URL}${path}`, {
+  const response = await fetch(`${import.meta.env.VITE_APP_API_URL}${path}`, {
     ...options,
     headers,
     credentials: 'include'
