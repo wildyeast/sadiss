@@ -42,11 +42,11 @@ const qrCodesModal = ref<typeof QrCodesModal | null>()
 
 const connectedClients = ref<{ [choirId: string]: number }>({})
 
-let getClientsInterval: number
+let getClientsInterval: any // any because of curently unresolved type-checking error during build step
 onMounted(async () => {
   performance.value = await getPerformanceWithTracks(performanceId as string)
 
-  // // Periodically update connected clients
+  // Periodically update connected clients
   getClientsInterval = setInterval(async () => {
     connectedClients.value = await getClientCountPerChoirId(performanceId as string)
   }, 1000)
