@@ -1,6 +1,6 @@
 import type { SadissPerformance, Track } from '@/types/types'
 
-const BASE_URL = 'http://localhost:3005'
+const BASE_URL = import.meta.env.VITE_APP_API_URL
 
 interface RequestOptions {
   method: string
