@@ -5,7 +5,7 @@ import { ref } from 'vue'
 export function useQrCodeGenerator() {
   const qrCodeData = ref<QrCodeData[]>([])
 
-  const wsServerUrl = import.meta.env.Vite_WS_SERVER_URL
+  const wsServerUrl = import.meta.env.VITE_APP_WS_URL
 
   const generateQrCodes = async (
     voiceCount: number,
