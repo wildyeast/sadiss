@@ -141,7 +141,10 @@ exports.editPerformance = async (req: Request, res: Response) => {
     res.status(500).json({ error: 'Server error' })
   }
 }
-
+/**
+ * Returns an object with the number of clients connected to the websocket per choirId.
+ * e.g. { "choirId1": 2, "choirId2": 1 }
+ */
 exports.getClientCountPerChoirId = async (req: Request, res: Response) => {
   if (!req.wss) {
     res.json({ error: 'WSS object undefined.' })
