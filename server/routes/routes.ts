@@ -14,14 +14,8 @@ const auth_controller = require('../controllers/authController')
 const router = express.Router()
 
 import multer from 'multer'
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    const destinationDir = 'uploads/';
-    cb(null, destinationDir);
-  },
-});
 
-const upload = multer({ storage });
+const upload = multer({ dest: 'upload/' });
 
 router.use('/api', authenticateToken)
 
