@@ -1,7 +1,7 @@
 import { PartialChunk, TtsJson } from '../types/types'
+import readline from 'readline'
 
 const fs = require('fs')
-const readline = require('readline')
 
 /** Takes partial path and returns chunk array */
 export const chunk = async (path?: string, ttsInstructions?: TtsJson) => {
@@ -39,7 +39,7 @@ export const chunk = async (path?: string, ttsInstructions?: TtsJson) => {
       if (partialsCount < 0 && f[0] === 'partials-count') {
         partialsCount = +f[1]
       } else if (!frameCount && f[0] === 'frame-count') {
-        frameCount = f[1]
+        frameCount = +f[1]
         continue
       } else if (!frameCount || f[0] === 'frame-data') {
         continue
@@ -78,8 +78,8 @@ export const chunk = async (path?: string, ttsInstructions?: TtsJson) => {
 
         partial.breakpoints.push({
           time,
-          freq,
-          amp
+          freq: +freq,
+          amp: +amp
         })
       }
     }

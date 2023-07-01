@@ -1,23 +1,23 @@
 import { Mode } from 'fs'
 import { Server } from 'ws'
-import { PartialChunk } from './types/types'
+import { PartialChunk, TrackMode } from './types/types'
+
+interface Frame {
+  partials: PartialChunk[]
+  ttsInstructions: { [voice: string]: { [lang: string]: string } }
+}
 
 export class ActivePerformance {
+  public loadedTrack: Frame[] = []
+  public trackMode: TrackMode = 'choir'
+  public trackWaveform: OscillatorType = 'sine'
+  public trackTtsRate: string = '1'
   private sendingIntervalRunning = false
 
   constructor(readonly id: string) {}
 
   // More or less accurate timer taken from https://stackoverflow.com/a/29972322/16725862
-  startSendingInterval = (
-    track: { partials: PartialChunk[]; ttsInstructions: { [voice: string]: { [lang: string]: string } } }[],
-    mode: Mode,
-    waveform: string,
-    ttsRate: string,
-    startTime: number,
-    wss: Server,
-    loopTrack: boolean,
-    trackId: string
-  ) => {
+  startSendingInterval = (startTime: number, wss: Server, loopTrack: boolean, trackId: string) => {
     console.log('SSI')
     if (this.sendingIntervalRunning) {
       return false
@@ -46,10 +46,10 @@ export class ActivePerformance {
         return
       }
 
-      if (chunkIndex >= track.length) {
+      if (chunkIndex >= this.loadedTrack.length) {
         if (loopTrack) {
           console.log('No more chunks. Looping.')
-          startTime += track.length
+          startTime += this.loadedTrack.length
           chunkIndex = 0
         } else {
           console.log('No more chunks. Stopping.')
@@ -69,7 +69,7 @@ export class ActivePerformance {
 
       if (wss.clients.size) {
         // Distribute partials among clients and send them to clients
-        if (mode === 'choir') {
+        if (this.trackMode === 'choir') {
           // Choir mode
           for (const client of wss.clients) {
             if (client.isAdmin || client.performanceId !== this.id) continue
@@ -81,18 +81,20 @@ export class ActivePerformance {
               chunk: { partials?: PartialChunk[]; ttsInstructions?: string }
             } = {
               startTime: startTime + 2,
-              waveform,
-              ttsRate,
+              waveform: this.trackWaveform,
+              ttsRate: this.trackTtsRate,
               chunk: {}
             }
 
-            const partialById = track[chunkIndex]?.partials.find((chunk: PartialChunk) => chunk.index === client.choirId)
+            const partialById = this.loadedTrack[chunkIndex]?.partials.find(
+              (chunk: PartialChunk) => chunk.index === client.choirId
+            )
             if (partialById) {
               dataToSend.chunk.partials = [partialById]
             }
 
-            if (track[chunkIndex]?.ttsInstructions) {
-              const ttsInstructionForClientId = track[chunkIndex]?.ttsInstructions[client.choirId]
+            if (this.loadedTrack[chunkIndex]?.ttsInstructions) {
+              const ttsInstructionForClientId = this.loadedTrack[chunkIndex]?.ttsInstructions[client.choirId]
               if (ttsInstructionForClientId) {
                 dataToSend.chunk.ttsInstructions = ttsInstructionForClientId[client.ttsLang.iso]
               }
@@ -107,7 +109,7 @@ export class ActivePerformance {
 
           const clientArr = Array.from(wss.clients)
           const clients = clientArr.filter((client) => !client.isAdmin || client.performanceId === this.id)
-          const partials = track[chunkIndex]?.partials
+          const partials = this.loadedTrack[chunkIndex]?.partials
 
           const newPartialMap: { [partialIndex: string]: string[] } = {}
 
@@ -178,15 +180,22 @@ export class ActivePerformance {
             const dataToSend: { partials: PartialChunk[]; ttsInstructions?: string } = {
               partials: allocatedPartials[client.id]
             }
-            if (track[chunkIndex] && track[chunkIndex].ttsInstructions) {
-              const ttsInstructions = Object.values(track[chunkIndex].ttsInstructions)[0]
+            if (this.loadedTrack[chunkIndex] && this.loadedTrack[chunkIndex].ttsInstructions) {
+              const ttsInstructions = Object.values(this.loadedTrack[chunkIndex].ttsInstructions)[0]
               if (ttsInstructions) {
                 dataToSend.ttsInstructions = ttsInstructions[client.ttsLang.iso]
               }
             }
 
             if (dataToSend.partials?.length || dataToSend.ttsInstructions) {
-              client.send(JSON.stringify({ startTime: startTime + 2, waveform, ttsRate, chunk: dataToSend }))
+              const json = JSON.stringify({
+                startTime: startTime + 2,
+                waveform: this.trackWaveform,
+                ttsRate: this.trackTtsRate,
+                chunk: dataToSend
+              })
+              console.log('Data length to send: ', json.length)
+              client.send(json)
               client.lastSentTime = Date.now()
             }
           }
@@ -199,7 +208,7 @@ export class ActivePerformance {
 
       const admins = Array.from(wss.clients).filter((client) => client.isAdmin && client.performanceId === this.id)
       for (const admin of admins) {
-        admin.send(JSON.stringify({ chunkIndex: chunkIndex, totalChunks: track.length, trackId, loop: loopTrack }))
+        admin.send(JSON.stringify({ chunkIndex: chunkIndex, totalChunks: this.loadedTrack.length, trackId, loop: loopTrack }))
       }
 
       chunkIndex++

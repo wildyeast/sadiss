@@ -23,7 +23,7 @@ export interface TtsJson {
   }
 }
 
-export type Mode = 'choir' | 'nonChoir'
+export type TrackMode = 'choir' | 'nonChoir'
 
 export interface UserDocument extends Document {
   username: string

@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import type { Track } from '@/types/types'
-import { startTrack, stopTrack } from '@/services/api'
+import { loadTrackForPlayback, startTrack, stopTrack } from '@/services/api'
 
 const props = defineProps<{
   performanceId: string
   selectedTrack: Track
   nextTrack?: Track
+  trackLoaded: boolean
 }>()
 
 const emit = defineEmits<{
@@ -40,7 +41,11 @@ const handleStartTrack = async (trackId: string) => {
 }
 
 const handleStopTrack = async () => {
-  await stopTrack(props.performanceId)
+  const res = await stopTrack(props.performanceId)
+  if (res) {
+    shouldGoToNextTrack.value = false
+    playingTrackId.value = ''
+  }
 }
 
 const shouldLoop = ref(false)
@@ -90,7 +95,7 @@ const establishWebsocketConnection = async () => {
     // TODO: Handle error
   }
 
-  ws.value.onmessage = (event) => {
+  ws.value.onmessage = async (event) => {
     if (!event.data) {
       return
     }
@@ -104,6 +109,12 @@ const establishWebsocketConnection = async () => {
     if (data.stop) {
       // TODO: Handle stop
       if (shouldGoToNextTrack.value && props.nextTrack) {
+        const trackLoadedSuccessfully = await loadTrackForPlayback(props.nextTrack._id, props.performanceId)
+        if (!trackLoadedSuccessfully) {
+          alert('Failed to load next track. Stopping.')
+          playingTrackId.value = ''
+          return
+        }
         handleStartTrack(props.nextTrack._id)
         emit('nextTrackStarted')
       } else {
@@ -153,8 +164,15 @@ onUnmounted(() => {
           icon="fa-repeat"
           size="lg" />
       </button>
+      <div
+        v-if="!trackLoaded"
+        title="Wait for track load">
+        <font-awesome-icon
+          icon="fa-clock"
+          size="2x" />
+      </div>
       <button
-        v-if="!playingTrackId"
+        v-else-if="!playingTrackId"
         @click="handleStartTrack(selectedTrack._id)"
         title="Start track">
         <font-awesome-icon
