@@ -3,5 +3,7 @@ node_modules
 dist
 uploads
 chunks
+chunks_bkp
+uploads_bkp
 
 coverage
