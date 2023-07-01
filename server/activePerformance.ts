@@ -1,4 +1,3 @@
-import { Mode } from 'fs'
 import { Server } from 'ws'
 import { PartialChunk, TrackMode } from './types/types'
 
