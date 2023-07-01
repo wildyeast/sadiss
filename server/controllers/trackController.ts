@@ -6,7 +6,7 @@ type File = Express.Multer.File
 import { chunk } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose, { isValidObjectId } from 'mongoose'
-import { TtsJson } from '../types/types'
+import { TrackMode, TtsJson } from '../types/types'
 import { trackSchema } from '../models/track'
 import { ActivePerformance } from '../activePerformance'
 import { TrackPerformance } from '../models'
@@ -46,6 +46,9 @@ exports.loadTrackForPlayback = async (req: Request, res: Response) => {
 
       const activePerformance = initializeActivePerformances(performanceId)
       activePerformance.loadedTrack = chunks
+      activePerformance.trackMode = t.mode as TrackMode
+      activePerformance.trackWaveform = t.waveform as OscillatorType
+      activePerformance.trackTtsRate = t.ttsRate
 
       return res.status(200).json({ message: 'Track loaded successfully.' })
     })
