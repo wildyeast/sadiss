@@ -107,7 +107,7 @@ export class ActivePerformance {
           // nonChoir mode
 
           const clientArr = Array.from(wss.clients)
-          const clients = clientArr.filter((client) => !client.isAdmin || client.performanceId === this.id)
+          const clients = clientArr.filter((client) => !client.isAdmin || client.performanceId !== this.id)
           const partials = this.loadedTrack[chunkIndex]?.partials
 
           const newPartialMap: { [partialIndex: string]: string[] } = {}
