@@ -40,6 +40,9 @@ router.post('/api/track/start', track_controller.startTrack)
 // Stop track
 router.post('/api/track/stop', track_controller.stopTrack)
 
+// Load track for playback
+router.post('/api/track/load', track_controller.loadTrackForPlayback)
+
 // Get voices and languages
 router.get('/api/get-voices-and-languages', track_controller.get_voices_and_languages)
 

@@ -18,49 +18,55 @@ const Track = mongoose.model('Track', trackSchema)
 
 const activePerformances: ActivePerformance[] = []
 
+exports.loadTrackForPlayback = async (req: Request, res: Response) => {
+  const { trackId, performanceId } = req.body
+
+  try {
+    const t = await Track.findById(trackId)
+    if (!t) {
+      return res.status(404).json({ message: 'Track not found.' })
+    }
+
+    fs.readFile(`chunks/${t.chunkFileName}`, 'utf8', (err: any, data: string) => {
+      if (err) {
+        console.error(err)
+        return res.status(500).json({ message: 'Error reading track file.' })
+      }
+
+      let chunks
+      try {
+        chunks = JSON.parse(data)
+        if (!chunks) {
+          return res.status(500).json({ message: 'Failed to parse track chunks.' })
+        }
+      } catch (parseError) {
+        console.error(parseError)
+        return res.status(500).json({ message: 'Error parsing track chunks.' })
+      }
+
+      const activePerformance = initializeActivePerformances(performanceId)
+      activePerformance.loadedTrack = chunks
+
+      return res.status(200).json({ message: 'Track loaded successfully.' })
+    })
+  } catch (error) {
+    console.error(error)
+    return res.status(500).json({ message: 'Error loading track.' })
+  }
+}
+
 // Start track
 exports.startTrack = async (req: Request, res: Response) => {
   const { trackId, performanceId, startTime, loop } = req.body
 
   try {
-    const t = await Track.findById(trackId)
-    if (t) {
-      let chunks
-      fs.readFile(`chunks/${t.chunkFileName}`, 'utf8', (err: any, data: string) => {
-        if (err) {
-          console.error(err)
-          return
-        }
-        chunks = JSON.parse(data)
-        if (!chunks) {
-          throw new Error('Chunks undefined')
-        }
+    const activePerformance = initializeActivePerformances(performanceId)
 
-        // Check if performance already exists
-        let performance = activePerformances.find((p) => p.id === performanceId)
-        if (!performance) {
-          performance = new ActivePerformance(performanceId)
-          activePerformances.push(performance)
-        }
-
-        const trackStarted = performance.startSendingInterval(
-          chunks,
-          t.mode,
-          t.waveform,
-          t.ttsRate,
-          startTime,
-          req.wss,
-          loop,
-          trackId
-        )
-        if (trackStarted) {
-          res.json({ data: 'Track started.' })
-        } else {
-          res.json({ data: 'Track already running.' })
-        }
-      })
+    const trackStarted = activePerformance.startSendingInterval(startTime, req.wss, loop, trackId)
+    if (trackStarted) {
+      res.json({ data: 'Track started.' })
     } else {
-      throw new Error('Track not found.')
+      res.json({ data: 'Track already running.' })
     }
   } catch (err) {
     res.status(500).json({ error: err })
@@ -337,4 +343,19 @@ const handleUploadedTtsFiles = (files: File[]) => {
     })
   }
   return { ttsFilesToSave, ttsLangs, ttsJson }
+}
+/**
+ * Initializes an active performance if it doesn't already exist.
+ * @param {string} performanceId - ID of the performance.
+ * @return {ActivePerformance} The active performance.
+ */
+
+const initializeActivePerformances = (performanceId: string) => {
+  // Check if performance already exists
+  let activePerformance = activePerformances.find((p) => p.id === performanceId)
+  if (!activePerformance) {
+    activePerformance = new ActivePerformance(performanceId)
+    activePerformances.push(activePerformance)
+  }
+  return activePerformance
 }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getPerformanceWithTracks, getClientCountPerChoirId } from '@/services/api'
+import { getPerformanceWithTracks, getClientCountPerChoirId, loadTrackForPlayback } from '@/services/api'
 import type { SadissPerformance } from '@/types/types'
 import { onMounted, ref, computed, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
@@ -27,7 +27,15 @@ const nextTrack = computed(() => {
   return performance.value?.tracks[selectedTrackIndex.value + 1]
 })
 
-const selectTrack = (trackIndex: number) => (selectedTrackIndex.value = trackIndex)
+const trackLoaded = ref<boolean>(false)
+const selectTrack = async (trackIndex: number) => {
+  trackLoaded.value = false
+  selectedTrackIndex.value = trackIndex
+  const res = await loadTrackForPlayback(selectedTrack.value?._id as string, performanceId as string)
+  if (res) {
+    trackLoaded.value = true
+  }
+}
 
 const nextTrackStarted = () => selectedTrackIndex.value++
 
@@ -122,6 +130,7 @@ onUnmounted(() => {
       :performance-id="(performanceId as string)"
       :selectedTrack="selectedTrack"
       :next-track="nextTrack"
+      :track-loaded="trackLoaded"
       @nextTrackStarted="nextTrackStarted"
       @set-current-track="setCurrentTrack" />
 

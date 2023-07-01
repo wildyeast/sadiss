@@ -165,6 +165,19 @@ export async function getClientCountPerChoirId(performanceId: string) {
   return response.data!.clientCountPerChoirId
 }
 
+export async function loadTrackForPlayback(trackId: string, performanceId: string) {
+  const response = await request<{ message: string }>(`/api/track/load`, {
+    method: 'POST',
+    body: JSON.stringify({ trackId, performanceId })
+  })
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.message
+}
+
 /* TRACKS */
 export async function getTracks() {
   const response = await request<{ tracks: Track[] }>('/api/tracks')
