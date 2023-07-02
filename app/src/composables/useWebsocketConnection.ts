@@ -52,7 +52,7 @@ export function useWebsocketConnection() {
       }
 
       const data = JSON.parse(event.data)
-      console.log('\nReceived message: ', Object.keys(data))
+      // console.log('\nReceived message: ', Object.keys(data))
 
       if (data.start) {
         setOffset()

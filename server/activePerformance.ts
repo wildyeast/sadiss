@@ -1,5 +1,6 @@
 import { Server } from 'ws'
 import { PartialChunk, TrackMode } from './types/types'
+import WebSocket from 'ws'
 
 interface Frame {
   partials: PartialChunk[]
@@ -128,7 +129,7 @@ export class ActivePerformance {
 
     const handleNonChoirDistribution = () => {
       const clientArr = Array.from(wss.clients)
-      const clients = clientArr.filter((client) => !client.isAdmin || client.performanceId === this.id)
+      const clients = clientArr.filter((client) => !client.isAdmin && client.performanceId === this.id)
       const partials = this.loadedTrack[chunkIndex]?.partials
 
       const newPartialMap: { [partialIndex: string]: string[] } = {}
@@ -139,7 +140,7 @@ export class ActivePerformance {
         allocatedPartials[clients[i].id] = []
       }
 
-      if (partials) {
+      if (clients.length && partials) {
         for (const partial of partials) {
           newPartialMap[partial.index] = []
 
@@ -155,7 +156,7 @@ export class ActivePerformance {
 
                 // If all clients disconnected, give to client with least partials
                 if (!clientIdsLastIteration.length) {
-                  const clientIdWithMinPartials = getClientIdWithMinPartials(allocatedPartials)
+                  const clientIdWithMinPartials = getClientIdWithMinPartials(allocatedPartials, clients)
                   if (clientIdWithMinPartials) {
                     newPartialMap[partial.index].push(clientIdWithMinPartials)
                     allocatedPartials[clientIdWithMinPartials].push(partial)
@@ -169,7 +170,7 @@ export class ActivePerformance {
             }
           } else {
             // Partial was not distributed last iteration
-            const clientIdWithMinPartials = getClientIdWithMinPartials(allocatedPartials)
+            const clientIdWithMinPartials = getClientIdWithMinPartials(allocatedPartials, clients)
             if (clientIdWithMinPartials) {
               newPartialMap[partial.index].push(clientIdWithMinPartials)
               allocatedPartials[clientIdWithMinPartials].push(partial)
@@ -192,7 +193,8 @@ export class ActivePerformance {
           }
         }
 
-        console.log('Allocation finished. Clients to distribute to: ', Object.keys(allocatedPartials))
+        // console.log('Allocation finished. Clients to distribute to: ', Object.keys(allocatedPartials))
+        console.log('Allocation finished. Clients to distribute to: ', allocatedPartials)
       }
 
       for (const client of clients) {
@@ -213,7 +215,6 @@ export class ActivePerformance {
             ttsRate: this.trackTtsRate,
             chunk: dataToSend
           })
-          console.log('Data length to send: ', json.length)
           client.send(json)
           client.lastSentTime = Date.now()
         }
@@ -222,7 +223,18 @@ export class ActivePerformance {
       partialMap = newPartialMap
     }
 
-    const getClientIdWithMinPartials = (allocatedPartials: { [clientId: string]: PartialChunk[] }) => {
+    // WebSocket.Websocket: see https://github.com/websockets/ws/issues/1517#issuecomment-623148704
+    const getClientIdWithMinPartials = (
+      allocatedPartials: { [clientId: string]: PartialChunk[] },
+      clients: WebSocket.WebSocket[]
+    ) => {
+      // If there is a client that is not allocated any partials, give it to them
+      for (const client of clients) {
+        if (!allocatedPartials[client.id].length) {
+          return client.id
+        }
+      }
+
       const p = Object.keys(allocatedPartials)
         .map((k) => ({ clientId: k, partials: allocatedPartials[k] }))
         .sort((a, b) => a.partials.length - b.partials.length)

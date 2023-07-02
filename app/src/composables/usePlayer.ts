@@ -45,21 +45,21 @@ export function usePlayer() {
     // Set offset again to allow for ctx time drift
     setOffset()
 
-    // console.log('\nHandling following chunk data: ', trackData)
+    console.log('\nHandling following chunk data: ', trackData)
 
     // TODO: Refactor this
     currentChunkStartTimeInCtxTime.value = startTimeInCtxTime
-    console.log('currentChunkStartTimeInCtxTime: ', currentChunkStartTimeInCtxTime.value)
+    // console.log('currentChunkStartTimeInCtxTime: ', currentChunkStartTimeInCtxTime.value)
 
     if (trackData.partials) {
       for (const partialChunk of trackData.partials) {
         const oscObj = oscillators.find((el) => el.index === partialChunk.index)
         if (oscObj) {
-          console.log('Found osc.')
+          // console.log('Found osc.')
           setBreakpoints(oscObj.oscillator, oscObj.gain, partialChunk.breakpoints, startTimeInCtxTime + partialChunk.endTime)
         } else {
           if (!ctx) return
-          console.log('Creating osc.')
+          // console.log('Creating osc.')
           const oscNode = ctx.createOscillator()
           const gainNode = ctx.createGain()
           oscNode.connect(gainNode)
@@ -67,10 +67,11 @@ export function usePlayer() {
 
           oscNode.type = waveform
 
-          oscNode.start(startTimeInCtxTime + partialChunk.startTime)
-          setBreakpoints(oscNode, gainNode, partialChunk.breakpoints, startTimeInCtxTime + partialChunk.endTime)
+          // Set initial gain to 0 and start osc immediately
+          gainNode.gain.setValueAtTime(0, ctx.currentTime)
+          oscNode.start()
 
-          oscNode.stop(startTimeInCtxTime + partialChunk.endTime)
+          setBreakpoints(oscNode, gainNode, partialChunk.breakpoints, startTimeInCtxTime + partialChunk.endTime)
 
           oscNode.onended = (event) => {
             const oscObj = oscillators.find((oscObj) => oscObj.oscillator === event.target)
