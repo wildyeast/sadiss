@@ -1,6 +1,6 @@
 import { Types } from 'mongoose'
 import { SadissPerformance } from '../models/sadissPerformance'
-import { createTestPerformance, generateMockId, testPerformanceId } from './testUtils'
+import { createMockWsClient, createTestPerformance, generateMockId, testPerformanceId } from './testUtils'
 
 describe('performanceController test', () => {
   describe('POST /api/performances', () => {
@@ -135,18 +135,6 @@ describe('performanceController test', () => {
     it('should return 400 if performanceId is not a valid ObjectId', async () => {
       await agent.get('/api/client-count-per-choir-id/invalidId').expect(400)
     })
-
-    // Helper
-    const createMockWsClient = (performanceId: Types.ObjectId, choirId: number) => {
-      const mockClientId = generateMockId()
-      testWss.clients.add({
-        id: mockClientId,
-        readyState: 1,
-        performanceId,
-        choirId
-      } as any)
-      return mockClientId
-    }
   })
 
   describe('POST /api/performance/edit/:id', () => {

@@ -1,11 +1,7 @@
 import { Server } from 'ws'
-import { PartialChunk, TrackMode } from './types/types'
+import { PartialChunk, TrackMode, Frame } from './types/types'
 import WebSocket from 'ws'
-
-interface Frame {
-  partials: PartialChunk[]
-  ttsInstructions: { [voice: string]: { [lang: string]: string } }
-}
+import { Types } from 'mongoose'
 
 export class ActivePerformance {
   public loadedTrack: Frame[] = []
@@ -14,10 +10,10 @@ export class ActivePerformance {
   public trackTtsRate: string = '1'
   private sendingIntervalRunning = false
 
-  constructor(readonly id: string) {}
+  constructor(readonly id: Types.ObjectId, readonly wss: Server) {}
 
   // More or less accurate timer taken from https://stackoverflow.com/a/29972322/16725862
-  startSendingInterval = (startTime: number, wss: Server, loopTrack: boolean, trackId: string) => {
+  startSendingInterval = (startTime: number, loopTrack: boolean, trackId: Types.ObjectId) => {
     if (this.sendingIntervalRunning) {
       return false
     }
@@ -26,7 +22,7 @@ export class ActivePerformance {
 
     this.sendingIntervalRunning = true
 
-    for (const client of wss.clients) {
+    for (const client of this.wss.clients) {
       if (client.performanceId !== this.id) continue
       client.send(JSON.stringify({ start: true }))
     }
@@ -68,7 +64,7 @@ export class ActivePerformance {
         return
       }
 
-      if (wss.clients.size) {
+      if (this.wss.clients.size) {
         // Distribute partials among clients and send them to clients
         if (this.trackMode === 'choir') {
           handleChoirDistribution()
@@ -79,7 +75,7 @@ export class ActivePerformance {
         console.log('No clients to distribute to.')
       }
 
-      const admins = Array.from(wss.clients).filter((client) => client.isAdmin && client.performanceId === this.id)
+      const admins = Array.from(this.wss.clients).filter((client) => client.isAdmin && client.performanceId === this.id)
       for (const admin of admins) {
         admin.send(JSON.stringify({ chunkIndex: chunkIndex, totalChunks: this.loadedTrack.length, trackId, loop: loopTrack }))
       }
@@ -93,8 +89,11 @@ export class ActivePerformance {
     // Start
     setTimeout(step, interval)
 
+    // Time in seconds added to the startTime to make sure the clients have time to receive the message
+    const TIME_TO_REVEIVE_MESSAGE = 2
+
     const handleChoirDistribution = () => {
-      for (const client of wss.clients) {
+      for (const client of this.wss.clients) {
         if (client.isAdmin || client.performanceId !== this.id) continue
 
         const dataToSend: {
@@ -103,7 +102,7 @@ export class ActivePerformance {
           ttsRate: string
           chunk: { partials?: PartialChunk[]; ttsInstructions?: string }
         } = {
-          startTime: startTime + 2,
+          startTime: startTime + TIME_TO_REVEIVE_MESSAGE,
           waveform: this.trackWaveform,
           ttsRate: this.trackTtsRate,
           chunk: {}
@@ -128,7 +127,7 @@ export class ActivePerformance {
     }
 
     const handleNonChoirDistribution = () => {
-      const clientArr = Array.from(wss.clients)
+      const clientArr = Array.from(this.wss.clients)
       const clients = clientArr.filter((client) => !client.isAdmin && client.performanceId === this.id)
       const partials = this.loadedTrack[chunkIndex]?.partials
 
@@ -210,7 +209,7 @@ export class ActivePerformance {
 
         if (dataToSend.partials?.length || dataToSend.ttsInstructions) {
           const json = JSON.stringify({
-            startTime: startTime + 2,
+            startTime: startTime + TIME_TO_REVEIVE_MESSAGE,
             waveform: this.trackWaveform,
             ttsRate: this.trackTtsRate,
             chunk: dataToSend
@@ -262,7 +261,7 @@ export class ActivePerformance {
       chunkIndex = 0
 
       // Notify all clients of track end
-      for (const client of wss.clients) {
+      for (const client of this.wss.clients) {
         if (client.performanceId !== this.id) continue
         client.send(JSON.stringify({ stop: true }))
       }

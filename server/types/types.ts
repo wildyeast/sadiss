@@ -13,6 +13,11 @@ export interface Breakpoint {
   amp: number
 }
 
+export interface Frame {
+  partials: PartialChunk[]
+  ttsInstructions: { [voice: string]: { [lang: string]: string } }
+}
+
 export type Message = { [key: string]: any }
 
 export interface TtsJson {

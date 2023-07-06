@@ -1,4 +1,4 @@
-import { PartialChunk, TtsJson } from '../types/types'
+import { Frame, PartialChunk, TtsJson } from '../types/types'
 import readline from 'readline'
 
 const fs = require('fs')
@@ -8,7 +8,7 @@ export const chunk = async (path?: string, ttsInstructions?: TtsJson) => {
   const CHUNK_DURATION = 0.999 // float in seconds
 
   // Initialize chunks array and first chunk object
-  const chunks = []
+  const chunks: Frame[] = []
   const initChunk = () => {
     return {
       time: 0,

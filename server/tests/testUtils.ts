@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose, { Types } from 'mongoose'
 
 /**
  * Returns a MongoDB ObjectId. This is used to mock MongoDB ids in tests.
@@ -70,4 +70,18 @@ export const resetTestIds = () => {
   testTrackId = ''
   testPerformanceId = ''
   testTrackPerformanceId = ''
+}
+
+export const createMockWsClient = (performanceId: Types.ObjectId, choirId: number, isAdmin = false) => {
+  const mockClientId = generateMockId()
+  const mockClient = {
+    id: mockClientId,
+    readyState: 1,
+    performanceId,
+    choirId,
+    isAdmin,
+    send: jest.fn()
+  }
+  testWss.clients.add(mockClient as any)
+  return mockClient
 }
