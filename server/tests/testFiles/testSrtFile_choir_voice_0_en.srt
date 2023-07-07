@@ -1,0 +1,11 @@
+1
+00:00:03,603 --> 00:00:06,906
+This is the first line of voice zero.
+
+2
+00:00:16,983 --> 00:00:19,552
+This is the second line of voice zero.
+
+3
+00:00:36,069 --> 00:00:38,405
+This is the third line of voice zero.

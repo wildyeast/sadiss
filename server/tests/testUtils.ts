@@ -72,7 +72,12 @@ export const resetTestIds = () => {
   testTrackPerformanceId = ''
 }
 
-export const createMockWsClient = (performanceId: Types.ObjectId, choirId: number, isAdmin = false) => {
+export const createMockWsClient = (
+  performanceId: Types.ObjectId,
+  choirId: number,
+  isAdmin = false,
+  ttsLang = { iso: 'en-US', lang: 'English' }
+) => {
   const mockClientId = generateMockId()
   const mockClient = {
     id: mockClientId,
@@ -80,6 +85,7 @@ export const createMockWsClient = (performanceId: Types.ObjectId, choirId: numbe
     performanceId,
     choirId,
     isAdmin,
+    ttsLang,
     send: jest.fn()
   }
   testWss.clients.add(mockClient as any)
