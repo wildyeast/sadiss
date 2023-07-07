@@ -39,7 +39,8 @@ beforeAll(async () => {
 })
 
 afterAll(async () => {
-  await disconnectDB()
+  // await disconnectDB()
+  disconnectDB()
   server.close()
   wss.close()
 })
