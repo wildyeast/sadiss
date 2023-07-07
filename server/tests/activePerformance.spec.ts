@@ -2,7 +2,6 @@ import { ActivePerformance } from '../activePerformance'
 import { createMockWsClient, generateMockId } from './testUtils'
 import { Frame, PartialChunk, TrackMode } from '../types/types'
 import * as fs from 'fs'
-import { start } from 'repl'
 
 describe('activePerformance test', () => {
   describe('startSendingInterval test', () => {
@@ -52,10 +51,17 @@ describe('activePerformance test', () => {
       activePerformance.startSendingInterval(startTime, false, generateMockId())
       jest.advanceTimersByTime(1000)
 
+      const TIME_ADDED_TO_START = 2 // seconds
+
       const partialForTestClient = chunks[0]?.partials.find((chunk: PartialChunk) => chunk.index === testClient.choirId)
       expect(testClient.send).toHaveBeenNthCalledWith(
         2,
-        JSON.stringify({ startTime: startTime + 2, waveform, ttsRate, chunk: { partials: [partialForTestClient] } }) // TODO: Remove magic number 2
+        JSON.stringify({
+          startTime: startTime + TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { partials: [partialForTestClient] }
+        })
       )
     })
 
