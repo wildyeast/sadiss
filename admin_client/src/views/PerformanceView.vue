@@ -72,7 +72,9 @@ onUnmounted(() => {
       <FixedViewHeader :title="performance.name">
         <div class="flex items-center justify-between">
           <p>Created by: {{ performance.creator.username }}</p>
-          <button @click.stop="qrCodesModal?.openModal()">
+          <button
+            @click.stop="qrCodesModal?.openModal()"
+            title="Generate QR codes">
             <font-awesome-icon
               icon="fa-qrcode"
               size="xl" />
