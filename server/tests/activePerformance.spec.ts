@@ -120,7 +120,7 @@ describe('activePerformance test', () => {
 
       // Add clients to wss
       const testClient = createMockWsClient(activePerformance.id, 0, false, { iso: 'en-US', lang: 'English' })
-      const testClient2 = createMockWsClient(activePerformance.id, 0, false, { iso: 'de-DE', lang: 'Deutsch' })
+      const testClient2 = createMockWsClient(activePerformance.id, 1, false, { iso: 'de-DE', lang: 'Deutsch' })
       const testAdminClient = createMockWsClient(activePerformance.id, 0, true)
 
       // Start sending interval
@@ -219,6 +219,181 @@ describe('activePerformance test', () => {
         4,
         JSON.stringify({
           chunkIndex: 2,
+          totalChunks,
+          trackId: mockTrackId,
+          loop: loopTrack
+        })
+      )
+    })
+
+    it('choir mode: should send partials and tts instructions to clients in the performance that are not admins', () => {
+      const trackMode = 'choir'
+      const waveform = 'sine'
+      const ttsRate = '1'
+
+      const { activePerformance, chunks } = preparePerformance(
+        'tests/testFiles/testChunkFile_twoShortPartialsTwoVoicesTwoLanguages.json',
+        trackMode,
+        waveform,
+        ttsRate
+      )
+
+      const totalChunks = chunks.length
+
+      // Add clients to wss
+      const testClient = createMockWsClient(activePerformance.id, 0, false, { iso: 'en-US', lang: 'English' })
+      const testClient2 = createMockWsClient(activePerformance.id, 1, false, { iso: 'de-DE', lang: 'Deutsch' })
+      const testAdminClient = createMockWsClient(activePerformance.id, 0, true)
+
+      // Start sending interval
+      const startTime = 0
+      const mockTrackId = generateMockId()
+      const loopTrack = false
+      activePerformance.startSendingInterval(startTime, loopTrack, mockTrackId)
+
+      const oneMinuteInMs = 60000
+      jest.advanceTimersByTime(oneMinuteInMs)
+
+      const TIME_ADDED_TO_START = 2 // seconds
+
+      const allTtsInstructions = chunks
+        .filter((chunk: Frame) => chunk && chunk.ttsInstructions)
+        .map((chunk: Frame) => chunk.ttsInstructions)
+
+      // First chunk
+      let partialForTestClient = chunks[0]?.partials.find((chunk: PartialChunk) => chunk.index === testClient.choirId)
+      expect(testClient.send).toHaveBeenNthCalledWith(
+        2,
+        JSON.stringify({
+          startTime: startTime + TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { partials: [partialForTestClient] }
+        })
+      )
+      expect(testAdminClient.send).toHaveBeenNthCalledWith(
+        2,
+        JSON.stringify({
+          chunkIndex: 0,
+          totalChunks,
+          trackId: mockTrackId,
+          loop: loopTrack
+        })
+      )
+
+      // Second chunk
+      partialForTestClient = chunks[1]?.partials.find((chunk: PartialChunk) => chunk.index === testClient.choirId)
+      expect(testClient.send).toHaveBeenNthCalledWith(
+        3,
+        JSON.stringify({
+          startTime: startTime + TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          // chunk: { ttsInstructions: allTtsInstructions[1][testClient.choirId][testClient.ttsLang.iso] }
+          chunk: { partials: [partialForTestClient] }
+        })
+      )
+      partialForTestClient = chunks[1]?.partials.find((chunk: PartialChunk) => chunk.index === testClient2.choirId)
+      expect(testClient2.send).toHaveBeenNthCalledWith(
+        2,
+        JSON.stringify({
+          startTime: startTime + TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { partials: [partialForTestClient] }
+        })
+      )
+      expect(testAdminClient.send).toHaveBeenNthCalledWith(
+        3,
+        JSON.stringify({
+          chunkIndex: 1,
+          totalChunks,
+          trackId: mockTrackId,
+          loop: loopTrack
+        })
+      )
+
+      // Third chunk
+      expect(testClient.send).toHaveBeenNthCalledWith(
+        4,
+        JSON.stringify({
+          startTime: startTime + TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { ttsInstructions: allTtsInstructions[2][testClient.choirId][testClient.ttsLang.iso] }
+        })
+      )
+      expect(testClient2.send).toHaveBeenNthCalledWith(
+        3,
+        JSON.stringify({
+          startTime: startTime + TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { ttsInstructions: allTtsInstructions[2][testClient2.choirId][testClient2.ttsLang.iso] }
+        })
+      )
+      expect(testAdminClient.send).toHaveBeenNthCalledWith(
+        4,
+        JSON.stringify({
+          chunkIndex: 2,
+          totalChunks,
+          trackId: mockTrackId,
+          loop: loopTrack
+        })
+      )
+
+      // Fourth chunk
+      expect(testClient.send).toHaveBeenNthCalledWith(
+        5,
+        JSON.stringify({
+          startTime: startTime + TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { ttsInstructions: allTtsInstructions[3][testClient.choirId][testClient.ttsLang.iso] }
+        })
+      )
+      expect(testClient2.send).toHaveBeenNthCalledWith(
+        4,
+        JSON.stringify({
+          startTime: startTime + TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { ttsInstructions: allTtsInstructions[3][testClient2.choirId][testClient2.ttsLang.iso] }
+        })
+      )
+      expect(testAdminClient.send).toHaveBeenNthCalledWith(
+        5,
+        JSON.stringify({
+          chunkIndex: 3,
+          totalChunks,
+          trackId: mockTrackId,
+          loop: loopTrack
+        })
+      )
+
+      // Fifth chunk
+      expect(testClient.send).toHaveBeenNthCalledWith(
+        6,
+        JSON.stringify({
+          startTime: startTime + TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { ttsInstructions: allTtsInstructions[4][testClient.choirId][testClient.ttsLang.iso] }
+        })
+      )
+      expect(testClient2.send).toHaveBeenNthCalledWith(
+        5,
+        JSON.stringify({
+          startTime: startTime + TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { ttsInstructions: allTtsInstructions[4][testClient2.choirId][testClient2.ttsLang.iso] }
+        })
+      )
+      expect(testAdminClient.send).toHaveBeenNthCalledWith(
+        6,
+        JSON.stringify({
+          chunkIndex: 4,
           totalChunks,
           trackId: mockTrackId,
           loop: loopTrack

@@ -3,7 +3,7 @@ import readline from 'readline'
 
 const fs = require('fs')
 
-/** Takes partial path and returns chunk array */
+/** Takes partial path and TTS instructions JSON and returns chunk array */
 export const chunk = async (path?: string, ttsInstructions?: TtsJson) => {
   const CHUNK_DURATION = 0.999 // float in seconds
 
