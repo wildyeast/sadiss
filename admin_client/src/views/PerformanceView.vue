@@ -17,6 +17,7 @@ const performance = ref<SadissPerformance>()
 
 const selectedTrackIndex = ref<number>(-1)
 
+// TODO: Are the checks for -1 necessary?
 const selectedTrack = computed(() => {
   if (selectedTrackIndex.value === -1) return undefined
   return performance.value?.tracks[selectedTrackIndex.value]

@@ -103,11 +103,10 @@ const establishWebsocketConnection = async () => {
     const data = JSON.parse(event.data)
 
     if (data.start) {
-      // TODO: Handle start
+      // Nothing to do at start.
     }
 
     if (data.stop) {
-      // TODO: Handle stop
       if (shouldGoToNextTrack.value && props.nextTrack) {
         const trackLoadedSuccessfully = await loadTrackForPlayback(props.nextTrack._id, props.performanceId)
         if (!trackLoadedSuccessfully) {
