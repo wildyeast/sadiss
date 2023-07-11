@@ -1,19 +1,12 @@
 import { Types } from 'mongoose'
 import { Track } from '../models'
-import {
-  createTestPerformance,
-  createTestTrack,
-  createTestTrackPerformance,
-  resetTestIds,
-  testPerformanceId,
-  testTrackId
-} from './testUtils'
+import { createTestTrack, createTestTrackPerformance } from './testUtils'
 import { generateMockId } from './testUtils'
 
 describe('trackController test', () => {
   describe('GET /api/tracks', () => {
     it('should get tracks from DB', async () => {
-      await createTestTrack()
+      const trackId = await createTestTrack()
       const res = await agent.get('/api/tracks')!.expect(200)
       expect(res.body.tracks.length).toBe(1)
       expect(res.body.tracks[0].name).toBe('test track')
@@ -21,7 +14,7 @@ describe('trackController test', () => {
       expect(res.body.tracks[0].waveform).toBe('sine')
       expect(res.body.tracks[0].partialFile.origName).toBe('testPartialFile.txt')
       expect(res.body.tracks[0].creator.username).toBe(mockUser.username)
-      await Track.findByIdAndDelete(testTrackId)
+      await Track.findByIdAndDelete(trackId)
     })
 
     it('should return an empty array if no tracks in DB', async () => {
@@ -181,12 +174,10 @@ describe('trackController test', () => {
   })
 
   describe('POST /api/track/edit/:id', () => {
-    afterEach(async () => resetTestIds())
-
     it('should edit partial+tts track if partialfile, srt file and necessary fields provided', async () => {
-      await createTestTrack('partialsAndTts')
+      const trackId = await createTestTrack('partialsAndTts')
       const resEdit = await agent
-        .post(`/api/track/edit/${testTrackId}`)
+        .post(`/api/track/edit/${trackId}`)
         .attach('files', 'tests/testFiles/testPartialFile2.txt', 'partialfile_testPartialFile2')
         .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_1_de-DE_testSrtFile')
         .field('name', 'test track edited')
@@ -200,7 +191,7 @@ describe('trackController test', () => {
       expect(resEdit.body.partialFile.origName).toBe('testPartialFile2.txt')
       expect(resEdit.body.ttsFiles[0].origName).toBe('testSrtFile.txt')
 
-      const resGet = await agent.get(`/api/track/${testTrackId}`).expect(200)
+      const resGet = await agent.get(`/api/track/${trackId}`).expect(200)
       expect(resGet.body[0].name).toBe('test track edited')
       expect(resGet.body[0].mode).toBe('nonChoir')
       expect(resGet.body[0].waveform).toBe('square')
@@ -211,9 +202,9 @@ describe('trackController test', () => {
     })
 
     it('should edit partial track to partial+tts track if srt file and necessary fields provided', async () => {
-      await createTestTrack('partials')
+      const trackId = await createTestTrack('partials')
       const resEdit = await agent
-        .post(`/api/track/edit/${testTrackId}`)
+        .post(`/api/track/edit/${trackId}`)
         .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_0_en-US_testSrtFile')
         .field('name', 'test track edited')
         .field('mode', 'nonChoir')
@@ -226,7 +217,7 @@ describe('trackController test', () => {
       expect(resEdit.body.partialFile.origName).toBe('testPartialFile.txt')
       expect(resEdit.body.ttsFiles[0].origName).toBe('testSrtFile.txt')
 
-      const resGet = await agent.get(`/api/track/${testTrackId}`).expect(200)
+      const resGet = await agent.get(`/api/track/${trackId}`).expect(200)
       expect(resGet.body[0].name).toBe('test track edited')
       expect(resGet.body[0].mode).toBe('nonChoir')
       expect(resGet.body[0].waveform).toBe('square')
@@ -235,9 +226,9 @@ describe('trackController test', () => {
     })
 
     it('should edit partial track to partial+tts track if partial file and necessary fields provided', async () => {
-      await createTestTrack('tts')
+      const trackId = await createTestTrack('tts')
       const resEdit = await agent
-        .post(`/api/track/edit/${testTrackId}`)!
+        .post(`/api/track/edit/${trackId}`)!
         .attach('files', 'tests/testFiles/testPartialFile2.txt', 'partialfile_testPartialFile2')
         .field('name', 'test track edited')
         .field('waveform', 'square')
@@ -249,7 +240,7 @@ describe('trackController test', () => {
       expect(resEdit.body.partialFile.origName).toBe('testPartialFile2.txt')
       expect(resEdit.body.ttsFiles[0].origName).toBe('testSrtFile.txt')
 
-      const resGet = await agent.get(`/api/track/${testTrackId}`).expect(200)
+      const resGet = await agent.get(`/api/track/${trackId}`).expect(200)
       expect(resGet.body[0].name).toBe('test track edited')
       expect(resGet.body[0].mode).toBe('choir')
       expect(resGet.body[0].waveform).toBe('square')
@@ -258,14 +249,14 @@ describe('trackController test', () => {
     })
 
     it('should add tts file to existing tts files', async () => {
-      await createTestTrack('tts')
+      const trackId = await createTestTrack('tts')
       const resEdit = await agent
-        .post(`/api/track/edit/${testTrackId}`)
+        .post(`/api/track/edit/${trackId}`)
         .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_0_en-US_testSrtFile')
         .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_1_de-DE_testSrtFile')
         .expect(200)
 
-      const resGet = await agent.get(`/api/track/${testTrackId}`).expect(200)
+      const resGet = await agent.get(`/api/track/${trackId}`).expect(200)
       expect(resGet.body[0].ttsFiles[0].origName).toBe('testSrtFile.txt')
       expect(resGet.body[0].ttsFiles[0].voice).toBe('0')
       expect(resGet.body[0].ttsFiles[0].lang).toBe('en-US')
@@ -299,19 +290,19 @@ describe('trackController test', () => {
 
   describe('POST /api/track/delete/:id', () => {
     it('should delete track and trackperformance (if any) if track found', async () => {
-      await createTestTrackPerformance()
+      const { performanceId, trackId, trackPerformanceId } = await createTestTrackPerformance()
 
-      let performanceWithTracksResGet = await agent.get(`/api/performance/${testPerformanceId}/with-tracks`).expect(200)
+      let performanceWithTracksResGet = await agent.get(`/api/performance/${performanceId}/with-tracks`).expect(200)
 
       expect(performanceWithTracksResGet.body.performance.tracks.length).toBe(1)
 
-      const resDelete = await agent.post(`/api/track/delete/${testTrackId}`).expect(200)
+      const resDelete = await agent.post(`/api/track/delete/${trackId}`).expect(200)
       expect(resDelete.body.message).toBe('Track deleted')
 
-      const trackResGet = await agent.get(`/api/track/${testTrackId}`).expect(404)
+      const trackResGet = await agent.get(`/api/track/${trackId}`).expect(404)
       expect(trackResGet.body.error).toBe('Track not found')
 
-      performanceWithTracksResGet = await agent.get(`/api/performance/${testPerformanceId}/with-tracks`).expect(200)
+      performanceWithTracksResGet = await agent.get(`/api/performance/${performanceId}/with-tracks`).expect(200)
 
       expect(performanceWithTracksResGet.body.performance.tracks.length).toBe(0)
     })
@@ -341,7 +332,7 @@ describe('trackController test', () => {
         throw new Error('Server error')
       })
 
-      const resDelete = await agent.post(`/api/track/delete/${testTrackId}`).expect(500)
+      const resDelete = await agent.post(`/api/track/delete/${generateMockId()}`).expect(500)
       expect(resDelete.body.error).toBe('Server error')
     })
   })

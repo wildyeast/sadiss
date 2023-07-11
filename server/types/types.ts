@@ -65,4 +65,5 @@ export interface SadissPerformanceDocument extends Document {
 export interface TrackPerformanceDocument extends Document {
   track: TrackDocument
   performance: SadissPerformanceDocument
+  sortOrder: number
 }
