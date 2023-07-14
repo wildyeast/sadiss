@@ -44,6 +44,10 @@ const onSortOrderUpdate = async () => {
     })
   })
 
+  // Make no track selected to prevent a visual issue where the selected track
+  // changes to the one taking its place after it was dragged.
+  selectedTrackIndex.value = -1
+
   await updateTrackPerformanceOrder(trackPerformanceIdsAndSortOrders)
 }
 
@@ -126,6 +130,7 @@ onUnmounted(() => {
         v-model="tracks"
         class="mt-4 flex-1 space-y-2 overflow-y-scroll"
         handle=".drag-handle"
+        animation="100"
         @update="onSortOrderUpdate">
         <button
           v-for="(track, index) in tracks"
