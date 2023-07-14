@@ -15,7 +15,7 @@ const router = express.Router()
 
 import multer from 'multer'
 
-const upload = multer({ dest: 'uploads/' });
+const upload = multer({ dest: 'uploads/' })
 
 router.use('/api', authenticateToken)
 
@@ -71,13 +71,15 @@ router.post('/api/performance/edit/:id', performance_controller.editPerformance)
 // Get clients per choir id
 router.get('/api/client-count-per-choir-id/:performanceId', performance_controller.getClientCountPerChoirId)
 
-/* TRACK PERFORMANCE */
+/* TRACKPERFORMANCE */
 // Add track to performance
 router.post(
   '/api/add-track-to-performance',
   [validateTrackAccess, validatePerformanceAccess],
   track_performance_controller.addTrackToPerformance
 )
+// Update sortOrder of trackPerformance
+router.post('/api/track-performance/update-order', track_performance_controller.updateTrackPerformanceOrder)
 
 /* PERFORMANCE VIEW */
 // Get performance with tracks

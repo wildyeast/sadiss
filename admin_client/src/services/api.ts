@@ -1,4 +1,4 @@
-import type { SadissPerformance, Track } from '@/types/types'
+import type { SadissPerformance, Track, TrackPerformanceIdAndSortOrder } from '@/types/types'
 
 interface RequestOptions {
   method: string
@@ -291,6 +291,21 @@ export async function getPerformanceWithTracks(id: string) {
   }
 
   return response.data!.performance
+}
+
+export async function updateTrackPerformanceOrder(trackPerformances: TrackPerformanceIdAndSortOrder[]) {
+  const response = await request<{ message: string }>(`/api/track-performance/update-order`, {
+    method: 'POST',
+    body: JSON.stringify({
+      trackPerformances
+    })
+  })
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.message
 }
 
 // export async function getTracks() {

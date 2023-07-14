@@ -28,6 +28,8 @@ interface Track {
   ttsRate?: number
   partialFile?: { origName: string; fileName: string }
   ttsFiles?: TtsFileDownloadInformation[]
+  trackPerformanceId: string
+  sortOrder: number
 }
 
 interface TtsFileDownloadInformation {
@@ -50,4 +52,17 @@ interface TtsFilesObject {
   [voice: number]: { [lang: string]: File }
 }
 
-export type { QrCodeData, SadissPerformance, Track, Waveform, TtsFilesObject, TtsFileDownloadInformation }
+interface TrackPerformanceIdAndSortOrder {
+  trackPerformanceId: string
+  sortOrder: number
+}
+
+export type {
+  QrCodeData,
+  SadissPerformance,
+  Track,
+  Waveform,
+  TtsFilesObject,
+  TtsFileDownloadInformation,
+  TrackPerformanceIdAndSortOrder
+}

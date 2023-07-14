@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { getPerformanceWithTracks, getClientCountPerChoirId, loadTrackForPlayback } from '@/services/api'
-import type { SadissPerformance } from '@/types/types'
+import {
+  getPerformanceWithTracks,
+  getClientCountPerChoirId,
+  loadTrackForPlayback,
+  updateTrackPerformanceOrder
+} from '@/services/api'
+import type { SadissPerformance, Track, TrackPerformanceIdAndSortOrder } from '@/types/types'
 import { onMounted, ref, computed, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import PlayerControls from '@/components/PlayerControls.vue'
 import QrCodesModal from '@/components/QrCodesModal.vue'
 import FixedViewHeader from '@/components/FixedViewHeader.vue'
 import { useStore } from '@/stores/store'
+import { VueDraggable } from 'vue-draggable-plus'
 
 const store = useStore()
 
@@ -14,6 +20,7 @@ const store = useStore()
 const route = useRoute()
 const performanceId = route.params.id
 const performance = ref<SadissPerformance>()
+const tracks = ref<Track[]>([])
 
 const selectedTrackIndex = ref<number>(-1)
 
@@ -27,6 +34,18 @@ const nextTrack = computed(() => {
   if (selectedTrackIndex.value === -1) return undefined
   return performance.value?.tracks[selectedTrackIndex.value + 1]
 })
+
+const onSortOrderUpdate = async () => {
+  const trackPerformanceIdsAndSortOrders: TrackPerformanceIdAndSortOrder[] = []
+  tracks.value.forEach((track, index) => {
+    trackPerformanceIdsAndSortOrders.push({
+      trackPerformanceId: track.trackPerformanceId as string,
+      sortOrder: index + 1
+    })
+  })
+
+  await updateTrackPerformanceOrder(trackPerformanceIdsAndSortOrders)
+}
 
 const trackLoaded = ref<boolean>(false)
 const selectTrack = async (trackIndex: number) => {
@@ -54,6 +73,9 @@ const connectedClients = ref<{ [choirId: string]: number }>({})
 let getClientsInterval: any // any because of currently unresolved type-checking error during build step
 onMounted(async () => {
   performance.value = await getPerformanceWithTracks(performanceId as string)
+  if (performance.value) {
+    tracks.value = performance.value.tracks
+  }
 
   // Periodically update connected clients
   getClientsInterval = setInterval(async () => {
@@ -64,6 +86,8 @@ onMounted(async () => {
 onUnmounted(() => {
   clearInterval(getClientsInterval)
 })
+
+//https://github.com/Alfred-Skyblue/vue-draggable-plus
 </script>
 <template>
   <main class="flex h-screen flex-col justify-between">
@@ -97,17 +121,26 @@ onUnmounted(() => {
         >
       </div>
 
-      <div
-        v-if="performance.tracks.length"
-        class="mt-4 flex-1 space-y-2 overflow-y-scroll">
+      <VueDraggable
+        v-if="tracks.length"
+        v-model="tracks"
+        class="mt-4 flex-1 space-y-2 overflow-y-scroll"
+        handle=".drag-handle"
+        @update="onSortOrderUpdate">
         <button
-          v-for="(track, index) in performance.tracks"
+          v-for="(track, index) in tracks"
           @click="selectTrack(index)"
-          class="flex w-full border p-4"
+          class="flex w-full items-center justify-between border p-4"
           :class="{ 'bg-secondary': selectedTrack === track }">
           <p>{{ track.name }}</p>
+          <font-awesome-icon
+            icon="fa-bars"
+            size="lg"
+            class="drag-handle"
+            @click.stop
+            title="Click and drag to change order" />
         </button>
-      </div>
+      </VueDraggable>
       <div
         v-else-if="store.userName === performance.creator.username"
         class="bg-red flex h-full flex-col items-center">

@@ -2,7 +2,7 @@ import { SadissPerformance, User, TrackPerformance, Track } from '../models'
 import { generateMockId } from './testUtils'
 
 describe('getPerformanceWithTracks', () => {
-  it('should return performance data with associated tracks', async () => {
+  it('should return performance data with associated tracks in correct order', async () => {
     const testUser = new User({
       username: 'test-username',
       password: 'test-password',
@@ -29,7 +29,8 @@ describe('getPerformanceWithTracks', () => {
 
     const trackPerformance = new TrackPerformance({
       track: testTrack1._id,
-      performance: testPerformance._id
+      performance: testPerformance._id,
+      sortOrder: 2
     })
     await trackPerformance.save()
 
@@ -46,7 +47,8 @@ describe('getPerformanceWithTracks', () => {
 
     const trackPerformance2 = new TrackPerformance({
       track: testTrack2._id,
-      performance: testPerformance._id
+      performance: testPerformance._id,
+      sortOrder: 1
     })
     await trackPerformance2.save()
 
@@ -59,15 +61,6 @@ describe('getPerformanceWithTracks', () => {
         creator: { username: 'test-username' },
         tracks: [
           {
-            _id: testTrack1._id.toString(),
-            name: 'Track 1',
-            mode: 'choir',
-            waveform: 'sine',
-            ttsRate: '1.5',
-            creator: testUser._id.toString(),
-            isPublic: true
-          },
-          {
             _id: testTrack2._id.toString(),
             name: 'Track 2',
             mode: 'choir',
@@ -75,7 +68,20 @@ describe('getPerformanceWithTracks', () => {
             ttsRate: '1',
             creator: testUser._id.toString(),
             isPublic: false,
-            notes: 'test-notes'
+            notes: 'test-notes',
+            sortOrder: 1,
+            trackPerformanceId: trackPerformance2._id.toString()
+          },
+          {
+            _id: testTrack1._id.toString(),
+            name: 'Track 1',
+            mode: 'choir',
+            waveform: 'sine',
+            ttsRate: '1.5',
+            creator: testUser._id.toString(),
+            isPublic: true,
+            sortOrder: 2,
+            trackPerformanceId: trackPerformance._id.toString()
           }
         ]
       }

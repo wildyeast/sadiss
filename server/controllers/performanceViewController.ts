@@ -12,7 +12,7 @@ exports.getPerformanceWithTracks = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Performance not found' })
     }
 
-    const trackPerformances = await TrackPerformance.find({ performance: performance._id }, 'track -_id order')
+    const trackPerformances = await TrackPerformance.find({ performance: performance._id }, 'track _id sortOrder')
       .populate('track', 'name notes mode waveform ttsRate creator isPublic')
       .lean()
 
@@ -20,7 +20,7 @@ exports.getPerformanceWithTracks = async (req: Request, res: Response) => {
       const orderA = a.sortOrder
       const orderB = b.sortOrder
 
-      // Tracks without an order value should come last
+      // Tracks without a sortOrder value come last
       if (orderA === undefined && orderB === undefined) {
         return 0
       } else if (orderA === undefined) {
@@ -29,11 +29,17 @@ exports.getPerformanceWithTracks = async (req: Request, res: Response) => {
         return -1
       }
 
-      // Sort by order in ascending order
+      // Sort by sortOrder in ascending order
       return orderA - orderB
     })
 
-    const tracks = trackPerformances.map((trackPerformance) => trackPerformance.track)
+    const tracks = trackPerformances.map((trackPerformance) => {
+      const track = trackPerformance.track
+      const trackPerformanceId = trackPerformance._id
+      const sortOrder = trackPerformance.sortOrder
+
+      return { ...track, trackPerformanceId, sortOrder }
+    })
 
     res.json({ performance: { ...performance, tracks } })
   } catch (err) {

@@ -4205,6 +4205,11 @@ vue-demi@*:
   resolved "https://registry.yarnpkg.com/vue-demi/-/vue-demi-0.14.0.tgz#dcfd9a9cf9bb62ada1582ec9042372cf67ca6190"
   integrity sha512-gt58r2ogsNQeVoQ3EhoUAvUsH9xviydl0dWJj7dabBC/2L4uBId7ujtCwDRD0JhkGsV1i0CtfLAeyYKBht9oWg==
 
+vue-draggable-plus@^0.2.2:
+  version "0.2.2"
+  resolved "https://registry.yarnpkg.com/vue-draggable-plus/-/vue-draggable-plus-0.2.2.tgz#f46d455cf862e9489e38cbd27d51c2aab3e09244"
+  integrity sha512-Mp9T7FK/N8anWr1Bi3RKQ3GETRu/pCHz+upvd0CTHY9Rq4sITfVtpoKsMUkasg55svx5sw8B+yeQob3WfaqqzQ==
+
 vue-eslint-parser@^9.0.1, vue-eslint-parser@^9.1.1:
   version "9.1.1"
   resolved "https://registry.yarnpkg.com/vue-eslint-parser/-/vue-eslint-parser-9.1.1.tgz#3f4859be7e9bb7edaa1dc7edb05abffee72bf3dd"
