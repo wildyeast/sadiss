@@ -1,6 +1,6 @@
 import { Types } from 'mongoose'
 import { SadissPerformance } from '../models/sadissPerformance'
-import { createMockWsClient, createTestPerformance, generateMockId, testPerformanceId } from './testUtils'
+import { createTestPerformance, generateMockId } from './testUtils'
 
 describe('performanceController test', () => {
   describe('POST /api/performances', () => {
@@ -101,13 +101,13 @@ describe('performanceController test', () => {
     })
 
     it('should delete a performance from the database', async () => {
-      await createTestPerformance()
+      const performanceId = await createTestPerformance()
 
-      const res = await agent.post(`/api/performance/delete/${testPerformanceId}`).send()
+      const res = await agent.post(`/api/performance/delete/${performanceId}`).send()
 
       expect(res.status).toBe(200)
 
-      const deletedPerformance = await SadissPerformance.findById(testPerformanceId)
+      const deletedPerformance = await SadissPerformance.findById(performanceId)
       expect(deletedPerformance).toBeNull()
     })
   })
@@ -163,13 +163,13 @@ describe('performanceController test', () => {
     })
 
     it('should update a performance in the database', async () => {
-      await createTestPerformance()
+      const performanceId = await createTestPerformance()
 
-      const res = await agent.post(`/api/performance/edit/${testPerformanceId}`).send({ name: 'Updated Performance' })
+      const res = await agent.post(`/api/performance/edit/${performanceId}`).send({ name: 'Updated Performance' })
 
       expect(res.status).toBe(200)
 
-      const updatedPerformance = await SadissPerformance.findById(testPerformanceId)
+      const updatedPerformance = await SadissPerformance.findById(performanceId)
       expect(updatedPerformance).toBeDefined()
       expect(updatedPerformance!.name).toBe('Updated Performance')
     })

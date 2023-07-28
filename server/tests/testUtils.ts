@@ -6,7 +6,6 @@ import mongoose, { Types } from 'mongoose'
 export const generateMockId = () => new mongoose.Types.ObjectId()
 
 // Helpers
-export let testTrackId = ''
 export const createTestTrack = async (trackType: 'partials' | 'tts' | 'partialsAndTts' = 'partialsAndTts') => {
   const testTrack = {
     name: 'test track',
@@ -32,44 +31,38 @@ export const createTestTrack = async (trackType: 'partials' | 'tts' | 'partialsA
       .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_0_en-US_testSrtFile')
   }
 
-  const resCreate = await req.expect(201)
+  const resCreate: { body: { _id: Types.ObjectId } } = await req.expect(201)
 
-  testTrackId = resCreate.body._id
+  return resCreate.body._id
 }
 
-export let testPerformanceId = ''
 export const createTestPerformance = async () => {
   const testPerformance = {
     name: 'test performance',
     isPublic: true
   }
 
-  const resCreate = await agent.post('/api/performance/create')!.send(testPerformance).expect(201)
+  const resCreate: { body: { _id: Types.ObjectId } } = await agent
+    .post('/api/performance/create')!
+    .send(testPerformance)
+    .expect(201)
 
-  testPerformanceId = resCreate.body._id
   return resCreate.body._id
 }
 
-export let testTrackPerformanceId = ''
 export const createTestTrackPerformance = async () => {
-  await createTestTrack()
-  await createTestPerformance()
+  const trackId = await createTestTrack()
+  const performanceId = await createTestPerformance()
 
-  const resAddTrackToPerformance = await agent
+  const res: { body: { trackPerformance: { _id: Types.ObjectId } } } = await agent
     .post('/api/add-track-to-performance')!
     .send({
-      trackId: testTrackId,
-      performanceId: testPerformanceId
+      trackId,
+      performanceId
     })
     .expect(201)
 
-  testTrackPerformanceId = resAddTrackToPerformance.body.trackPerformance._id
-}
-
-export const resetTestIds = () => {
-  testTrackId = ''
-  testPerformanceId = ''
-  testTrackPerformanceId = ''
+  return { trackId, performanceId, trackPerformanceId: res.body.trackPerformance._id }
 }
 
 export const createMockWsClient = (

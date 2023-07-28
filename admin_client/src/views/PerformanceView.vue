@@ -1,12 +1,18 @@
 <script setup lang="ts">
-import { getPerformanceWithTracks, getClientCountPerChoirId, loadTrackForPlayback } from '@/services/api'
-import type { SadissPerformance } from '@/types/types'
+import {
+  getPerformanceWithTracks,
+  getClientCountPerChoirId,
+  loadTrackForPlayback,
+  updateTrackPerformanceOrder
+} from '@/services/api'
+import type { SadissPerformance, Track, TrackPerformanceIdAndSortOrder } from '@/types/types'
 import { onMounted, ref, computed, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import PlayerControls from '@/components/PlayerControls.vue'
 import QrCodesModal from '@/components/QrCodesModal.vue'
 import FixedViewHeader from '@/components/FixedViewHeader.vue'
 import { useStore } from '@/stores/store'
+import { VueDraggable } from 'vue-draggable-plus'
 
 const store = useStore()
 
@@ -14,9 +20,11 @@ const store = useStore()
 const route = useRoute()
 const performanceId = route.params.id
 const performance = ref<SadissPerformance>()
+const tracks = ref<Track[]>([])
 
 const selectedTrackIndex = ref<number>(-1)
 
+// TODO: Are the checks for -1 necessary?
 const selectedTrack = computed(() => {
   if (selectedTrackIndex.value === -1) return undefined
   return performance.value?.tracks[selectedTrackIndex.value]
@@ -26,6 +34,22 @@ const nextTrack = computed(() => {
   if (selectedTrackIndex.value === -1) return undefined
   return performance.value?.tracks[selectedTrackIndex.value + 1]
 })
+
+const onSortOrderUpdate = async () => {
+  const trackPerformanceIdsAndSortOrders: TrackPerformanceIdAndSortOrder[] = []
+  tracks.value.forEach((track, index) => {
+    trackPerformanceIdsAndSortOrders.push({
+      trackPerformanceId: track.trackPerformanceId as string,
+      sortOrder: index + 1
+    })
+  })
+
+  // Make no track selected to prevent a visual issue where the selected track
+  // changes to the one taking its place after it was dragged.
+  selectedTrackIndex.value = -1
+
+  await updateTrackPerformanceOrder(trackPerformanceIdsAndSortOrders)
+}
 
 const trackLoaded = ref<boolean>(false)
 const selectTrack = async (trackIndex: number) => {
@@ -50,9 +74,12 @@ const qrCodesModal = ref<typeof QrCodesModal | null>()
 
 const connectedClients = ref<{ [choirId: string]: number }>({})
 
-let getClientsInterval: any // any because of curently unresolved type-checking error during build step
+let getClientsInterval: any // any because of currently unresolved type-checking error during build step
 onMounted(async () => {
   performance.value = await getPerformanceWithTracks(performanceId as string)
+  if (performance.value) {
+    tracks.value = performance.value.tracks
+  }
 
   // Periodically update connected clients
   getClientsInterval = setInterval(async () => {
@@ -63,6 +90,8 @@ onMounted(async () => {
 onUnmounted(() => {
   clearInterval(getClientsInterval)
 })
+
+//https://github.com/Alfred-Skyblue/vue-draggable-plus
 </script>
 <template>
   <main class="flex h-screen flex-col justify-between">
@@ -72,7 +101,9 @@ onUnmounted(() => {
       <FixedViewHeader :title="performance.name">
         <div class="flex items-center justify-between">
           <p>Created by: {{ performance.creator.username }}</p>
-          <button @click.stop="qrCodesModal?.openModal()">
+          <button
+            @click.stop="qrCodesModal?.openModal()"
+            title="Generate QR codes">
             <font-awesome-icon
               icon="fa-qrcode"
               size="xl" />
@@ -94,17 +125,27 @@ onUnmounted(() => {
         >
       </div>
 
-      <div
-        v-if="performance.tracks.length"
-        class="mt-4 flex-1 space-y-2 overflow-y-scroll">
+      <VueDraggable
+        v-if="tracks.length"
+        v-model="tracks"
+        class="mt-4 flex-1 space-y-2 overflow-y-scroll"
+        handle=".drag-handle"
+        animation="100"
+        @update="onSortOrderUpdate">
         <button
-          v-for="(track, index) in performance.tracks"
+          v-for="(track, index) in tracks"
           @click="selectTrack(index)"
-          class="flex w-full border p-4"
+          class="flex w-full items-center justify-between border p-4"
           :class="{ 'bg-secondary': selectedTrack === track }">
           <p>{{ track.name }}</p>
+          <font-awesome-icon
+            icon="fa-bars"
+            size="lg"
+            class="drag-handle"
+            @click.stop
+            title="Click and drag to change order" />
         </button>
-      </div>
+      </VueDraggable>
       <div
         v-else-if="store.userName === performance.creator.username"
         class="bg-red flex h-full flex-col items-center">
