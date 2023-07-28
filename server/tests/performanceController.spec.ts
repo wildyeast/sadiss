@@ -1,6 +1,6 @@
 import { Types } from 'mongoose'
 import { SadissPerformance } from '../models/sadissPerformance'
-import { createTestPerformance, generateMockId } from './testUtils'
+import { createMockWsClient, createTestPerformance, generateMockId } from './testUtils'
 
 describe('performanceController test', () => {
   describe('POST /api/performances', () => {
