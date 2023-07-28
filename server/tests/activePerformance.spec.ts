@@ -5,6 +5,10 @@ import * as fs from 'fs'
 
 describe('activePerformance test', () => {
   describe('startSendingInterval test', () => {
+    const TIME_ADDED_TO_START = 2 // seconds
+    const ONE_MINUTE_IN_MS = 60000
+    const SENDING_INTERVAL_LENGTH_IN_MS = 1000
+
     beforeAll(() => {
       jest.useFakeTimers()
     })
@@ -49,23 +53,17 @@ describe('activePerformance test', () => {
       const testClient = createMockWsClient(activePerformance.id, 0, false)
       const testAdminClient = createMockWsClient(activePerformance.id, 0, true)
 
-      // Start sending interval
-      const startTime = 0
       const mockTrackId = generateMockId()
       const loopTrack = false
-      activePerformance.startSendingInterval(startTime, loopTrack, mockTrackId)
+      startSendingInterval(activePerformance, mockTrackId, loopTrack)
 
-      const sendingIntevalLength = 1000 // ms
-
-      jest.advanceTimersByTime(sendingIntevalLength)
-
-      const TIME_ADDED_TO_START = 2 // seconds
+      jest.advanceTimersByTime(SENDING_INTERVAL_LENGTH_IN_MS)
 
       let partialForTestClient = chunks[0]?.partials.find((chunk: PartialChunk) => chunk.index === testClient.choirId)
       expect(testClient.send).toHaveBeenNthCalledWith(
         2,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           chunk: { partials: [partialForTestClient] }
@@ -81,13 +79,13 @@ describe('activePerformance test', () => {
         })
       )
 
-      jest.advanceTimersByTime(sendingIntevalLength)
+      jest.advanceTimersByTime(SENDING_INTERVAL_LENGTH_IN_MS)
 
       partialForTestClient = chunks[1]?.partials.find((chunk: PartialChunk) => chunk.index === testClient.choirId)
       expect(testClient.send).toHaveBeenNthCalledWith(
         3,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           chunk: { partials: [partialForTestClient] }
@@ -124,15 +122,11 @@ describe('activePerformance test', () => {
       const testAdminClient = createMockWsClient(activePerformance.id, 0, true)
 
       // Start sending interval
-      const startTime = 0
       const mockTrackId = generateMockId()
       const loopTrack = false
-      activePerformance.startSendingInterval(startTime, loopTrack, mockTrackId)
+      startSendingInterval(activePerformance, mockTrackId, loopTrack)
 
-      const oneMinuteInMs = 60000
-      jest.advanceTimersByTime(oneMinuteInMs)
-
-      const TIME_ADDED_TO_START = 2 // seconds
+      jest.advanceTimersByTime(ONE_MINUTE_IN_MS)
 
       const allTtsInstructions = chunks
         .filter((chunk: Frame) => chunk && chunk.ttsInstructions)
@@ -142,7 +136,7 @@ describe('activePerformance test', () => {
       expect(testClient.send).toHaveBeenNthCalledWith(
         2,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           chunk: { ttsInstructions: allTtsInstructions[0][testClient.choirId][testClient.ttsLang.iso] }
@@ -151,7 +145,7 @@ describe('activePerformance test', () => {
       expect(testClient2.send).toHaveBeenNthCalledWith(
         2,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           chunk: { ttsInstructions: allTtsInstructions[0][testClient2.choirId][testClient2.ttsLang.iso] }
@@ -171,7 +165,7 @@ describe('activePerformance test', () => {
       expect(testClient.send).toHaveBeenNthCalledWith(
         3,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           chunk: { ttsInstructions: allTtsInstructions[1][testClient.choirId][testClient.ttsLang.iso] }
@@ -180,7 +174,7 @@ describe('activePerformance test', () => {
       expect(testClient2.send).toHaveBeenNthCalledWith(
         3,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           chunk: { ttsInstructions: allTtsInstructions[1][testClient2.choirId][testClient2.ttsLang.iso] }
@@ -200,7 +194,7 @@ describe('activePerformance test', () => {
       expect(testClient.send).toHaveBeenNthCalledWith(
         4,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           chunk: { ttsInstructions: allTtsInstructions[2][testClient.choirId][testClient.ttsLang.iso] }
@@ -209,7 +203,7 @@ describe('activePerformance test', () => {
       expect(testClient2.send).toHaveBeenNthCalledWith(
         4,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           chunk: { ttsInstructions: allTtsInstructions[2][testClient2.choirId][testClient2.ttsLang.iso] }
@@ -245,16 +239,11 @@ describe('activePerformance test', () => {
       const testClient2 = createMockWsClient(activePerformance.id, 1, false, { iso: 'de-DE', lang: 'Deutsch' })
       const testAdminClient = createMockWsClient(activePerformance.id, 0, true)
 
-      // Start sending interval
-      const startTime = 0
       const mockTrackId = generateMockId()
       const loopTrack = false
-      activePerformance.startSendingInterval(startTime, loopTrack, mockTrackId)
+      startSendingInterval(activePerformance, mockTrackId, loopTrack)
 
-      const oneMinuteInMs = 60000
-      jest.advanceTimersByTime(oneMinuteInMs)
-
-      const TIME_ADDED_TO_START = 2 // seconds
+      jest.advanceTimersByTime(ONE_MINUTE_IN_MS)
 
       const allTtsInstructions = chunks
         .filter((chunk: Frame) => chunk && chunk.ttsInstructions)
@@ -265,7 +254,7 @@ describe('activePerformance test', () => {
       expect(testClient.send).toHaveBeenNthCalledWith(
         2,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           chunk: { partials: [partialForTestClient] }
@@ -286,7 +275,7 @@ describe('activePerformance test', () => {
       expect(testClient.send).toHaveBeenNthCalledWith(
         3,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           // chunk: { ttsInstructions: allTtsInstructions[1][testClient.choirId][testClient.ttsLang.iso] }
@@ -297,7 +286,7 @@ describe('activePerformance test', () => {
       expect(testClient2.send).toHaveBeenNthCalledWith(
         2,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           chunk: { partials: [partialForTestClient] }
@@ -317,7 +306,7 @@ describe('activePerformance test', () => {
       expect(testClient.send).toHaveBeenNthCalledWith(
         4,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           chunk: { ttsInstructions: allTtsInstructions[2][testClient.choirId][testClient.ttsLang.iso] }
@@ -326,7 +315,7 @@ describe('activePerformance test', () => {
       expect(testClient2.send).toHaveBeenNthCalledWith(
         3,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           chunk: { ttsInstructions: allTtsInstructions[2][testClient2.choirId][testClient2.ttsLang.iso] }
@@ -346,7 +335,7 @@ describe('activePerformance test', () => {
       expect(testClient.send).toHaveBeenNthCalledWith(
         5,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           chunk: { ttsInstructions: allTtsInstructions[3][testClient.choirId][testClient.ttsLang.iso] }
@@ -355,7 +344,7 @@ describe('activePerformance test', () => {
       expect(testClient2.send).toHaveBeenNthCalledWith(
         4,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           chunk: { ttsInstructions: allTtsInstructions[3][testClient2.choirId][testClient2.ttsLang.iso] }
@@ -375,7 +364,7 @@ describe('activePerformance test', () => {
       expect(testClient.send).toHaveBeenNthCalledWith(
         6,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           chunk: { ttsInstructions: allTtsInstructions[4][testClient.choirId][testClient.ttsLang.iso] }
@@ -384,7 +373,7 @@ describe('activePerformance test', () => {
       expect(testClient2.send).toHaveBeenNthCalledWith(
         5,
         JSON.stringify({
-          startTime: startTime + TIME_ADDED_TO_START,
+          startTime: TIME_ADDED_TO_START,
           waveform,
           ttsRate,
           chunk: { ttsInstructions: allTtsInstructions[4][testClient2.choirId][testClient2.ttsLang.iso] }
@@ -397,6 +386,216 @@ describe('activePerformance test', () => {
           totalChunks,
           trackId: mockTrackId,
           loop: loopTrack
+        })
+      )
+    })
+
+    it('non-choir mode: should send same partial data to all clients in the performance', () => {
+      const trackMode: TrackMode = 'nonChoir'
+      const waveform = 'sine'
+      const ttsRate = '1'
+
+      const { activePerformance, chunks } = preparePerformance(
+        'tests/testFiles/testChunkFile_shortOnePartial.json',
+        trackMode,
+        waveform,
+        ttsRate
+      )
+
+      // Add clients to wss
+      const testClient = createMockWsClient(activePerformance.id, 0, false)
+      const testClient2 = createMockWsClient(activePerformance.id, 1, false)
+
+      startSendingInterval(activePerformance)
+
+      jest.advanceTimersByTime(ONE_MINUTE_IN_MS)
+
+      let expectedPartials = chunks[0]?.partials
+      expect(testClient.send).toHaveBeenNthCalledWith(
+        2,
+        JSON.stringify({
+          startTime: TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { partials: expectedPartials }
+        })
+      )
+      expect(testClient2.send).toHaveBeenNthCalledWith(
+        2,
+        JSON.stringify({
+          startTime: TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { partials: expectedPartials }
+        })
+      )
+
+      jest.advanceTimersByTime(SENDING_INTERVAL_LENGTH_IN_MS)
+
+      expectedPartials = chunks[1]?.partials
+      expect(testClient.send).toHaveBeenNthCalledWith(
+        3,
+        JSON.stringify({
+          startTime: TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { partials: expectedPartials }
+        })
+      )
+      expect(testClient2.send).toHaveBeenNthCalledWith(
+        3,
+        JSON.stringify({
+          startTime: TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { partials: expectedPartials }
+        })
+      )
+    })
+
+    it('non-choir mode: should send same tts instructions to all clients in the performance', () => {
+      const trackMode: TrackMode = 'nonChoir'
+      const waveform = 'sine'
+      const ttsRate = '1'
+
+      const { activePerformance, chunks } = preparePerformance(
+        'tests/testFiles/testChunkFile_ttsOneVoiceTwoLanguages.json',
+        trackMode,
+        waveform,
+        ttsRate
+      )
+
+      // Add clients to wss
+      const testClient = createMockWsClient(activePerformance.id, 0, false, { iso: 'en-US', lang: 'English' })
+      const testClient2 = createMockWsClient(activePerformance.id, 1, false, { iso: 'de-DE', lang: 'Deutsch' })
+
+      startSendingInterval(activePerformance)
+
+      jest.advanceTimersByTime(ONE_MINUTE_IN_MS)
+
+      const allTtsInstructions = chunks
+        .filter((chunk: Frame) => chunk && chunk.ttsInstructions)
+        .map((chunk: Frame) => chunk.ttsInstructions)
+
+      // Always only one voice in nonChoir mode
+      const firstAndOnlyTtsVoice = 0
+
+      expect(testClient.send).toHaveBeenNthCalledWith(
+        2,
+        JSON.stringify({
+          startTime: TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { partials: [], ttsInstructions: allTtsInstructions[0][firstAndOnlyTtsVoice][testClient.ttsLang.iso] }
+        })
+      )
+      expect(testClient2.send).toHaveBeenNthCalledWith(
+        2,
+        JSON.stringify({
+          startTime: TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { partials: [], ttsInstructions: allTtsInstructions[0][firstAndOnlyTtsVoice][testClient2.ttsLang.iso] }
+        })
+      )
+
+      jest.advanceTimersByTime(SENDING_INTERVAL_LENGTH_IN_MS)
+
+      expect(testClient.send).toHaveBeenNthCalledWith(
+        3,
+        JSON.stringify({
+          startTime: TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { partials: [], ttsInstructions: allTtsInstructions[1][firstAndOnlyTtsVoice][testClient.ttsLang.iso] }
+        })
+      )
+      expect(testClient2.send).toHaveBeenNthCalledWith(
+        3,
+        JSON.stringify({
+          startTime: TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { partials: [], ttsInstructions: allTtsInstructions[1][firstAndOnlyTtsVoice][testClient2.ttsLang.iso] }
+        })
+      )
+    })
+
+    it('non-choir mode: should send same partials and tts instructions to all clients in the performance', () => {
+      const trackMode: TrackMode = 'nonChoir'
+      const waveform = 'sine'
+      const ttsRate = '1'
+
+      const { activePerformance, chunks } = preparePerformance(
+        'tests/testFiles/testChunkFile_twoShortPartialsOneVoiceTwoLanguages.json',
+        trackMode,
+        waveform,
+        ttsRate
+      )
+
+      // Add clients to wss
+      const testClient = createMockWsClient(activePerformance.id, 0, false, { iso: 'en-US', lang: 'English' })
+      const testClient2 = createMockWsClient(activePerformance.id, 1, false, { iso: 'de-DE', lang: 'Deutsch' })
+
+      startSendingInterval(activePerformance)
+
+      jest.advanceTimersByTime(ONE_MINUTE_IN_MS)
+
+      const allTtsInstructions = chunks
+        .filter((chunk: Frame) => chunk && chunk.ttsInstructions)
+        .map((chunk: Frame) => chunk.ttsInstructions)
+
+      // Always only one voice in nonChoir mode
+      const firstAndOnlyTtsVoice = 0
+
+      const expectedPartials = chunks[0]?.partials
+      expect(testClient.send).toHaveBeenNthCalledWith(
+        2,
+        JSON.stringify({
+          startTime: TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: {
+            partials: expectedPartials
+          }
+        })
+      )
+      expect(testClient2.send).toHaveBeenNthCalledWith(
+        2,
+        JSON.stringify({
+          startTime: TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: {
+            partials: expectedPartials
+          }
+        })
+      )
+
+      jest.advanceTimersByTime(SENDING_INTERVAL_LENGTH_IN_MS * 2)
+
+      expect(testClient.send).toHaveBeenNthCalledWith(
+        4,
+        JSON.stringify({
+          startTime: TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: {
+            partials: [],
+            ttsInstructions: allTtsInstructions[2][firstAndOnlyTtsVoice][testClient.ttsLang.iso]
+          }
+        })
+      )
+      expect(testClient2.send).toHaveBeenNthCalledWith(
+        4,
+        JSON.stringify({
+          startTime: TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: {
+            partials: [],
+            ttsInstructions: allTtsInstructions[2][firstAndOnlyTtsVoice][testClient2.ttsLang.iso]
+          }
         })
       )
     })
@@ -424,6 +623,15 @@ describe('activePerformance test', () => {
       activePerformance.trackTtsRate = ttsRate
 
       return { activePerformance, chunks }
+    }
+
+    const startSendingInterval = (
+      activePerformance: ActivePerformance,
+      mockTrackId = generateMockId(),
+      loopTrack = false,
+      startTime = 0
+    ) => {
+      activePerformance.startSendingInterval(startTime, loopTrack, mockTrackId)
     }
   })
 })
