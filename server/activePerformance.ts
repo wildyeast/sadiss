@@ -147,9 +147,11 @@ export class ActivePerformance {
             // Partial of same index was distributed last iteration
             // Distribute again to same client, if client still connected
             const clientIdsLastIteration = partialMap[partial.index]
+            console.log('Client ids last iteration: ', clientIdsLastIteration)
             for (const clientId of clientIdsLastIteration) {
               const client = clients.find((c) => c.id === clientId)
               if (!client) {
+                console.log('Client has disconnected!')
                 // Client has disconnected
                 clientIdsLastIteration.splice(clientIdsLastIteration.indexOf(clientId, 1))
 

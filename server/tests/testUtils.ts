@@ -71,9 +71,8 @@ export const createMockWsClient = (
   isAdmin = false,
   ttsLang = { iso: 'en-US', lang: 'English' }
 ) => {
-  const mockClientId = generateMockId()
   const mockClient = {
-    id: mockClientId,
+    id: generateMockId(),
     readyState: 1,
     performanceId,
     choirId,

@@ -600,6 +600,147 @@ describe('activePerformance test', () => {
       )
     })
 
+    it('should not start sending interval if already started', () => {
+      const trackMode = 'choir'
+      const waveform = 'sine'
+      const ttsRate = '1'
+
+      const { activePerformance } = preparePerformance(
+        'tests/testFiles/testChunkFile_shortOnePartial.json',
+        trackMode,
+        waveform,
+        ttsRate
+      )
+
+      activePerformance.startSendingInterval(0, false, generateMockId())
+
+      expect(activePerformance.startSendingInterval(0, false, generateMockId())).toBe(false)
+    })
+
+    it('should reset chunkIndex to 0 if loop is true', () => {
+      const trackMode = 'choir'
+      const waveform = 'sine'
+      const ttsRate = '1'
+
+      const { activePerformance, chunks } = preparePerformance(
+        'tests/testFiles/testChunkFile_shortOnePartial.json',
+        trackMode,
+        waveform,
+        ttsRate
+      )
+
+      const totalChunks = chunks.length
+
+      const testClient = createMockWsClient(activePerformance.id, 0, false)
+
+      const mockTrackId = generateMockId()
+      const loopTrack = true
+      startSendingInterval(activePerformance, mockTrackId, loopTrack)
+
+      jest.advanceTimersByTime(SENDING_INTERVAL_LENGTH_IN_MS * (totalChunks + 1))
+
+      const expectedPartials = chunks[0]?.partials
+      expect(testClient.send).toHaveBeenNthCalledWith(
+        4,
+        JSON.stringify({
+          startTime: TIME_ADDED_TO_START + totalChunks,
+          waveform,
+          ttsRate,
+          chunk: { partials: expectedPartials }
+        })
+      )
+    })
+
+    it('should give all partials to a client if there is only one client and give a client joining late only one partial', () => {
+      const trackMode = 'choir'
+      const waveform = 'sine'
+      const ttsRate = '1'
+
+      const { activePerformance, chunks } = preparePerformance(
+        'tests/testFiles/testChunkFile_twoShortPartialsTwoVoicesTwoLanguages.json',
+        trackMode,
+        waveform,
+        ttsRate
+      )
+
+      const testClient = createMockWsClient(activePerformance.id, 0, false)
+
+      const mockTrackId = generateMockId()
+      const loopTrack = false
+      startSendingInterval(activePerformance, mockTrackId, loopTrack)
+
+      jest.advanceTimersByTime(SENDING_INTERVAL_LENGTH_IN_MS)
+
+      const expectedPartials = chunks[0]?.partials
+      expect(testClient.send).toHaveBeenNthCalledWith(
+        2,
+        JSON.stringify({
+          startTime: TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { partials: expectedPartials }
+        })
+      )
+
+      const testClient2 = createMockWsClient(activePerformance.id, 1, false)
+
+      jest.advanceTimersByTime(SENDING_INTERVAL_LENGTH_IN_MS)
+
+      const expectedPartialsForClient2 = chunks[1]?.partials[1]
+      expect(testClient2.send).toHaveBeenNthCalledWith(
+        1,
+        JSON.stringify({
+          startTime: TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { partials: [expectedPartialsForClient2] }
+        })
+      )
+    })
+
+    it('should give partials that were distributed last iteration to the client with the least amount of partials if the clients the partials were distributed to before have disconnected', () => {
+      const trackMode = 'choir'
+      const waveform = 'sine'
+      const ttsRate = '1'
+
+      const { activePerformance, chunks } = preparePerformance(
+        'tests/testFiles/testChunkFile_two6sPartials.json',
+        trackMode,
+        waveform,
+        ttsRate
+      )
+
+      const testClient = createMockWsClient(activePerformance.id, 0, false)
+      createMockWsClient(activePerformance.id, 0, false)
+
+      const mockTrackId = generateMockId()
+      const loopTrack = false
+      startSendingInterval(activePerformance, mockTrackId, loopTrack)
+
+      jest.advanceTimersByTime(SENDING_INTERVAL_LENGTH_IN_MS)
+
+      const testClient2 = createMockWsClient(activePerformance.id, 0, false)
+
+      jest.advanceTimersByTime(SENDING_INTERVAL_LENGTH_IN_MS)
+
+      testWss.clients.delete(testClient as any)
+
+      jest.advanceTimersByTime(SENDING_INTERVAL_LENGTH_IN_MS)
+
+      const expectedPartials = chunks[3]?.partials
+      expect(testClient2.send).toHaveBeenNthCalledWith(
+        3,
+        JSON.stringify({
+          startTime: TIME_ADDED_TO_START,
+          waveform,
+          ttsRate,
+          chunk: { partials: [expectedPartials] }
+        })
+      )
+    })
+
+    // it('should not start sending interval if no track is loaded', () => {// TODO})
+
     // it('should not send partials and ttsInstructions to admin clients', () => {
     //   // TODO
     //   expect(true).toBe(false)
