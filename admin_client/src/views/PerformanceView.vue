@@ -3,7 +3,8 @@ import {
   getPerformanceWithTracks,
   getClientCountPerChoirId,
   loadTrackForPlayback,
-  updateTrackPerformanceOrder
+  updateTrackPerformanceOrder,
+  removeTrackFromPerformance
 } from '@/services/api'
 import type { SadissPerformance, Track, TrackPerformanceIdAndSortOrder } from '@/types/types'
 import { onMounted, ref, computed, onUnmounted } from 'vue'
@@ -49,6 +50,11 @@ const onSortOrderUpdate = async () => {
   selectedTrackIndex.value = -1
 
   await updateTrackPerformanceOrder(trackPerformanceIdsAndSortOrders)
+}
+
+const handleRemoveTrackFromPerformance = async (trackPerformanceId: string) => {
+  await removeTrackFromPerformance(trackPerformanceId)
+  tracks.value = tracks.value.filter((track) => track.trackPerformanceId !== trackPerformanceId)
 }
 
 const trackLoaded = ref<boolean>(false)
@@ -138,12 +144,21 @@ onUnmounted(() => {
           class="flex w-full items-center justify-between border p-4"
           :class="{ 'bg-secondary': selectedTrack === track }">
           <p>{{ track.name }}</p>
-          <font-awesome-icon
-            icon="fa-bars"
-            size="lg"
-            class="drag-handle"
-            @click.stop
-            title="Click and drag to change order" />
+          <div class="flex gap-4">
+            <font-awesome-icon
+              @click.stop="handleRemoveTrackFromPerformance(track.trackPerformanceId as string)"
+              icon="fa-trash"
+              size="lg"
+              class="mr-2"
+              title="Remove track from performance" />
+
+            <font-awesome-icon
+              icon="fa-bars"
+              size="lg"
+              class="drag-handle"
+              @click.stop
+              title="Click and drag to change order" />
+          </div>
         </button>
       </VueDraggable>
       <div

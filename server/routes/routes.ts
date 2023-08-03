@@ -81,6 +81,8 @@ router.post(
 // Update sortOrder of trackPerformance
 router.post('/api/track-performance/update-order', track_performance_controller.updateTrackPerformanceOrder)
 
+router.post('/api/track-performance/delete', track_performance_controller.deleteTrackFromPerformance)
+
 /* PERFORMANCE VIEW */
 // Get performance with tracks
 router.get('/api/performance/:id/with-tracks', performance_view_controller.getPerformanceWithTracks)

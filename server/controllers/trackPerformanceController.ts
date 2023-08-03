@@ -78,6 +78,24 @@ exports.updateTrackPerformanceOrder = async (req: Request, res: Response) => {
   }
 }
 
+exports.deleteTrackFromPerformance = async (req: Request, res: Response) => {
+  try {
+    const { trackPerformanceId } = req.body
+
+    // Check if the provided data is valid
+    if (!trackPerformanceId || !isValidObjectId(trackPerformanceId)) {
+      return res.status(400).send({ error: 'Invalid input data' })
+    }
+
+    // Delete the TrackPerformance record
+    await TrackPerformance.findByIdAndDelete(trackPerformanceId)
+
+    res.status(200).send({ message: 'Track performance deleted' })
+  } catch (error) {
+    res.status(500).send({ error: 'Server error' })
+  }
+}
+
 // Currently unused?
 // exports.getTracksOfPerformance = async (req: Request, res: Response) => {
 //   try {

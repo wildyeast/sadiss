@@ -283,6 +283,19 @@ export async function addTrackToPerformance(trackId: string, performanceId: stri
   return response.data!.trackPerformance
 }
 
+export async function removeTrackFromPerformance(trackPerformanceId: string) {
+  const response = await request<{ message: string }>(`/api/track-performance/delete`, {
+    method: 'POST',
+    body: JSON.stringify({ trackPerformanceId })
+  })
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.message
+}
+
 export async function getPerformanceWithTracks(id: string) {
   const response = await request<{ performance: SadissPerformance }>(`/api/performance/${id}/with-tracks`)
 
