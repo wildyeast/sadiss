@@ -90,7 +90,7 @@ exports.deleteTrack = async (req: Request, res: Response) => {
     }
 
     // Delete TrackPerformances, if any
-    const trackPerformances = await TrackPerformance.find({ trackId: track._id })
+    const trackPerformances = await TrackPerformance.find({ track })
     for (const trackPerformance of trackPerformances) {
       await trackPerformance.remove()
     }
