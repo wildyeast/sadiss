@@ -93,8 +93,11 @@ export function usePlayer() {
   const setBreakpoints = (oscNode: OscillatorNode, gainNode: GainNode, breakpoints: Breakpoint[], chunkEndTime: number) => {
     oscNode.stop(chunkEndTime + outputLatencyOffset)
     for (const bp of breakpoints) {
-      oscNode.frequency.setValueAtTime(bp.freq, currentChunkStartTimeInCtxTime.value + bp.time + outputLatencyOffset)
-      gainNode.gain.setValueAtTime(bp.amp, currentChunkStartTimeInCtxTime.value + bp.time + outputLatencyOffset)
+      oscNode.frequency.exponentialRampToValueAtTime(
+        bp.freq,
+        currentChunkStartTimeInCtxTime.value + bp.time + outputLatencyOffset
+      )
+      gainNode.gain.exponentialRampToValueAtTime(bp.amp, currentChunkStartTimeInCtxTime.value + bp.time + outputLatencyOffset)
     }
   }
 
