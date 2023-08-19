@@ -20,7 +20,7 @@ PODS:
     - Capacitor
   - CordovaPlugins (4.2.0):
     - CapacitorCordova
-  - HugotomaziCapacitorNavigationBar (2.0.0):
+  - HugotomaziCapacitorNavigationBar (2.0.1):
     - Capacitor
 
 DEPENDENCIES:
@@ -75,8 +75,8 @@ SPEC CHECKSUMS:
   CapacitorPreferences: 1d66dc32299f55ed632c5611f312878979275ea5
   CapacitorStatusBar: e6cf2a9ed07f92ddae9ca101be36d08c61866b35
   CordovaPlugins: fd78569316dfb29cc635ddee18cde538a5d065cd
-  HugotomaziCapacitorNavigationBar: 026a9c46b514b6752f89d12c6cb66c2a50a1a1d5
+  HugotomaziCapacitorNavigationBar: 9220af908152f38caa3963b8de23c36bf43d2468
 
 PODFILE CHECKSUM: 18c8b85326364af0fc5a5f84ae7d9bfa848035a9
 
-COCOAPODS: 1.12.0
+COCOAPODS: 1.12.1
