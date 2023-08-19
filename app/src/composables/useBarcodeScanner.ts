@@ -59,7 +59,7 @@ export function useBarcodeScanner() {
     // Expert Mode
     const expertModeResult = result.expertMode
     if (expertModeResult) {
-      mainStore.expertMode = expertModeResult === 'true'
+      mainStore.expertMode = expertModeResult
     }
 
     const performanceIdResult = result.performanceId

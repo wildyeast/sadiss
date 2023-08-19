@@ -51,6 +51,6 @@ export interface QrCodeScanResult {
   tts?: AvailableLanguage[]
   roleName?: string
   defaultLang?: string
-  expertMode?: string
+  expertMode?: boolean
   wsUrl: string
 }
