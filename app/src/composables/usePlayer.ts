@@ -3,6 +3,8 @@ import { TextToSpeech } from '@capacitor-community/text-to-speech'
 import { PartialChunk, OscillatorObject, Breakpoint } from '../types/types'
 
 const BREAKPOINT_LENGTH = 0.01 // in seconds
+const AMP_MIN_VALUE = 0.000001
+const FREQ_MIN_VALUE = 0.000001
 
 let ctx: AudioContext
 let offset: number
@@ -72,7 +74,7 @@ export function usePlayer() {
           oscNode.type = waveform
 
           // Set initial gain to 0 and start osc immediately
-          gainNode.gain.setValueAtTime(0, ctx.currentTime)
+          gainNode.gain.setValueAtTime(AMP_MIN_VALUE, ctx.currentTime)
           oscNode.start()
 
           setBreakpoints(oscNode, gainNode, partialChunk.breakpoints)
@@ -103,10 +105,10 @@ export function usePlayer() {
       let ampToSet = bp.amp
       // Set values <= 0 to 0.000001 because exponentialRampToValueAtTime doesn't work with 0 (or values less than 0)
       if (freqToSet <= 0) {
-        freqToSet = 0.000001
+        freqToSet = FREQ_MIN_VALUE
       }
       if (ampToSet <= 0) {
-        ampToSet = 0.000001
+        ampToSet = AMP_MIN_VALUE
       }
       oscNode.frequency.exponentialRampToValueAtTime(
         freqToSet,
@@ -122,23 +124,26 @@ export function usePlayer() {
       for (const oscObj of oscillators) {
         const oscEndTimeReached = ctx.currentTime > startTimeInCtxTime + oscObj.endTime + outputLatencyOffset
         if (oscEndTimeReached) {
-          console.log(`Stopping oscillator ${oscObj.index}.`)
-          oscObj.gain.gain.setValueAtTime(oscObj.lastGain, startTimeInCtxTime + oscObj.endTime + outputLatencyOffset)
-          oscObj.gain.gain.exponentialRampToValueAtTime(0.000001, startTimeInCtxTime + oscObj.endTime + outputLatencyOffset + 0.3)
-          oscObj.oscillator.stop(startTimeInCtxTime + oscObj.endTime + outputLatencyOffset + 0.3)
-
-          // Remove from array
-          oscillators.splice(oscillators.indexOf(oscObj), 1)
+          fadeOutAndStopOscillator(oscObj)
         }
       }
     }, 100)
   }
 
+  const fadeOutAndStopOscillator = (oscObj: OscillatorObject) => {
+    oscObj.gain.gain.setValueAtTime(oscObj.lastGain, ctx.currentTime)
+    oscObj.gain.gain.exponentialRampToValueAtTime(AMP_MIN_VALUE, ctx.currentTime + 0.3)
+    oscObj.oscillator.stop(ctx.currentTime + 0.3)
+
+    // Remove from array
+    oscillators.splice(oscillators.indexOf(oscObj), 1)
+  }
+
   const setStartTime = (startTime: number) => (startTimeInCtxTime = startTime - offset)
 
   const stopPlayback = () => {
-    for (const osc of oscillators) {
-      osc.oscillator.stop()
+    for (const oscObj of oscillators) {
+      fadeOutAndStopOscillator(oscObj)
     }
   }
 
@@ -159,11 +164,7 @@ export function usePlayer() {
 
   const setMotionRef = (motionRef: { pos: number }) => (motion = motionRef)
 
-  const setOffset = () => {
-    console.log(motion.pos, ctx.currentTime)
-    offset = motion.pos - ctx.currentTime
-    console.log('Offset: ', offset)
-  }
+  const setOffset = () => (offset = motion.pos - ctx.currentTime)
 
   const setTrackSettings = (wf: OscillatorType, rate: string) => {
     waveform = wf
