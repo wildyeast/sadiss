@@ -27,6 +27,8 @@ export interface OscillatorObject {
   index: number
   oscillator: OscillatorNode
   gain: GainNode
+  endTime: number
+  lastGain: number
 }
 
 export interface TtsInstruction {
