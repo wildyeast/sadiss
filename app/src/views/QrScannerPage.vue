@@ -26,6 +26,7 @@
           </a>
           for more information on the software system.
         </p>
+        <p class="mt-4 text-[12px]">v1.0.6.4</p>
         <div
           v-if="mainStore.processing"
           class="flex h-full items-center justify-center">
