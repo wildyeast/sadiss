@@ -73,8 +73,8 @@ export function usePlayer() {
 
           oscNode.type = waveform
 
-          // Set intial frequency to the first breakpoint's frequency and start osc immediately
-          // oscNode.frequency.value = partialChunk.breakpoints[0].freq
+          // Set initial frequency to the first breakpoint's frequency and start osc immediately
+          oscNode.frequency.value = partialChunk.breakpoints[0].freq
 
           // Set initial gain to 0 and start osc immediately
           gainNode.gain.value = AMP_MIN_VALUE
