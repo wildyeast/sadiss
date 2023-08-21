@@ -74,7 +74,7 @@ export function usePlayer() {
           oscNode.type = waveform
 
           // Set initial gain to 0 and start osc immediately
-          gainNode.gain.setValueAtTime(AMP_MIN_VALUE, ctx.currentTime)
+          gainNode.gain.value = AMP_MIN_VALUE
           oscNode.start()
 
           setBreakpoints(oscNode, gainNode, partialChunk.breakpoints)
