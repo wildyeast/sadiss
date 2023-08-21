@@ -7,6 +7,8 @@ interface Frame {
   ttsInstructions: { [voice: string]: { [lang: string]: string } }
 }
 
+const MAX_PARTIALS_PER_CLIENT = 16
+
 export class ActivePerformance {
   public loadedTrack: Frame[] = []
   public trackMode: TrackMode = 'choir'
@@ -144,6 +146,17 @@ export class ActivePerformance {
         for (const partial of partials) {
           newPartialMap[partial.index] = []
 
+          /**
+          * Returns true if partial was distributed to a client. Returns false if all clients have reached max partials.
+          */
+          const distributePartialToNewClient = () => {
+            const clientIdWithMinPartials = getClientIdWithMinPartials(allocatedPartials, clients)
+            if (!clientIdWithMinPartials) return false
+            newPartialMap[partial.index].push(clientIdWithMinPartials)
+            allocatedPartials[clientIdWithMinPartials].push(partial)
+            return true
+          }
+
           if (partial.index in partialMap) {
             // Partial of same index was distributed last iteration
             // Distribute again to same client, if client still connected
@@ -156,11 +169,8 @@ export class ActivePerformance {
 
                 // If all clients disconnected, give to client with least partials
                 if (!clientIdsLastIteration.length) {
-                  const clientIdWithMinPartials = getClientIdWithMinPartials(allocatedPartials, clients)
-                  if (clientIdWithMinPartials) {
-                    newPartialMap[partial.index].push(clientIdWithMinPartials)
-                    allocatedPartials[clientIdWithMinPartials].push(partial)
-                  }
+                  const partialDistributed = distributePartialToNewClient()
+                  if (!partialDistributed) break
                 }
               } else {
                 // Client still connected
@@ -170,11 +180,8 @@ export class ActivePerformance {
             }
           } else {
             // Partial was not distributed last iteration
-            const clientIdWithMinPartials = getClientIdWithMinPartials(allocatedPartials, clients)
-            if (clientIdWithMinPartials) {
-              newPartialMap[partial.index].push(clientIdWithMinPartials)
-              allocatedPartials[clientIdWithMinPartials].push(partial)
-            }
+            const partialDistributed = distributePartialToNewClient()
+            if (!partialDistributed) break
           }
         }
 
@@ -192,9 +199,6 @@ export class ActivePerformance {
             allocatedPartials[client.id].push(partial)
           }
         }
-
-        // console.log('Allocation finished. Clients to distribute to: ', Object.keys(allocatedPartials))
-        console.log('Allocation finished. Clients to distribute to: ', allocatedPartials)
       }
 
       for (const client of clients) {
@@ -235,11 +239,19 @@ export class ActivePerformance {
         }
       }
 
+      // Create array of objects with clientId and partials and sort by number of allocated partials
       const p = Object.keys(allocatedPartials)
         .map((k) => ({ clientId: k, partials: allocatedPartials[k] }))
         .sort((a, b) => a.partials.length - b.partials.length)
       if (!p) return
       if (!p[0]) return
+
+      // If client with least amount of partials has reached max partials, return null
+      // leading to the partial not being distributed
+      if (p[0].partials.length >= MAX_PARTIALS_PER_CLIENT) {
+        return null
+      }
+
       return p[0].clientId
 
       // Probably faster
