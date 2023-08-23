@@ -11,7 +11,6 @@ import { onMounted, ref, computed, onUnmounted } from 'vue'
 import { useRoute } from 'vue-router'
 import PlayerControls from '@/components/PlayerControls.vue'
 import QrCodesModal from '@/components/QrCodesModal.vue'
-import FixedViewHeader from '@/components/FixedViewHeader.vue'
 import { useStore } from '@/stores/store'
 import { VueDraggable } from 'vue-draggable-plus'
 
@@ -100,12 +99,14 @@ onUnmounted(() => {
 //https://github.com/Alfred-Skyblue/vue-draggable-plus
 </script>
 <template>
-  <main class="flex h-screen flex-col justify-between">
+  <main class="h-full">
     <div
       v-if="performance"
-      class="flex flex-col">
-      <FixedViewHeader :title="performance.name">
-        <div class="flex items-center justify-between">
+      class="flex h-full flex-col">
+      <!-- Page Header -->
+      <div class="sticky top-0 flex flex-col items-center justify-between bg-primary pb-4">
+        <h3 class="pb-4 text-center text-3xl font-bold">{{ performance.name }}</h3>
+        <div class="flex w-full justify-between">
           <p>Created by: {{ performance.creator.username }}</p>
           <button
             @click.stop="qrCodesModal?.openModal()"
@@ -115,52 +116,52 @@ onUnmounted(() => {
               size="xl" />
           </button>
         </div>
-      </FixedViewHeader>
-
-      <!-- Spacer for pushing content below down so it is visible below the fixed header
-        TODO: Maybe do away with the fixed header or think of a less annoying way of doing this. -->
-      <div class="mt-12 pt-16"></div>
-
-      <div
-        v-if="Object.keys(connectedClients).length"
-        class="flex gap-4">
-        <span v-for="choirId of Object.keys(connectedClients)">
-          <font-awesome-icon
-            icon="fa-qrcode"
-            class="mr-1" />{{ choirId }}: {{ connectedClients[choirId] }}</span
-        >
+        <!-- List of connected clients -->
+        <div
+          v-if="Object.keys(connectedClients).length"
+          class="flex gap-4">
+          <span v-for="choirId of Object.keys(connectedClients)">
+            <font-awesome-icon
+              icon="fa-qrcode"
+              class="mr-1" />
+            {{ choirId }}: {{ connectedClients[choirId] }}
+          </span>
+        </div>
       </div>
 
-      <VueDraggable
+      <!-- Track list -->
+      <div
         v-if="tracks.length"
-        v-model="tracks"
-        class="mt-4 flex-1 space-y-2 overflow-y-scroll"
-        handle=".drag-handle"
-        animation="100"
-        @update="onSortOrderUpdate">
-        <button
-          v-for="(track, index) in tracks"
-          @click="selectTrack(index)"
-          class="flex w-full items-center justify-between border p-4"
-          :class="{ 'bg-secondary': selectedTrack === track }">
-          <p>{{ track.name }}</p>
-          <div class="flex gap-4">
-            <font-awesome-icon
-              @click.stop="handleRemoveTrackFromPerformance(track.trackPerformanceId as string)"
-              icon="fa-trash"
-              size="lg"
-              class="mr-2"
-              title="Remove track from performance" />
-
-            <font-awesome-icon
-              icon="fa-bars"
-              size="lg"
-              class="drag-handle"
-              @click.stop
-              title="Click and drag to change order" />
-          </div>
-        </button>
-      </VueDraggable>
+        class="mt-4 space-y-2 overflow-y-scroll">
+        <VueDraggable
+          v-model="tracks"
+          class="space-y-2 py-4"
+          handle=".drag-handle"
+          animation="100"
+          @update="onSortOrderUpdate">
+          <button
+            v-for="(track, index) in tracks"
+            @click="selectTrack(index)"
+            class="flex w-full items-center justify-between border p-4"
+            :class="{ 'bg-secondary': selectedTrack === track }">
+            <p>{{ track.name }}</p>
+            <div class="flex gap-4">
+              <font-awesome-icon
+                @click.stop="handleRemoveTrackFromPerformance(track.trackPerformanceId as string)"
+                icon="fa-trash"
+                size="lg"
+                class="mr-2"
+                title="Remove track from performance" />
+              <font-awesome-icon
+                icon="fa-bars"
+                size="lg"
+                class="drag-handle"
+                @click.stop
+                title="Click and drag to change order" />
+            </div>
+          </button>
+        </VueDraggable>
+      </div>
       <div
         v-else-if="store.userName === performance.creator.username"
         class="bg-red flex h-full flex-col items-center">
@@ -179,16 +180,16 @@ onUnmounted(() => {
           Ask <span class="font-bold">{{ performance.creator.username }}</span> to add some.
         </p>
       </div>
+      <PlayerControls
+        v-if="selectedTrack"
+        :performance-id="(performanceId as string)"
+        :selectedTrack="selectedTrack"
+        :next-track="nextTrack"
+        :track-loaded="trackLoaded"
+        @nextTrackStarted="nextTrackStarted"
+        @set-current-track="setCurrentTrack"
+        class="sticky bottom-0 bg-primary py-2" />
     </div>
-
-    <PlayerControls
-      v-if="selectedTrack"
-      :performance-id="(performanceId as string)"
-      :selectedTrack="selectedTrack"
-      :next-track="nextTrack"
-      :track-loaded="trackLoaded"
-      @nextTrackStarted="nextTrackStarted"
-      @set-current-track="setCurrentTrack" />
 
     <QrCodesModal
       ref="qrCodesModal"

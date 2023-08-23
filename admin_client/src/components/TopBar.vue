@@ -58,7 +58,8 @@ onUnmounted(() => {
 })
 </script>
 <template>
-  <header class="z-10 flex h-[80px] w-full items-center justify-between border-b border-light bg-primary px-2 lg:px-10">
+  <header
+    class="sticky top-0 z-10 mb-6 flex min-h-[80px] w-full items-center justify-between border-b border-light bg-primary px-2 lg:px-10">
     <router-link to="/">
       <img
         src="https://sadiss.net/wp-content/uploads/2022/07/Sadiss-Logo.png"
