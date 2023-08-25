@@ -330,8 +330,7 @@ watch(trackTtsRate, (newValue) => {
         type="submit"
         formmethod="dialog"
         class="text-white rounded-sm bg-primary p-2">
-        <span v-if="!isEditingTrack">Add Track</span>
-        <span v-else>Edit Track</span>
+        <span>Save</span>
       </button>
     </form>
   </BaseModal>
