@@ -228,35 +228,38 @@ exports.editTrack = async (req: Request, res: Response) => {
 
   const patch = req.body
 
-  const { path, partialFileToSave } = handleUploadedPartialFile(<File[]>req.files)
-  if (Object.keys(partialFileToSave).length) {
-    patch.partialFile = partialFileToSave
-  }
+  // Editing track currently disabled since it doesn't work correctly
+  // see https://github.com/wildyeast/sadiss/issues/71#issuecomment-1587183286 for more information
+  // TODO: Fix this
+  // const { path, partialFileToSave } = handleUploadedPartialFile(<File[]>req.files)
+  // if (Object.keys(partialFileToSave).length) {
+  //   patch.partialFile = partialFileToSave
+  // }
 
-  const { ttsFilesToSave, ttsLangs, ttsJson } = handleUploadedTtsFiles(<File[]>req.files)
-  if (ttsFilesToSave.length && ttsLangs) {
-    patch.ttsFiles = ttsFilesToSave
-    patch.ttsLangs = Array.from(ttsLangs)
-  }
+  // const { ttsFilesToSave, ttsLangs, ttsJson } = handleUploadedTtsFiles(<File[]>req.files)
+  // if (ttsFilesToSave.length && ttsLangs) {
+  //   patch.ttsFiles = ttsFilesToSave
+  //   patch.ttsLangs = Array.from(ttsLangs)
+  // }
 
-  const { partialsCount, chunks } = await chunk(path, ttsJson)
+  // const { partialsCount, chunks } = await chunk(path, ttsJson)
 
-  if (Object.keys(chunks)) {
-    const filename = uuid.v4()
-    fs.writeFile(`chunks/${filename}`, JSON.stringify(chunks), (err: any) => {
-      if (err) {
-        console.error(err)
-      }
-    })
-  }
+  // if (Object.keys(chunks)) {
+  //   const filename = uuid.v4()
+  //   fs.writeFile(`chunks/${filename}`, JSON.stringify(chunks), (err: any) => {
+  //     if (err) {
+  //       console.error(err)
+  //     }
+  //   })
+  // }
 
-  if (partialsCount > 0 && patch.mode === 'choir') {
-    patch.partialsCount = partialsCount
-  } else {
-    patch.partialsCount = undefined
-  }
+  // if (partialsCount > 0 && patch.mode === 'choir') {
+  //   patch.partialsCount = partialsCount
+  // } else {
+  //   patch.partialsCount = undefined
+  // }
 
-  patch.chunks = JSON.stringify(chunks)
+  // patch.chunks = JSON.stringify(chunks)
 
   track.set(patch)
 

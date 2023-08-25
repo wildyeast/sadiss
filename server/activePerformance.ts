@@ -147,8 +147,8 @@ export class ActivePerformance {
           newPartialMap[partial.index] = []
 
           /**
-          * Returns true if partial was distributed to a client. Returns false if all clients have reached max partials.
-          */
+           * Returns true if partial was distributed to a client. Returns false if all clients have reached max partials.
+           */
           const distributePartialToNewClient = () => {
             const clientIdWithMinPartials = getClientIdWithMinPartials(allocatedPartials, clients)
             if (!clientIdWithMinPartials) return false

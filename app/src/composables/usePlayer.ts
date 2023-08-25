@@ -18,6 +18,14 @@ export function usePlayer() {
   const oscillators: OscillatorObject[] = []
   const currentChunkStartTimeInCtxTime = ref()
 
+  /**
+   * Prepares the audio context and warms up the TTS engine
+   */
+  const playbackPreparation = () => {
+    startAudioCtx()
+    warmUpTtsEngine()
+  }
+
   const startAudioCtx = () => {
     console.log('Starting ctx.')
     ctx = new AudioContext()
@@ -37,6 +45,22 @@ export function usePlayer() {
     }
 
     setOffset()
+  }
+
+  /**
+   * Warms up the TTS engine by speaking a 3 times with volume set to 0
+   */
+  const warmUpTtsEngine = async () => {
+    for (let i = 0; i < 3; i++) {
+      await TextToSpeech.speak({
+        text: 'Warming up TTS engine.',
+        lang: 'en-US',
+        rate: 1.0,
+        pitch: 1.0,
+        volume: 0.0,
+        category: 'playback'
+      })
+    }
   }
 
   let startTimeInCtxTime: number
@@ -178,7 +202,7 @@ export function usePlayer() {
 
   return {
     handleChunkData,
-    startAudioCtx,
+    playbackPreparation,
     setStartTime,
     setTtsLanguage,
     setMotionRef,
