@@ -124,18 +124,18 @@ export function usePlayer() {
 
     if (trackData.ttsInstructions) {
       const tts = trackData.ttsInstructions
-      console.log('Speaking: ', tts)
       if (typeof tts !== 'string') {
         // New format with time and phrase, where TTS is spoken exactly when intended
-        const speakingInterval = setInterval(async () => {
+        const speakingInterval = setInterval(() => {
           if (ctx.currentTime >= startTimeInCtxTime + tts.time + outputLatencyOffset) {
-            await speak(tts.phrase)
             clearInterval(speakingInterval)
+            speak(tts.phrase)
           }
         }, 100)
       } else {
         // For backwards compatibility
-        await speak(tts)
+        console.log('Speaking: ', tts)
+        speak(tts)
       }
     }
   }
