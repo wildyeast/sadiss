@@ -65,7 +65,10 @@ export function usePlayer() {
 
   let startTimeInCtxTime: number
 
-  const handleChunkData = async (trackData: { partials: PartialChunk[]; ttsInstructions: string }) => {
+  const handleChunkData = async (trackData: {
+    partials: PartialChunk[]
+    ttsInstructions: { time: number; phrase: string } | string // Type string for backwards compatibility
+  }) => {
     if (!fadeOutAndStopOscillatorsInterval) {
       startFadeOutAndStopOscillatorsInterval() // Currently we leave this running until app is closed
     }
@@ -122,7 +125,18 @@ export function usePlayer() {
     if (trackData.ttsInstructions) {
       const tts = trackData.ttsInstructions
       console.log('Speaking: ', tts)
-      await speak(tts)
+      if (typeof tts !== 'string') {
+        // New format with time and phrase, where TTS is spoken exactly when intended
+        const speakingInterval = setInterval(async () => {
+          if (ctx.currentTime >= startTimeInCtxTime + tts.time + outputLatencyOffset) {
+            await speak(tts.phrase)
+            clearInterval(speakingInterval)
+          }
+        }, 100)
+      } else {
+        // For backwards compatibility
+        await speak(tts)
+      }
     }
   }
 

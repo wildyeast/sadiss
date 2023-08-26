@@ -23,6 +23,10 @@ export interface TtsJson {
   }
 }
 
+export interface TtsInstructions {
+  [voice: string]: { time: number; langs: { [language: string]: string } }
+}
+
 export type TrackMode = 'choir' | 'nonChoir'
 
 export interface UserDocument extends Document {

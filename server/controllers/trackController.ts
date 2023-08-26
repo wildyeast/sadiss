@@ -350,12 +350,12 @@ const handleUploadedTtsFiles = (files: File[]) => {
   }
   return { ttsFilesToSave, ttsLangs, ttsJson }
 }
+
 /**
  * Initializes an active performance if it doesn't already exist.
  * @param {string} performanceId - ID of the performance.
  * @return {ActivePerformance} The active performance.
  */
-
 const initializeActivePerformances = (performanceId: string) => {
   // Check if performance already exists
   let activePerformance = activePerformances.find((p) => p.id === performanceId)
