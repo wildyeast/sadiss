@@ -23,7 +23,7 @@ export const useMainStore = defineStore('main', () => {
   // const roleName = ref('DefaultRoleName')
   // const performanceName = ref('DefaultPerformanceName')
   // const defaultLang = ref('en-US')
-  // const selectedLanguage = ref('en-US')
+  // const selectedLanguage = ref({ iso: 'en-US', lang: 'English' })
 
   return {
     availableLanguages,
