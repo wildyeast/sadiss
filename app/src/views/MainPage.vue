@@ -46,7 +46,7 @@
           </div>
         </div>
 
-        <p class="text-[12px]">v1.0.7</p>
+        <p class="text-[12px]">v1.0.8</p>
       </BasePage>
     </ion-content>
   </ion-page>
