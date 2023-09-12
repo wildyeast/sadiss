@@ -45,9 +45,6 @@ export function useBarcodeScanner() {
       mainStore.defaultLang = defaultLangResult
     }
 
-    // Timestamp of scan
-    // await setPreference('lastScanTimestamp', Date.now().toString())
-
     // TTS langs
     const ttsLangsResult = result.tts
     if (ttsLangsResult) {
