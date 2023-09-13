@@ -1,4 +1,4 @@
-import { PartialChunk, TtsJson } from '../types/types'
+import { PartialChunk, TtsInstructions, TtsJson } from '../types/types'
 import readline from 'readline'
 
 const fs = require('fs')
@@ -13,7 +13,7 @@ export const chunk = async (path?: string, ttsInstructions?: TtsJson) => {
     return {
       time: 0,
       partials: <PartialChunk[]>[],
-      ttsInstructions: <{ [voice: string]: { [language: string]: string } }>{}
+      ttsInstructions: <TtsInstructions>{}
     }
   }
   let chunk = initChunk()
@@ -90,18 +90,30 @@ export const chunk = async (path?: string, ttsInstructions?: TtsJson) => {
   if (ttsInstructions) {
     for (const ttsTime in ttsInstructions) {
       // Need to floor time, meaning tts time of e.g. 11.42 will be assigned to chunk index 11.
+      const instructionObject: { [voice: string]: { time: number; langs: { [language: string]: string } } } = {}
+      for (const voice in ttsInstructions[ttsTime]) {
+        const langs = ttsInstructions[ttsTime][voice]
+        if (!instructionObject[voice]) {
+          instructionObject[voice] = {
+            time: +ttsTime,
+            langs: {}
+          }
+        }
+        instructionObject[voice].langs = langs
+      }
       const flooredTime = Math.floor(+ttsTime)
       if (chunks[flooredTime]) {
         if (chunks[flooredTime].ttsInstructions) {
-          chunks[flooredTime].ttsInstructions = { ...chunks[flooredTime].ttsInstructions, ...ttsInstructions[ttsTime] }
+          chunks[flooredTime].ttsInstructions = { ...chunks[flooredTime].ttsInstructions, ...instructionObject }
         } else {
-          chunks[flooredTime].ttsInstructions = ttsInstructions[ttsTime]
+          chunks[flooredTime].ttsInstructions = instructionObject
         }
       } else {
         const chunk = initChunk()
-        chunk.ttsInstructions = ttsInstructions[ttsTime]
+        chunk.ttsInstructions = instructionObject
         chunks[flooredTime] = chunk
       }
+      console.log('chunks[flooredTime]', chunks[flooredTime])
     }
   }
 

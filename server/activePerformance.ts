@@ -1,10 +1,10 @@
 import { Server } from 'ws'
-import { PartialChunk, TrackMode } from './types/types'
+import { PartialChunk, TrackMode, TtsInstructions } from './types/types'
 import WebSocket from 'ws'
 
 interface Frame {
   partials: PartialChunk[]
-  ttsInstructions: { [voice: string]: { [lang: string]: string } }
+  ttsInstructions: TtsInstructions
 }
 
 const MAX_PARTIALS_PER_CLIENT = 16
@@ -103,7 +103,7 @@ export class ActivePerformance {
           startTime: number
           waveform: string
           ttsRate: string
-          chunk: { partials?: PartialChunk[]; ttsInstructions?: string }
+          chunk: { partials?: PartialChunk[]; ttsInstructions?: { time: number; phrase: string } }
         } = {
           startTime: startTime + 2,
           waveform: this.trackWaveform,
@@ -119,7 +119,10 @@ export class ActivePerformance {
         if (this.loadedTrack[chunkIndex]?.ttsInstructions) {
           const ttsInstructionForClientId = this.loadedTrack[chunkIndex]?.ttsInstructions[client.choirId]
           if (ttsInstructionForClientId) {
-            dataToSend.chunk.ttsInstructions = ttsInstructionForClientId[client.ttsLang.iso]
+            dataToSend.chunk.ttsInstructions = {
+              time: ttsInstructionForClientId.time,
+              phrase: ttsInstructionForClientId.langs[client.ttsLang.iso]
+            }
           }
         }
 
@@ -147,8 +150,8 @@ export class ActivePerformance {
           newPartialMap[partial.index] = []
 
           /**
-          * Returns true if partial was distributed to a client. Returns false if all clients have reached max partials.
-          */
+           * Returns true if partial was distributed to a client. Returns false if all clients have reached max partials.
+           */
           const distributePartialToNewClient = () => {
             const clientIdWithMinPartials = getClientIdWithMinPartials(allocatedPartials, clients)
             if (!clientIdWithMinPartials) return false
@@ -202,13 +205,13 @@ export class ActivePerformance {
       }
 
       for (const client of clients) {
-        const dataToSend: { partials: PartialChunk[]; ttsInstructions?: string } = {
+        const dataToSend: { partials: PartialChunk[]; ttsInstructions?: { time: number; phrase: string } } = {
           partials: allocatedPartials[client.id]
         }
         if (this.loadedTrack[chunkIndex] && this.loadedTrack[chunkIndex].ttsInstructions) {
           const ttsInstructions = Object.values(this.loadedTrack[chunkIndex].ttsInstructions)[0]
           if (ttsInstructions) {
-            dataToSend.ttsInstructions = ttsInstructions[client.ttsLang.iso]
+            dataToSend.ttsInstructions = { time: ttsInstructions.time, phrase: ttsInstructions.langs[client.ttsLang.iso] }
           }
         }
 
