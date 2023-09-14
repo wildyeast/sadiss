@@ -4,7 +4,6 @@ import type { Track } from '@/types/types'
 import { onMounted, ref, computed } from 'vue'
 import AddTrackModal from '@/components/AddTrackModal.vue'
 import AddTrackToPerformanceModal from '@/components/AddTrackToPerformanceModal.vue'
-import FixedViewHeader from '@/components/FixedViewHeader.vue'
 import { useStore } from '@/stores/store'
 
 const store = useStore()
@@ -62,26 +61,25 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="flex flex-col">
-    <FixedViewHeader title="Tracks">
-      <div class="flex flex-row-reverse gap-2">
-        <!-- Open add track modal -->
-        <button
-          class="rounded-sm bg-light px-4 py-2 font-bold text-primary"
-          @click.stop="addTrackModal?.openModal">
-          Add track
-        </button>
-        <select
-          v-model="filterTracksBy"
-          class="rounded-sm bg-light px-4 py-2 font-bold text-primary">
-          <option value="all">All tracks</option>
-          <option value="own">My tracks</option>
-          <option value="public">Public tracks</option>
-        </select>
-      </div>
-    </FixedViewHeader>
+  <main class="flex h-full flex-col">
+    <h1 class="text-center">Tracks</h1>
+    <div class="sticky top-0 flex flex-row-reverse gap-2 pb-4">
+      <!-- Open add track modal -->
+      <button
+        class="rounded-sm bg-light px-4 py-2 font-bold text-primary"
+        @click.stop="addTrackModal?.openModal">
+        Add track
+      </button>
+      <select
+        v-model="filterTracksBy"
+        class="rounded-sm bg-light px-4 py-2 font-bold text-primary">
+        <option value="all">All tracks</option>
+        <option value="own">My tracks</option>
+        <option value="public">Public tracks</option>
+      </select>
+    </div>
 
-    <div class="mt-12 space-y-2 overflow-y-auto pt-16">
+    <div class="space-y-2 overflow-y-scroll">
       <!-- Tracks -->
       <div
         v-for="track of tracksToDisplay"

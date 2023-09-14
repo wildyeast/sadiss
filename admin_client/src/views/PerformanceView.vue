@@ -105,7 +105,7 @@ onUnmounted(() => {
       class="flex h-full flex-col">
       <!-- Page Header -->
       <div class="sticky top-0 flex flex-col items-center justify-between bg-primary pb-4">
-        <h3 class="pb-4 text-center text-3xl font-bold">{{ performance.name }}</h3>
+        <h1 class="pb-4 text-center font-bold">{{ performance.name }}</h1>
         <div class="flex w-full justify-between">
           <p>Created by: {{ performance.creator.username }}</p>
           <button

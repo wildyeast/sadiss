@@ -4,7 +4,6 @@ import { getPerformances, deletePerformance } from '@/services/api'
 import type { SadissPerformance } from '@/types/types'
 import { computed, onMounted, ref } from 'vue'
 import AddPerformanceModal from '@/components/AddPerformanceModal.vue'
-import FixedViewHeader from '@/components/FixedViewHeader.vue'
 import { useStore } from '@/stores/store'
 
 const store = useStore()
@@ -53,25 +52,24 @@ onMounted(async () => {
 </script>
 
 <template>
-  <main class="flex flex-col">
-    <FixedViewHeader title="Performances">
-      <div class="flex flex-row-reverse gap-2">
-        <!-- Open add performance modal -->
-        <button
-          class="rounded-sm bg-light px-4 py-2 font-bold text-primary"
-          @click.stop="addPerformanceModal?.openModal">
-          Add performance
-        </button>
-        <select
-          v-model="filterPerformancesBy"
-          class="rounded-sm bg-light px-4 py-2 font-bold text-primary">
-          <option value="all">All performances</option>
-          <option value="own">My performances</option>
-          <option value="public">Public performances</option>
-        </select>
-      </div>
-    </FixedViewHeader>
-    <div class="mt-12 flex-1 space-y-2 overflow-y-scroll pt-16">
+  <main class="flex h-full flex-col">
+    <h1 class="text-center">Performances</h1>
+    <div class="flex flex-row-reverse gap-2 pb-4">
+      <!-- Open add performance modal -->
+      <button
+        class="rounded-sm bg-light px-4 py-2 font-bold text-primary"
+        @click.stop="addPerformanceModal?.openModal">
+        Add performance
+      </button>
+      <select
+        v-model="filterPerformancesBy"
+        class="rounded-sm bg-light px-4 py-2 font-bold text-primary">
+        <option value="all">All performances</option>
+        <option value="own">My performances</option>
+        <option value="public">Public performances</option>
+      </select>
+    </div>
+    <div class="flex-1 space-y-2 overflow-y-scroll">
       <button
         @click="goToPerformance(performance._id)"
         v-for="performance of performancesToDisplay"
