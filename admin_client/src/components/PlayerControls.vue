@@ -150,7 +150,7 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <div class="flex h-[100px] flex-col items-center justify-between">
+  <div class="flex h-[100px] flex-col items-center justify-between border-t">
     <div>
       <p>{{ selectedTrack.name }}</p>
     </div>

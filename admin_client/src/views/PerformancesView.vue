@@ -54,7 +54,7 @@ onMounted(async () => {
 <template>
   <main class="flex h-full flex-col">
     <h1 class="text-center">Performances</h1>
-    <div class="flex flex-row-reverse gap-2 pb-4">
+    <div class="flex flex-row-reverse gap-2 border-b px-2 pb-4 lg:px-10">
       <!-- Open add performance modal -->
       <button
         class="rounded-sm bg-light px-4 py-2 font-bold text-primary"
@@ -69,7 +69,7 @@ onMounted(async () => {
         <option value="public">Public performances</option>
       </select>
     </div>
-    <div class="flex-1 space-y-2 overflow-y-scroll">
+    <div class="flex-1 space-y-2 overflow-y-scroll px-2 py-4 lg:px-10">
       <button
         @click="goToPerformance(performance._id)"
         v-for="performance of performancesToDisplay"

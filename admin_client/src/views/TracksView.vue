@@ -63,7 +63,7 @@ onMounted(async () => {
 <template>
   <main class="flex h-full flex-col">
     <h1 class="text-center">Tracks</h1>
-    <div class="sticky top-0 flex flex-row-reverse gap-2 pb-4">
+    <div class="sticky top-0 flex flex-row-reverse gap-2 border-b px-2 pb-4 lg:px-10">
       <!-- Open add track modal -->
       <button
         class="rounded-sm bg-light px-4 py-2 font-bold text-primary"
@@ -79,7 +79,7 @@ onMounted(async () => {
       </select>
     </div>
 
-    <div class="space-y-2 overflow-y-scroll">
+    <div class="space-y-2 overflow-y-scroll px-2 py-4 lg:px-10">
       <!-- Tracks -->
       <div
         v-for="track of tracksToDisplay"

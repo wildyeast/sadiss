@@ -104,7 +104,7 @@ onUnmounted(() => {
       v-if="performance"
       class="flex h-full flex-col">
       <!-- Page Header -->
-      <div class="sticky top-0 flex flex-col items-center justify-between bg-primary pb-4">
+      <div class="sticky top-0 flex flex-col items-center justify-between border-b bg-primary px-2 pb-4 lg:px-10">
         <h1 class="pb-4 text-center font-bold">{{ performance.name }}</h1>
         <div class="flex w-full justify-between">
           <p>Created by: {{ performance.creator.username }}</p>
@@ -132,7 +132,7 @@ onUnmounted(() => {
       <!-- Track list -->
       <div
         v-if="tracks.length"
-        class="mt-4 space-y-2 overflow-y-scroll">
+        class="space-y-2 overflow-y-scroll px-2 lg:px-10">
         <VueDraggable
           v-model="tracks"
           class="space-y-2 py-4"
@@ -164,7 +164,7 @@ onUnmounted(() => {
       </div>
       <div
         v-else-if="store.userName === performance.creator.username"
-        class="bg-red flex h-full flex-col items-center">
+        class="mt-4 flex h-full flex-col items-center">
         <p>No tracks yet.</p>
         <router-link
           to="/tracks"

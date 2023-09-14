@@ -7,7 +7,7 @@ const route = useRoute()
 <template>
   <div class="flex h-screen flex-col">
     <TopBar v-if="route.path !== '/login' && route.path !== '/register'" />
-    <div class="sticky overflow-y-hidden px-2 pb-2 lg:px-10">
+    <div class="sticky overflow-y-hidden pb-2">
       <router-view />
     </div>
   </div>
