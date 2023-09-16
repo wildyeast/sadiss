@@ -1,7 +1,7 @@
 ![SADISS](https://sadiss.net/api/logo_black.png)
 # A socially aggregated distributed sound system.
 
-SADISS is a set of web applications developed in the research project ‘The Choir & the Sound System’ at the Institute for Composition, Conducting and Computermusic at Anton Bruckner university (Linz, Austria) that bundles smartphones into monumental yet intricate sound systems or performance systems.
+SADISS is a set of web applications developed in the research project ‘The Choir & the Sound System’ at the Institute for Composition, Conducting and Computermusic at Anton Bruckner university (Linz, Austria) that bundles smartphones into monumental yet intricate sound or performance systems.
 
 Take a look at [sadiss.net](https://sadiss.net/) to get an idea.
 
