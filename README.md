@@ -4,6 +4,7 @@
 SADISS is a set of web applications developed in the research project ‘The Choir & the Sound System’ at the Institute for Composition, Conducting and Computermusic at Anton Bruckner university (Linz, Austria) that bundles smartphones into monumental yet intricate sound systems or performance systems.
 
 Take a look at [sadiss.net](https://sadiss.net/) to get an idea.
+
 Check out our [wiki](https://github.com/wildyeast/sadiss/wiki) to get an even better idea about SADISS.
 
 ### Get the apps
