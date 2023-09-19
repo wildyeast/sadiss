@@ -44,7 +44,7 @@ exports.loadTrackForPlayback = async (req: Request, res: Response) => {
         return res.status(500).json({ message: 'Error parsing track chunks.' })
       }
 
-      const activePerformance = initializeActivePerformances(performanceId)
+      const activePerformance = initializeActivePerformance(performanceId)
       activePerformance.loadedTrack = chunks
       activePerformance.trackMode = t.mode as TrackMode
       activePerformance.trackWaveform = t.waveform as OscillatorType
@@ -63,7 +63,7 @@ exports.startTrack = async (req: Request, res: Response) => {
   const { trackId, performanceId, startTime, loop } = req.body
 
   try {
-    const activePerformance = initializeActivePerformances(performanceId)
+    const activePerformance = initializeActivePerformance(performanceId)
 
     const trackStarted = activePerformance.startSendingInterval(startTime, req.wss, loop, trackId)
     if (trackStarted) {
@@ -356,7 +356,7 @@ const handleUploadedTtsFiles = (files: File[]) => {
  * @param {string} performanceId - ID of the performance.
  * @return {ActivePerformance} The active performance.
  */
-const initializeActivePerformances = (performanceId: string) => {
+const initializeActivePerformance = (performanceId: string) => {
   // Check if performance already exists
   let activePerformance = activePerformances.find((p) => p.id === performanceId)
   if (!activePerformance) {
