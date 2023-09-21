@@ -14,7 +14,7 @@ export class ActivePerformance {
   constructor(readonly id: string) {}
 
   // More or less accurate timer taken from https://stackoverflow.com/a/29972322/16725862
-  startSendingInterval = (startTime: number, wss: Server, loopTrack: boolean, trackId: string) => {
+  startSendingInterval = (startTime: number, wss: Server, loopTrack: boolean, trackId: string, startAtChunk: number) => {
     if (this.sendingIntervalRunning) {
       return false
     }
@@ -30,7 +30,7 @@ export class ActivePerformance {
 
     const interval = 1000 // ms
     let expected = Date.now() + interval
-    let chunkIndex = 0
+    let chunkIndex = startAtChunk
 
     // nonChoir mode: Stores partialIds and array of client ids that were given
     // the respective partial in the last iteration

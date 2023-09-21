@@ -166,7 +166,7 @@ export async function getClientCountPerChoirId(performanceId: string) {
 }
 
 export async function loadTrackForPlayback(trackId: string, performanceId: string) {
-  const response = await request<{ message: string }>(`/api/track/load`, {
+  const response = await request<{ trackLengthInChunks: number }>(`/api/track/load`, {
     method: 'POST',
     body: JSON.stringify({ trackId, performanceId })
   })
@@ -175,7 +175,7 @@ export async function loadTrackForPlayback(trackId: string, performanceId: strin
     throw new Error(response.error)
   }
 
-  return response.data!.message
+  return response.data!.trackLengthInChunks
 }
 
 /* TRACKS */
@@ -237,10 +237,10 @@ export async function deleteTrack(id: string) {
   return response.data!.message
 }
 
-export async function startTrack(trackId: string, performanceId: string, startTime: number, loop = false) {
+export async function startTrack(trackId: string, performanceId: string, startTime: number, startAtChunk: number, loop = false) {
   const response = await request<{ track: Track }>(`/api/track/start`, {
     method: 'POST',
-    body: JSON.stringify({ trackId, performanceId, startTime, loop })
+    body: JSON.stringify({ trackId, performanceId, startTime, startAtChunk, loop })
   })
 
   if (response.error) {
