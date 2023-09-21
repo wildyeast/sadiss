@@ -57,13 +57,15 @@ const handleRemoveTrackFromPerformance = async (trackPerformanceId: string) => {
   tracks.value = tracks.value.filter((track) => track.trackPerformanceId !== trackPerformanceId)
 }
 
-const trackLoaded = ref<boolean>(false)
+const trackLoaded = ref(false)
+const selectedTrackLengthInChunks = ref(0)
 const selectTrack = async (trackIndex: number) => {
   trackLoaded.value = false
   selectedTrackIndex.value = trackIndex
   const res = await loadTrackForPlayback(selectedTrack.value?._id as string, performanceId as string)
   if (res) {
     trackLoaded.value = true
+    selectedTrackLengthInChunks.value = res
   }
 }
 
@@ -187,6 +189,7 @@ onUnmounted(() => {
       :selectedTrack="selectedTrack"
       :next-track="nextTrack"
       :track-loaded="trackLoaded"
+      :selected-track-length-in-chunks="selectedTrackLengthInChunks"
       @nextTrackStarted="nextTrackStarted"
       @set-current-track="setCurrentTrack" />
 

@@ -27,6 +27,11 @@ export interface TtsInstructions {
   [voice: string]: { time: number; langs: { [language: string]: string } }
 }
 
+export interface Frame {
+  partials: PartialChunk[]
+  ttsInstructions: TtsInstructions
+}
+
 export type TrackMode = 'choir' | 'nonChoir'
 
 export interface UserDocument extends Document {

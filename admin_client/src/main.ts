@@ -24,7 +24,8 @@ import {
   faMusic,
   faComments,
   faClock,
-  faBars
+  faBars,
+  faX
 } from '@fortawesome/free-solid-svg-icons'
 import { createPinia } from 'pinia'
 
@@ -46,7 +47,8 @@ library.add(
   faMusic,
   faComments,
   faClock,
-  faBars
+  faBars,
+  faX
 )
 
 const pinia = createPinia()

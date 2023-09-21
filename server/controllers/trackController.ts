@@ -6,7 +6,7 @@ type File = Express.Multer.File
 import { chunk } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose, { isValidObjectId } from 'mongoose'
-import { TrackMode, TtsJson } from '../types/types'
+import { TrackMode, TtsJson, Frame } from '../types/types'
 import { trackSchema } from '../models/track'
 import { ActivePerformance } from '../activePerformance'
 import { TrackPerformance } from '../models'
@@ -33,7 +33,7 @@ exports.loadTrackForPlayback = async (req: Request, res: Response) => {
         return res.status(500).json({ message: 'Error reading track file.' })
       }
 
-      let chunks
+      let chunks: Frame[]
       try {
         chunks = JSON.parse(data)
         if (!chunks) {
@@ -44,13 +44,13 @@ exports.loadTrackForPlayback = async (req: Request, res: Response) => {
         return res.status(500).json({ message: 'Error parsing track chunks.' })
       }
 
-      const activePerformance = initializeActivePerformances(performanceId)
+      const activePerformance = initializeActivePerformance(performanceId)
       activePerformance.loadedTrack = chunks
       activePerformance.trackMode = t.mode as TrackMode
       activePerformance.trackWaveform = t.waveform as OscillatorType
       activePerformance.trackTtsRate = t.ttsRate
 
-      return res.status(200).json({ message: 'Track loaded successfully.' })
+      return res.status(200).json({ trackLengthInChunks: chunks.length })
     })
   } catch (error) {
     console.error(error)
@@ -60,12 +60,12 @@ exports.loadTrackForPlayback = async (req: Request, res: Response) => {
 
 // Start track
 exports.startTrack = async (req: Request, res: Response) => {
-  const { trackId, performanceId, startTime, loop } = req.body
+  const { trackId, performanceId, startTime, startAtChunk, loop } = req.body
 
   try {
-    const activePerformance = initializeActivePerformances(performanceId)
+    const activePerformance = initializeActivePerformance(performanceId)
 
-    const trackStarted = activePerformance.startSendingInterval(startTime, req.wss, loop, trackId)
+    const trackStarted = activePerformance.startSendingInterval(startTime, req.wss, loop, trackId, startAtChunk)
     if (trackStarted) {
       res.json({ data: 'Track started.' })
     } else {
@@ -352,11 +352,11 @@ const handleUploadedTtsFiles = (files: File[]) => {
 }
 
 /**
- * Initializes an active performance if it doesn't already exist.
+ * Initializes an active performance if it doesn't already exist. Returns said performance.
  * @param {string} performanceId - ID of the performance.
  * @return {ActivePerformance} The active performance.
  */
-const initializeActivePerformances = (performanceId: string) => {
+const initializeActivePerformance = (performanceId: string) => {
   // Check if performance already exists
   let activePerformance = activePerformances.find((p) => p.id === performanceId)
   if (!activePerformance) {

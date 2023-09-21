@@ -1,16 +1,11 @@
 import { Server } from 'ws'
-import { PartialChunk, TrackMode, TtsInstructions } from './types/types'
+import { PartialChunk, TrackMode, Frame } from './types/types'
 import WebSocket from 'ws'
-
-interface Frame {
-  partials: PartialChunk[]
-  ttsInstructions: TtsInstructions
-}
 
 const MAX_PARTIALS_PER_CLIENT = 16
 
 export class ActivePerformance {
-  public loadedTrack: Frame[] = []
+  public loadedTrack: (Frame | null)[] = []
   public trackMode: TrackMode = 'choir'
   public trackWaveform: OscillatorType = 'sine'
   public trackTtsRate: string = '1'
@@ -19,7 +14,7 @@ export class ActivePerformance {
   constructor(readonly id: string) {}
 
   // More or less accurate timer taken from https://stackoverflow.com/a/29972322/16725862
-  startSendingInterval = (startTime: number, wss: Server, loopTrack: boolean, trackId: string) => {
+  startSendingInterval = (startTime: number, wss: Server, loopTrack: boolean, trackId: string, startAtChunk: number) => {
     if (this.sendingIntervalRunning) {
       return false
     }
@@ -35,7 +30,7 @@ export class ActivePerformance {
 
     const interval = 1000 // ms
     let expected = Date.now() + interval
-    let chunkIndex = 0
+    let chunkIndex = startAtChunk
 
     // nonChoir mode: Stores partialIds and array of client ids that were given
     // the respective partial in the last iteration
@@ -208,10 +203,14 @@ export class ActivePerformance {
         const dataToSend: { partials: PartialChunk[]; ttsInstructions?: { time: number; phrase: string } } = {
           partials: allocatedPartials[client.id]
         }
-        if (this.loadedTrack[chunkIndex] && this.loadedTrack[chunkIndex].ttsInstructions) {
-          const ttsInstructions = Object.values(this.loadedTrack[chunkIndex].ttsInstructions)[0]
-          if (ttsInstructions) {
-            dataToSend.ttsInstructions = { time: ttsInstructions.time, phrase: ttsInstructions.langs[client.ttsLang.iso] }
+
+        if (this.loadedTrack[chunkIndex]?.ttsInstructions) {
+          const ttsInstructions = this.loadedTrack[chunkIndex]?.ttsInstructions
+          if (!ttsInstructions) continue
+
+          const firstTtsInstruction = Object.values(ttsInstructions)[0]
+          if (firstTtsInstruction) {
+            dataToSend.ttsInstructions = { time: firstTtsInstruction.time, phrase: firstTtsInstruction.langs[client.ttsLang.iso] }
           }
         }
 
