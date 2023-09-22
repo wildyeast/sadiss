@@ -99,12 +99,12 @@ export class ActivePerformance {
         if (client.isAdmin || client.performanceId !== this.id) continue
 
         const dataToSend: {
-          actualStartTime: number
+          startTime: number
           waveform: string
           ttsRate: string
           chunk: { partials?: PartialChunk[]; ttsInstructions?: { time: number; phrase: string } }
         } = {
-          actualStartTime: actualStartTime + 2,
+          startTime: actualStartTime + 2,
           waveform: this.trackWaveform,
           ttsRate: this.trackTtsRate,
           chunk: {}
@@ -220,7 +220,7 @@ export class ActivePerformance {
 
         if (dataToSend.partials?.length || dataToSend.ttsInstructions) {
           const json = JSON.stringify({
-            actualStartTime: actualStartTime + 2,
+            startTime: actualStartTime + 2,
             waveform: this.trackWaveform,
             ttsRate: this.trackTtsRate,
             chunk: dataToSend
