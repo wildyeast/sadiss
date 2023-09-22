@@ -32,6 +32,10 @@ export class ActivePerformance {
     let expected = Date.now() + interval
     let chunkIndex = startAtChunk
 
+    // This makes it so that we start at the chosen chunk position immediately after starting the track
+    // This works because chunks are 1s long.
+    let actualStartTime = startTime - startAtChunk
+
     // nonChoir mode: Stores partialIds and array of client ids that were given
     // the respective partial in the last iteration
     let partialMap: { [partialId: string]: string[] } = {}
@@ -47,7 +51,7 @@ export class ActivePerformance {
       if (chunkIndex >= this.loadedTrack.length) {
         if (loopTrack) {
           console.log('No more chunks. Looping.')
-          startTime += this.loadedTrack.length
+          actualStartTime += this.loadedTrack.length
           chunkIndex = 0
         } else {
           console.log('No more chunks. Stopping.')
@@ -95,12 +99,12 @@ export class ActivePerformance {
         if (client.isAdmin || client.performanceId !== this.id) continue
 
         const dataToSend: {
-          startTime: number
+          actualStartTime: number
           waveform: string
           ttsRate: string
           chunk: { partials?: PartialChunk[]; ttsInstructions?: { time: number; phrase: string } }
         } = {
-          startTime: startTime + 2,
+          actualStartTime: actualStartTime + 2,
           waveform: this.trackWaveform,
           ttsRate: this.trackTtsRate,
           chunk: {}
@@ -216,7 +220,7 @@ export class ActivePerformance {
 
         if (dataToSend.partials?.length || dataToSend.ttsInstructions) {
           const json = JSON.stringify({
-            startTime: startTime + 2,
+            actualStartTime: actualStartTime + 2,
             waveform: this.trackWaveform,
             ttsRate: this.trackTtsRate,
             chunk: dataToSend
