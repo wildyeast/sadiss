@@ -226,7 +226,7 @@ watch(
         {{ currentChunkIndex }} / {{ totalChunks }}
       </p>
     </div>
-    <!-- <div
+    <div
       v-else-if="trackLoaded"
       class="flex w-[350px] items-center gap-2">
       <label for="startAtChunk">Set start position</label>
@@ -244,6 +244,6 @@ watch(
         title="Reset start position">
         <font-awesome-icon icon="fa-x" />
       </button>
-    </div> -->
+    </div>
   </div>
 </template>
