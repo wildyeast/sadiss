@@ -113,7 +113,6 @@ export const chunk = async (path?: string, ttsInstructions?: TtsJson) => {
         chunk.ttsInstructions = instructionObject
         chunks[flooredTime] = chunk
       }
-      console.log('chunks[flooredTime]', chunks[flooredTime])
     }
   }
 
