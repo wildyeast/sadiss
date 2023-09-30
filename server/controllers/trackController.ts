@@ -210,66 +210,70 @@ exports.uploadTrack = async (req: Request, res: Response) => {
 }
 
 exports.editTrack = async (req: Request, res: Response) => {
-  if (!isValidObjectId(req.params.id)) {
-    res.status(400).send({ error: 'Invalid track id.' })
-    return
-  }
-
-  const track = await Track.findById(req.params.id)
-  if (!track) {
-    res.status(404).send({ error: 'Track not found.' })
-    return
-  }
-
-  if (track.creator.toString() !== req.user!.id.toString()) {
-    res.status(403).send({ error: 'Forbidden.' })
-    return
-  }
-
-  const patch = req.body
-
-  // Editing track currently disabled since it doesn't work correctly
-  // see https://github.com/wildyeast/sadiss/issues/71#issuecomment-1587183286 for more information
-  // TODO: Fix this
-  // const { path, partialFileToSave } = handleUploadedPartialFile(<File[]>req.files)
-  // if (Object.keys(partialFileToSave).length) {
-  //   patch.partialFile = partialFileToSave
-  // }
-
-  // const { ttsFilesToSave, ttsLangs, ttsJson } = handleUploadedTtsFiles(<File[]>req.files)
-  // if (ttsFilesToSave.length && ttsLangs) {
-  //   patch.ttsFiles = ttsFilesToSave
-  //   patch.ttsLangs = Array.from(ttsLangs)
-  // }
-
-  // const { partialsCount, chunks } = await chunk(path, ttsJson)
-
-  // if (Object.keys(chunks)) {
-  //   const filename = uuid.v4()
-  //   fs.writeFile(`chunks/${filename}`, JSON.stringify(chunks), (err: any) => {
-  //     if (err) {
-  //       console.error(err)
-  //     }
-  //   })
-  // }
-
-  // if (partialsCount > 0 && patch.mode === 'choir') {
-  //   patch.partialsCount = partialsCount
-  // } else {
-  //   patch.partialsCount = undefined
-  // }
-
-  // patch.chunks = JSON.stringify(chunks)
-
-  track.set(patch)
-
-  track.save((err, updatedTrack) => {
-    if (err) {
-      return res.status(500).json({ error: err.message })
+  try {
+    if (!isValidObjectId(req.params.id)) {
+      res.status(400).send({ error: 'Invalid track id.' })
+      return
     }
 
-    res.json(updatedTrack)
-  })
+    const track = await Track.findById(req.params.id)
+    if (!track) {
+      res.status(404).send({ error: 'Track not found.' })
+      return
+    }
+
+    if (track.creator.toString() !== req.user!.id.toString()) {
+      res.status(403).send({ error: 'Forbidden.' })
+      return
+    }
+
+    const patch = req.body
+
+    // Editing track currently disabled since it doesn't work correctly
+    // see https://github.com/wildyeast/sadiss/issues/71#issuecomment-1587183286 for more information
+    // TODO: Fix this
+    // const { path, partialFileToSave } = handleUploadedPartialFile(<File[]>req.files)
+    // if (Object.keys(partialFileToSave).length) {
+    //   patch.partialFile = partialFileToSave
+    // }
+
+    // const { ttsFilesToSave, ttsLangs, ttsJson } = handleUploadedTtsFiles(<File[]>req.files)
+    // if (ttsFilesToSave.length && ttsLangs) {
+    //   patch.ttsFiles = ttsFilesToSave
+    //   patch.ttsLangs = Array.from(ttsLangs)
+    // }
+
+    // const { partialsCount, chunks } = await chunk(path, ttsJson)
+
+    // if (Object.keys(chunks)) {
+    //   const filename = uuid.v4()
+    //   fs.writeFile(`chunks/${filename}`, JSON.stringify(chunks), (err: any) => {
+    //     if (err) {
+    //       console.error(err)
+    //     }
+    //   })
+    // }
+
+    // if (partialsCount > 0 && patch.mode === 'choir') {
+    //   patch.partialsCount = partialsCount
+    // } else {
+    //   patch.partialsCount = undefined
+    // }
+
+    // patch.chunks = JSON.stringify(chunks)
+
+    track.set(patch)
+
+    track.save((err, updatedTrack) => {
+      if (err) {
+        res.status(500).send({ error: err.message })
+      } else {
+        res.json(updatedTrack)
+      }
+    })
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' })
+  }
 }
 
 exports.stopTrack = (req: Request, res: Response) => {

@@ -11,7 +11,8 @@ export const createTestTrack = async (trackType: 'partials' | 'tts' | 'partialsA
     name: 'test track',
     mode: 'choir',
     waveform: 'sine',
-    isPublic: true
+    isPublic: true,
+    ttsRate: '1.0'
   }
 
   const req = agent

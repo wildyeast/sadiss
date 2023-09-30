@@ -7,7 +7,7 @@ describe('trackController test', () => {
   describe('GET /api/tracks', () => {
     it('should get tracks from DB', async () => {
       const trackId = await createTestTrack()
-      const res = await agent.get('/api/tracks')!.expect(200)
+      const res = await agent.get('/api/tracks').expect(200)
       expect(res.body.tracks.length).toBe(1)
       expect(res.body.tracks[0].name).toBe('test track')
       expect(res.body.tracks[0].mode).toBe('choir')
@@ -285,6 +285,46 @@ describe('trackController test', () => {
 
     it('should return 400 if invalid track id provided', async () => {
       await agent.post(`/api/track/edit/invalidId`).expect(400)
+    })
+
+    it('should edit all non-file fields if they are provided', async () => {
+      const trackId = await createTestTrack('tts')
+      const resEdit = await agent
+        .post(`/api/track/edit/${trackId}`)!
+        .field('name', 'test track edited')
+        .field('mode', 'nonChoir')
+        .field('waveform', 'square')
+        .field('isPublic', false)
+        .field('ttsRate', '0.5')
+        .expect(200)
+
+      expect(resEdit.body.name).toBe('test track edited')
+      expect(resEdit.body.mode).toBe('nonChoir')
+      expect(resEdit.body.waveform).toBe('square')
+      expect(resEdit.body.isPublic).toBe(false)
+      expect(resEdit.body.ttsRate).toBe('0.5')
+    })
+
+    // TODO: This test times out most of the time. I've also seen it pass.
+    // I might be doing something wrong. Could also to do with concurrency maybe? Can't figure it out atm.
+    // it('should return 500 and error message if saving the edited fails', async () => {
+    //   const trackId = await createTestTrack('tts')
+
+    //   jest.spyOn(Track.prototype, 'save').mockRejectedValueOnce(new Error('Save failed'))
+
+    //   const res = await agent.post(`/api/track/edit/${trackId}`).expect(500)
+    //   expect(res.body.error).toBe('Save failed')
+    // })
+
+    it('should return a 500 error if there is a server error', async () => {
+      const trackId = await createTestTrack('tts')
+
+      jest.spyOn(Track.prototype, 'save').mockImplementationOnce(() => {
+        throw new Error()
+      })
+
+      const res = await agent.post(`/api/track/edit/${trackId}`).expect(500)
+      expect(res.body.error).toBe('Server error')
     })
   })
 
