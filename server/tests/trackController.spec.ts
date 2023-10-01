@@ -384,8 +384,18 @@ describe('trackController test', () => {
       expect(res.body.message).toBe('Invalid trackId provided.')
     })
 
-    it('should return 400 if no or invalid performanceId provided', async () => {
+    it('should return 400 if no provided', async () => {
       const res = await agent.post(`/api/track/load`).send({ trackId: generateMockId() }).expect(400)
+      expect(res.body.message).toBe('Invalid performanceId provided.')
+    })
+
+    it('should return 400 if invalid trackId provided', async () => {
+      const res = await agent.post(`/api/track/load`).send({ trackId: 'invalidId', performanceId: generateMockId() }).expect(400)
+      expect(res.body.message).toBe('Invalid trackId provided.')
+    })
+
+    it('should return 400 if invalid performanceId provided', async () => {
+      const res = await agent.post(`/api/track/load`).send({ trackId: generateMockId(), performanceId: 'invalidId' }).expect(400)
       expect(res.body.message).toBe('Invalid performanceId provided.')
     })
 
@@ -397,10 +407,12 @@ describe('trackController test', () => {
       expect(res.body.message).toBe('Track not found.')
     })
 
-    it('should return 500 if there is an error reading the track file', async () => {
-      const trackId = await createTestTrack('tts')
-      jest.spyOn(fs.promises, 'readFile').mockRejectedValueOnce(new Error('Error reading track file.'))
-      const res = await agent.post(`/api/track/load`).send({ trackId, performanceId: generateMockId() }).expect(500)
+    it('should return 200 and trackLengthInChunks if track found and performance activePerformance created', async () => {
+      const trackId = await createTestTrack()
+      const performanceId = await createTestPerformance()
+
+      const res = await agent.post(`/api/track/load`).send({ trackId, performanceId }).expect(200)
+      expect(res.body.trackLengthInChunks).toBeTruthy()
     })
   })
 })
