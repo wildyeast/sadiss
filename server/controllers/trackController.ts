@@ -21,8 +21,25 @@ const activePerformances: ActivePerformance[] = []
 exports.loadTrackForPlayback = async (req: Request, res: Response) => {
   const { trackId, performanceId } = req.body
 
+  if (!trackId && !isValidObjectId(trackId)) {
+    return res.status(400).json({ message: 'Invalid trackId provided.' })
+  }
+
+  if (!performanceId && !isValidObjectId(performanceId)) {
+    return res.status(400).json({ message: 'Invalid performanceId provided.' })
+  }
+
   try {
     const t = await Track.findById(trackId)
+
+    console.log('t', t)
+
+    const test = await Track.find({ _id: trackId })
+    console.log('test', test)
+
+    const findOne = await Track.findOne({ _id: trackId })
+    console.log('findOne', findOne)
+
     if (!t) {
       return res.status(404).json({ message: 'Track not found.' })
     }
@@ -314,6 +331,7 @@ exports.get_voices_and_languages = async (req: Request, res: Response) => {
   }
 }
 
+// TODO: This probably can be removed.
 exports.get_own_tracks = (req: Request, res: Response) => {
   res.json({ message: 'hi', user: req.user })
 }

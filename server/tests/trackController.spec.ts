@@ -1,7 +1,8 @@
 import { Types } from 'mongoose'
 import { Track } from '../models'
-import { createTestTrack, createTestTrackPerformance } from './testUtils'
+import { createTestPerformance, createTestTrack, createTestTrackPerformance } from './testUtils'
 import { generateMockId } from './testUtils'
+import fs from 'fs'
 
 describe('trackController test', () => {
   describe('GET /api/tracks', () => {
@@ -374,6 +375,32 @@ describe('trackController test', () => {
 
       const resDelete = await agent.post(`/api/track/delete/${generateMockId()}`).expect(500)
       expect(resDelete.body.error).toBe('Server error')
+    })
+  })
+
+  describe('POST /api/track/load', () => {
+    it('should return 400 if no or invalid trackId provided', async () => {
+      const res = await agent.post(`/api/track/load`).send({ performanceId: generateMockId() }).expect(400)
+      expect(res.body.message).toBe('Invalid trackId provided.')
+    })
+
+    it('should return 400 if no or invalid performanceId provided', async () => {
+      const res = await agent.post(`/api/track/load`).send({ trackId: generateMockId() }).expect(400)
+      expect(res.body.message).toBe('Invalid performanceId provided.')
+    })
+
+    it('should return 404 if track not found', async () => {
+      const res = await agent
+        .post(`/api/track/load`)
+        .send({ trackId: generateMockId(), performanceId: generateMockId() })
+        .expect(404)
+      expect(res.body.message).toBe('Track not found.')
+    })
+
+    it('should return 500 if there is an error reading the track file', async () => {
+      const trackId = await createTestTrack('tts')
+      jest.spyOn(fs.promises, 'readFile').mockRejectedValueOnce(new Error('Error reading track file.'))
+      const res = await agent.post(`/api/track/load`).send({ trackId, performanceId: generateMockId() }).expect(500)
     })
   })
 })
