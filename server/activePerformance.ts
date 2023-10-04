@@ -5,7 +5,7 @@ import WebSocket from 'ws'
 const MAX_PARTIALS_PER_CLIENT = 16
 
 export class ActivePerformance {
-  public loadedTrack: (Frame | null)[] = []
+  public loadedTrack: Frame[] = []
   public trackMode: TrackMode = 'choir'
   public trackWaveform: OscillatorType = 'sine'
   public trackTtsRate: string = '1'
