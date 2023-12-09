@@ -3,6 +3,7 @@ import { TrackPerformance } from '../models/trackPerformance'
 import { SadissPerformance, Track } from '../models'
 import { Types } from 'mongoose'
 import { isValidObjectId } from 'mongoose'
+import { unloadTrackFromActivePerformance } from '../services/activePerformanceService'
 
 exports.addTrackToPerformance = async (req: Request, res: Response) => {
   try {
@@ -89,6 +90,8 @@ exports.deleteTrackFromPerformance = async (req: Request, res: Response) => {
 
     // Delete the TrackPerformance record
     await TrackPerformance.findByIdAndDelete(trackPerformanceId)
+
+    unloadTrackFromActivePerformance(trackPerformanceId)
 
     res.status(200).send({ message: 'Track performance deleted' })
   } catch (error) {

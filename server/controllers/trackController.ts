@@ -6,17 +6,15 @@ type File = Express.Multer.File
 import { chunk } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose, { isValidObjectId } from 'mongoose'
-import { TrackMode, TtsJson, Frame } from '../types/types'
+import { TtsJson, Frame } from '../types/types'
 import { trackSchema } from '../models/track'
-import { ActivePerformance } from '../activePerformance'
 import { TrackPerformance } from '../models'
+import { activePerformances, initializeActivePerformance } from '../services/activePerformanceService'
 
 const fs = require('fs')
 const uuid = require('uuid')
 
 const Track = mongoose.model('Track', trackSchema)
-
-const activePerformances: ActivePerformance[] = []
 
 exports.loadTrackForPlayback = async (req: Request, res: Response) => {
   const { trackId, performanceId } = req.body
@@ -45,10 +43,7 @@ exports.loadTrackForPlayback = async (req: Request, res: Response) => {
       }
 
       const activePerformance = initializeActivePerformance(performanceId)
-      activePerformance.loadedTrack = chunks
-      activePerformance.trackMode = t.mode as TrackMode
-      activePerformance.trackWaveform = t.waveform as OscillatorType
-      activePerformance.trackTtsRate = t.ttsRate
+      activePerformance.loadTrack(chunks, t.mode, t.waveform, t.ttsRate)
 
       return res.status(200).json({ trackLengthInChunks: chunks.length })
     })
@@ -349,19 +344,4 @@ const handleUploadedTtsFiles = (files: File[]) => {
     })
   }
   return { ttsFilesToSave, ttsLangs, ttsJson }
-}
-
-/**
- * Initializes an active performance if it doesn't already exist. Returns said performance.
- * @param {string} performanceId - ID of the performance.
- * @return {ActivePerformance} The active performance.
- */
-const initializeActivePerformance = (performanceId: string) => {
-  // Check if performance already exists
-  let activePerformance = activePerformances.find((p) => p.id === performanceId)
-  if (!activePerformance) {
-    activePerformance = new ActivePerformance(performanceId)
-    activePerformances.push(activePerformance)
-  }
-  return activePerformance
 }

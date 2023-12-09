@@ -46,12 +46,12 @@ export interface TrackDocument extends Document {
   chunks: string
   chunkFileName: string
   partialsCount: number
-  mode: string
+  mode: TrackMode
   notes: string
   ttsInstructions: string
   ttsLangs: string[]
-  waveform: string
-  ttsRate: string
+  waveform: OscillatorType
+  ttsRate: number
   partialFile: {
     origName: string
     fileName: string

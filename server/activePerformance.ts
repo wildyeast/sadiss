@@ -5,7 +5,7 @@ import WebSocket from 'ws'
 const MAX_PARTIALS_PER_CLIENT = 16
 
 export class ActivePerformance {
-  public loadedTrack: Frame[] = []
+  private loadedTrack: Frame[] = []
   public trackMode: TrackMode = 'choir'
   public trackWaveform: OscillatorType = 'sine'
   public trackTtsRate: string = '1'
@@ -290,4 +290,12 @@ export class ActivePerformance {
   }
 
   stopSendingInterval = () => (this.sendingIntervalRunning = false)
+
+  loadTrack = (track: Frame[], mode: TrackMode, waveform: OscillatorType, ttsRate: number) => {
+    this.loadedTrack = track
+    this.trackMode = mode
+    this.trackWaveform = waveform
+    this.trackTtsRate = ttsRate.toString()
+  }
+  unloadTrack = () => (this.loadedTrack = [])
 }
