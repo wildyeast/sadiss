@@ -4,11 +4,11 @@ import { usePlayer } from './usePlayer'
 const { handleChunkData, setOffset, stopPlayback, setStartTime, setTrackSettings } = usePlayer()
 
 const isRegistered = ref(false)
+let attemptingToRegister = false
 export function useWebsocketConnection() {
   const mainStore = useMainStore()
   const ws = ref<WebSocket>()
 
-  let attemptingToRegister = false
   const establishWebsocketConnection = async () => {
     if (attemptingToRegister || isRegistered.value) return
     attemptingToRegister = true
