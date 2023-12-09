@@ -57,7 +57,7 @@ export function usePlayer() {
         lang: 'en-US',
         rate: 1.0,
         pitch: 1.0,
-        volume: 0.0,
+        volume: 0.001,
         category: 'playback'
       })
     }
