@@ -21,7 +21,7 @@ export function usePlayer() {
   /**
    * Prepares the audio context and warms up the TTS engine
    */
-  const playbackPreparation = () => {
+  const preparePlaybackAndTts = () => {
     startAudioCtx()
     warmUpTtsEngine()
   }
@@ -207,7 +207,7 @@ export function usePlayer() {
 
   return {
     handleChunkData,
-    playbackPreparation,
+    preparePlaybackAndTts,
     setStartTime,
     setTtsLanguage,
     setMotionRef,

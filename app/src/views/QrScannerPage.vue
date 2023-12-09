@@ -50,14 +50,14 @@ import { usePlayer } from '@/composables/usePlayer'
 
 const ionRouter = useIonRouter()
 const mainStore = useMainStore()
-const { playbackPreparation } = usePlayer()
+const { preparePlaybackAndTts } = usePlayer()
 
 /* QR Code Scanning */
 const { startScan, stopScan, processScanResult } = useBarcodeScanner()
 
 const scanCode = async () => {
   // Prepare for playback
-  playbackPreparation()
+  preparePlaybackAndTts()
 
   // Make camera visible and everything else invisible in app viewport, classes defined in App.vue
   document.body.classList.add('qrscanner')
