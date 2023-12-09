@@ -48,7 +48,7 @@ export function usePlayer() {
   }
 
   /**
-   * Warms up the TTS engine by speaking a 3 times with volume set to 0
+   * Warms up the TTS engine by speaking a phrase 3 times with volume set to 0
    */
   const warmUpTtsEngine = async () => {
     for (let i = 0; i < 3; i++) {
