@@ -121,7 +121,6 @@ export function usePlayer() {
 
     if (trackData.ttsInstructions) {
       const tts = trackData.ttsInstructions
-      console.log('Speaking: ', tts)
       const speakingInterval = setInterval(() => {
         if (ctx.currentTime >= startTimeInCtxTime + tts.time + outputLatencyOffset) {
           clearInterval(speakingInterval)
