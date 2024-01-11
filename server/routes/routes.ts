@@ -43,12 +43,6 @@ router.post('/api/track/stop', track_controller.stopTrack)
 // Load track for playback
 router.post('/api/track/load', track_controller.loadTrackForPlayback)
 
-// Get voices and languages
-router.get('/api/get-voices-and-languages', track_controller.get_voices_and_languages)
-
-// Protected Test Route
-router.get('/api/get-own-tracks', track_controller.get_own_tracks)
-
 /* PERFORMANCE */
 // Get performances
 router.get('/api/performances', performance_controller.getPerformances)

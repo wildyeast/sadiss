@@ -290,39 +290,6 @@ exports.stopTrack = (req: Request, res: Response) => {
   }
 }
 
-exports.get_voices_and_languages = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this TODO: Is this still the case?
-  try {
-    let maxPartialsCount = -1
-    let ttsLangs: string[] = []
-
-    const tracks = await Track.find({}, 'partialsCount ttsLangs mode')
-    for (const track of tracks) {
-      if (track.mode === 'choir' && track.partialsCount && track.partialsCount > maxPartialsCount) {
-        maxPartialsCount = track.partialsCount
-      }
-
-      if (track.ttsLangs.length) {
-        for (const lang of track.ttsLangs) {
-          if (!ttsLangs.includes(lang)) {
-            ttsLangs.push(lang)
-          }
-        }
-      }
-    }
-
-    res.json({ maxPartialsCount, ttsLangs })
-  } catch (err) {
-    console.log('Failed getting voices and languages with:', err)
-    res.status(500).json({ Error: 'Failed fetching voices and languages.' })
-  }
-}
-
-// TODO: This probably can be removed.
-exports.get_own_tracks = (req: Request, res: Response) => {
-  res.json({ message: 'hi', user: req.user })
-}
-
 const handleUploadedPartialFile = (files: File[]) => {
   const partialFilePrefix = 'partialfile_'
   const partialFile: File = Object.values(files).filter((file: File) => file.originalname.includes(partialFilePrefix))[0]
