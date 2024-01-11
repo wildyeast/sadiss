@@ -21,7 +21,7 @@ export function usePlayer() {
   /**
    * Prepares the audio context and warms up the TTS engine
    */
-  const playbackPreparation = () => {
+  const preparePlaybackAndTts = () => {
     startAudioCtx()
     warmUpTtsEngine()
   }
@@ -48,7 +48,7 @@ export function usePlayer() {
   }
 
   /**
-   * Warms up the TTS engine by speaking a 3 times with volume set to 0
+   * Warms up the TTS engine by speaking a phrase 3 times with volume set to 0
    */
   const warmUpTtsEngine = async () => {
     for (let i = 0; i < 3; i++) {
@@ -57,7 +57,7 @@ export function usePlayer() {
         lang: 'en-US',
         rate: 1.0,
         pitch: 1.0,
-        volume: 0.0,
+        volume: 0.001,
         category: 'playback'
       })
     }
@@ -121,7 +121,6 @@ export function usePlayer() {
 
     if (trackData.ttsInstructions) {
       const tts = trackData.ttsInstructions
-      console.log('Speaking: ', tts)
       const speakingInterval = setInterval(() => {
         if (ctx.currentTime >= startTimeInCtxTime + tts.time + outputLatencyOffset) {
           clearInterval(speakingInterval)
@@ -207,7 +206,7 @@ export function usePlayer() {
 
   return {
     handleChunkData,
-    playbackPreparation,
+    preparePlaybackAndTts,
     setStartTime,
     setTtsLanguage,
     setMotionRef,

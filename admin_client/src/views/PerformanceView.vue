@@ -55,6 +55,8 @@ const onSortOrderUpdate = async () => {
 const handleRemoveTrackFromPerformance = async (trackPerformanceId: string) => {
   await removeTrackFromPerformance(trackPerformanceId)
   tracks.value = tracks.value.filter((track) => track.trackPerformanceId !== trackPerformanceId)
+  selectedTrackIndex.value = -1
+  loadPerformanceAndTracks()
 }
 
 const trackLoaded = ref(false)
@@ -78,16 +80,20 @@ const setCurrentTrack = (trackId: string) => {
   }
 }
 
+const loadPerformanceAndTracks = async () => {
+  performance.value = await getPerformanceWithTracks(performanceId as string)
+  if (performance.value) {
+    tracks.value = performance.value.tracks
+  }
+}
+
 const qrCodesModal = ref<typeof QrCodesModal | null>()
 
 const connectedClients = ref<{ [choirId: string]: number }>({})
 
 let getClientsInterval: any // any because of currently unresolved type-checking error during build step
-onMounted(async () => {
-  performance.value = await getPerformanceWithTracks(performanceId as string)
-  if (performance.value) {
-    tracks.value = performance.value.tracks
-  }
+onMounted(() => {
+  loadPerformanceAndTracks()
 
   // Periodically update connected clients
   getClientsInterval = setInterval(async () => {
@@ -98,8 +104,6 @@ onMounted(async () => {
 onUnmounted(() => {
   clearInterval(getClientsInterval)
 })
-
-//https://github.com/Alfred-Skyblue/vue-draggable-plus
 </script>
 <template>
   <main class="flex h-screen flex-col justify-between">
