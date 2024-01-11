@@ -291,7 +291,7 @@ exports.stopTrack = (req: Request, res: Response) => {
 }
 
 exports.get_voices_and_languages = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
+  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this TODO: Is this still the case?
   try {
     let maxPartialsCount = -1
     let ttsLangs: string[] = []
