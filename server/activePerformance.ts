@@ -233,7 +233,7 @@ export class ActivePerformance {
       partialMap = newPartialMap
     }
 
-    // WebSocket.Websocket: see https://github.com/websockets/ws/issues/1517#issuecomment-623148704
+    // WebSocket.WebSocket: see https://github.com/websockets/ws/issues/1517#issuecomment-623148704
     const getClientIdWithMinPartials = (
       allocatedPartials: { [clientId: string]: PartialChunk[] },
       clients: WebSocket.WebSocket[]
