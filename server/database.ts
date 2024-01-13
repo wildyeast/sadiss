@@ -30,7 +30,6 @@ const connectDB = async () => {
       }
       mongoose.set('strictQuery', true)
       mongoose.connect(mongoURI)
-      console.log('MongoDB connected.')
     } catch (err) {
       console.error(err)
       process.exit(1)

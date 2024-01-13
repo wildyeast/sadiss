@@ -16,5 +16,4 @@ export const startKeepAliveInterval = (wss: Server) => {
       }
     }
   }, 50000)
-  console.log('Keep Alive Interval started.')
 }

@@ -5,7 +5,7 @@ import { createTestPerformance, generateMockId } from './testUtils'
 describe('performanceController test', () => {
   describe('POST /api/performances', () => {
     it('should get performances from DB', async () => {
-      // create a performance in the database
+      // Create a performance in the database
       const performance = new SadissPerformance({
         name: 'Performance 1',
         isPublic: true,
@@ -13,7 +13,7 @@ describe('performanceController test', () => {
       })
       await performance.save()
 
-      // save the performance id for later use
+      // Save the performance id for later use
       const performanceId = performance._id
 
       const res = await agent.get('/api/performances').expect(200)

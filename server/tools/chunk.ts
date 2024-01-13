@@ -23,7 +23,6 @@ export const chunk = async (path?: string, ttsInstructions?: TtsJson) => {
 
   if (path) {
     // Open partials file
-    console.log('Analyzing', path, '...')
     const fileStream = fs.createReadStream(path)
     const rl = readline.createInterface({
       input: fileStream,
@@ -115,8 +114,6 @@ export const chunk = async (path?: string, ttsInstructions?: TtsJson) => {
       }
     }
   }
-
-  console.log('Created', chunks.length, 'chunks')
 
   return { partialsCount, chunks }
 }
