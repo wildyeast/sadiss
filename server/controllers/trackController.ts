@@ -230,12 +230,6 @@ const validateInputsForUpload = (req: Request) => {
     return 'No files were uploaded.'
   }
 
-  if (Array.isArray(req.files)) {
-    req.files.forEach((file) => {
-      console.log(file.path)
-    })
-  }
-
   if (!req.body.name) {
     return 'No name provided.'
   }
