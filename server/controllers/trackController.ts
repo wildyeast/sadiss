@@ -11,8 +11,8 @@ import { trackSchema } from '../models/track'
 import { TrackPerformance } from '../models'
 import { activePerformances, initializeActivePerformance } from '../services/activePerformanceService'
 import path from 'path'
+import fs from 'fs'
 
-const fs = require('fs')
 const uuid = require('uuid')
 
 const Track = mongoose.model('Track', trackSchema)
