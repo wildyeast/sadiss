@@ -1,4 +1,5 @@
 import mongoose, { Types } from 'mongoose'
+import { TrackDocument } from '../types/types'
 
 /**
  * Returns a MongoDB ObjectId. This is used to mock MongoDB ids in tests.
@@ -12,7 +13,8 @@ export const createTestTrack = async (trackType: 'partials' | 'tts' | 'partialsA
     mode: 'choir',
     waveform: 'sine',
     isPublic: true,
-    ttsRate: '1.0'
+    ttsRate: '1.0',
+    notes: 'test notes'
   }
 
   const req = agent
@@ -21,6 +23,8 @@ export const createTestTrack = async (trackType: 'partials' | 'tts' | 'partialsA
     .field('mode', testTrack.mode)
     .field('waveform', testTrack.waveform)
     .field('isPublic', testTrack.isPublic)
+    .field('ttsRate', testTrack.ttsRate)
+    .field('notes', testTrack.notes)
 
   if (trackType === 'partials') {
     req.attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile_testPartialFile')
@@ -32,9 +36,9 @@ export const createTestTrack = async (trackType: 'partials' | 'tts' | 'partialsA
       .attach('files', 'tests/testFiles/testSrtFile.txt', 'ttsfile_0_en-US_testSrtFile')
   }
 
-  const resCreate: { body: { _id: Types.ObjectId } } = await req.expect(201)
+  const resCreate: { body: TrackDocument } = await req.expect(201)
 
-  return resCreate.body._id
+  return resCreate.body
 }
 
 export const createTestPerformance = async () => {
@@ -51,17 +55,26 @@ export const createTestPerformance = async () => {
   return resCreate.body._id
 }
 
-export const createTestTrackPerformance = async () => {
-  const trackId = await createTestTrack()
+export const createTestTrackPerformance = async (tracksToCreateCount = 1) => {
+  const tracks: TrackDocument[] = []
+  for (let i = 0; i < tracksToCreateCount; i++) {
+    tracks.push(await createTestTrack())
+  }
   const performanceId = await createTestPerformance()
 
-  const res: { body: { trackPerformance: { _id: Types.ObjectId } } } = await agent
-    .post('/api/add-track-to-performance')!
-    .send({
-      trackId,
-      performanceId
-    })
-    .expect(201)
+  const trackPerformanceIds: Types.ObjectId[] = []
 
-  return { trackId, performanceId, trackPerformanceId: res.body.trackPerformance._id }
+  for (const track of tracks) {
+    const res: { body: { trackPerformance: { _id: Types.ObjectId } } } = await agent
+      .post('/api/add-track-to-performance')!
+      .send({
+        trackId: track._id,
+        performanceId
+      })
+      .expect(201)
+
+    trackPerformanceIds.push(res.body.trackPerformance._id)
+  }
+
+  return { tracks, performanceId, trackPerformanceIds }
 }

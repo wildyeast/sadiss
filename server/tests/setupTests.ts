@@ -2,6 +2,10 @@ import * as dotenv from 'dotenv'
 import { generateMockId } from './testUtils'
 import { connectDB, disconnectDB } from '../database'
 import request from 'supertest'
+import fs from 'fs'
+import mongoose from 'mongoose'
+import { trackSchema } from '../models/track'
+import path from 'path'
 
 dotenv.config()
 
@@ -38,11 +42,49 @@ beforeAll(async () => {
   })
 })
 
+afterEach(async () => {
+  await deleteTracksAndFilesCreatedDuringTest()
+})
+
 afterAll(async () => {
   await disconnectDB()
   server.close()
   wss.close()
 })
+
+const deleteTracksAndFilesCreatedDuringTest = async () => {
+  const uploadsDir = path.join(__dirname, '../uploads')
+  const chunksDir = path.join(__dirname, '../chunks')
+
+  const Track = mongoose.model('Track', trackSchema)
+  const tracks = await Track.find()
+
+  // Go through all tracks and delete files
+  for (const track of tracks) {
+    if (track.partialFile) {
+      const fullPath = `${uploadsDir}/${track.partialFile.fileName}`
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(`${uploadsDir}/${track.partialFile.fileName}`)
+      }
+    }
+
+    track.ttsFiles.forEach((ttsFileObject) => {
+      const fullPath = `${uploadsDir}/${ttsFileObject.fileName}`
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath)
+      }
+    })
+
+    if (track.chunkFileName) {
+      const fullPath = `${chunksDir}/${track.chunkFileName}`
+      if (fs.existsSync(fullPath)) {
+        fs.unlinkSync(fullPath)
+      }
+    }
+
+    await Track.deleteOne({ _id: track._id })
+  }
+}
 
 // Mock user with no access to most resources created by mockUser
 const unauthorizedMockUser = {

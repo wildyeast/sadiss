@@ -291,11 +291,12 @@ export class ActivePerformance {
 
   stopSendingInterval = () => (this.sendingIntervalRunning = false)
 
-  loadTrack = (track: Frame[], mode: TrackMode, waveform: OscillatorType, ttsRate: number) => {
+  loadTrack = (track: Frame[], mode: TrackMode, waveform: OscillatorType, ttsRate: string) => {
     this.loadedTrack = track
     this.trackMode = mode
     this.trackWaveform = waveform
-    this.trackTtsRate = ttsRate.toString()
+    this.trackTtsRate = ttsRate
   }
+
   unloadTrack = () => (this.loadedTrack = [])
 }

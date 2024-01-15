@@ -13,11 +13,11 @@ jest.mock('../middlewares/validatePerformanceAccess', () => ({
 describe('trackPerformanceController test', () => {
   describe('addTrackToPerformance function', () => {
     it('should return a 201 status and the saved TrackPerformance data on success', async () => {
-      const trackId = await createTestTrack()
+      const { _id: trackId } = await createTestTrack()
       const performanceId = await createTestPerformance()
 
-      const trackPerformanceData = { trackId, performanceId }
-      const res = await agent.post('/api/add-track-to-performance').send(trackPerformanceData).expect(201)
+      const trackPerformanceData = { trackId: trackId, performanceId }
+      await agent.post('/api/add-track-to-performance').send(trackPerformanceData).expect(201)
 
       const savedTrackPerformance = await TrackPerformance.findOne({ track: trackId, performance: performanceId })
       expect(savedTrackPerformance).toBeDefined()
@@ -25,17 +25,17 @@ describe('trackPerformanceController test', () => {
     })
 
     it('should set the sortOrder of the TrackPerformance to the number of TrackPerformances in the performance + 1', async () => {
-      const trackId = await createTestTrack()
+      const { _id: trackId } = await createTestTrack()
       const performanceId = await createTestPerformance()
 
-      const trackPerformanceData = { trackId, performanceId }
+      const trackPerformanceData = { trackId: trackId, performanceId }
       const res = await agent.post('/api/add-track-to-performance').send(trackPerformanceData).expect(201)
 
       const savedTrackPerformance = await TrackPerformance.findOne({ track: trackId, performance: performanceId })
       expect(savedTrackPerformance).toBeDefined()
       expect(savedTrackPerformance!.sortOrder).toBe(1)
 
-      const trackId2 = await createTestTrack()
+      const { _id: trackId2 } = await createTestTrack()
       const trackPerformanceData2 = { trackId: trackId2, performanceId }
       const res2 = await agent.post('/api/add-track-to-performance').send(trackPerformanceData2).expect(201)
 
@@ -45,8 +45,8 @@ describe('trackPerformanceController test', () => {
     })
 
     it('should return a 400 error if no performanceId is provided', async () => {
-      const trackId = await createTestTrack()
-      const trackPerformanceData = { track: trackId }
+      const track = await createTestTrack()
+      const trackPerformanceData = { track: track }
       const res = await agent.post('/api/add-track-to-performance').send(trackPerformanceData)
       expect(res.status).toBe(400)
       expect(res.body.error).toBe('Invalid input data')
@@ -84,7 +84,7 @@ describe('trackPerformanceController test', () => {
         throw new Error('Server error')
       })
 
-      const trackId = await createTestTrack()
+      const { _id: trackId } = await createTestTrack()
       const performanceId = await createTestPerformance()
 
       const trackPerformanceData = { trackId, performanceId }
@@ -95,8 +95,8 @@ describe('trackPerformanceController test', () => {
   describe('POST /api/track-performance/update-order', () => {
     it('Should update the order of all TrackPerformances of the performance and return 200', async () => {
       const performanceId = await createTestPerformance()
-      const trackId = await createTestTrack()
-      const trackId2 = await createTestTrack()
+      const { _id: trackId } = await createTestTrack()
+      const { _id: trackId2 } = await createTestTrack()
 
       await agent.post('/api/add-track-to-performance').send({ trackId, performanceId }).expect(201)
       await agent.post('/api/add-track-to-performance').send({ trackId: trackId2, performanceId }).expect(201)
@@ -121,8 +121,8 @@ describe('trackPerformanceController test', () => {
 
     it('Should return 400 if the request body contains invalid data', async () => {
       const performanceId = await createTestPerformance()
-      const trackId = await createTestTrack()
-      const trackId2 = await createTestTrack()
+      const { _id: trackId } = await createTestTrack()
+      const { _id: trackId2 } = await createTestTrack()
 
       await agent.post('/api/add-track-to-performance').send({ trackId, performanceId }).expect(201)
       await agent.post('/api/add-track-to-performance').send({ trackId: trackId2, performanceId }).expect(201)

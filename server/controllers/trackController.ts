@@ -6,10 +6,11 @@ type File = Express.Multer.File
 import { chunk } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose, { isValidObjectId } from 'mongoose'
-import { TtsJson, Frame } from '../types/types'
+import { TtsJson, Frame, TrackDocument } from '../types/types'
 import { trackSchema } from '../models/track'
 import { TrackPerformance } from '../models'
 import { activePerformances, initializeActivePerformance } from '../services/activePerformanceService'
+import path from 'path'
 
 const fs = require('fs')
 const uuid = require('uuid')
@@ -99,12 +100,32 @@ exports.deleteTrack = async (req: Request, res: Response) => {
       await trackPerformance.remove()
     }
 
+    deleteUploadedFiles(track)
+
     // Delete track
     await track.remove()
 
     res.status(200).json({ message: 'Track deleted' })
   } catch (error) {
     res.status(500).json({ error: 'Server error' })
+  }
+}
+
+const deleteUploadedFiles = (track: TrackDocument) => {
+  const uploadsDir = path.join(__dirname, '../uploads')
+  const chunksDir = path.join(__dirname, '../chunks')
+
+  // Delete files
+  if (track.partialFile) {
+    fs.unlinkSync(`${uploadsDir}/${track.partialFile.fileName}`)
+  }
+
+  track.ttsFiles.forEach((ttsFileObject) => {
+    fs.unlinkSync(`${uploadsDir}/${ttsFileObject.fileName}`)
+  })
+
+  if (track.chunkFileName) {
+    fs.unlinkSync(`${chunksDir}/${track.chunkFileName}`)
   }
 }
 
@@ -138,23 +159,13 @@ exports.getTrack = async (req: Request, res: Response) => {
 }
 
 exports.uploadTrack = async (req: Request, res: Response) => {
-  if (!req.files || !req.files.length) {
-    res.status(400).send({ message: 'No files were uploaded.' })
-    return
-  }
+  const validationFailedMessage = validateInputsForUpload(req)
 
-  if (!req.body.name) {
-    res.status(400).send({ message: 'No name provided.' })
-    return
-  }
-
-  if (!req.body.mode) {
-    res.status(400).send({ message: 'No mode provided.' })
-    return
-  }
-
-  if (!req.body.waveform) {
-    res.status(400).send({ message: 'No waveform provided.' })
+  if (validationFailedMessage) {
+    if (req.files && req.files.length) {
+      deleteFilesIfValidationFailed(req)
+    }
+    res.status(400).send({ message: validationFailedMessage })
     return
   }
 
@@ -177,6 +188,7 @@ exports.uploadTrack = async (req: Request, res: Response) => {
     const waveform = req.body.waveform
     const ttsRate = req.body.ttsRate
     const isPublic = req.body.isPublic === 'true'
+
     // Save track to DB
     const t = new Track({
       name,
@@ -210,6 +222,41 @@ exports.uploadTrack = async (req: Request, res: Response) => {
   } catch (err) {
     console.log('Failed uploading track with:', err)
     res.status(500).send(err)
+  }
+}
+
+const validateInputsForUpload = (req: Request) => {
+  if (!req.files || !req.files.length) {
+    return 'No files were uploaded.'
+  }
+
+  if (Array.isArray(req.files)) {
+    req.files.forEach((file) => {
+      console.log(file.path)
+    })
+  }
+
+  if (!req.body.name) {
+    return 'No name provided.'
+  }
+
+  if (!req.body.mode) {
+    return 'No mode provided.'
+  }
+
+  if (!req.body.waveform) {
+    return 'No waveform provided.'
+  }
+
+  return null
+}
+
+const deleteFilesIfValidationFailed = (req: Request) => {
+  if (Array.isArray(req.files)) {
+    const uploadsDir = path.join(__dirname, '../uploads')
+    req.files.forEach((file) => {
+      fs.unlinkSync(`${uploadsDir}/${file.filename}`)
+    })
   }
 }
 
