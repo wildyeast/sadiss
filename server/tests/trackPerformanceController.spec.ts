@@ -2,14 +2,6 @@ import { SadissPerformance, Track } from '../models'
 import { TrackPerformance } from '../models/trackPerformance'
 import { createTestPerformance, createTestTrack } from './testUtils'
 
-jest.mock('../middlewares/validateTrackAccess', () => ({
-  validateTrackAccess: jest.fn((req, res, next) => next())
-}))
-
-jest.mock('../middlewares/validatePerformanceAccess', () => ({
-  validatePerformanceAccess: jest.fn((req, res, next) => next())
-}))
-
 describe('trackPerformanceController test', () => {
   describe('addTrackToPerformance function', () => {
     it('should return a 201 status and the saved TrackPerformance data on success', async () => {

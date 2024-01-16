@@ -21,6 +21,15 @@ beforeAll(async () => {
   // Make wss available globally
   global.testWss = wss
 
+  // Mock middlewares
+  jest.mock('../middlewares/validateTrackAccess', () => ({
+    validateTrackAccess: jest.fn((req, res, next) => next())
+  }))
+
+  jest.mock('../middlewares/validatePerformanceAccess', () => ({
+    validatePerformanceAccess: jest.fn((req, res, next) => next())
+  }))
+
   // Register a user to be used for testing
   const mockUser = {
     username: 'Test User',
