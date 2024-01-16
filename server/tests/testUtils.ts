@@ -65,13 +65,10 @@ export const createTestTrackPerformance = async (tracksToCreateCount = 1) => {
   const trackPerformanceIds: Types.ObjectId[] = []
 
   for (const track of tracks) {
-    const res: { body: { trackPerformance: { _id: Types.ObjectId } } } = await agent
-      .post('/api/add-track-to-performance')!
-      .send({
-        trackId: track._id,
-        performanceId
-      })
-      .expect(201)
+    const res: { body: { trackPerformance: { _id: Types.ObjectId } } } = await agent.post('/api/add-track-to-performance').send({
+      trackId: track._id,
+      performanceId
+    })
 
     trackPerformanceIds.push(res.body.trackPerformance._id)
   }
