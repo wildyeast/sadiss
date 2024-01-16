@@ -53,6 +53,7 @@ beforeAll(async () => {
 
 afterEach(async () => {
   await deleteTracksAndFilesCreatedDuringTest()
+  jest.restoreAllMocks()
 })
 
 afterAll(async () => {
