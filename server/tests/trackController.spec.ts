@@ -377,9 +377,11 @@ describe('trackController test', () => {
     })
 
     it('should return 500 if trackperformance delete fails', async () => {
-      Track.findById = jest.fn().mockImplementationOnce(() => {
+      const mockFindById = jest.fn().mockImplementationOnce(() => {
         throw new Error('Server error')
       })
+
+      jest.spyOn(Track, 'findById').mockImplementationOnce(mockFindById)
 
       const resDelete = await agent.post(`/api/track/delete/${generateMockId()}`).expect(500)
       expect(resDelete.body.error).toBe('Server error')
