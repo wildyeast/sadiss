@@ -19,8 +19,6 @@ export class ActivePerformance {
       return false
     }
 
-    console.log('Sending interval started.')
-
     this.sendingIntervalRunning = true
 
     for (const client of wss.clients) {
