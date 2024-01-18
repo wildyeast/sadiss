@@ -51,9 +51,15 @@ beforeAll(async () => {
   })
 })
 
+beforeEach(async () => {
+  // About 'advanceTimers: true' see https://github.com/nock/nock/issues/2200#issuecomment-1699838032
+  jest.useFakeTimers({ advanceTimers: true })
+})
+
 afterEach(async () => {
   await deleteTracksAndFilesCreatedDuringTest()
   jest.restoreAllMocks()
+  jest.clearAllTimers()
 })
 
 afterAll(async () => {

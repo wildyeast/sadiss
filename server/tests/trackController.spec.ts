@@ -431,9 +431,6 @@ describe('trackController test', () => {
       const { tracks, performanceId } = await createTestTrackPerformance()
       const res = await agent.post(`/api/track/start`).send({ trackId: tracks[0]._id, performanceId }).expect(200)
       expect(res.body.data).toBe('Track started.')
-
-      // Stop tracks immediately after starting them to prevent errors due to the the track running
-      await agent.post('/api/track/stop').send({ performanceId }).expect(200)
     })
 
     it('should return 200 and a "Track already running." message if track already running', async () => {
@@ -441,9 +438,6 @@ describe('trackController test', () => {
       await agent.post(`/api/track/start`).send({ trackId: tracks[0]._id, performanceId }).expect(200)
       const res = await agent.post(`/api/track/start`).send({ trackId: tracks[0]._id, performanceId }).expect(200)
       expect(res.body.data).toBe('Track already running.')
-
-      // Stop tracks immediately after starting them to prevent errors due to the the track running
-      await agent.post('/api/track/stop').send({ performanceId }).expect(200)
     })
   })
 })
