@@ -1,6 +1,6 @@
 import { SadissPerformance, Track } from '../models'
 import { TrackPerformance } from '../models/trackPerformance'
-import { createTestPerformance, createTestTrack } from './testUtils'
+import { createTestPerformance, createTestTrack, createTestTrackPerformance } from './testUtils'
 
 describe('trackPerformanceController test', () => {
   describe('addTrackToPerformance function', () => {
@@ -86,29 +86,25 @@ describe('trackPerformanceController test', () => {
 
   describe('POST /api/track-performance/update-order', () => {
     it('Should update the order of all TrackPerformances of the performance and return 200', async () => {
-      const performanceId = await createTestPerformance()
-      const { _id: trackId } = await createTestTrack()
-      const { _id: trackId2 } = await createTestTrack()
+      const { trackPerformances } = await createTestTrackPerformance(2)
 
-      await agent.post('/api/add-track-to-performance').send({ trackId, performanceId }).expect(201)
-      await agent.post('/api/add-track-to-performance').send({ trackId: trackId2, performanceId }).expect(201)
-
-      const res = await agent.get(`/api/performance/${performanceId}/with-tracks`).expect(200)
+      const { _id: id1, sortOrder: sortOrder1 } = trackPerformances[0]
+      const { _id: id2, sortOrder: sortOrder2 } = trackPerformances[1]
 
       const reSortRequestObject = {
         trackPerformances: [
-          { trackPerformanceId: res.body.performance.tracks[0].trackPerformanceId, sortOrder: 2 },
-          { trackPerformanceId: res.body.performance.tracks[1].trackPerformanceId, sortOrder: 1 }
+          { trackPerformanceId: id1, sortOrder: sortOrder2 },
+          { trackPerformanceId: id2, sortOrder: sortOrder1 }
         ]
       }
 
       await agent.post('/api/track-performance/update-order').send(reSortRequestObject).expect(200)
 
-      const trackPerformance1 = await TrackPerformance.find({ _id: res.body.performance.tracks[0].trackPerformanceId })
-      const trackPerformance2 = await TrackPerformance.find({ _id: res.body.performance.tracks[1].trackPerformanceId })
+      const trackPerformance1 = await TrackPerformance.find({ _id: id1 })
+      const trackPerformance2 = await TrackPerformance.find({ _id: id2 })
 
-      expect(trackPerformance1[0].sortOrder).toBe(2)
-      expect(trackPerformance2[0].sortOrder).toBe(1)
+      expect(trackPerformance1[0].sortOrder).toBe(sortOrder2)
+      expect(trackPerformance2[0].sortOrder).toBe(sortOrder1)
     })
 
     it('Should return 400 if the request body contains invalid data', async () => {

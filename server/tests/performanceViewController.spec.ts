@@ -3,7 +3,7 @@ import { generateMockId, createTestTrackPerformance } from './testUtils'
 
 describe('getPerformanceWithTracks', () => {
   it('should return performance data with associated tracks in correct order', async () => {
-    const { performanceId, tracks, trackPerformanceIds } = await createTestTrackPerformance(2)
+    const { performanceId, tracks, trackPerformances } = await createTestTrackPerformance(2)
 
     const res = await agent.get(`/api/performance/${performanceId}/with-tracks`).expect(200)
 
@@ -36,7 +36,7 @@ describe('getPerformanceWithTracks', () => {
             isPublic: true,
             notes: 'test notes',
             sortOrder: 1,
-            trackPerformanceId: trackPerformanceIds[0]
+            trackPerformanceId: trackPerformances[0]._id
           },
           {
             _id: tracks[1]._id,
@@ -60,7 +60,7 @@ describe('getPerformanceWithTracks', () => {
             creator: global.mockUser.id.toString(),
             isPublic: true,
             sortOrder: 2,
-            trackPerformanceId: trackPerformanceIds[1],
+            trackPerformanceId: trackPerformances[1]._id,
             notes: 'test notes'
           }
         ]

@@ -76,6 +76,7 @@ export interface SadissPerformanceDocument extends Document {
 }
 
 export interface TrackPerformanceDocument extends Document {
+  _id: string
   track: TrackDocument
   performance: SadissPerformanceDocument
   sortOrder: number

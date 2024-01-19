@@ -1,5 +1,5 @@
 import mongoose, { Types } from 'mongoose'
-import { TrackDocument } from '../types/types'
+import { TrackDocument, TrackPerformanceDocument } from '../types/types'
 
 /**
  * Returns a MongoDB ObjectId. This is used to mock MongoDB ids in tests.
@@ -62,16 +62,16 @@ export const createTestTrackPerformance = async (tracksToCreateCount = 1) => {
   }
   const performanceId = await createTestPerformance()
 
-  const trackPerformanceIds: Types.ObjectId[] = []
+  const trackPerformances: TrackPerformanceDocument[] = []
 
   for (const track of tracks) {
-    const res: { body: { trackPerformance: { _id: Types.ObjectId } } } = await agent.post('/api/add-track-to-performance').send({
+    const res: { body: { trackPerformance: TrackPerformanceDocument } } = await agent.post('/api/add-track-to-performance').send({
       trackId: track._id,
       performanceId
     })
 
-    trackPerformanceIds.push(res.body.trackPerformance._id)
+    trackPerformances.push(res.body.trackPerformance)
   }
 
-  return { tracks, performanceId, trackPerformanceIds }
+  return { tracks, performanceId, trackPerformances }
 }
