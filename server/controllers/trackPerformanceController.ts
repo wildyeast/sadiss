@@ -67,11 +67,11 @@ exports.updateTrackPerformanceOrder = async (req: Request, res: Response) => {
     }
 
     // Update the sortOrder of each trackPerformance
-    trackPerformances.forEach(async (trackPerformance: any) => {
+    for (const trackPerformance of trackPerformances) {
       await TrackPerformance.findByIdAndUpdate(trackPerformance.trackPerformanceId, {
         sortOrder: trackPerformance.sortOrder
       })
-    })
+    }
 
     res.status(200).send({ message: 'Track performance order updated' })
   } catch (error) {
