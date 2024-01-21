@@ -112,8 +112,8 @@ exports.deleteTrack = async (req: Request, res: Response) => {
 }
 
 const deleteUploadedFiles = (track: TrackDocument) => {
-  const uploadsDir = path.join(__dirname, '../uploads')
-  const chunksDir = path.join(__dirname, '../chunks')
+  const uploadsDir = path.join(__dirname, `../${process.env.UPLOADS_DIR}`)
+  const chunksDir = path.join(__dirname, `../${process.env.CHUNKS_DIR}`)
 
   // Delete files
   if (track.partialFile) {
@@ -176,7 +176,7 @@ exports.uploadTrack = async (req: Request, res: Response) => {
 
     const filename = uuid.v4()
     const { partialsCount, chunks } = await chunk(path, ttsJson)
-    fs.writeFile(`chunks/${filename}`, JSON.stringify(chunks), (err: any) => {
+    fs.writeFile(`${process.env.CHUNKS_DIR}/${filename}`, JSON.stringify(chunks), (err: any) => {
       if (err) {
         console.error(err)
       }
@@ -247,7 +247,7 @@ const validateInputsForUpload = (req: Request) => {
 
 const deleteFilesIfValidationFailed = (req: Request) => {
   if (Array.isArray(req.files)) {
-    const uploadsDir = path.join(__dirname, '../uploads')
+    const uploadsDir = path.join(__dirname, `../${process.env.UPLOADS_DIR}`)
     req.files.forEach((file) => {
       fs.unlinkSync(`${uploadsDir}/${file.filename}`)
     })
@@ -292,7 +292,7 @@ exports.editTrack = async (req: Request, res: Response) => {
 
     // if (Object.keys(chunks)) {
     //   const filename = uuid.v4()
-    //   fs.writeFile(`chunks/${filename}`, JSON.stringify(chunks), (err: any) => {
+    //   fs.writeFile(`${process.env.CHUNKS_DIR}/${filename}`, JSON.stringify(chunks), (err: any) => {
     //     if (err) {
     //       console.error(err)
     //     }

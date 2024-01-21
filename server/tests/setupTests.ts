@@ -7,7 +7,7 @@ import mongoose from 'mongoose'
 import { trackSchema } from '../models/track'
 import path from 'path'
 
-dotenv.config()
+dotenv.config({ path: '.env.test' })
 
 const { app, server, wss } = require('../server')
 
@@ -69,8 +69,8 @@ afterAll(async () => {
 })
 
 const deleteTracksAndFilesCreatedDuringTest = async () => {
-  const uploadsDir = path.join(__dirname, '../uploads')
-  const chunksDir = path.join(__dirname, '../chunks')
+  const uploadsDir = path.join(__dirname, `../${process.env.UPLOADS_DIR}`)
+  const chunksDir = path.join(__dirname, `../${process.env.CHUNKS_DIR}`)
 
   const Track = mongoose.model('Track', trackSchema)
   const tracks = await Track.find()

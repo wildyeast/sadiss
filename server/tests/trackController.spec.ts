@@ -326,9 +326,9 @@ describe('trackController test', () => {
 
       // Get first track of performance and check that files exist and are deleted correctly
       const firstTrack = performanceWithTracksResGet.body.performance.tracks[0]
-      const firstTrackPartialFilePath = `${__dirname}/../uploads/${firstTrack.partialFile.fileName}`
-      const firstTrackTtsFilePath = `${__dirname}/../uploads/${firstTrack.ttsFiles[0].fileName}`
-      const firstTrackChunkFilePath = `${__dirname}/../chunks/${firstTrack.chunkFileName}`
+      const firstTrackPartialFilePath = `${__dirname}/../${process.env.UPLOADS_DIR}/${firstTrack.partialFile.fileName}`
+      const firstTrackTtsFilePath = `${__dirname}/../${process.env.UPLOADS_DIR}/${firstTrack.ttsFiles[0].fileName}`
+      const firstTrackChunkFilePath = `${__dirname}/../${process.env.CHUNKS_DIR}/${firstTrack.chunkFileName}`
 
       // Check that files exist
       let partialFileExists = fs.existsSync(firstTrackPartialFilePath)

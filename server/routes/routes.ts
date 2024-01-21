@@ -15,7 +15,7 @@ const router = express.Router()
 
 import multer from 'multer'
 
-const upload = multer({ dest: 'uploads/' })
+const upload = multer({ dest: `${process.env.UPLOADS_DIR}/` })
 
 router.use('/api', authenticateToken)
 

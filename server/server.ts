@@ -6,18 +6,25 @@ import { passport } from './auth'
 import { Server } from 'ws'
 import { connectDB } from './database'
 import { startKeepAliveInterval } from './tools/startKeepAliveInterval'
+import fs from 'fs'
 
 const cors = require('cors')
 const uuid = require('uuid')
 const session = require('express-session')
 const cookieParser = require('cookie-parser')
 
-// Load .env
-dotenv.config()
-
 // Connect to database
 if (process.env.NODE_ENV !== 'test') {
+  // Load .env
+  dotenv.config()
   connectDB()
+} else {
+  // Load .env.test
+  dotenv.config({ path: '.env.test' })
+}
+
+if (!fs.existsSync(process.env.CHUNKS_DIR!)) {
+  fs.mkdirSync(process.env.CHUNKS_DIR!)
 }
 
 let whitelist = ['https://sadiss.net']
