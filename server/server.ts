@@ -6,6 +6,7 @@ import { passport } from './auth'
 import { Server } from 'ws'
 import { connectDB } from './database'
 import { startKeepAliveInterval } from './tools/startKeepAliveInterval'
+import { startWebSocketServer } from './services/webSocketServerService'
 import fs from 'fs'
 
 const cors = require('cors')
@@ -70,10 +71,10 @@ const app = express()
 let server
 let wss: Server
 if (process.env.NODE_ENV === 'test') {
-  wss = new Server({ port: 0 })
+  wss = startWebSocketServer()
   server = app.listen()
 } else {
-  wss = new Server({ port: +process.env.WS_SERVER_PORT! })
+  wss = startWebSocketServer(+process.env.WS_SERVER_PORT!)
   console.log(`Websocket server listening on port ${process.env.WS_SERVER_PORT}.`)
 
   server = app.listen(process.env.BASE_PORT, () => console.log(`Http server listening on port ${process.env.BASE_PORT}.`))
@@ -97,6 +98,7 @@ wss.on('connection', (client) => {
       console.log(
         `Performance ${client.performanceId}: Client ${client.id} registered with choir id ${client.choirId} and TTS lang ${client.ttsLang.iso}`
       )
+      client.send('clientInfoReceived')
     } else if (parsed.message === 'measure') {
       client.send('measure')
     } else if (parsed.message === 'isAdmin') {

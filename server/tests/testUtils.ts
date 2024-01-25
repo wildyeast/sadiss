@@ -1,5 +1,6 @@
 import mongoose, { Types } from 'mongoose'
 import { TrackDocument, TrackPerformanceDocument } from '../types/types'
+import WebSocket from 'ws'
 
 /**
  * Returns a MongoDB ObjectId. This is used to mock MongoDB ids in tests.
@@ -74,4 +75,48 @@ export const createTestTrackPerformance = async (tracksToCreateCount = 1) => {
   }
 
   return { tracks, performanceId, trackPerformances }
+}
+
+export const createWebSocketClient = (performanceId: string, choirId = 0, selectedLanguage = 'en-US') => {
+  const wssPort = (global.testWss.address() as WebSocket.AddressInfo).port
+
+  // Return a Promise that resolves when the WebSocket connection is open
+  return new Promise<WebSocket>((resolve, reject) => {
+    const ws = new WebSocket(`ws://localhost:${wssPort}/`)
+
+    ws.onopen = function () {
+      this.send(
+        JSON.stringify({
+          message: 'clientInfo',
+          clientId: choirId,
+          ttsLang: selectedLanguage,
+          performanceId: performanceId
+        })
+      )
+    }
+
+    ws.onerror = function (error) {
+      // Reject the Promise if there's an error during the WebSocket connection
+      reject(error)
+    }
+
+    ws.onmessage = function (event) {
+      console.log(`${getTime()}: Received message from ws server: ${event.data}`)
+
+      if (event.data && event.data === 'clientInfoReceived') {
+        // Resolve the Promise with the WebSocket instance when the connection is open
+        resolve(ws)
+      }
+    }
+  })
+}
+
+// Helper function the gets current time in human readable format
+const getTime = () => {
+  const date = new Date()
+  const hours = date.getHours()
+  const minutes = date.getMinutes()
+  const seconds = date.getSeconds()
+  const milliseconds = date.getMilliseconds()
+  return `${hours}:${minutes}:${seconds}:${milliseconds}`
 }

@@ -6,12 +6,13 @@ type File = Express.Multer.File
 import { chunk } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose, { isValidObjectId } from 'mongoose'
-import { TtsJson, Frame, TrackDocument } from '../types/types'
+import { TtsJson, TrackDocument } from '../types/types'
 import { trackSchema } from '../models/track'
 import { TrackPerformance } from '../models'
 import { activePerformances, initializeActivePerformance } from '../services/activePerformanceService'
 import path from 'path'
 import fs from 'fs'
+import { readAndParseChunkFile } from '../services/fileService'
 
 const uuid = require('uuid')
 
@@ -29,34 +30,21 @@ exports.loadTrackForPlayback = async (req: Request, res: Response) => {
   }
 
   try {
-    const t = await Track.findOne({ _id: trackId })
+    const track = await Track.findOne({ _id: trackId })
 
-    if (!t) {
+    if (!track) {
       return res.status(404).json({ message: 'Track not found.' })
     }
 
-    fs.readFile(`chunks/${t.chunkFileName}`, 'utf8', (err: any, data: string) => {
-      if (err) {
-        console.error(err)
-        return res.status(500).json({ message: 'Error reading track file.' })
-      }
+    const chunks = await readAndParseChunkFile(track)
 
-      let chunks: Frame[]
-      try {
-        chunks = JSON.parse(data)
-        if (!chunks) {
-          return res.status(500).json({ message: 'Failed to parse track chunks.' })
-        }
-      } catch (parseError) {
-        console.error(parseError)
-        return res.status(500).json({ message: 'Error parsing track chunks.' })
-      }
-
+    if (chunks) {
       const activePerformance = initializeActivePerformance(performanceId)
-      activePerformance.loadTrack(chunks, t.mode, t.waveform, t.ttsRate)
-
+      activePerformance.loadTrack(chunks, track.mode, track.waveform, track.ttsRate)
       return res.status(200).json({ trackLengthInChunks: chunks.length })
-    })
+    } else {
+      return res.status(500).json({ message: 'Error loading track.' })
+    }
   } catch (error) {
     console.error(error)
     return res.status(500).json({ message: 'Error loading track.' })

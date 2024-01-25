@@ -15,6 +15,22 @@ export class ActivePerformance {
 
   // More or less accurate timer taken from https://stackoverflow.com/a/29972322/16725862
   startSendingInterval = (startTime: number, wss: Server, loopTrack: boolean, trackId: string, startAtChunk: number) => {
+    interface PartialMap {
+      [partialId: string]: string[]
+    }
+
+    interface DataToSend {
+      startTime: number
+      waveform: string
+      ttsRate: string
+      chunk: Chunk
+    }
+
+    interface Chunk {
+      partials?: PartialChunk[]
+      ttsInstructions?: { time: number; phrase: string }
+    }
+
     if (this.sendingIntervalRunning) {
       return false
     }
@@ -36,28 +52,18 @@ export class ActivePerformance {
 
     // nonChoir mode: Stores partialIds and array of client ids that were given
     // the respective partial in the last iteration
-    let partialMap: { [partialId: string]: string[] } = {}
+    let partialMap: PartialMap = {}
 
     const step = () => {
-      console.log('Performing', this.id)
+      console.log(`Performing ${this.id} chunk ${chunkIndex} at ${Date.now()}`)
       if (!this.sendingIntervalRunning) {
         console.log('Sending interval stopped.')
         reset()
         return
       }
 
-      if (chunkIndex >= this.loadedTrack.length) {
-        if (loopTrack) {
-          console.log('No more chunks. Looping.')
-          actualStartTime += this.loadedTrack.length
-          chunkIndex = 0
-        } else {
-          console.log('No more chunks. Stopping.')
-          this.sendingIntervalRunning = false
-          reset()
-          return
-        }
-      }
+      const shouldContinue = handleTrackEnd()
+      if (!shouldContinue) return
 
       const dt = Date.now() - expected
       if (dt > interval) {
@@ -69,10 +75,14 @@ export class ActivePerformance {
 
       if (wss.clients.size) {
         // Distribute partials among clients and send them to clients
+        const currentFrame = this.loadedTrack[chunkIndex]
+
+        if (!currentFrame) return
+
         if (this.trackMode === 'choir') {
-          handleChoirDistribution()
+          handleChoirDistribution(currentFrame)
         } else {
-          handleNonChoirDistribution()
+          handleNonChoirDistribution(currentFrame)
         }
       } else {
         console.log('No clients to distribute to.')
@@ -92,29 +102,24 @@ export class ActivePerformance {
     // Start
     setTimeout(step, interval)
 
-    const handleChoirDistribution = () => {
+    const handleChoirDistribution = (currentFrame: Frame) => {
       for (const client of wss.clients) {
         if (client.isAdmin || client.performanceId !== this.id) continue
 
-        const dataToSend: {
-          startTime: number
-          waveform: string
-          ttsRate: string
-          chunk: { partials?: PartialChunk[]; ttsInstructions?: { time: number; phrase: string } }
-        } = {
+        const dataToSend: DataToSend = {
           startTime: actualStartTime + 2,
           waveform: this.trackWaveform,
           ttsRate: this.trackTtsRate,
           chunk: {}
         }
 
-        const partialById = this.loadedTrack[chunkIndex]?.partials.find((chunk: PartialChunk) => chunk.index === client.choirId)
+        const partialById = currentFrame.partials.find((chunk) => chunk.index === client.choirId)
         if (partialById) {
           dataToSend.chunk.partials = [partialById]
         }
 
-        if (this.loadedTrack[chunkIndex]?.ttsInstructions) {
-          const ttsInstructionForClientId = this.loadedTrack[chunkIndex]?.ttsInstructions[client.choirId]
+        if (currentFrame.ttsInstructions) {
+          const ttsInstructionForClientId = currentFrame.ttsInstructions[client.choirId]
           if (ttsInstructionForClientId) {
             dataToSend.chunk.ttsInstructions = {
               time: ttsInstructionForClientId.time,
@@ -129,12 +134,12 @@ export class ActivePerformance {
       }
     }
 
-    const handleNonChoirDistribution = () => {
+    const handleNonChoirDistribution = (currentFrame: Frame) => {
       const clientArr = Array.from(wss.clients)
       const clients = clientArr.filter((client) => !client.isAdmin && client.performanceId === this.id)
-      const partials = this.loadedTrack[chunkIndex]?.partials
+      const partials = currentFrame.partials
 
-      const newPartialMap: { [partialIndex: string]: string[] } = {}
+      const newPartialMap: PartialMap = {}
 
       const allocatedPartials: { [clientId: string]: PartialChunk[] } = {}
 
@@ -202,26 +207,26 @@ export class ActivePerformance {
       }
 
       for (const client of clients) {
-        const dataToSend: { partials: PartialChunk[]; ttsInstructions?: { time: number; phrase: string } } = {
+        const chunk: Chunk = {
           partials: allocatedPartials[client.id]
         }
 
-        if (this.loadedTrack[chunkIndex]?.ttsInstructions) {
-          const ttsInstructions = this.loadedTrack[chunkIndex]?.ttsInstructions
+        if (currentFrame.ttsInstructions) {
+          const ttsInstructions = currentFrame.ttsInstructions
           if (!ttsInstructions) continue
 
           const firstTtsInstruction = Object.values(ttsInstructions)[0]
           if (firstTtsInstruction) {
-            dataToSend.ttsInstructions = { time: firstTtsInstruction.time, phrase: firstTtsInstruction.langs[client.ttsLang.iso] }
+            chunk.ttsInstructions = { time: firstTtsInstruction.time, phrase: firstTtsInstruction.langs[client.ttsLang.iso] }
           }
         }
 
-        if (dataToSend.partials?.length || dataToSend.ttsInstructions) {
+        if (chunk.partials?.length || chunk.ttsInstructions) {
           const json = JSON.stringify({
             startTime: actualStartTime + 2,
             waveform: this.trackWaveform,
             ttsRate: this.trackTtsRate,
-            chunk: dataToSend
+            chunk
           })
           client.send(json)
           client.lastSentTime = Date.now()
@@ -282,6 +287,23 @@ export class ActivePerformance {
         if (client.performanceId !== this.id) continue
         client.send(JSON.stringify({ stop: true }))
       }
+    }
+
+    const handleTrackEnd = () => {
+      if (chunkIndex >= this.loadedTrack.length) {
+        if (loopTrack) {
+          console.log('No more chunks. Looping.')
+          actualStartTime += this.loadedTrack.length
+          chunkIndex = 0
+          return true
+        } else {
+          console.log('No more chunks. Stopping.')
+          this.sendingIntervalRunning = false
+          reset()
+          return false
+        }
+      }
+      return true
     }
 
     return true
