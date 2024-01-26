@@ -85,13 +85,13 @@ startKeepAliveInterval(wss)
 wss.on('connection', (client) => {
   // Assign id to new connection, needed for nonChoir partial distribution
   client.id = uuid.v4()
-  logger.info('New client connected! Assigned id: ', client.id, 'Total clients:', wss.clients.size)
+  logger.info(`New client connected! Assigned id: ${client.id} Total clients: ${wss.clients.size}`)
 
   client.onclose = () => logger.info(`Client ${client.id} has disconnected!`)
 
   client.onmessage = (event) => {
     const parsed: Message = JSON.parse(event.data.toString())
-    logger.debug('Received message from ws client:', parsed.message)
+    logger.debug(`Received message from ws client: ${parsed.message}`)
     if (parsed.message === 'clientInfo') {
       client.choirId = parsed.clientId
       client.ttsLang = parsed.ttsLang
