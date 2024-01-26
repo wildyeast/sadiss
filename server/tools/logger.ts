@@ -1,9 +1,7 @@
 import { createLogger, format, transports } from 'winston'
 const { combine, timestamp, printf, colorize } = format
 
-const myFormat = printf(({ level, message, timestamp }) => {
-  return `${timestamp} ${level}: ${message}`
-})
+const myFormat = printf(({ level, message, timestamp }) => `${timestamp} ${level}: ${message}`)
 
 let desiredLogLevel = 'info'
 if (process.env.NODE_ENV === 'test' || process.env.NODE_ENV === 'development') {
