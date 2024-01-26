@@ -13,6 +13,7 @@ import { activePerformances, initializeActivePerformance } from '../services/act
 import path from 'path'
 import fs from 'fs'
 import { readAndParseChunkFile } from '../services/fileService'
+import { logger } from '../tools'
 
 const uuid = require('uuid')
 
@@ -141,7 +142,7 @@ exports.getTrack = async (req: Request, res: Response) => {
     }
     res.json(track)
   } catch (err) {
-    console.log('Failed getting track with:', err)
+    logger.error('Failed getting track with:', err)
     res.status(500).json({ Error: 'Failed fetching track.' })
   }
 }
@@ -201,14 +202,14 @@ exports.uploadTrack = async (req: Request, res: Response) => {
 
     t.save((err) => {
       if (err) {
-        console.log('Failed uploading track with:', err)
+        logger.error('Failed uploading track with:', err)
         res.status(500).send(err)
       } else {
         res.status(201).send(t)
       }
     })
   } catch (err) {
-    console.log('Failed uploading track with:', err)
+    logger.error('Failed uploading track with:', err)
     res.status(500).send(err)
   }
 }

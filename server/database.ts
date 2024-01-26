@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
+import { logger } from './tools'
 
 // Load .env
 dotenv.config()
@@ -44,7 +45,7 @@ const disconnectDB = async () => {
       await mongod.stop()
     }
   } catch (err) {
-    console.log(err)
+    logger.error(err)
     process.exit(1)
   }
 }

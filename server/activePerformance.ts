@@ -1,6 +1,7 @@
 import { Server } from 'ws'
 import { PartialChunk, TrackMode, Frame } from './types/types'
 import WebSocket from 'ws'
+import { logger } from './tools'
 
 const MAX_PARTIALS_PER_CLIENT = 16
 
@@ -55,9 +56,9 @@ export class ActivePerformance {
     let partialMap: PartialMap = {}
 
     const step = () => {
-      console.log(`Performing ${this.id} chunk ${chunkIndex} at ${Date.now()}`)
+      logger.info(`Performing ${this.id} @ chunk ${chunkIndex}`)
       if (!this.sendingIntervalRunning) {
-        console.log('Sending interval stopped.')
+        logger.info('Sending interval stopped.')
         reset()
         return
       }
@@ -67,7 +68,7 @@ export class ActivePerformance {
 
       const dt = Date.now() - expected
       if (dt > interval) {
-        console.log('Sending interval somehow broke. Stopping.')
+        logger.warn('Sending interval somehow broke. Stopping.')
         this.sendingIntervalRunning = false
         reset()
         return
@@ -85,7 +86,7 @@ export class ActivePerformance {
           handleNonChoirDistribution(currentFrame)
         }
       } else {
-        console.log('No clients to distribute to.')
+        logger.info('No clients to distribute to.')
       }
 
       const admins = Array.from(wss.clients).filter((client) => client.isAdmin && client.performanceId === this.id)
@@ -292,12 +293,12 @@ export class ActivePerformance {
     const handleTrackEnd = () => {
       if (chunkIndex >= this.loadedTrack.length) {
         if (loopTrack) {
-          console.log('No more chunks. Looping.')
+          logger.info('No more chunks. Looping.')
           actualStartTime += this.loadedTrack.length
           chunkIndex = 0
           return true
         } else {
-          console.log('No more chunks. Stopping.')
+          logger.info('No more chunks. Stopping.')
           this.sendingIntervalRunning = false
           reset()
           return false
