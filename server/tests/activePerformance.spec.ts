@@ -12,13 +12,13 @@ describe('activePerformance test', () => {
       const track = tracks[0]
       const chunks = await readAndParseChunkFile(track)
 
-      await createWebSocketClient(performanceId.toString())
-      // await createWebSocketClient(performanceId.toString(), 1)
+      const wsClient1 = await createWebSocketClient(performanceId.toString())
+      const wsClient2 = await createWebSocketClient(performanceId.toString(), 1)
 
       activePerformance.loadTrack(chunks!, track.mode, track.waveform, track.ttsRate)
       activePerformance.startSendingInterval(0, global.testWss, false, track._id.toString(), 0)
 
-      jest.advanceTimersByTime(40000)
+      jest.advanceTimersByTime(10000)
     })
   })
 })
