@@ -148,8 +148,8 @@ const voiceLangCombinations = computed(() => {
 watch(trackTtsRate, (newValue) => {
   if (newValue > 2) {
     trackTtsRate.value = 2
-  } else if (newValue < 0.5) {
-    trackTtsRate.value = 0.5
+  } else if (newValue < 0.2) {
+    trackTtsRate.value = 0.2
   }
 })
 </script>
@@ -305,7 +305,7 @@ watch(trackTtsRate, (newValue) => {
             name="ttsRate"
             type="number"
             step="0.1"
-            min="0.5"
+            min="0.2"
             max="2"
             v-model="trackTtsRate"
             class="rounded-sm border p-1" />
