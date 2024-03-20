@@ -60,6 +60,9 @@ export interface TrackDocument extends Document {
   ttsFiles: TTSFileObject[]
   isPublic: boolean
   creator: Types.ObjectId
+  deleted: boolean
+  deletedAt: Date
+  deletedBy: Types.ObjectId
 }
 
 export interface TTSFileObject {
@@ -73,6 +76,9 @@ export interface SadissPerformanceDocument extends Document {
   name: string
   creator: Types.ObjectId
   isPublic: boolean
+  deleted: boolean
+  deletedAt: Date
+  deletedBy: Types.ObjectId
 }
 
 export interface TrackPerformanceDocument extends Document {
@@ -80,4 +86,7 @@ export interface TrackPerformanceDocument extends Document {
   track: TrackDocument
   performance: SadissPerformanceDocument
   sortOrder: number
+  deleted: boolean
+  deletedAt: Date
+  deletedBy: Types.ObjectId
 }

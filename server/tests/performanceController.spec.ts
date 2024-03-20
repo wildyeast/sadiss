@@ -1,22 +1,14 @@
 import { Types } from 'mongoose'
 import { SadissPerformance } from '../models/sadissPerformance'
 import { createTestPerformance, generateMockId } from './testUtils'
+import exp from 'constants'
 
 describe('performanceController test', () => {
   describe('POST /api/performances', () => {
-    it('should get performances from DB', async () => {
-      // Create a performance in the database
-      const performance = new SadissPerformance({
-        name: 'Performance 1',
-        isPublic: true,
-        creator: '123456789012'
-      })
-      await performance.save()
+    it('should get performances from DB if deleted !== true', async () => {
+      const performanceId = await createTestPerformance()
 
-      // Save the performance id for later use
-      const performanceId = performance._id
-
-      const res = await agent.get('/api/performances').expect(200)
+      let res = await agent.get('/api/performances').expect(200)
 
       const data = JSON.parse(res.text)
       expect(Array.isArray(data.performances)).toBe(true)
@@ -25,6 +17,36 @@ describe('performanceController test', () => {
       expect(data.performances[0]).toHaveProperty('_id')
       expect(data.performances[0]).toHaveProperty('name')
       expect(data.performances[0]['_id']).toBe(performanceId.toString())
+
+      // Delete the performance
+      await agent.post(`/api/performance/delete/${performanceId}`).send()
+
+      // Check if the performance is no longer in response
+      res = await agent.get('/api/performances').expect(200)
+      expect(res.body.performances.length).toBe(0)
+    })
+  })
+
+  describe('GET /api/own-performances', () => {
+    it('should get own performances from DB if deleted !== true', async () => {
+      const performanceId = await createTestPerformance()
+
+      let res = await agent.get('/api/own-performances').expect(200)
+
+      const data = JSON.parse(res.text)
+      expect(Array.isArray(data.performances)).toBe(true)
+      expect(data.performances.length).toBeGreaterThan(0)
+
+      expect(data.performances[0]).toHaveProperty('_id')
+      expect(data.performances[0]).toHaveProperty('name')
+      expect(data.performances[0]['_id']).toBe(performanceId.toString())
+
+      // Delete the performance
+      await agent.post(`/api/performance/delete/${performanceId}`).send()
+
+      // Check if the performance is no longer in response
+      res = await agent.get('/api/own-performances').expect(200)
+      expect(res.body.performances.length).toBe(0)
     })
   })
 
@@ -108,7 +130,9 @@ describe('performanceController test', () => {
       expect(res.status).toBe(200)
 
       const deletedPerformance = await SadissPerformance.findById(performanceId)
-      expect(deletedPerformance).toBeNull()
+      expect(deletedPerformance!.deleted).toBe(true)
+      expect(deletedPerformance!.deletedAt).toBeTruthy()
+      expect(deletedPerformance!.deletedBy.toString()).toEqual(global.mockUser.id.toString())
     })
   })
 

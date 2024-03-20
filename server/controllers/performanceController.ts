@@ -8,7 +8,7 @@ exports.getPerformances = async (req: Request, res: Response) => {
   try {
     // Get all performances that are public or owned by the user
     const performances = await SadissPerformance.find(
-      { $or: [{ isPublic: true }, { creator: req.user!.id }] },
+      { $or: [{ isPublic: true }, { creator: req.user!.id }], deleted: { $ne: true } },
       '_id name creator isPublic'
     ).populate('creator', 'username')
 
@@ -21,10 +21,10 @@ exports.getPerformances = async (req: Request, res: Response) => {
 // Get performances owned by requesting user
 exports.getOwnPerformances = async (req: Request, res: Response) => {
   try {
-    const performances = await SadissPerformance.find({ creator: req.user!.id }, '_id name creator isPublic').populate(
-      'creator',
-      'username'
-    )
+    const performances = await SadissPerformance.find(
+      { creator: req.user!.id, deleted: { $ne: true } },
+      '_id name creator isPublic'
+    ).populate('creator', 'username')
 
     res.json({ performances })
   } catch (err) {
@@ -99,7 +99,10 @@ exports.deletePerformance = async (req: Request, res: Response) => {
     }
 
     // Delete performance
-    await performance.remove()
+    performance.deleted = true
+    performance.deletedAt = new Date()
+    performance.deletedBy = req.user!.id
+    await performance.save()
 
     res.status(200).json({ message: 'Performance deleted' })
   } catch (error) {

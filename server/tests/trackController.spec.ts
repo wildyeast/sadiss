@@ -1,11 +1,11 @@
-import { Track } from '../models'
+import { Track, TrackPerformance } from '../models'
 import { createTestPerformance, createTestTrack, createTestTrackPerformance } from './testUtils'
 import { generateMockId } from './testUtils'
 import fs from 'fs'
 
 describe('trackController test', () => {
   describe('GET /api/tracks', () => {
-    it('should get tracks from DB', async () => {
+    it('should get all tracks from DB where deleted !== true', async () => {
       await createTestTrack()
       const res = await agent.get('/api/tracks').expect(200)
       expect(res.body.tracks.length).toBe(1)
@@ -14,21 +14,17 @@ describe('trackController test', () => {
       expect(res.body.tracks[0].waveform).toBe('sine')
       expect(res.body.tracks[0].partialFile.origName).toBe('testPartialFile.txt')
       expect(res.body.tracks[0].creator.username).toBe(mockUser.username)
+
+      // Delete track
+      await agent.post(`/api/track/delete/${res.body.tracks[0]._id}`).expect(200)
+
+      const resGetDeleted = await agent.get('/api/tracks').expect(200)
+      expect(resGetDeleted.body.tracks.length).toBe(0)
     })
 
     it('should return an empty array if no tracks in DB', async () => {
       const res = await agent.get('/api/tracks').expect(200)
       expect(res.body.tracks).toEqual([])
-    })
-
-    it('should return tracks if tracks in DB', async () => {
-      const track = await createTestTrack()
-
-      const res = await agent.get('/api/tracks')!.expect(200)
-      expect(res.body.tracks.length).toBe(1)
-      expect(res.body.tracks[0].name).toBe(track.name)
-      expect(res.body.tracks[0].mode).toBe(track.mode)
-      expect(res.body.tracks[0].waveform).toBe(track.waveform)
     })
   })
 
@@ -317,46 +313,36 @@ describe('trackController test', () => {
   })
 
   describe('POST /api/track/delete/:id', () => {
-    it('should delete track and trackperformance (if any) if track found', async () => {
-      const { performanceId, tracks } = await createTestTrackPerformance()
+    it('should soft delete track and trackperformance (if any) if track found', async () => {
+      const { performanceId, tracks, trackPerformances } = await createTestTrackPerformance()
 
       // Check that trackperformance exists
       let performanceWithTracksResGet = await agent.get(`/api/performance/${performanceId}/with-tracks`).expect(200)
       expect(performanceWithTracksResGet.body.performance.tracks.length).toBe(1)
 
-      // Get first track of performance and check that files exist and are deleted correctly
-      const firstTrack = performanceWithTracksResGet.body.performance.tracks[0]
-      const firstTrackPartialFilePath = `${__dirname}/../${process.env.UPLOADS_DIR}/${firstTrack.partialFile.fileName}`
-      const firstTrackTtsFilePath = `${__dirname}/../${process.env.UPLOADS_DIR}/${firstTrack.ttsFiles[0].fileName}`
-      const firstTrackChunkFilePath = `${__dirname}/../${process.env.CHUNKS_DIR}/${firstTrack.chunkFileName}`
-
-      // Check that files exist
-      let partialFileExists = fs.existsSync(firstTrackPartialFilePath)
-      expect(partialFileExists).toBe(true)
-      let ttsFileExists = fs.existsSync(firstTrackTtsFilePath)
-      expect(ttsFileExists).toBe(true)
-      let chunkFileExists = fs.existsSync(firstTrackChunkFilePath)
-      expect(chunkFileExists).toBe(true)
-
       // Delete track
       const resDelete = await agent.post(`/api/track/delete/${tracks[0]._id}`).expect(200)
       expect(resDelete.body.message).toBe('Track deleted')
 
-      // Check that files are deleted
-      partialFileExists = fs.existsSync(firstTrackPartialFilePath)
-      expect(partialFileExists).toBe(false)
-      ttsFileExists = fs.existsSync(firstTrackTtsFilePath)
-      expect(ttsFileExists).toBe(false)
-      chunkFileExists = fs.existsSync(firstTrackChunkFilePath)
-      expect(chunkFileExists).toBe(false)
-
-      // Check that track is deleted from DB
+      // Check that track is no longer in response when getting tracks
       const trackResGet = await agent.get(`/api/track/${tracks[0]._id}`).expect(404)
       expect(trackResGet.body.error).toBe('Track not found')
 
-      // Check that track is deleted from performance
+      // Check that track is still in DB, with correct deletion related fields
+      const trackInDb = await Track.findById(tracks[0]._id)
+      expect(trackInDb!.deleted).toBe(true)
+      expect(trackInDb!.deletedAt).toBeTruthy()
+      expect(trackInDb!.deletedBy.toString()).toBe(mockUser.id)
+
+      // Check that track is no longer in response when getting performance with tracks
       performanceWithTracksResGet = await agent.get(`/api/performance/${performanceId}/with-tracks`).expect(200)
-      expect(performanceWithTracksResGet.body.performance.tracks.length).toBe(0)
+      expect(performanceWithTracksResGet.body.performance.tracks.includes(tracks[0]._id)).toBe(false)
+
+      // Check that trackperformance is still in DB with correct deletion related fields
+      const trackPerformanceInDb = await TrackPerformance.findById(trackPerformances[0]._id)
+      expect(trackPerformanceInDb!.deleted).toBe(true)
+      expect(trackPerformanceInDb!.deletedAt).toBeTruthy()
+      expect(trackPerformanceInDb!.deletedBy.toString()).toBe(mockUser.id)
     })
 
     it('should return 404 if track not found', async () => {

@@ -83,16 +83,20 @@ exports.deleteTrack = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
-    // Delete TrackPerformances, if any
+    // Soft delete TrackPerformances, if any
     const trackPerformances = await TrackPerformance.find({ track })
     for (const trackPerformance of trackPerformances) {
-      await trackPerformance.remove()
+      trackPerformance.deleted = true
+      trackPerformance.deletedAt = new Date()
+      trackPerformance.deletedBy = req.user!.id
+      trackPerformance.save()
     }
 
-    deleteUploadedFiles(track)
-
-    // Delete track
-    await track.remove()
+    // Soft delete track
+    track.deleted = true
+    track.deletedAt = new Date()
+    track.deletedBy = req.user!.id
+    track.save()
 
     res.status(200).json({ message: 'Track deleted' })
   } catch (error) {
@@ -121,7 +125,7 @@ const deleteUploadedFiles = (track: TrackDocument) => {
 exports.getTracks = async (req: Request, res: Response) => {
   try {
     const allTracks = await Track.find(
-      { $or: [{ isPublic: true }, { creator: req.user!.id }] },
+      { $or: [{ isPublic: true }, { creator: req.user!.id }], deleted: { $ne: true } },
       '_id name notes mode waveform ttsRate creator isPublic partialFile ttsFiles'
     )
       .populate('creator', 'username') // Populate the 'creator' field with 'username'
@@ -135,7 +139,11 @@ exports.getTracks = async (req: Request, res: Response) => {
 
 exports.getTrack = async (req: Request, res: Response) => {
   try {
-    const track = await Track.find({ _id: req.params.id }, '_id name notes mode waveform ttsRate partialFile ttsFiles')
+    const track = await Track.find(
+      { _id: req.params.id, deleted: { $ne: true } },
+      '_id name notes mode waveform ttsRate partialFile ttsFiles'
+    )
+
     if (!track.length) {
       res.status(404).json({ error: 'Track not found' })
       return
