@@ -1,6 +1,6 @@
 import { TtsJson } from '../types/types'
-
-const fs = require('fs')
+import { logger } from './logger'
+import fs from 'fs'
 
 export const convertSrtToJson = (srtFiles: { path: string; originalname: string }[]) => {
   let ttsJson: TtsJson = {}
@@ -42,7 +42,7 @@ export const convertSrtToJson = (srtFiles: { path: string; originalname: string 
     // Write last timestamp and its lines to object
     ttsJson = writeToObject(ttsJson, currentTimestamp, voice, lang, currentLine)
   }
-  // console.log('Converted .srt to following object: ', ttsJson)
+  // logger.debug(`Converted .srt to following object: ${ttsJson}`)
   return { ttsLangs, ttsJson }
 }
 

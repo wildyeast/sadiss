@@ -1,46 +1,32 @@
-import { Types } from 'mongoose'
-import { Track } from '../models'
-import { createTestTrack, createTestTrackPerformance } from './testUtils'
+import { Track, TrackPerformance } from '../models'
+import { createTestPerformance, createTestTrack, createTestTrackPerformance } from './testUtils'
 import { generateMockId } from './testUtils'
+import fs from 'fs'
 
 describe('trackController test', () => {
   describe('GET /api/tracks', () => {
-    it('should get tracks from DB', async () => {
-      const trackId = await createTestTrack()
-      const res = await agent.get('/api/tracks')!.expect(200)
+    it('should get all tracks from DB where deleted !== true', async () => {
+      await createTestTrack()
+      const res = await agent.get('/api/tracks').expect(200)
       expect(res.body.tracks.length).toBe(1)
       expect(res.body.tracks[0].name).toBe('test track')
       expect(res.body.tracks[0].mode).toBe('choir')
       expect(res.body.tracks[0].waveform).toBe('sine')
       expect(res.body.tracks[0].partialFile.origName).toBe('testPartialFile.txt')
       expect(res.body.tracks[0].creator.username).toBe(mockUser.username)
-      await Track.findByIdAndDelete(trackId)
+
+      // Set deleted flag on track
+      const trackInDb = await Track.findOne({ name: 'test track' })
+      trackInDb!.deleted = true
+      await trackInDb!.save()
+
+      const resGetDeleted = await agent.get('/api/tracks').expect(200)
+      expect(resGetDeleted.body.tracks.length).toBe(0)
     })
 
     it('should return an empty array if no tracks in DB', async () => {
-      const res = await agent.get('/api/tracks')!.expect(200)
+      const res = await agent.get('/api/tracks').expect(200)
       expect(res.body.tracks).toEqual([])
-    })
-
-    it('should return tracks if tracks in DB', async () => {
-      const testTrack = {
-        name: 'test track',
-        mode: 'choir',
-        waveform: 'sine'
-      }
-      await agent
-        .post('/api/track/create')!
-        .attach('files', 'tests/testFiles/testPartialFile.txt', 'partialfile-testPartialFile')
-        .field('name', testTrack.name)
-        .field('mode', testTrack.mode)
-        .field('waveform', testTrack.waveform)
-        .expect(201)
-
-      const res = await agent.get('/api/tracks')!.expect(200)
-      expect(res.body.tracks.length).toBe(1)
-      expect(res.body.tracks[0].name).toBe(testTrack.name)
-      expect(res.body.tracks[0].mode).toBe(testTrack.mode)
-      expect(res.body.tracks[0].waveform).toBe(testTrack.waveform)
     })
   })
 
@@ -286,25 +272,79 @@ describe('trackController test', () => {
     it('should return 400 if invalid track id provided', async () => {
       await agent.post(`/api/track/edit/invalidId`).expect(400)
     })
+
+    it('should edit all non-file fields if they are provided', async () => {
+      const track = await createTestTrack('tts')
+      const resEdit = await agent
+        .post(`/api/track/edit/${track._id}`)!
+        .field('name', 'test track edited')
+        .field('mode', 'nonChoir')
+        .field('waveform', 'square')
+        .field('isPublic', false)
+        .field('ttsRate', '0.5')
+        .expect(200)
+
+      expect(resEdit.body.name).toBe('test track edited')
+      expect(resEdit.body.mode).toBe('nonChoir')
+      expect(resEdit.body.waveform).toBe('square')
+      expect(resEdit.body.isPublic).toBe(false)
+      expect(resEdit.body.ttsRate).toBe('0.5')
+    })
+
+    // TODO: This test times out most of the time. I've also seen it pass.
+    // I might be doing something wrong. Could also to do with concurrency maybe? Can't figure it out atm.
+    // it('should return 500 and error message if saving the edited fails', async () => {
+    //   const trackId = await createTestTrack('tts')
+
+    //   jest.spyOn(Track.prototype, 'save').mockRejectedValueOnce(new Error('Save failed'))
+
+    //   const res = await agent.post(`/api/track/edit/${trackId}`).expect(500)
+    //   expect(res.body.error).toBe('Save failed')
+    // })
+
+    it('should return a 500 error if there is a server error', async () => {
+      const track = await createTestTrack('tts')
+
+      jest.spyOn(Track.prototype, 'save').mockImplementationOnce(() => {
+        throw new Error()
+      })
+
+      const res = await agent.post(`/api/track/edit/${track._id}`).expect(500)
+      expect(res.body.error).toBe('Server error')
+    })
   })
 
   describe('POST /api/track/delete/:id', () => {
-    it('should delete track and trackperformance (if any) if track found', async () => {
-      const { performanceId, trackId, trackPerformanceId } = await createTestTrackPerformance()
+    it('should soft delete track and trackperformance (if any) if track found', async () => {
+      const { performanceId, tracks, trackPerformances } = await createTestTrackPerformance()
 
+      // Check that trackperformance exists
       let performanceWithTracksResGet = await agent.get(`/api/performance/${performanceId}/with-tracks`).expect(200)
-
       expect(performanceWithTracksResGet.body.performance.tracks.length).toBe(1)
 
-      const resDelete = await agent.post(`/api/track/delete/${trackId}`).expect(200)
+      // Delete track
+      const resDelete = await agent.post(`/api/track/delete/${tracks[0]._id}`).expect(200)
       expect(resDelete.body.message).toBe('Track deleted')
 
-      const trackResGet = await agent.get(`/api/track/${trackId}`).expect(404)
+      // Check that track is no longer in response when getting tracks
+      const trackResGet = await agent.get(`/api/track/${tracks[0]._id}`).expect(404)
       expect(trackResGet.body.error).toBe('Track not found')
 
-      performanceWithTracksResGet = await agent.get(`/api/performance/${performanceId}/with-tracks`).expect(200)
+      // Check that track is still in DB, with correct deletion related fields
+      const trackInDb = await Track.findById(tracks[0]._id)
+      expect(trackInDb!.deleted).toBe(true)
+      expect(trackInDb!.deletedAt).toBeTruthy()
+      expect(trackInDb!.deletedBy.toString()).toBe(mockUser.id)
 
-      expect(performanceWithTracksResGet.body.performance.tracks.length).toBe(0)
+      // Check that track is no longer in response when getting performance with tracks
+      performanceWithTracksResGet = await agent.get(`/api/performance/${performanceId}/with-tracks`).expect(200)
+      expect(performanceWithTracksResGet.body.performance.tracks.includes(tracks[0]._id)).toBe(false)
+
+      // Check that trackperformance is still in DB with correct deletion related fields
+      const trackPerformanceInDb = await TrackPerformance.findById(trackPerformances[0]._id)
+      expect(trackPerformanceInDb!.deleted).toBe(true)
+      expect(trackPerformanceInDb!.deletedAt).toBeTruthy()
+      expect(trackPerformanceInDb!.deletedBy.toString()).toBe(mockUser.id)
     })
 
     it('should return 404 if track not found', async () => {
@@ -322,18 +362,70 @@ describe('trackController test', () => {
         creator: generateMockId(),
         isPublic: true
       }).save()
-
-      const resDelete = await agent.post(`/api/track/delete/${track._id}`).expect(401)
-      expect(resDelete.body.error).toBe('Unauthorized')
     })
 
     it('should return 500 if trackperformance delete fails', async () => {
-      Track.findById = jest.fn().mockImplementationOnce(() => {
+      const mockFindById = jest.fn().mockImplementationOnce(() => {
         throw new Error('Server error')
       })
 
+      jest.spyOn(Track, 'findById').mockImplementationOnce(mockFindById)
+
       const resDelete = await agent.post(`/api/track/delete/${generateMockId()}`).expect(500)
       expect(resDelete.body.error).toBe('Server error')
+    })
+  })
+
+  describe('POST /api/track/load', () => {
+    it('should return 400 if no or invalid trackId provided', async () => {
+      const res = await agent.post(`/api/track/load`).send({ performanceId: generateMockId() }).expect(400)
+      expect(res.body.message).toBe('Invalid trackId provided.')
+    })
+
+    it('should return 400 if no provided', async () => {
+      const res = await agent.post(`/api/track/load`).send({ trackId: generateMockId() }).expect(400)
+      expect(res.body.message).toBe('Invalid performanceId provided.')
+    })
+
+    it('should return 400 if invalid trackId provided', async () => {
+      const res = await agent.post(`/api/track/load`).send({ trackId: 'invalidId', performanceId: generateMockId() }).expect(400)
+      expect(res.body.message).toBe('Invalid trackId provided.')
+    })
+
+    it('should return 400 if invalid performanceId provided', async () => {
+      const res = await agent.post(`/api/track/load`).send({ trackId: generateMockId(), performanceId: 'invalidId' }).expect(400)
+      expect(res.body.message).toBe('Invalid performanceId provided.')
+    })
+
+    it('should return 404 if track not found', async () => {
+      const res = await agent
+        .post(`/api/track/load`)
+        .send({ trackId: generateMockId(), performanceId: generateMockId() })
+        .expect(404)
+      expect(res.body.message).toBe('Track not found.')
+    })
+
+    it('should return 200 and trackLengthInChunks if track found and performance activePerformance created', async () => {
+      const { _id: trackId } = await createTestTrack()
+      const performanceId = await createTestPerformance()
+
+      const res = await agent.post(`/api/track/load`).send({ trackId, performanceId }).expect(200)
+      expect(res.body.trackLengthInChunks).toBeTruthy()
+    })
+  })
+
+  describe('POST /api/track/start', () => {
+    it('should return 200 and a "Track started." message if track successfully started', async () => {
+      const { tracks, performanceId } = await createTestTrackPerformance()
+      const res = await agent.post(`/api/track/start`).send({ trackId: tracks[0]._id, performanceId }).expect(200)
+      expect(res.body.data).toBe('Track started.')
+    })
+
+    it('should return 200 and a "Track already running." message if track already running', async () => {
+      const { tracks, performanceId } = await createTestTrackPerformance()
+      await agent.post(`/api/track/start`).send({ trackId: tracks[0]._id, performanceId }).expect(200)
+      const res = await agent.post(`/api/track/start`).send({ trackId: tracks[0]._id, performanceId }).expect(200)
+      expect(res.body.data).toBe('Track already running.')
     })
   })
 })

@@ -6,7 +6,6 @@ import { User } from './models/user'
 import * as dotenv from 'dotenv'
 import { compare } from 'bcryptjs'
 
-// Load .env
 dotenv.config()
 
 passport.use(

@@ -4,7 +4,10 @@ import { SadissPerformanceDocument } from '../types/types'
 export const sadissPerformanceSchema = new Schema<SadissPerformanceDocument>({
   name: { type: String, required: true },
   creator: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
-  isPublic: { type: Boolean, required: true }
+  isPublic: { type: Boolean, required: true },
+  deleted: Boolean,
+  deletedAt: Date,
+  deletedBy: { type: Schema.Types.ObjectId, ref: 'User' }
 })
 sadissPerformanceSchema.set('timestamps', true)
 

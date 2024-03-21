@@ -1,5 +1,6 @@
 node_modules
 .env
+.env.test
 dist
 uploads
 chunks
@@ -7,3 +8,5 @@ chunks_bkp
 uploads_bkp
 
 coverage
+test-uploads
+test-chunks

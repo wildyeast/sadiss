@@ -1,6 +1,7 @@
 import { Server } from 'ws'
 import { PartialChunk, TrackMode, Frame } from './types/types'
 import WebSocket from 'ws'
+import { logger } from './tools'
 
 const MAX_PARTIALS_PER_CLIENT = 16
 
@@ -15,11 +16,25 @@ export class ActivePerformance {
 
   // More or less accurate timer taken from https://stackoverflow.com/a/29972322/16725862
   startSendingInterval = (startTime: number, wss: Server, loopTrack: boolean, trackId: string, startAtChunk: number) => {
+    interface PartialMap {
+      [partialId: string]: string[]
+    }
+
+    interface DataToSend {
+      startTime: number
+      waveform: string
+      ttsRate: string
+      chunk: Chunk
+    }
+
+    interface Chunk {
+      partials?: PartialChunk[]
+      ttsInstructions?: { time: number; phrase: string }
+    }
+
     if (this.sendingIntervalRunning) {
       return false
     }
-
-    console.log('Sending interval started.')
 
     this.sendingIntervalRunning = true
 
@@ -38,32 +53,22 @@ export class ActivePerformance {
 
     // nonChoir mode: Stores partialIds and array of client ids that were given
     // the respective partial in the last iteration
-    let partialMap: { [partialId: string]: string[] } = {}
+    let partialMap: PartialMap = {}
 
     const step = () => {
-      console.log('Performing', this.id)
+      logger.info(`Performing ${this.id} @ chunk ${chunkIndex}`)
       if (!this.sendingIntervalRunning) {
-        console.log('Sending interval stopped.')
+        logger.info('Sending interval stopped.')
         reset()
         return
       }
 
-      if (chunkIndex >= this.loadedTrack.length) {
-        if (loopTrack) {
-          console.log('No more chunks. Looping.')
-          actualStartTime += this.loadedTrack.length
-          chunkIndex = 0
-        } else {
-          console.log('No more chunks. Stopping.')
-          this.sendingIntervalRunning = false
-          reset()
-          return
-        }
-      }
+      const shouldContinue = handleTrackEnd()
+      if (!shouldContinue) return
 
       const dt = Date.now() - expected
       if (dt > interval) {
-        console.log('Sending interval somehow broke. Stopping.')
+        logger.warn('Sending interval somehow broke. Stopping.')
         this.sendingIntervalRunning = false
         reset()
         return
@@ -71,13 +76,17 @@ export class ActivePerformance {
 
       if (wss.clients.size) {
         // Distribute partials among clients and send them to clients
+        const currentFrame = this.loadedTrack[chunkIndex]
+
+        if (!currentFrame) return
+
         if (this.trackMode === 'choir') {
-          handleChoirDistribution()
+          handleChoirDistribution(currentFrame)
         } else {
-          handleNonChoirDistribution()
+          handleNonChoirDistribution(currentFrame)
         }
       } else {
-        console.log('No clients to distribute to.')
+        logger.info('No clients to distribute to.')
       }
 
       const admins = Array.from(wss.clients).filter((client) => client.isAdmin && client.performanceId === this.id)
@@ -94,29 +103,24 @@ export class ActivePerformance {
     // Start
     setTimeout(step, interval)
 
-    const handleChoirDistribution = () => {
+    const handleChoirDistribution = (currentFrame: Frame) => {
       for (const client of wss.clients) {
         if (client.isAdmin || client.performanceId !== this.id) continue
 
-        const dataToSend: {
-          startTime: number
-          waveform: string
-          ttsRate: string
-          chunk: { partials?: PartialChunk[]; ttsInstructions?: { time: number; phrase: string } }
-        } = {
+        const dataToSend: DataToSend = {
           startTime: actualStartTime + 2,
           waveform: this.trackWaveform,
           ttsRate: this.trackTtsRate,
           chunk: {}
         }
 
-        const partialById = this.loadedTrack[chunkIndex]?.partials.find((chunk: PartialChunk) => chunk.index === client.choirId)
+        const partialById = currentFrame.partials.find((chunk) => chunk.index === client.choirId)
         if (partialById) {
           dataToSend.chunk.partials = [partialById]
         }
 
-        if (this.loadedTrack[chunkIndex]?.ttsInstructions) {
-          const ttsInstructionForClientId = this.loadedTrack[chunkIndex]?.ttsInstructions[client.choirId]
+        if (currentFrame.ttsInstructions) {
+          const ttsInstructionForClientId = currentFrame.ttsInstructions[client.choirId]
           if (ttsInstructionForClientId) {
             dataToSend.chunk.ttsInstructions = {
               time: ttsInstructionForClientId.time,
@@ -131,12 +135,12 @@ export class ActivePerformance {
       }
     }
 
-    const handleNonChoirDistribution = () => {
+    const handleNonChoirDistribution = (currentFrame: Frame) => {
       const clientArr = Array.from(wss.clients)
       const clients = clientArr.filter((client) => !client.isAdmin && client.performanceId === this.id)
-      const partials = this.loadedTrack[chunkIndex]?.partials
+      const partials = currentFrame.partials
 
-      const newPartialMap: { [partialIndex: string]: string[] } = {}
+      const newPartialMap: PartialMap = {}
 
       const allocatedPartials: { [clientId: string]: PartialChunk[] } = {}
 
@@ -204,26 +208,26 @@ export class ActivePerformance {
       }
 
       for (const client of clients) {
-        const dataToSend: { partials: PartialChunk[]; ttsInstructions?: { time: number; phrase: string } } = {
+        const chunk: Chunk = {
           partials: allocatedPartials[client.id]
         }
 
-        if (this.loadedTrack[chunkIndex]?.ttsInstructions) {
-          const ttsInstructions = this.loadedTrack[chunkIndex]?.ttsInstructions
+        if (currentFrame.ttsInstructions) {
+          const ttsInstructions = currentFrame.ttsInstructions
           if (!ttsInstructions) continue
 
           const firstTtsInstruction = Object.values(ttsInstructions)[0]
           if (firstTtsInstruction) {
-            dataToSend.ttsInstructions = { time: firstTtsInstruction.time, phrase: firstTtsInstruction.langs[client.ttsLang.iso] }
+            chunk.ttsInstructions = { time: firstTtsInstruction.time, phrase: firstTtsInstruction.langs[client.ttsLang.iso] }
           }
         }
 
-        if (dataToSend.partials?.length || dataToSend.ttsInstructions) {
+        if (chunk.partials?.length || chunk.ttsInstructions) {
           const json = JSON.stringify({
             startTime: actualStartTime + 2,
             waveform: this.trackWaveform,
             ttsRate: this.trackTtsRate,
-            chunk: dataToSend
+            chunk
           })
           client.send(json)
           client.lastSentTime = Date.now()
@@ -233,7 +237,7 @@ export class ActivePerformance {
       partialMap = newPartialMap
     }
 
-    // WebSocket.Websocket: see https://github.com/websockets/ws/issues/1517#issuecomment-623148704
+    // WebSocket.WebSocket: see https://github.com/websockets/ws/issues/1517#issuecomment-623148704
     const getClientIdWithMinPartials = (
       allocatedPartials: { [clientId: string]: PartialChunk[] },
       clients: WebSocket.WebSocket[]
@@ -286,16 +290,34 @@ export class ActivePerformance {
       }
     }
 
+    const handleTrackEnd = () => {
+      if (chunkIndex >= this.loadedTrack.length) {
+        if (loopTrack) {
+          logger.info('No more chunks. Looping.')
+          actualStartTime += this.loadedTrack.length
+          chunkIndex = 0
+          return true
+        } else {
+          logger.info('No more chunks. Stopping.')
+          this.sendingIntervalRunning = false
+          reset()
+          return false
+        }
+      }
+      return true
+    }
+
     return true
   }
 
   stopSendingInterval = () => (this.sendingIntervalRunning = false)
 
-  loadTrack = (track: Frame[], mode: TrackMode, waveform: OscillatorType, ttsRate: number) => {
+  loadTrack = (track: Frame[], mode: TrackMode, waveform: OscillatorType, ttsRate: string) => {
     this.loadedTrack = track
     this.trackMode = mode
     this.trackWaveform = waveform
-    this.trackTtsRate = ttsRate.toString()
+    this.trackTtsRate = ttsRate
   }
+
   unloadTrack = () => (this.loadedTrack = [])
 }

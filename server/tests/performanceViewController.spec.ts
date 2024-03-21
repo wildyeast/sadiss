@@ -1,91 +1,78 @@
-import { SadissPerformance, User, TrackPerformance, Track } from '../models'
-import { generateMockId } from './testUtils'
+import { SadissPerformance } from '../models'
+import { generateMockId, createTestTrackPerformance } from './testUtils'
 
 describe('getPerformanceWithTracks', () => {
   it('should return performance data with associated tracks in correct order', async () => {
-    const testUser = new User({
-      username: 'test-username',
-      password: 'test-password',
-      email: 'test@email.com'
-    })
-    await testUser.save()
+    const { performanceId, tracks, trackPerformances } = await createTestTrackPerformance(2)
 
-    const testPerformance = new SadissPerformance({
-      name: 'Performance 1',
-      creator: testUser._id,
-      isPublic: true
-    })
-    await testPerformance.save()
-
-    const testTrack1 = new Track({
-      name: 'Track 1',
-      mode: 'choir',
-      waveform: 'sine',
-      ttsRate: 1.5,
-      creator: testUser._id,
-      isPublic: true
-    })
-    await testTrack1.save()
-
-    const trackPerformance = new TrackPerformance({
-      track: testTrack1._id,
-      performance: testPerformance._id,
-      sortOrder: 2
-    })
-    await trackPerformance.save()
-
-    const testTrack2 = new Track({
-      name: 'Track 2',
-      mode: 'choir',
-      waveform: 'sine',
-      ttsRate: '1',
-      creator: testUser._id,
-      isPublic: false,
-      notes: 'test-notes'
-    })
-    await testTrack2.save()
-
-    const trackPerformance2 = new TrackPerformance({
-      track: testTrack2._id,
-      performance: testPerformance._id,
-      sortOrder: 1
-    })
-    await trackPerformance2.save()
-
-    const res = await agent.get(`/api/performance/${testPerformance._id}/with-tracks`).expect(200)
+    const res = await agent.get(`/api/performance/${performanceId}/with-tracks`).expect(200)
 
     expect(res.body).toEqual({
       performance: {
-        _id: testPerformance._id.toString(),
-        name: 'Performance 1',
-        creator: { username: 'test-username' },
+        _id: performanceId.toString(),
+        name: 'test performance',
+        creator: { username: 'Test User' },
         tracks: [
           {
-            _id: testTrack2._id.toString(),
-            name: 'Track 2',
+            _id: tracks[0]._id,
+            chunkFileName: tracks[0].chunkFileName,
+            name: 'test track',
+            partialFile: {
+              fileName: tracks[0].partialFile.fileName,
+              origName: tracks[0].partialFile.origName
+            },
+            ttsFiles: [
+              {
+                fileName: tracks[0].ttsFiles[0].fileName,
+                lang: tracks[0].ttsFiles[0].lang,
+                origName: tracks[0].ttsFiles[0].origName,
+                voice: tracks[0].ttsFiles[0].voice
+              }
+            ],
             mode: 'choir',
             waveform: 'sine',
-            ttsRate: '1',
-            creator: testUser._id.toString(),
-            isPublic: false,
-            notes: 'test-notes',
+            ttsRate: '1.0',
+            creator: global.mockUser.id.toString(),
+            isPublic: true,
+            notes: 'test notes',
             sortOrder: 1,
-            trackPerformanceId: trackPerformance2._id.toString()
+            trackPerformanceId: trackPerformances[0]._id
           },
           {
-            _id: testTrack1._id.toString(),
-            name: 'Track 1',
+            _id: tracks[1]._id,
+            chunkFileName: tracks[1].chunkFileName,
+            name: 'test track',
+            partialFile: {
+              fileName: tracks[1].partialFile.fileName,
+              origName: tracks[1].partialFile.origName
+            },
+            ttsFiles: [
+              {
+                fileName: tracks[1].ttsFiles[0].fileName,
+                lang: tracks[1].ttsFiles[0].lang,
+                origName: tracks[1].ttsFiles[0].origName,
+                voice: tracks[1].ttsFiles[0].voice
+              }
+            ],
             mode: 'choir',
             waveform: 'sine',
-            ttsRate: '1.5',
-            creator: testUser._id.toString(),
+            ttsRate: '1.0',
+            creator: global.mockUser.id.toString(),
             isPublic: true,
             sortOrder: 2,
-            trackPerformanceId: trackPerformance._id.toString()
+            trackPerformanceId: trackPerformances[1]._id,
+            notes: 'test notes'
           }
         ]
       }
     })
+
+    // Delete one of the tracks
+    await agent.post(`/api/track/delete/${tracks[0]._id}`).send()
+
+    // Check if the track is no longer in response
+    const res2 = await agent.get(`/api/performance/${performanceId}/with-tracks`).expect(200)
+    expect(res2.body.performance.tracks.length).toBe(1)
   })
 
   it('should return error response if fetching performance fails', async () => {

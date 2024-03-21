@@ -42,6 +42,7 @@ export interface UserDocument extends Document {
 }
 
 export interface TrackDocument extends Document {
+  _id: string
   name: string
   chunks: string
   chunkFileName: string
@@ -51,7 +52,7 @@ export interface TrackDocument extends Document {
   ttsInstructions: string
   ttsLangs: string[]
   waveform: OscillatorType
-  ttsRate: number
+  ttsRate: string
   partialFile: {
     origName: string
     fileName: string
@@ -59,20 +60,33 @@ export interface TrackDocument extends Document {
   ttsFiles: TTSFileObject[]
   isPublic: boolean
   creator: Types.ObjectId
+  deleted: boolean
+  deletedAt: Date
+  deletedBy: Types.ObjectId
 }
 
 export interface TTSFileObject {
-  [voice: number]: { [lang: string]: File }
+  voice: string
+  lang: string
+  origName: string
+  fileName: string
 }
 
 export interface SadissPerformanceDocument extends Document {
   name: string
   creator: Types.ObjectId
   isPublic: boolean
+  deleted: boolean
+  deletedAt: Date
+  deletedBy: Types.ObjectId
 }
 
 export interface TrackPerformanceDocument extends Document {
+  _id: string
   track: TrackDocument
   performance: SadissPerformanceDocument
   sortOrder: number
+  deleted: boolean
+  deletedAt: Date
+  deletedBy: Types.ObjectId
 }
