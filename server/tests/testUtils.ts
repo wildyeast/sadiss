@@ -102,7 +102,7 @@ export const createWebSocketClient = (performanceId: string, choirId = 0, select
     }
 
     ws.onmessage = function (event) {
-      logger.debug(`Received message from ws server: ${event.data}`)
+      // logger.debug(`Received message from ws server: ${event.data}`)
 
       if (event.data && event.data === 'clientInfoReceived') {
         // Resolve the Promise with the WebSocket instance when the connection is open
