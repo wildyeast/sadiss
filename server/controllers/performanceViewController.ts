@@ -12,7 +12,10 @@ exports.getPerformanceWithTracks = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'Performance not found' })
     }
 
-    const trackPerformances = await TrackPerformance.find({ performance: performance._id }, 'track _id sortOrder')
+    const trackPerformances = await TrackPerformance.find(
+      { performance: performance._id, deleted: { $ne: true } },
+      'track _id sortOrder'
+    )
       .populate('track', 'name notes mode waveform ttsRate creator isPublic partialFile ttsFiles chunkFileName')
       .lean()
 

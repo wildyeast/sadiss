@@ -1,7 +1,8 @@
 import { Types } from 'mongoose'
 import { SadissPerformance } from '../models/sadissPerformance'
-import { createTestPerformance, generateMockId } from './testUtils'
+import { createTestPerformance, createTestTrack, createTestTrackPerformance, generateMockId } from './testUtils'
 import exp from 'constants'
+import { TrackPerformance } from '../models'
 
 describe('performanceController test', () => {
   describe('POST /api/performances', () => {
@@ -122,8 +123,8 @@ describe('performanceController test', () => {
       expect(res.status).toBe(500)
     })
 
-    it('should delete a performance from the database', async () => {
-      const performanceId = await createTestPerformance()
+    it('should soft delete a performance and all its trackperformances', async () => {
+      const { performanceId, trackPerformances } = await createTestTrackPerformance()
 
       const res = await agent.post(`/api/performance/delete/${performanceId}`).send()
 
@@ -133,6 +134,12 @@ describe('performanceController test', () => {
       expect(deletedPerformance!.deleted).toBe(true)
       expect(deletedPerformance!.deletedAt).toBeTruthy()
       expect(deletedPerformance!.deletedBy.toString()).toEqual(global.mockUser.id.toString())
+
+      const updatedTrackPerformance = await TrackPerformance.find({ _id: trackPerformances[0]._id })
+
+      expect(updatedTrackPerformance[0].deleted).toBe(true)
+      expect(updatedTrackPerformance[0].deletedAt).toBeTruthy()
+      expect(updatedTrackPerformance[0].deletedBy.toString()).toEqual(global.mockUser.id.toString())
     })
   })
 

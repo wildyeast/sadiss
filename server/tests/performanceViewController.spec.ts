@@ -66,6 +66,13 @@ describe('getPerformanceWithTracks', () => {
         ]
       }
     })
+
+    // Delete one of the tracks
+    await agent.post(`/api/track/delete/${tracks[0]._id}`).send()
+
+    // Check if the track is no longer in response
+    const res2 = await agent.get(`/api/performance/${performanceId}/with-tracks`).expect(200)
+    expect(res2.body.performance.tracks.length).toBe(1)
   })
 
   it('should return error response if fetching performance fails', async () => {

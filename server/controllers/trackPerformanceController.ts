@@ -88,8 +88,16 @@ exports.deleteTrackFromPerformance = async (req: Request, res: Response) => {
       return res.status(400).send({ error: 'Invalid input data' })
     }
 
-    // Delete the TrackPerformance record
-    await TrackPerformance.findByIdAndDelete(trackPerformanceId)
+    // Soft delete the TrackPerformance record
+    const trackPerformance = await TrackPerformance.findById(trackPerformanceId)
+    if (!trackPerformance) {
+      return res.status(404).send({ error: 'Track performance not found' })
+    }
+
+    trackPerformance.deleted = true
+    trackPerformance.deletedAt = new Date()
+    trackPerformance.deletedBy = req.user!.id
+    await trackPerformance.save()
 
     unloadTrackFromActivePerformance(trackPerformanceId)
 

@@ -2,6 +2,7 @@ import { Response, Request } from 'express'
 import { isValidObjectId } from 'mongoose'
 import { SadissPerformance } from '../models/sadissPerformance'
 import { User } from '../models/user'
+import { TrackPerformance } from '../models'
 
 // Get all performances that are public or owned by the user
 exports.getPerformances = async (req: Request, res: Response) => {
@@ -98,7 +99,16 @@ exports.deletePerformance = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
-    // Delete performance
+    // Soft delete trackperformances
+    const trackPerformances = await TrackPerformance.find({ performance: performance._id })
+    for (const trackPerformance of trackPerformances) {
+      trackPerformance.deleted = true
+      trackPerformance.deletedAt = new Date()
+      trackPerformance.deletedBy = req.user!.id
+      await trackPerformance.save()
+    }
+
+    // Soft delete performance
     performance.deleted = true
     performance.deletedAt = new Date()
     performance.deletedBy = req.user!.id
