@@ -27,6 +27,7 @@ if (process.env.NODE_ENV !== 'test') {
 
 if (!fs.existsSync(process.env.CHUNKS_DIR!)) {
   fs.mkdirSync(process.env.CHUNKS_DIR!)
+  console.log('Directory created: ', process.env.CHUNKS_DIR)
 }
 
 let whitelist = ['https://sadiss.net']

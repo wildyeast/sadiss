@@ -57,7 +57,9 @@ beforeEach(async () => {
 })
 
 afterEach(async () => {
-  await deleteTracksAndFilesCreatedDuringTest()
+  if (process.env.NODE_ENV === 'test' && process.env.UPLOADS_DIR && process.env.CHUNKS_DIR) {
+    await deleteTracksAndFilesCreatedDuringTest()
+  }
   jest.restoreAllMocks()
   jest.clearAllTimers()
 })
@@ -69,36 +71,41 @@ afterAll(async () => {
 })
 
 const deleteTracksAndFilesCreatedDuringTest = async () => {
-  const uploadsDir = path.join(__dirname, `../${process.env.UPLOADS_DIR}`)
-  const chunksDir = path.join(__dirname, `../${process.env.CHUNKS_DIR}`)
+  // Ensure this operation is only performed in a test environment
+  if (process.env.NODE_ENV !== 'test') {
+    console.error('Attempted to run test cleanup outside of a test environment. Aborting.')
+    return
+  }
+
+  if (!process.env.UPLOADS_DIR || !process.env.CHUNKS_DIR) {
+    console.error('UPLOADS_DIR or CHUNKS_DIR not defined. Aborting.')
+    return
+  }
 
   const Track = mongoose.model('Track', trackSchema)
   const tracks = await Track.find()
 
   // Go through all tracks and delete files
   for (const track of tracks) {
-    if (track.partialFile) {
-      const fullPath = `${uploadsDir}/${track.partialFile.fileName}`
-      if (fs.existsSync(fullPath)) {
-        fs.unlinkSync(`${uploadsDir}/${track.partialFile.fileName}`)
-      }
-    }
-
+    safelyDeleteFile(process.env.UPLOADS_DIR, track.partialFile?.fileName)
     track.ttsFiles.forEach((ttsFileObject) => {
-      const fullPath = `${uploadsDir}/${ttsFileObject.fileName}`
-      if (fs.existsSync(fullPath)) {
-        fs.unlinkSync(fullPath)
-      }
+      safelyDeleteFile(process.env.UPLOADS_DIR!, ttsFileObject.fileName)
     })
-
-    if (track.chunkFileName) {
-      const fullPath = `${chunksDir}/${track.chunkFileName}`
-      if (fs.existsSync(fullPath)) {
-        fs.unlinkSync(fullPath)
-      }
-    }
+    safelyDeleteFile(process.env.CHUNKS_DIR, track.chunkFileName)
 
     await Track.deleteOne({ _id: track._id })
+  }
+}
+
+const safelyDeleteFile = (directory: string, fileName: string) => {
+  if (!directory.includes('test') || !fileName) {
+    console.warn(`Attempted to delete a non-test file or file is undefined: ${fileName}. Operation aborted.`)
+    return
+  }
+
+  const fullPath = path.join(__dirname, `../${directory}`, fileName)
+  if (fs.existsSync(fullPath)) {
+    fs.unlinkSync(fullPath)
   }
 }
 

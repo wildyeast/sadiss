@@ -3,9 +3,6 @@ import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
 import { logger } from './tools'
 
-// Load .env
-dotenv.config()
-
 let mongoURI: string
 const mongoUser = process.env.MONGO_USER
 if (process.env.NODE_ENV === 'production') {
