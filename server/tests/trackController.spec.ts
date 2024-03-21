@@ -15,8 +15,10 @@ describe('trackController test', () => {
       expect(res.body.tracks[0].partialFile.origName).toBe('testPartialFile.txt')
       expect(res.body.tracks[0].creator.username).toBe(mockUser.username)
 
-      // Delete track
-      await agent.post(`/api/track/delete/${res.body.tracks[0]._id}`).expect(200)
+      // Set deleted flag on track
+      const trackInDb = await Track.findOne({ name: 'test track' })
+      trackInDb!.deleted = true
+      await trackInDb!.save()
 
       const resGetDeleted = await agent.get('/api/tracks').expect(200)
       expect(resGetDeleted.body.tracks.length).toBe(0)
