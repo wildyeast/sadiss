@@ -79,12 +79,12 @@ export class ActivePerformance {
         // Distribute partials among clients and send them to clients
         const currentFrame = this.loadedTrack[chunkIndex]
 
-        if (!currentFrame) return
-
-        if (this.trackMode === 'choir') {
-          handleChoirDistribution(currentFrame)
-        } else {
-          handleNonChoirDistribution(currentFrame)
+        if (currentFrame) {
+          if (this.trackMode === 'choir') {
+            handleChoirDistribution(currentFrame)
+          } else {
+            handleNonChoirDistribution(currentFrame)
+          }
         }
       } else {
         logger.info('No clients to distribute to.')
