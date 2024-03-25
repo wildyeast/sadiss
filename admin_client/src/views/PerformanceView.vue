@@ -3,7 +3,8 @@ import {
   getPerformanceWithTracks,
   getClientCountPerChoirId,
   loadTrackForPlayback,
-  updateTrackPerformanceOrder
+  updateTrackPerformanceOrder,
+  removeTrackFromPerformance
 } from '@/services/api'
 import type { SadissPerformance, Track, TrackPerformanceIdAndSortOrder } from '@/types/types'
 import { onMounted, ref, computed, onUnmounted } from 'vue'
@@ -51,13 +52,22 @@ const onSortOrderUpdate = async () => {
   await updateTrackPerformanceOrder(trackPerformanceIdsAndSortOrders)
 }
 
-const trackLoaded = ref<boolean>(false)
+const handleRemoveTrackFromPerformance = async (trackPerformanceId: string) => {
+  await removeTrackFromPerformance(trackPerformanceId)
+  tracks.value = tracks.value.filter((track) => track.trackPerformanceId !== trackPerformanceId)
+  selectedTrackIndex.value = -1
+  loadPerformanceAndTracks()
+}
+
+const trackLoaded = ref(false)
+const selectedTrackLengthInChunks = ref(0)
 const selectTrack = async (trackIndex: number) => {
   trackLoaded.value = false
   selectedTrackIndex.value = trackIndex
   const res = await loadTrackForPlayback(selectedTrack.value?._id as string, performanceId as string)
   if (res) {
     trackLoaded.value = true
+    selectedTrackLengthInChunks.value = res
   }
 }
 
@@ -70,16 +80,20 @@ const setCurrentTrack = (trackId: string) => {
   }
 }
 
+const loadPerformanceAndTracks = async () => {
+  performance.value = await getPerformanceWithTracks(performanceId as string)
+  if (performance.value) {
+    tracks.value = performance.value.tracks
+  }
+}
+
 const qrCodesModal = ref<typeof QrCodesModal | null>()
 
 const connectedClients = ref<{ [choirId: string]: number }>({})
 
 let getClientsInterval: any // any because of currently unresolved type-checking error during build step
-onMounted(async () => {
-  performance.value = await getPerformanceWithTracks(performanceId as string)
-  if (performance.value) {
-    tracks.value = performance.value.tracks
-  }
+onMounted(() => {
+  loadPerformanceAndTracks()
 
   // Periodically update connected clients
   getClientsInterval = setInterval(async () => {
@@ -90,8 +104,6 @@ onMounted(async () => {
 onUnmounted(() => {
   clearInterval(getClientsInterval)
 })
-
-//https://github.com/Alfred-Skyblue/vue-draggable-plus
 </script>
 <template>
   <main class="flex h-screen flex-col justify-between">
@@ -138,12 +150,21 @@ onUnmounted(() => {
           class="flex w-full items-center justify-between border p-4"
           :class="{ 'bg-secondary': selectedTrack === track }">
           <p>{{ track.name }}</p>
-          <font-awesome-icon
-            icon="fa-bars"
-            size="lg"
-            class="drag-handle"
-            @click.stop
-            title="Click and drag to change order" />
+          <div class="flex gap-4">
+            <font-awesome-icon
+              @click.stop="handleRemoveTrackFromPerformance(track.trackPerformanceId as string)"
+              icon="fa-trash"
+              size="lg"
+              class="mr-2"
+              title="Remove track from performance" />
+
+            <font-awesome-icon
+              icon="fa-bars"
+              size="lg"
+              class="drag-handle"
+              @click.stop
+              title="Click and drag to change order" />
+          </div>
         </button>
       </VueDraggable>
       <div
@@ -172,6 +193,7 @@ onUnmounted(() => {
       :selectedTrack="selectedTrack"
       :next-track="nextTrack"
       :track-loaded="trackLoaded"
+      :selected-track-length-in-chunks="selectedTrackLengthInChunks"
       @nextTrackStarted="nextTrackStarted"
       @set-current-track="setCurrentTrack" />
 

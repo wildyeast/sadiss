@@ -16,6 +16,7 @@ export function useQrCodeGenerator() {
     ttsLangs: string,
     defaultLanguage: string
   ) => {
+    qrCodeData.value = []
     if (voiceCount) {
       for (let i = 0; i < voiceCount; i++) {
         const data: QrCodeData = {

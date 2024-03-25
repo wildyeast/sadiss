@@ -2,13 +2,14 @@ import { Response, Request } from 'express'
 import { isValidObjectId } from 'mongoose'
 import { SadissPerformance } from '../models/sadissPerformance'
 import { User } from '../models/user'
+import { TrackPerformance } from '../models'
 
 // Get all performances that are public or owned by the user
 exports.getPerformances = async (req: Request, res: Response) => {
   try {
     // Get all performances that are public or owned by the user
     const performances = await SadissPerformance.find(
-      { $or: [{ isPublic: true }, { creator: req.user!.id }] },
+      { $or: [{ isPublic: true }, { creator: req.user!.id }], deleted: { $ne: true } },
       '_id name creator isPublic'
     ).populate('creator', 'username')
 
@@ -21,10 +22,10 @@ exports.getPerformances = async (req: Request, res: Response) => {
 // Get performances owned by requesting user
 exports.getOwnPerformances = async (req: Request, res: Response) => {
   try {
-    const performances = await SadissPerformance.find({ creator: req.user!.id }, '_id name creator isPublic').populate(
-      'creator',
-      'username'
-    )
+    const performances = await SadissPerformance.find(
+      { creator: req.user!.id, deleted: { $ne: true } },
+      '_id name creator isPublic'
+    ).populate('creator', 'username')
 
     res.json({ performances })
   } catch (err) {
@@ -98,8 +99,20 @@ exports.deletePerformance = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
-    // Delete performance
-    await performance.remove()
+    // Soft delete trackperformances
+    const trackPerformances = await TrackPerformance.find({ performance: performance._id })
+    for (const trackPerformance of trackPerformances) {
+      trackPerformance.deleted = true
+      trackPerformance.deletedAt = new Date()
+      trackPerformance.deletedBy = req.user!.id
+      await trackPerformance.save()
+    }
+
+    // Soft delete performance
+    performance.deleted = true
+    performance.deletedAt = new Date()
+    performance.deletedBy = req.user!.id
+    await performance.save()
 
     res.status(200).json({ message: 'Performance deleted' })
   } catch (error) {

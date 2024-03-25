@@ -148,8 +148,8 @@ const voiceLangCombinations = computed(() => {
 watch(trackTtsRate, (newValue) => {
   if (newValue > 2) {
     trackTtsRate.value = 2
-  } else if (newValue < 0.5) {
-    trackTtsRate.value = 0.5
+  } else if (newValue < 0.2) {
+    trackTtsRate.value = 0.2
   }
 })
 </script>
@@ -198,7 +198,9 @@ watch(trackTtsRate, (newValue) => {
       <hr />
 
       <!-- Partial File Upload -->
-      <div class="lg:flex lg:flex-row">
+      <div
+        v-if="!isEditingTrack"
+        class="lg:flex lg:flex-row">
         <div class="flex justify-between gap-2">
           <div>Partials file</div>
           <input
@@ -236,9 +238,16 @@ watch(trackTtsRate, (newValue) => {
       </div>
 
       <hr />
+      <p
+        v-if="isEditingTrack"
+        class="text-primary">
+        Changing partial or TTS files is currently in development. To change files delete the track and create a new one.
+      </p>
 
       <!-- TTS (.srt or .txt) file upload -->
-      <div class="lg:flex lg:flex-col">
+      <div
+        v-if="!isEditingTrack"
+        class="lg:flex lg:flex-col">
         <div class="flex flex-col">
           <div>Subtitle files</div>
           <div>
@@ -296,7 +305,7 @@ watch(trackTtsRate, (newValue) => {
             name="ttsRate"
             type="number"
             step="0.1"
-            min="0.5"
+            min="0.2"
             max="2"
             v-model="trackTtsRate"
             class="rounded-sm border p-1" />
@@ -330,8 +339,7 @@ watch(trackTtsRate, (newValue) => {
         type="submit"
         formmethod="dialog"
         class="text-white rounded-sm bg-primary p-2">
-        <span v-if="!isEditingTrack">Add Track</span>
-        <span v-else>Edit Track</span>
+        <span>Save</span>
       </button>
     </form>
   </BaseModal>

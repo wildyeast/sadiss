@@ -15,7 +15,7 @@ const router = express.Router()
 
 import multer from 'multer'
 
-const upload = multer({ dest: 'uploads/' })
+const upload = multer({ dest: `${process.env.UPLOADS_DIR}/` })
 
 router.use('/api', authenticateToken)
 
@@ -42,12 +42,6 @@ router.post('/api/track/stop', track_controller.stopTrack)
 
 // Load track for playback
 router.post('/api/track/load', track_controller.loadTrackForPlayback)
-
-// Get voices and languages
-router.get('/api/get-voices-and-languages', track_controller.get_voices_and_languages)
-
-// Protected Test Route
-router.get('/api/get-own-tracks', track_controller.get_own_tracks)
 
 /* PERFORMANCE */
 // Get performances
@@ -80,6 +74,8 @@ router.post(
 )
 // Update sortOrder of trackPerformance
 router.post('/api/track-performance/update-order', track_performance_controller.updateTrackPerformanceOrder)
+
+router.post('/api/track-performance/delete', track_performance_controller.deleteTrackFromPerformance)
 
 /* PERFORMANCE VIEW */
 // Get performance with tracks

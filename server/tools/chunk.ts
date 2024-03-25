@@ -1,19 +1,19 @@
-import { Frame, PartialChunk, TtsJson } from '../types/types'
+import { PartialChunk, TtsInstructions, TtsJson } from '../types/types'
 import readline from 'readline'
 
 const fs = require('fs')
 
-/** Takes partial path and TTS instructions JSON and returns chunk array */
+/** Takes partial path and returns chunk array */
 export const chunk = async (path?: string, ttsInstructions?: TtsJson) => {
   const CHUNK_DURATION = 0.999 // float in seconds
 
   // Initialize chunks array and first chunk object
-  const chunks: Frame[] = []
+  const chunks = []
   const initChunk = () => {
     return {
       time: 0,
       partials: <PartialChunk[]>[],
-      ttsInstructions: <{ [voice: string]: { [language: string]: string } }>{}
+      ttsInstructions: <TtsInstructions>{}
     }
   }
   let chunk = initChunk()
@@ -23,7 +23,6 @@ export const chunk = async (path?: string, ttsInstructions?: TtsJson) => {
 
   if (path) {
     // Open partials file
-    console.log('Analyzing', path, '...')
     const fileStream = fs.createReadStream(path)
     const rl = readline.createInterface({
       input: fileStream,
@@ -90,22 +89,31 @@ export const chunk = async (path?: string, ttsInstructions?: TtsJson) => {
   if (ttsInstructions) {
     for (const ttsTime in ttsInstructions) {
       // Need to floor time, meaning tts time of e.g. 11.42 will be assigned to chunk index 11.
+      const instructionObject: { [voice: string]: { time: string; langs: { [language: string]: string } } } = {}
+      for (const voice in ttsInstructions[ttsTime]) {
+        const langs = ttsInstructions[ttsTime][voice]
+        if (!instructionObject[voice]) {
+          instructionObject[voice] = {
+            time: ttsTime,
+            langs: {}
+          }
+        }
+        instructionObject[voice].langs = langs
+      }
       const flooredTime = Math.floor(+ttsTime)
       if (chunks[flooredTime]) {
         if (chunks[flooredTime].ttsInstructions) {
-          chunks[flooredTime].ttsInstructions = { ...chunks[flooredTime].ttsInstructions, ...ttsInstructions[ttsTime] }
+          chunks[flooredTime].ttsInstructions = { ...chunks[flooredTime].ttsInstructions, ...instructionObject }
         } else {
-          chunks[flooredTime].ttsInstructions = ttsInstructions[ttsTime]
+          chunks[flooredTime].ttsInstructions = instructionObject
         }
       } else {
         const chunk = initChunk()
-        chunk.ttsInstructions = ttsInstructions[ttsTime]
+        chunk.ttsInstructions = instructionObject
         chunks[flooredTime] = chunk
       }
     }
   }
-
-  console.log('Created', chunks.length, 'chunks')
 
   return { partialsCount, chunks }
 }

@@ -15,7 +15,10 @@ export const trackSchema = new Schema<TrackDocument>({
   partialFile: Object,
   ttsFiles: Array<TTSFileObject>,
   isPublic: { type: Boolean, required: true },
-  creator: { type: Schema.Types.ObjectId, required: true, ref: 'User' }
+  creator: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+  deleted: Boolean,
+  deletedAt: Date,
+  deletedBy: { type: Schema.Types.ObjectId, ref: 'User' }
 })
 trackSchema.set('timestamps', true)
 

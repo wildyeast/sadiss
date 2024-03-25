@@ -13,11 +13,6 @@ export interface Breakpoint {
   amp: number
 }
 
-export interface Frame {
-  partials: PartialChunk[]
-  ttsInstructions: { [voice: string]: { [lang: string]: string } }
-}
-
 export type Message = { [key: string]: any }
 
 export interface TtsJson {
@@ -26,6 +21,15 @@ export interface TtsJson {
       [language: string]: string
     }
   }
+}
+
+export interface TtsInstructions {
+  [voice: string]: { time: string; langs: { [language: string]: string } }
+}
+
+export interface Frame {
+  partials: PartialChunk[]
+  ttsInstructions: TtsInstructions
 }
 
 export type TrackMode = 'choir' | 'nonChoir'
@@ -38,15 +42,16 @@ export interface UserDocument extends Document {
 }
 
 export interface TrackDocument extends Document {
+  _id: string
   name: string
   chunks: string
   chunkFileName: string
   partialsCount: number
-  mode: string
+  mode: TrackMode
   notes: string
   ttsInstructions: string
   ttsLangs: string[]
-  waveform: string
+  waveform: OscillatorType
   ttsRate: string
   partialFile: {
     origName: string
@@ -55,20 +60,33 @@ export interface TrackDocument extends Document {
   ttsFiles: TTSFileObject[]
   isPublic: boolean
   creator: Types.ObjectId
+  deleted: boolean
+  deletedAt: Date
+  deletedBy: Types.ObjectId
 }
 
 export interface TTSFileObject {
-  [voice: number]: { [lang: string]: File }
+  voice: string
+  lang: string
+  origName: string
+  fileName: string
 }
 
 export interface SadissPerformanceDocument extends Document {
   name: string
   creator: Types.ObjectId
   isPublic: boolean
+  deleted: boolean
+  deletedAt: Date
+  deletedBy: Types.ObjectId
 }
 
 export interface TrackPerformanceDocument extends Document {
+  _id: string
   track: TrackDocument
   performance: SadissPerformanceDocument
   sortOrder: number
+  deleted: boolean
+  deletedAt: Date
+  deletedBy: Types.ObjectId
 }

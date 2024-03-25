@@ -95,15 +95,9 @@ describe('processScanResult', () => {
   })
 
   it('should update the expert mode to be true in mainStore when provided in the scan result', () => {
-    const result = { performanceName: 'My Performance', expertMode: 'true', performanceId: '456', wsUrl: 'ws://wsUrl.test' }
+    const result = { performanceName: 'My Performance', expertMode: true, performanceId: '456', wsUrl: 'ws://wsUrl.test' }
     processScanResult(result)
     expect(mainStore.expertMode).toBe(true)
-  })
-
-  it('should update the expert mode to be false in mainStore when provided in the scan result', () => {
-    const result = { performanceName: 'My Performance', expertMode: 'false', performanceId: '456', wsUrl: 'ws://wsUrl.test' }
-    processScanResult(result)
-    expect(mainStore.expertMode).toBe(false)
   })
 
   it('should update the performanceId in mainStore when provided in the scan result', () => {

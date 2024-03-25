@@ -1,9 +1,7 @@
 import * as dotenv from 'dotenv'
 import mongoose from 'mongoose'
 import { MongoMemoryServer } from 'mongodb-memory-server'
-
-// Load .env
-dotenv.config()
+import { logger } from './tools'
 
 let mongoURI: string
 const mongoUser = process.env.MONGO_USER
@@ -30,7 +28,6 @@ const connectDB = async () => {
       }
       mongoose.set('strictQuery', true)
       mongoose.connect(mongoURI)
-      console.log('MongoDB connected.')
     } catch (err) {
       console.error(err)
       process.exit(1)
@@ -45,7 +42,7 @@ const disconnectDB = async () => {
       await mongod.stop()
     }
   } catch (err) {
-    console.log(err)
+    logger.error(err)
     process.exit(1)
   }
 }

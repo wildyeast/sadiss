@@ -27,6 +27,8 @@ export interface OscillatorObject {
   index: number
   oscillator: OscillatorNode
   gain: GainNode
+  endTime: number
+  lastGain: number
 }
 
 export interface TtsInstruction {
@@ -49,6 +51,6 @@ export interface QrCodeScanResult {
   tts?: AvailableLanguage[]
   roleName?: string
   defaultLang?: string
-  expertMode?: string
+  expertMode?: boolean
   wsUrl: string
 }

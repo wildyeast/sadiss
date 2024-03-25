@@ -26,6 +26,7 @@
           </a>
           for more information on the software system.
         </p>
+        <p class="mt-4 text-[12px]">v1.0.8</p>
         <div
           v-if="mainStore.processing"
           class="flex h-full items-center justify-center">
@@ -49,14 +50,14 @@ import { usePlayer } from '@/composables/usePlayer'
 
 const ionRouter = useIonRouter()
 const mainStore = useMainStore()
-const { startAudioCtx } = usePlayer()
+const { preparePlaybackAndTts } = usePlayer()
 
 /* QR Code Scanning */
 const { startScan, stopScan, processScanResult } = useBarcodeScanner()
 
 const scanCode = async () => {
-  // Start audioCtx on first user interaction
-  startAudioCtx()
+  // Prepare for playback
+  preparePlaybackAndTts()
 
   // Make camera visible and everything else invisible in app viewport, classes defined in App.vue
   document.body.classList.add('qrscanner')

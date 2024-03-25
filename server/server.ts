@@ -6,18 +6,28 @@ import { passport } from './auth'
 import { Server } from 'ws'
 import { connectDB } from './database'
 import { startKeepAliveInterval } from './tools/startKeepAliveInterval'
+import { startWebSocketServer } from './services/webSocketServerService'
+import fs from 'fs'
+import { logger } from './tools'
 
 const cors = require('cors')
 const uuid = require('uuid')
 const session = require('express-session')
 const cookieParser = require('cookie-parser')
 
-// Load .env
-dotenv.config()
-
 // Connect to database
 if (process.env.NODE_ENV !== 'test') {
+  // Load .env
+  dotenv.config()
   connectDB()
+} else {
+  // Load .env.test
+  dotenv.config({ path: '.env.test' })
+}
+
+if (!fs.existsSync(process.env.CHUNKS_DIR!)) {
+  fs.mkdirSync(process.env.CHUNKS_DIR!)
+  console.log('Directory created: ', process.env.CHUNKS_DIR)
 }
 
 let whitelist = ['https://sadiss.net']
@@ -63,40 +73,41 @@ const app = express()
 let server
 let wss: Server
 if (process.env.NODE_ENV === 'test') {
-  wss = new Server({ port: 0 })
+  wss = startWebSocketServer()
   server = app.listen()
 } else {
-  wss = new Server({ port: +process.env.WS_SERVER_PORT! })
-  console.log(`Websocket server listening on port ${process.env.WS_SERVER_PORT}.`)
+  wss = startWebSocketServer(+process.env.WS_SERVER_PORT!)
+  logger.info(`Websocket server listening on port ${process.env.WS_SERVER_PORT}.`)
 
-  server = app.listen(process.env.BASE_PORT, () => console.log(`Http server listening on port ${process.env.BASE_PORT}.`))
+  server = app.listen(process.env.BASE_PORT, () => logger.info(`Http server listening on port ${process.env.BASE_PORT}.`))
 }
 
 startKeepAliveInterval(wss)
 wss.on('connection', (client) => {
   // Assign id to new connection, needed for nonChoir partial distribution
   client.id = uuid.v4()
-  console.log('New client connected! Assigned id: ', client.id, 'Total clients:', wss.clients.size)
+  logger.info(`New client connected! Assigned id: ${client.id} Total clients: ${wss.clients.size}`)
 
-  client.onclose = () => console.log('Client has disconnected!')
+  client.onclose = () => logger.info(`Client ${client.id} has disconnected!`)
 
   client.onmessage = (event) => {
     const parsed: Message = JSON.parse(event.data.toString())
-    console.log('Received message from ws client:', parsed.message)
+    logger.debug(`Received message from ws client: ${parsed.message}`)
     if (parsed.message === 'clientInfo') {
       client.choirId = parsed.clientId
       client.ttsLang = parsed.ttsLang
       client.performanceId = parsed.performanceId
-      console.log(
+      logger.info(
         `Performance ${client.performanceId}: Client ${client.id} registered with choir id ${client.choirId} and TTS lang ${client.ttsLang.iso}`
       )
+      client.send('clientInfoReceived')
     } else if (parsed.message === 'measure') {
       client.send('measure')
     } else if (parsed.message === 'isAdmin') {
       client.isAdmin = true
       if (parsed.performanceId) {
         client.performanceId = parsed.performanceId
-        console.log(`Performance ${client.performanceId}: Client ${client.id} is admin`)
+        logger.info(`Performance ${client.performanceId}: Client ${client.id} is admin`)
       }
     }
   }

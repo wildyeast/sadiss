@@ -6,54 +6,46 @@ type File = Express.Multer.File
 import { chunk } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose, { isValidObjectId } from 'mongoose'
-import { TrackMode, TtsJson, Frame } from '../types/types'
+import { TtsJson, TrackDocument } from '../types/types'
 import { trackSchema } from '../models/track'
-import { ActivePerformance } from '../activePerformance'
 import { TrackPerformance } from '../models'
-import { Types } from 'mongoose'
-import { Server } from 'ws'
+import { activePerformances, initializeActivePerformance } from '../services/activePerformanceService'
+import path from 'path'
+import fs from 'fs'
+import { readAndParseChunkFile } from '../services/fileService'
+import { logger } from '../tools'
 
-const fs = require('fs')
 const uuid = require('uuid')
 
 const Track = mongoose.model('Track', trackSchema)
 
-const activePerformances: ActivePerformance[] = []
-
 exports.loadTrackForPlayback = async (req: Request, res: Response) => {
   const { trackId, performanceId } = req.body
 
+  if (!trackId || !isValidObjectId(trackId)) {
+    return res.status(400).json({ message: 'Invalid trackId provided.' })
+  }
+
+  if (!performanceId || !isValidObjectId(performanceId)) {
+    return res.status(400).json({ message: 'Invalid performanceId provided.' })
+  }
+
   try {
-    const t = await Track.findById(trackId)
-    if (!t) {
-      return res.status(404).send({ message: 'Track not found.' })
+    const track = await Track.findOne({ _id: trackId })
+
+    if (!track) {
+      return res.status(404).json({ message: 'Track not found.' })
     }
 
-    fs.readFile(`chunks/${t.chunkFileName}`, 'utf8', (err: any, data: string) => {
-      if (err) {
-        console.error(err)
-        return res.status(500).send({ message: 'Error reading track file.' })
-      }
+    const chunks = await readAndParseChunkFile(track)
 
-      let chunks: Frame[]
-      try {
-        chunks = JSON.parse(data)
-        if (!chunks) {
-          return res.status(500).send({ message: 'Failed to parse track chunks.' })
-        }
-      } catch (parseError) {
-        console.error(parseError)
-        return res.status(500).send({ message: 'Error parsing track chunks.' })
-      }
-
-      const activePerformance = getActivePerformance(performanceId, req.wss)
-      activePerformance.loadedTrack = chunks
-      activePerformance.trackMode = t.mode as TrackMode
-      activePerformance.trackWaveform = t.waveform as OscillatorType
-      activePerformance.trackTtsRate = t.ttsRate
-
-      return res.status(200).send({ message: 'Track loaded successfully.' })
-    })
+    if (chunks) {
+      const activePerformance = initializeActivePerformance(performanceId)
+      activePerformance.loadTrack(chunks, track.mode, track.waveform, track.ttsRate)
+      return res.status(200).json({ trackLengthInChunks: chunks.length })
+    } else {
+      return res.status(500).json({ message: 'Error loading track.' })
+    }
   } catch (error) {
     console.error(error)
     return res.status(500).send({ message: 'Error loading track.' })
@@ -62,12 +54,12 @@ exports.loadTrackForPlayback = async (req: Request, res: Response) => {
 
 // Start track
 exports.startTrack = async (req: Request, res: Response) => {
-  const { trackId, performanceId, startTime, loop } = req.body
+  const { trackId, performanceId, startTime, startAtChunk, loop } = req.body
 
   try {
-    const activePerformance = getActivePerformance(performanceId, req.wss)
+    const activePerformance = initializeActivePerformance(performanceId)
 
-    const trackStarted = activePerformance.startSendingInterval(startTime, loop, trackId)
+    const trackStarted = activePerformance.startSendingInterval(startTime, req.wss, loop, trackId, startAtChunk)
     if (trackStarted) {
       res.json({ data: 'Track started.' })
     } else {
@@ -91,14 +83,20 @@ exports.deleteTrack = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
-    // Delete TrackPerformances, if any
-    const trackPerformances = await TrackPerformance.find({ trackId: track._id })
+    // Soft delete TrackPerformances, if any
+    const trackPerformances = await TrackPerformance.find({ track })
     for (const trackPerformance of trackPerformances) {
-      await trackPerformance.remove()
+      trackPerformance.deleted = true
+      trackPerformance.deletedAt = new Date()
+      trackPerformance.deletedBy = req.user!.id
+      trackPerformance.save()
     }
 
-    // Delete track
-    await track.remove()
+    // Soft delete track
+    track.deleted = true
+    track.deletedAt = new Date()
+    track.deletedBy = req.user!.id
+    track.save()
 
     res.status(200).json({ message: 'Track deleted' })
   } catch (error) {
@@ -106,10 +104,28 @@ exports.deleteTrack = async (req: Request, res: Response) => {
   }
 }
 
+const deleteUploadedFiles = (track: TrackDocument) => {
+  const uploadsDir = path.join(__dirname, `../${process.env.UPLOADS_DIR}`)
+  const chunksDir = path.join(__dirname, `../${process.env.CHUNKS_DIR}`)
+
+  // Delete files
+  if (track.partialFile) {
+    fs.unlinkSync(`${uploadsDir}/${track.partialFile.fileName}`)
+  }
+
+  track.ttsFiles.forEach((ttsFileObject) => {
+    fs.unlinkSync(`${uploadsDir}/${ttsFileObject.fileName}`)
+  })
+
+  if (track.chunkFileName) {
+    fs.unlinkSync(`${chunksDir}/${track.chunkFileName}`)
+  }
+}
+
 exports.getTracks = async (req: Request, res: Response) => {
   try {
     const allTracks = await Track.find(
-      { $or: [{ isPublic: true }, { creator: req.user!.id }] },
+      { $or: [{ isPublic: true }, { creator: req.user!.id }], deleted: { $ne: true } },
       '_id name notes mode waveform ttsRate creator isPublic partialFile ttsFiles'
     )
       .populate('creator', 'username') // Populate the 'creator' field with 'username'
@@ -123,36 +139,30 @@ exports.getTracks = async (req: Request, res: Response) => {
 
 exports.getTrack = async (req: Request, res: Response) => {
   try {
-    const track = await Track.find({ _id: req.params.id }, '_id name notes mode waveform ttsRate partialFile ttsFiles')
+    const track = await Track.find(
+      { _id: req.params.id, deleted: { $ne: true } },
+      '_id name notes mode waveform ttsRate partialFile ttsFiles'
+    )
+
     if (!track.length) {
       res.status(404).json({ error: 'Track not found' })
       return
     }
     res.json(track)
   } catch (err) {
-    console.log('Failed getting track with:', err)
+    logger.error('Failed getting track with:', err)
     res.status(500).json({ Error: 'Failed fetching track.' })
   }
 }
 
 exports.uploadTrack = async (req: Request, res: Response) => {
-  if (!req.files || !req.files.length) {
-    res.status(400).send({ message: 'No files were uploaded.' })
-    return
-  }
+  const validationFailedMessage = validateInputsForUpload(req)
 
-  if (!req.body.name) {
-    res.status(400).send({ message: 'No name provided.' })
-    return
-  }
-
-  if (!req.body.mode) {
-    res.status(400).send({ message: 'No mode provided.' })
-    return
-  }
-
-  if (!req.body.waveform) {
-    res.status(400).send({ message: 'No waveform provided.' })
+  if (validationFailedMessage) {
+    if (req.files && req.files.length) {
+      deleteFilesIfValidationFailed(req)
+    }
+    res.status(400).send({ message: validationFailedMessage })
     return
   }
 
@@ -163,7 +173,7 @@ exports.uploadTrack = async (req: Request, res: Response) => {
 
     const filename = uuid.v4()
     const { partialsCount, chunks } = await chunk(path, ttsJson)
-    fs.writeFile(`chunks/${filename}`, JSON.stringify(chunks), (err: any) => {
+    fs.writeFile(`${process.env.CHUNKS_DIR}/${filename}`, JSON.stringify(chunks), (err: any) => {
       if (err) {
         console.error(err)
       }
@@ -175,6 +185,7 @@ exports.uploadTrack = async (req: Request, res: Response) => {
     const waveform = req.body.waveform
     const ttsRate = req.body.ttsRate
     const isPublic = req.body.isPublic === 'true'
+
     // Save track to DB
     const t = new Track({
       name,
@@ -199,76 +210,112 @@ exports.uploadTrack = async (req: Request, res: Response) => {
 
     t.save((err) => {
       if (err) {
-        console.log('Failed uploading track with:', err)
+        logger.error('Failed uploading track with:', err)
         res.status(500).send(err)
       } else {
         res.status(201).send(t)
       }
     })
   } catch (err) {
-    console.log('Failed uploading track with:', err)
+    logger.error('Failed uploading track with:', err)
     res.status(500).send(err)
   }
 }
 
-exports.editTrack = async (req: Request, res: Response) => {
-  if (!isValidObjectId(req.params.id)) {
-    res.status(400).send({ error: 'Invalid track id.' })
-    return
+const validateInputsForUpload = (req: Request) => {
+  if (!req.files || !req.files.length) {
+    return 'No files were uploaded.'
   }
 
-  const track = await Track.findById(req.params.id)
-  if (!track) {
-    res.status(404).send({ error: 'Track not found.' })
-    return
+  if (!req.body.name) {
+    return 'No name provided.'
   }
 
-  if (track.creator.toString() !== req.user!.id.toString()) {
-    res.status(403).send({ error: 'Forbidden.' })
-    return
+  if (!req.body.mode) {
+    return 'No mode provided.'
   }
 
-  const patch = req.body
-
-  const { path, partialFileToSave } = handleUploadedPartialFile(<File[]>req.files)
-  if (Object.keys(partialFileToSave).length) {
-    patch.partialFile = partialFileToSave
+  if (!req.body.waveform) {
+    return 'No waveform provided.'
   }
 
-  const { ttsFilesToSave, ttsLangs, ttsJson } = handleUploadedTtsFiles(<File[]>req.files)
-  if (ttsFilesToSave.length && ttsLangs) {
-    patch.ttsFiles = ttsFilesToSave
-    patch.ttsLangs = Array.from(ttsLangs)
-  }
+  return null
+}
 
-  const { partialsCount, chunks } = await chunk(path, ttsJson)
-
-  if (Object.keys(chunks)) {
-    const filename = uuid.v4()
-    fs.writeFile(`chunks/${filename}`, JSON.stringify(chunks), (err: any) => {
-      if (err) {
-        console.error(err)
-      }
+const deleteFilesIfValidationFailed = (req: Request) => {
+  if (Array.isArray(req.files)) {
+    const uploadsDir = path.join(__dirname, `../${process.env.UPLOADS_DIR}`)
+    req.files.forEach((file) => {
+      fs.unlinkSync(`${uploadsDir}/${file.filename}`)
     })
   }
+}
 
-  if (partialsCount > 0 && patch.mode === 'choir') {
-    patch.partialsCount = partialsCount
-  } else {
-    patch.partialsCount = undefined
-  }
-
-  patch.chunks = JSON.stringify(chunks)
-
-  track.set(patch)
-
-  track.save((err, updatedTrack) => {
-    if (err) {
-      return res.status(500).json({ error: err.message })
+exports.editTrack = async (req: Request, res: Response) => {
+  try {
+    if (!isValidObjectId(req.params.id)) {
+      res.status(400).send({ error: 'Invalid track id.' })
+      return
     }
 
-    res.json(updatedTrack)
-  })
+    const track = await Track.findById(req.params.id)
+    if (!track) {
+      res.status(404).send({ error: 'Track not found.' })
+      return
+    }
+
+    if (track.creator.toString() !== req.user!.id.toString()) {
+      res.status(403).send({ error: 'Forbidden.' })
+      return
+    }
+
+    const patch = req.body
+
+    // Editing track currently disabled since it doesn't work correctly
+    // see https://github.com/wildyeast/sadiss/issues/71#issuecomment-1587183286 for more information
+    // TODO: Fix this
+    // const { path, partialFileToSave } = handleUploadedPartialFile(<File[]>req.files)
+    // if (Object.keys(partialFileToSave).length) {
+    //   patch.partialFile = partialFileToSave
+    // }
+
+    // const { ttsFilesToSave, ttsLangs, ttsJson } = handleUploadedTtsFiles(<File[]>req.files)
+    // if (ttsFilesToSave.length && ttsLangs) {
+    //   patch.ttsFiles = ttsFilesToSave
+    //   patch.ttsLangs = Array.from(ttsLangs)
+    // }
+
+    // const { partialsCount, chunks } = await chunk(path, ttsJson)
+
+    // if (Object.keys(chunks)) {
+    //   const filename = uuid.v4()
+    //   fs.writeFile(`${process.env.CHUNKS_DIR}/${filename}`, JSON.stringify(chunks), (err: any) => {
+    //     if (err) {
+    //       console.error(err)
+    //     }
+    //   })
+    // }
+
+    // if (partialsCount > 0 && patch.mode === 'choir') {
+    //   patch.partialsCount = partialsCount
+    // } else {
+    //   patch.partialsCount = undefined
+    // }
+
+    // patch.chunks = JSON.stringify(chunks)
+
+    track.set(patch)
+
+    track.save((err, updatedTrack) => {
+      if (err) {
+        res.status(500).send({ error: err.message })
+      } else {
+        res.json(updatedTrack)
+      }
+    })
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' })
+  }
 }
 
 exports.stopTrack = (req: Request, res: Response) => {
@@ -279,38 +326,6 @@ exports.stopTrack = (req: Request, res: Response) => {
   } else {
     res.status(404).send({ message: 'Performance not found.' })
   }
-}
-
-exports.get_voices_and_languages = async (req: Request, res: Response) => {
-  res.setHeader('Access-Control-Allow-Origin', '*') // cors error without this
-  try {
-    let maxPartialsCount = -1
-    let ttsLangs: string[] = []
-
-    const tracks = await Track.find({}, 'partialsCount ttsLangs mode')
-    for (const track of tracks) {
-      if (track.mode === 'choir' && track.partialsCount && track.partialsCount > maxPartialsCount) {
-        maxPartialsCount = track.partialsCount
-      }
-
-      if (track.ttsLangs.length) {
-        for (const lang of track.ttsLangs) {
-          if (!ttsLangs.includes(lang)) {
-            ttsLangs.push(lang)
-          }
-        }
-      }
-    }
-
-    res.json({ maxPartialsCount, ttsLangs })
-  } catch (err) {
-    console.log('Failed getting voices and languages with:', err)
-    res.status(500).json({ Error: 'Failed fetching voices and languages.' })
-  }
-}
-
-exports.get_own_tracks = (req: Request, res: Response) => {
-  res.json({ message: 'hi', user: req.user })
 }
 
 const handleUploadedPartialFile = (files: File[]) => {
@@ -348,18 +363,4 @@ const handleUploadedTtsFiles = (files: File[]) => {
     })
   }
   return { ttsFilesToSave, ttsLangs, ttsJson }
-}
-/**
- * Returns an active performance, initializing it if necessary.
- * @param {Types.ObjectId} performanceId - ID of the performance.
- * @return {ActivePerformance} The active performance.
- */
-const getActivePerformance = (performanceId: Types.ObjectId, wss: Server) => {
-  // Check if performance already exists
-  let activePerformance = activePerformances.find((p) => p.id === performanceId)
-  if (!activePerformance) {
-    activePerformance = new ActivePerformance(performanceId, wss)
-    activePerformances.push(activePerformance)
-  }
-  return activePerformance
 }

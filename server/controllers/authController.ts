@@ -1,14 +1,9 @@
 import jwt from 'jsonwebtoken'
 import { Request, Response } from 'express'
-import { UserDocument } from '../types/types'
 import { User } from '../models/user'
-import * as dotenv from 'dotenv'
 import { env } from 'process'
 
 const bcrypt = require('bcryptjs')
-
-// Load .env
-dotenv.config()
 
 exports.login = async (req: Request, res: Response) => {
   try {

@@ -3,6 +3,7 @@ import { TrackPerformance } from '../models/trackPerformance'
 import { SadissPerformance, Track } from '../models'
 import { Types } from 'mongoose'
 import { isValidObjectId } from 'mongoose'
+import { unloadTrackFromActivePerformance } from '../services/activePerformanceService'
 
 exports.addTrackToPerformance = async (req: Request, res: Response) => {
   try {
@@ -66,13 +67,41 @@ exports.updateTrackPerformanceOrder = async (req: Request, res: Response) => {
     }
 
     // Update the sortOrder of each trackPerformance
-    trackPerformances.forEach(async (trackPerformance: any) => {
+    for (const trackPerformance of trackPerformances) {
       await TrackPerformance.findByIdAndUpdate(trackPerformance.trackPerformanceId, {
         sortOrder: trackPerformance.sortOrder
       })
-    })
+    }
 
     res.status(200).send({ message: 'Track performance order updated' })
+  } catch (error) {
+    res.status(500).send({ error: 'Server error' })
+  }
+}
+
+exports.deleteTrackFromPerformance = async (req: Request, res: Response) => {
+  try {
+    const { trackPerformanceId } = req.body
+
+    // Check if the provided data is valid
+    if (!trackPerformanceId || !isValidObjectId(trackPerformanceId)) {
+      return res.status(400).send({ error: 'Invalid input data' })
+    }
+
+    // Soft delete the TrackPerformance record
+    const trackPerformance = await TrackPerformance.findById(trackPerformanceId)
+    if (!trackPerformance) {
+      return res.status(404).send({ error: 'Track performance not found' })
+    }
+
+    trackPerformance.deleted = true
+    trackPerformance.deletedAt = new Date()
+    trackPerformance.deletedBy = req.user!.id
+    await trackPerformance.save()
+
+    unloadTrackFromActivePerformance(trackPerformanceId)
+
+    res.status(200).send({ message: 'Track performance deleted' })
   } catch (error) {
     res.status(500).send({ error: 'Server error' })
   }

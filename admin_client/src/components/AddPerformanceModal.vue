@@ -22,6 +22,7 @@ const openModal = (performance?: SadissPerformance) => {
 const closeModal = () => {
   performanceName.value = ''
   isPublic.value = false
+  isEditingPerformance.value = false
   modal.value?.close()
 }
 
@@ -53,7 +54,10 @@ const handleCreatePerformance = async () => {
   <BaseModal
     ref="modal"
     @close-modal="closeModal">
-    <h1 class="text-center text-3xl font-bold text-primary">Add Performance</h1>
+    <h1 class="text-center text-3xl font-bold text-primary">
+      <span v-if="!isEditingPerformance">Add Performance</span>
+      <span v-else>Edit Performance</span>
+    </h1>
     <main>
       <form
         class="flex flex-col gap-4 p-4"
@@ -76,7 +80,7 @@ const handleCreatePerformance = async () => {
           type="submit"
           formmethod="dialog"
           class="text-white rounded-sm bg-primary p-2">
-          Add Performance
+          Save
         </button>
       </form>
     </main>

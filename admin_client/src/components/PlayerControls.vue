@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import type { Track } from '@/types/types'
 import { loadTrackForPlayback, startTrack, stopTrack } from '@/services/api'
 
@@ -8,6 +8,7 @@ const props = defineProps<{
   selectedTrack: Track
   nextTrack?: Track
   trackLoaded: boolean
+  selectedTrackLengthInChunks: number
 }>()
 
 const emit = defineEmits<{
@@ -34,9 +35,11 @@ const startClock = () => {
 }
 
 const playingTrackId = ref<string>('')
+const startAtChunk = ref<number>(0)
+const trackIsRunning = computed(() => playingTrackId.value !== '')
 
 const handleStartTrack = async (trackId: string) => {
-  await startTrack(trackId, props.performanceId, globalTime.value, shouldLoop.value)
+  await startTrack(trackId, props.performanceId, globalTime.value, startAtChunk.value, shouldLoop.value)
   playingTrackId.value = trackId
 }
 
@@ -50,7 +53,7 @@ const handleStopTrack = async () => {
 
 const shouldLoop = ref(false)
 const toggleLoop = () => {
-  if (playingTrackId.value) {
+  if (trackIsRunning.value) {
     alert('Cannot toggle loop while track is playing')
     return
   }
@@ -147,10 +150,25 @@ onMounted(async () => {
 onUnmounted(() => {
   ws.value?.close()
 })
+
+// Enforce min and max values
+watch(startAtChunk, (newValue: number) => {
+  if (newValue > props.selectedTrackLengthInChunks) {
+    startAtChunk.value = props.selectedTrackLengthInChunks
+  } else if (newValue < 0) {
+    startAtChunk.value = 0
+  }
+})
+
+// Reset start position when track changes
+watch(
+  () => props.selectedTrack,
+  () => (startAtChunk.value = 0)
+)
 </script>
 
 <template>
-  <div class="flex h-[100px] flex-col items-center justify-between">
+  <div class="flex flex-col items-center justify-between gap-3 py-3">
     <div>
       <p>{{ selectedTrack.name }}</p>
     </div>
@@ -171,7 +189,7 @@ onUnmounted(() => {
           size="2x" />
       </div>
       <button
-        v-else-if="!playingTrackId"
+        v-else-if="!trackIsRunning"
         @click="handleStartTrack(selectedTrack._id)"
         title="Start track">
         <font-awesome-icon
@@ -195,8 +213,10 @@ onUnmounted(() => {
           size="lg" />
       </button>
     </div>
-    <!-- Track progress bar -->
-    <div class="relative h-[25%] w-full">
+    <!-- Track progress bar (shown while track is running) -->
+    <div
+      v-if="trackIsRunning"
+      class="relative h-[25%] w-full">
       <div
         class="absolute h-full bg-secondary"
         :style="{ width: progress + '%' }" />
@@ -205,6 +225,25 @@ onUnmounted(() => {
         class="relative h-full text-center text-sm">
         {{ currentChunkIndex }} / {{ totalChunks }}
       </p>
+    </div>
+    <div
+      v-else-if="trackLoaded"
+      class="flex w-[350px] items-center gap-2">
+      <label for="startAtChunk">Set start position</label>
+      <input
+        type="number"
+        id="startAtChunk"
+        min="0"
+        :max="selectedTrackLengthInChunks"
+        v-model="startAtChunk"
+        class="w-24 rounded-sm p-1 text-center" />
+      <span>/ {{ selectedTrackLengthInChunks }}</span>
+      <button
+        v-if="startAtChunk > 0"
+        @click="startAtChunk = 0"
+        title="Reset start position">
+        <font-awesome-icon icon="fa-x" />
+      </button>
     </div>
   </div>
 </template>

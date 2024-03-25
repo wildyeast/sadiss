@@ -1,21 +1,15 @@
+import { Types } from 'mongoose'
 import { SadissPerformance } from '../models/sadissPerformance'
-import { createMockWsClient, createTestPerformance } from './testUtils'
+import { createTestPerformance, createTestTrack, createTestTrackPerformance, generateMockId } from './testUtils'
+import exp from 'constants'
+import { TrackPerformance } from '../models'
 
 describe('performanceController test', () => {
   describe('POST /api/performances', () => {
-    it('should get performances from DB', async () => {
-      // create a performance in the database
-      const performance = new SadissPerformance({
-        name: 'Performance 1',
-        isPublic: true,
-        creator: '123456789012'
-      })
-      await performance.save()
+    it('should get performances from DB if deleted !== true', async () => {
+      const performanceId = await createTestPerformance()
 
-      // save the performance id for later use
-      const performanceId = performance._id
-
-      const res = await agent.get('/api/performances').expect(200)
+      let res = await agent.get('/api/performances').expect(200)
 
       const data = JSON.parse(res.text)
       expect(Array.isArray(data.performances)).toBe(true)
@@ -24,6 +18,36 @@ describe('performanceController test', () => {
       expect(data.performances[0]).toHaveProperty('_id')
       expect(data.performances[0]).toHaveProperty('name')
       expect(data.performances[0]['_id']).toBe(performanceId.toString())
+
+      // Delete the performance
+      await agent.post(`/api/performance/delete/${performanceId}`).send()
+
+      // Check if the performance is no longer in response
+      res = await agent.get('/api/performances').expect(200)
+      expect(res.body.performances.length).toBe(0)
+    })
+  })
+
+  describe('GET /api/own-performances', () => {
+    it('should get own performances from DB if deleted !== true', async () => {
+      const performanceId = await createTestPerformance()
+
+      let res = await agent.get('/api/own-performances').expect(200)
+
+      const data = JSON.parse(res.text)
+      expect(Array.isArray(data.performances)).toBe(true)
+      expect(data.performances.length).toBeGreaterThan(0)
+
+      expect(data.performances[0]).toHaveProperty('_id')
+      expect(data.performances[0]).toHaveProperty('name')
+      expect(data.performances[0]['_id']).toBe(performanceId.toString())
+
+      // Delete the performance
+      await agent.post(`/api/performance/delete/${performanceId}`).send()
+
+      // Check if the performance is no longer in response
+      res = await agent.get('/api/own-performances').expect(200)
+      expect(res.body.performances.length).toBe(0)
     })
   })
 
@@ -99,15 +123,23 @@ describe('performanceController test', () => {
       expect(res.status).toBe(500)
     })
 
-    it('should delete a performance from the database', async () => {
-      const performanceId = await createTestPerformance()
+    it('should soft delete a performance and all its trackperformances', async () => {
+      const { performanceId, trackPerformances } = await createTestTrackPerformance()
 
       const res = await agent.post(`/api/performance/delete/${performanceId}`).send()
 
       expect(res.status).toBe(200)
 
       const deletedPerformance = await SadissPerformance.findById(performanceId)
-      expect(deletedPerformance).toBeNull()
+      expect(deletedPerformance!.deleted).toBe(true)
+      expect(deletedPerformance!.deletedAt).toBeTruthy()
+      expect(deletedPerformance!.deletedBy.toString()).toEqual(global.mockUser.id.toString())
+
+      const updatedTrackPerformance = await TrackPerformance.find({ _id: trackPerformances[0]._id })
+
+      expect(updatedTrackPerformance[0].deleted).toBe(true)
+      expect(updatedTrackPerformance[0].deletedAt).toBeTruthy()
+      expect(updatedTrackPerformance[0].deletedBy.toString()).toEqual(global.mockUser.id.toString())
     })
   })
 
@@ -134,6 +166,18 @@ describe('performanceController test', () => {
     it('should return 400 if performanceId is not a valid ObjectId', async () => {
       await agent.get('/api/client-count-per-choir-id/invalidId').expect(400)
     })
+
+    // Helper
+    const createMockWsClient = (performanceId: Types.ObjectId, choirId: number) => {
+      const mockClientId = generateMockId()
+      testWss.clients.add({
+        id: mockClientId,
+        readyState: 1,
+        performanceId,
+        choirId
+      } as any)
+      return mockClientId
+    }
   })
 
   describe('POST /api/performance/edit/:id', () => {

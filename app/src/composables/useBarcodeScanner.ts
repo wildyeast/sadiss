@@ -22,33 +22,27 @@ export function useBarcodeScanner() {
 
   const processScanResult = (result: QrCodeScanResult) => {
     const mainStore = useMainStore()
-    // Performance name
+
     const performanceNameResult = result.performanceName
     if (performanceNameResult) {
       mainStore.performanceName = performanceNameResult
     }
 
-    // ChoirId (id of Role)
     const choirIdResult = result.choirId
     if (choirIdResult !== undefined && !Number.isNaN(+choirIdResult)) {
       mainStore.choirId = +choirIdResult
     }
-    // Role Name
+
     const roleNameResult = result.roleName
     if (roleNameResult) {
       mainStore.roleName = roleNameResult
     }
 
-    // Default TTS lang
     const defaultLangResult = result.defaultLang
     if (defaultLangResult) {
       mainStore.defaultLang = defaultLangResult
     }
 
-    // Timestamp of scan
-    // await setPreference('lastScanTimestamp', Date.now().toString())
-
-    // TTS langs
     const ttsLangsResult = result.tts
     if (ttsLangsResult) {
       const foundDefaultLang = ttsLangsResult.find((lang) => lang.iso === defaultLangResult)
@@ -56,10 +50,9 @@ export function useBarcodeScanner() {
       mainStore.selectedLanguage = foundDefaultLang || ttsLangsResult[0]
     }
 
-    // Expert Mode
     const expertModeResult = result.expertMode
     if (expertModeResult) {
-      mainStore.expertMode = expertModeResult === 'true'
+      mainStore.expertMode = expertModeResult
     }
 
     const performanceIdResult = result.performanceId
