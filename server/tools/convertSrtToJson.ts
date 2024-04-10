@@ -55,6 +55,16 @@ const convertTimestampToSeconds = (timestamp: string) => {
   return +time[0] * 3600 + +time[1] * 60 + +time[2].replace(',', '.')
 }
 
+/**
+ * Writes the current line of text to the TtsJson object at the specified timestamp, voice, and language.
+ * @param result - The TtsJson object to write to.
+ * @param currentTimestamp - The timestamp at which to write the line of text.
+ * @param voice - The voice associated with the line of text.
+ * @param lang - The language associated with the line of text.
+ * @param currentLine - The line of text to write.
+ * @returns The updated TtsJson object.
+ */
+
 const writeToObject = (result: TtsJson, currentTimestamp: number, voice: string, lang: string, currentLine: string) => {
   if (currentTimestamp < 0) return result
   if (!result[currentTimestamp]) {
