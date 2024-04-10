@@ -92,7 +92,7 @@ export class ActivePerformance {
 
       const admins = Array.from(wss.clients).filter((client) => client.isAdmin && client.performanceId === this.id)
       for (const admin of admins) {
-        admin.send(JSON.stringify({ chunkIndex: chunkIndex, totalChunks: this.loadedTrack.length, trackId, loop: loopTrack }))
+        admin.send(JSON.stringify({ chunkIndex, totalChunks: this.loadedTrack.length, trackId, loop: loopTrack }))
       }
 
       chunkIndex++
