@@ -22,7 +22,8 @@ export const convertSrtToJson = (srtFiles: { path: string; originalname: string 
       line = line.trim()
 
       if (!line) {
-        ttsJson = writeToObject(ttsJson, currentTimestamp, voice, lang, currentLine)
+        const removedHtmlTags = removeHtmlTags(currentLine)
+        ttsJson = writeToObject(ttsJson, currentTimestamp, voice, lang, removedHtmlTags)
         currentLine = ''
         currentTimestamp = -1
         lastLineWasTimestamp = false
@@ -75,4 +76,15 @@ const writeToObject = (result: TtsJson, currentTimestamp: number, voice: string,
   //   }
   // }
   // End of equivalent code as above
+}
+
+/**
+ * Removes HTML tags from the input string.
+ *
+ * @param input - The string containing HTML tags.
+ * @returns The input string with all HTML tags removed.
+ */
+function removeHtmlTags(input: string): string {
+  // This regex finds all HTML tags and replaces them with an empty string
+  return input.replace(/<[^>]*>/g, '')
 }
