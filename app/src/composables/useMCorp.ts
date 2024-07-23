@@ -7,7 +7,7 @@ export function useMCorp() {
   const initializeMCorp = async () => {
     // @ts-expect-error: Can't find name MCorp, which is added via <script> in index.html
     // eslint-disable-next-line
-    const mCorpApp = MCorp.app(process.env.VUE_APP_MCORP_API_KEY, { anon: true })
+    const mCorpApp = MCorp.app(import.meta.env.VITE_APP_MCORP_API_KEY, { anon: true })
     mCorpApp.run = () => {
       const motion = reactive(mCorpApp.motions['shared'])
       setMotionRef(motion)
