@@ -11,7 +11,7 @@
     "allowSyntheticDefaultImports": true,
     "sourceMap": true,
     "baseUrl": ".",
-    "types": ["webpack-env", "jest", "node", "vue"],
+    "types": ["jest", "node", "vue"],
     "paths": {
       "@/*": ["src/*"]
     },
