@@ -4,7 +4,7 @@
 
 @font-face {
   font-family: 'VERDANA';
-  src: url('../../public/fonts/verdana.ttf');
+  src: url('assets/fonts/verdana.ttf');
 }
 
 @layer base {
