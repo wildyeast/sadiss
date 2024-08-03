@@ -36,7 +36,7 @@
     "vue-router": "^4.0.12"
   },
   "devDependencies": {
-    "@capacitor/assets": "^2.0.4",
+    "@capacitor/assets": "^3.0.5",
     "@capacitor/cli": "4.2.0",
     "@pinia/testing": "^0.0.16",
     "@types/jest": "^27.0.2",
@@ -48,7 +48,7 @@
     "@vue/vue3-jest": "^27.0.0-alpha.3",
     "autoprefixer": "^10.4.13",
     "babel-jest": "^27.3.1",
-    "cypress": "^8.7.0",
+    "cypress": "^13.13.2",
     "eslint": "^8.57.0",
     "eslint-plugin-vue": "^8.7.1",
     "jest": "^27.3.1",
