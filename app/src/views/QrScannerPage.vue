@@ -26,7 +26,7 @@
           </a>
           for more information on the software system.
         </p>
-        <p class="mt-4 text-[12px]">v1.0.8</p>
+        <p class="mt-4 text-[12px]">v{{ appVersionNumber }}</p>
         <div
           v-if="mainStore.processing"
           class="flex h-full items-center justify-center">
@@ -47,6 +47,8 @@ import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
 import { QrCodeScanResult } from '@/types/types'
 import { useMainStore } from '@/stores/MainStore'
 import { usePlayer } from '@/composables/usePlayer'
+
+const appVersionNumber = import.meta.env.VITE_APP_VERSION
 
 const ionRouter = useIonRouter()
 const mainStore = useMainStore()

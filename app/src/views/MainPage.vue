@@ -46,7 +46,7 @@
           </div>
         </div>
 
-        <p class="text-[12px]">v1.0.8</p>
+        <p class="text-[12px]">v{{ appVersionNumber }}</p>
       </BasePage>
     </ion-content>
   </ion-page>
@@ -76,6 +76,8 @@ const register = () => {
 useBackButton(10, () => {
   return
 })
+
+const appVersionNumber = import.meta.env.VITE_APP_VERSION
 
 onMounted(async () => {
   if (!mainStore.expertMode) {
