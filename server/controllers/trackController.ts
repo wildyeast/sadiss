@@ -12,43 +12,35 @@ import { TrackPerformance } from '../models'
 import { activePerformances, initializeActivePerformance } from '../services/activePerformanceService'
 import path from 'path'
 import fs from 'fs'
-import { readAndParseChunkFile } from '../services/fileService'
 import { logger } from '../tools'
+import { TrackService } from '../services/trackService'
+import { InvalidInputError } from '../errors/InvalidInputError'
+import { NotFoundError } from '../errors/NotFoundError'
+import { ProcessingError } from '../errors/ProcessingError'
 
 const uuid = require('uuid')
+
+const trackService = new TrackService()
 
 const Track = mongoose.model('Track', trackSchema)
 
 exports.loadTrackForPlayback = async (req: Request, res: Response) => {
   const { trackId, performanceId } = req.body
 
-  if (!trackId || !isValidObjectId(trackId)) {
-    return res.status(400).json({ message: 'Invalid trackId provided.' })
-  }
-
-  if (!performanceId || !isValidObjectId(performanceId)) {
-    return res.status(400).json({ message: 'Invalid performanceId provided.' })
-  }
-
   try {
-    const track = await Track.findOne({ _id: trackId })
-
-    if (!track) {
-      return res.status(404).json({ message: 'Track not found.' })
-    }
-
-    const chunks = await readAndParseChunkFile(track)
-
-    if (chunks) {
-      const activePerformance = initializeActivePerformance(performanceId)
-      activePerformance.loadTrack(chunks, track.mode, track.waveform, track.ttsRate)
-      return res.status(200).json({ trackLengthInChunks: chunks.length })
-    } else {
-      return res.status(500).json({ message: 'Error loading track.' })
-    }
+    const result = await trackService.loadTrackForPlayback(trackId, performanceId)
+    return res.status(200).json(result)
   } catch (error) {
-    console.error(error)
-    return res.status(500).send({ message: 'Error loading track.' })
+    if (error instanceof InvalidInputError) {
+      return res.status(400).json({ message: error.message })
+    } else if (error instanceof NotFoundError) {
+      return res.status(404).json({ message: error.message })
+    } else if (error instanceof ProcessingError) {
+      return res.status(500).json({ message: error.message })
+    } else {
+      console.error('Unexpected error:', error)
+      return res.status(500).json({ message: 'An unexpected error occurred.' })
+    }
   }
 }
 
@@ -101,24 +93,6 @@ exports.deleteTrack = async (req: Request, res: Response) => {
     res.status(200).json({ message: 'Track deleted' })
   } catch (error) {
     res.status(500).json({ error: 'Server error' })
-  }
-}
-
-const deleteUploadedFiles = (track: TrackDocument) => {
-  const uploadsDir = path.join(__dirname, `../${process.env.UPLOADS_DIR}`)
-  const chunksDir = path.join(__dirname, `../${process.env.CHUNKS_DIR}`)
-
-  // Delete files
-  if (track.partialFile) {
-    fs.unlinkSync(`${uploadsDir}/${track.partialFile.fileName}`)
-  }
-
-  track.ttsFiles.forEach((ttsFileObject) => {
-    fs.unlinkSync(`${uploadsDir}/${ttsFileObject.fileName}`)
-  })
-
-  if (track.chunkFileName) {
-    fs.unlinkSync(`${chunksDir}/${track.chunkFileName}`)
   }
 }
 
