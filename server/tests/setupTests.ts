@@ -99,7 +99,7 @@ const deleteTracksAndFilesCreatedDuringTest = async () => {
 
 const safelyDeleteFile = (directory: string, fileName: string) => {
   if (!directory.includes('test') || !fileName) {
-    console.warn(`Attempted to delete a non-test file or file is undefined: ${fileName}. Operation aborted.`)
+    // console.warn(`Attempted to delete a non-test file or file is undefined: ${fileName}. Operation aborted.`)
     return
   }
 

@@ -12,6 +12,7 @@ import fs from 'fs'
 import archiver from 'archiver'
 import { error } from 'console'
 import { logger } from '../tools'
+import { TrackDocument } from '../types/types'
 
 export class TrackService {
   async loadTrackForPlayback(trackId: string, performanceId: Types.ObjectId) {
@@ -42,7 +43,7 @@ export class TrackService {
   async getTrackDataForDownload(trackId: string) {
     const track = await Track.findOne(
       { _id: trackId },
-      'name mode notes ttsInstructions ttsLangs waveform ttsRate ttsFiles partialFile isPublic'
+      'name mode notes ttsInstructions ttsLangs waveform ttsRate ttsFiles partialFile isPublic creator'
     )
 
     if (!track) {
@@ -52,12 +53,7 @@ export class TrackService {
     return track
   }
 
-  async createTrackZip(trackId: string): Promise<string> {
-    if (!isValidObjectId(trackId)) {
-      throw new InvalidInputError('Invalid trackId provided.')
-    }
-
-    const track = await this.getTrackDataForDownload(trackId)
+  async createTrackZip(track: TrackDocument): Promise<string> {
     const zipFilePath = path.join(process.cwd(), `public/${track.name.replace(' ', '_')}.zip`)
     const output = fs.createWriteStream(zipFilePath)
     const archive = archiver('zip', {
@@ -82,20 +78,15 @@ export class TrackService {
 
       const baseFilePath = path.join(process.cwd(), `${process.env.UPLOADS_DIR}`)
 
-      console.log(track.ttsFiles)
-
       track.ttsFiles.forEach((file) => {
-        // archive.append(file.fileName, { name: file.origName })
         const uniqueFileName = file.lang + '_' + file.voice + '_' + file.origName
         const filePath = path.join(baseFilePath, file.fileName)
         archive.append(fs.createReadStream(filePath), { name: uniqueFileName })
-        console.log('file', file.origName)
       })
 
       // Get the file data from uploads folder
       const partialFilePath = path.join(baseFilePath, track.partialFile.fileName)
       archive.append(fs.createReadStream(partialFilePath), { name: track.partialFile.origName })
-      console.log('file', track.partialFile.origName)
 
       archive.finalize()
     })

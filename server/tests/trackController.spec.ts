@@ -430,18 +430,17 @@ describe('trackController test', () => {
   })
 
   describe('POST /api/track/download/:id', () => {
-    // it('should return 403 if user is not owner of track', async () => {
-    //   // Create track with different user
-    //   const track = await new Track({
-    //     name: 'test track',
-    //     mode: 'choir',
-    //     waveform: 'sine',
-    //     creator: generateMockId(),
-    //     isPublic: true
-    //   }).save()
+    it('should return 403 if user is not owner of track', async () => {
+      const track = await new Track({
+        name: 'test track',
+        mode: 'choir',
+        waveform: 'sine',
+        creator: generateMockId(),
+        isPublic: true
+      }).save()
 
-    //   await agent.get(`/api/track/download/${track._id}`).expect(403)
-    // })
+      await agent.get(`/api/track/download/${track._id}`).expect(403)
+    })
 
     it('should return 400 if invalid trackId provided', async () => {
       await agent.get('/api/track/download/invalidId').expect(400)

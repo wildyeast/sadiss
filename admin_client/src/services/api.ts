@@ -116,7 +116,7 @@ export async function getPerformance(id: string) {
 }
 
 export async function createPerformance(name: string, isPublic: boolean) {
-  const response = await request<{ performance: SadissPerformance }>('/api/performance/create', {
+  await request<{ performance: SadissPerformance }>('/api/performance/create', {
     method: 'POST',
     body: JSON.stringify({
       name,
@@ -279,8 +279,6 @@ export async function downloadTrack(trackId: string) {
     credentials: 'include'
   })
 
-  console.log(response)
-
   // if (response.error) {
   //   throw new Error(response.error)
   // }
@@ -294,7 +292,6 @@ export async function downloadTrack(trackId: string) {
   // link.download = `${track.name.replace(' ', '_')}.zip`
   link.download = `test.zip`
   document.body.appendChild(link)
-  console.log(link)
   link.click()
 
   document.body.removeChild(link)

@@ -17,6 +17,7 @@ import { TrackService } from '../services/trackService'
 import { InvalidInputError } from '../errors/InvalidInputError'
 import { NotFoundError } from '../errors/NotFoundError'
 import { ProcessingError } from '../errors/ProcessingError'
+import { ForbiddenError } from '../errors/ForbiddenError'
 
 const uuid = require('uuid')
 
@@ -347,9 +348,12 @@ exports.downloadTrack = async (req: Request, res: Response) => {
     }
 
     const trackDataForDownload = await trackService.getTrackDataForDownload(req.params.trackId)
-    const zipFilePath = await trackService.createTrackZip(req.params.trackId)
 
-    console.log('Downloading track:', trackDataForDownload.name, zipFilePath)
+    if (req.user!.id.toString() !== trackDataForDownload.creator.toString() || !trackDataForDownload.isPublic) {
+      throw new ForbiddenError('Forbidden.')
+    }
+
+    const zipFilePath = await trackService.createTrackZip(trackDataForDownload)
 
     res.setHeader('Content-Type', 'application/zip')
     res.setHeader('Content-Disposition', `attachment; filename="${trackDataForDownload.name.replace(' ', '_')}.zip"`)
@@ -373,11 +377,14 @@ exports.downloadTrack = async (req: Request, res: Response) => {
       case InvalidInputError:
         res.status(400).send({ error: err.message })
         break
+      case ForbiddenError:
+        res.status(403).send({ error: 'Forbidden.' })
+        break
       case NotFoundError:
         res.status(404).send({ error: err.message })
         break
       default:
-        res.status(500).json({ error: err.message })
+        res.status(500).json({ error: 'Server error.' })
     }
   }
 }
