@@ -338,3 +338,46 @@ const handleUploadedTtsFiles = (files: File[]) => {
   }
   return { ttsFilesToSave, ttsLangs, ttsJson }
 }
+
+exports.downloadTrack = async (req: Request, res: Response) => {
+  try {
+    if (!isValidObjectId(req.params.trackId)) {
+      res.status(400).send({ error: 'Invalid track id.' })
+      return
+    }
+
+    const trackDataForDownload = await trackService.getTrackDataForDownload(req.params.trackId)
+    const zipFilePath = await trackService.createTrackZip(req.params.trackId)
+
+    console.log('Downloading track:', trackDataForDownload.name, zipFilePath)
+
+    res.setHeader('Content-Type', 'application/zip')
+    res.setHeader('Content-Disposition', `attachment; filename="${trackDataForDownload.name.replace(' ', '_')}.zip"`)
+
+    res.download(zipFilePath, (err) => {
+      if (err) {
+        logger.error('Failed downloading track with:', err)
+        res.status(500).send({ error: 'Failed downloading track.' })
+      }
+    })
+
+    // setTimeout(() => {
+    //   fs.unlink(zipFilePath, (err) => {
+    //     if (err) {
+    //       logger.error('Failed deleting zip file with:', err)
+    //     }
+    //   })
+    // }, 10000)
+  } catch (err: any) {
+    switch (err.constructor) {
+      case InvalidInputError:
+        res.status(400).send({ error: err.message })
+        break
+      case NotFoundError:
+        res.status(404).send({ error: err.message })
+        break
+      default:
+        res.status(500).json({ error: err.message })
+    }
+  }
+}

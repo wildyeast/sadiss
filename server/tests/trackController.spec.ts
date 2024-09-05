@@ -428,6 +428,36 @@ describe('trackController test', () => {
       expect(res.body.data).toBe('Track already running.')
     })
   })
+
+  describe('POST /api/track/download/:id', () => {
+    // it('should return 403 if user is not owner of track', async () => {
+    //   // Create track with different user
+    //   const track = await new Track({
+    //     name: 'test track',
+    //     mode: 'choir',
+    //     waveform: 'sine',
+    //     creator: generateMockId(),
+    //     isPublic: true
+    //   }).save()
+
+    //   await agent.get(`/api/track/download/${track._id}`).expect(403)
+    // })
+
+    it('should return 400 if invalid trackId provided', async () => {
+      await agent.get('/api/track/download/invalidId').expect(400)
+    })
+
+    it('should return 404 if track not found', async () => {
+      const nonExistantTrackId = generateMockId()
+      await agent.get(`/api/track/download/${nonExistantTrackId}`).expect(404)
+    })
+
+    it('should return 200 and zip file if track found', async () => {
+      const track = await createTestTrack()
+      const res = await agent.get(`/api/track/download/${track._id}`).expect(200)
+      expect(res.header['content-type']).toBe('application/zip')
+    })
+  })
 })
 
 export {}

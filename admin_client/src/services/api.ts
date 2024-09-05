@@ -263,6 +263,46 @@ export async function stopTrack(performanceId: string) {
   return response.data!
 }
 
+export async function downloadTrack(trackId: string) {
+  // const response = await request<any>(`/api/track/download/${trackId}`, {
+  //   method: 'GET',
+  //   headers: {
+  //     Accept: 'application/zip'
+  //   }
+  // })
+
+  const response = await fetch(`${import.meta.env.VITE_APP_API_URL}/api/track/download/${trackId}`, {
+    method: 'GET',
+    headers: {
+      Accept: 'application/zip'
+    },
+    credentials: 'include'
+  })
+
+  console.log(response)
+
+  // if (response.error) {
+  //   throw new Error(response.error)
+  // }
+
+  // @ts-ignore FIXME Wrong type of response
+  const blob = await response.blob()
+  const downloadUrl = window.URL.createObjectURL(blob)
+
+  const link = document.createElement('a')
+  link.href = downloadUrl
+  // link.download = `${track.name.replace(' ', '_')}.zip`
+  link.download = `test.zip`
+  document.body.appendChild(link)
+  console.log(link)
+  link.click()
+
+  document.body.removeChild(link)
+  window.URL.revokeObjectURL(downloadUrl)
+
+  // return response.data!.track
+}
+
 /* TRACK PERFORMANCE */
 export async function addTrackToPerformance(trackId: string, performanceId: string) {
   const response = await request<{ trackPerformance: { performanceId: string; trackId: string } }>(

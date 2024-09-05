@@ -43,6 +43,9 @@ router.post('/api/track/stop', track_controller.stopTrack)
 // Load track for playback
 router.post('/api/track/load', track_controller.loadTrackForPlayback)
 
+// Download track
+router.get('/api/track/download/:trackId', track_controller.downloadTrack)
+
 /* PERFORMANCE */
 // Get performances
 router.get('/api/performances', performance_controller.getPerformances)

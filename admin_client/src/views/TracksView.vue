@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getTracks, deleteTrack, addTrackToPerformance } from '@/services/api'
+import { getTracks, deleteTrack, addTrackToPerformance, downloadTrack } from '@/services/api'
 import type { Track } from '@/types/types'
 import { onMounted, ref, computed } from 'vue'
 import AddTrackModal from '@/components/AddTrackModal.vue'
@@ -23,6 +23,8 @@ const tracksToDisplay = computed(() => {
     case 'public':
       localStorage.setItem('filterTracksBy', 'public')
       return tracks.value.filter((track) => track.isPublic)
+    default:
+      return tracks.value
   }
 })
 
@@ -47,6 +49,17 @@ const handleAddTrackToPerformance = async (trackId: string, performanceId: strin
     addTrackToPerformanceModal.value?.closeModal()
   } catch (err) {
     alert(err)
+  }
+}
+
+const handleDownloadTrack = async (trackId: string) => {
+  const track = tracks.value.find((track) => track._id === trackId)
+  if (!track) return
+
+  try {
+    await downloadTrack(trackId)
+  } catch (error) {
+    console.error('Error downloading track:', error)
   }
 }
 
@@ -124,6 +137,7 @@ onMounted(async () => {
           <span v-if="track.notes">{{ track.notes }}</span>
         </div>
         <div class="flex gap-4">
+          <button @click.stop="handleDownloadTrack(track._id)">Download</button>
           <button
             v-if="track.creator.username === store.userName"
             @click.stop="handleDeleteTrack(track._id)"

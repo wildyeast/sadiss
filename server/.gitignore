@@ -6,6 +6,7 @@ uploads
 chunks
 chunks_bkp
 uploads_bkp
+public
 
 coverage
 test-uploads
