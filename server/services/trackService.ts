@@ -86,8 +86,10 @@ export async function createTrackZip(track: TrackDocument): Promise<string> {
     })
 
     // Get the file data from uploads folder
-    const partialFilePath = path.join(baseFilePath, track.partialFile.fileName)
-    archive.append(fs.createReadStream(partialFilePath), { name: track.partialFile.origName })
+    if (track.partialFile) {
+      const partialFilePath = path.join(baseFilePath, track.partialFile.fileName)
+      archive.append(fs.createReadStream(partialFilePath), { name: track.partialFile.origName })
+    }
 
     archive.finalize()
   })
