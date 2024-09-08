@@ -263,7 +263,7 @@ export async function stopTrack(performanceId: string) {
   return response.data!
 }
 
-export async function downloadTrack(trackId: string) {
+export async function downloadTrack(trackId: string, trackName: string) {
   // const response = await request<any>(`/api/track/download/${trackId}`, {
   //   method: 'GET',
   //   headers: {
@@ -293,8 +293,8 @@ export async function downloadTrack(trackId: string) {
 
   const link = document.createElement('a')
   link.href = downloadUrl
-  // link.download = `${track.name.replace(' ', '_')}.zip`
-  link.download = `test.zip`
+  link.download = `${trackName.replace(' ', '_')}.zip`
+  // link.download = `test.zip`
   document.body.appendChild(link)
   link.click()
 

@@ -57,7 +57,7 @@ const handleDownloadTrack = async (trackId: string) => {
   if (!track) return
 
   try {
-    await downloadTrack(trackId)
+    await downloadTrack(trackId, track.name)
   } catch (error) {
     console.error('Error downloading track:', error)
   }

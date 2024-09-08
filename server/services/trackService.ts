@@ -173,6 +173,8 @@ export async function uploadTrackFromJson(
   try {
     const trackJson: TrackJson = JSON.parse(fs.readFileSync(trackJsonPath, 'utf8'))
 
+    console.log('Uploading track from .zip with following JSON:', trackJson)
+
     const formData = new FormData()
 
     formData.append('name', trackJson.name)
@@ -194,9 +196,7 @@ export async function uploadTrackFromJson(
     trackJson.ttsFiles.forEach((ttsFile, index) => {
       // it is in format lang_voice_filename
       const ttsFilePath = path.join(publicFolderPath, `${ttsFile.lang}_${ttsFile.voice}_${ttsFile.origName}`)
-      console.log('ttsFilePath', ttsFilePath)
       if (fs.existsSync(ttsFilePath)) {
-        console.log('ttsFile', ttsFile)
         const fileNameWithoutExtension = ttsFile.origName.slice(0, '.txt'.length * -1)
         formData.append(
           'files',
