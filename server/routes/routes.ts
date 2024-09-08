@@ -46,6 +46,9 @@ router.post('/api/track/load', track_controller.loadTrackForPlayback)
 // Download track
 router.get('/api/track/download/:trackId', track_controller.downloadTrack)
 
+// Upload zip (downloaded via above route, most likely)
+router.post('/api/track/upload-zip', upload.single('zip'), track_controller.uploadZip)
+
 /* PERFORMANCE */
 // Get performances
 router.get('/api/performances', performance_controller.getPerformances)

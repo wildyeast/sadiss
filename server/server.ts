@@ -9,6 +9,7 @@ import { startKeepAliveInterval } from './tools/startKeepAliveInterval'
 import { startWebSocketServer } from './services/webSocketServerService'
 import fs from 'fs'
 import { logger } from './tools'
+import { errorHandler } from './middlewares/errorHandler'
 
 const cors = require('cors')
 const uuid = require('uuid')
@@ -56,6 +57,7 @@ const app = express()
   .use(express.json())
   .use(cors(corsOptions))
   .use(express.urlencoded({ extended: false }))
+  .use(cookieParser())
   // Initialize express-session middleware
   .use(
     session({
@@ -67,7 +69,6 @@ const app = express()
   // Initialize Passport and restore authentication state, if any, from the session.
   .use(passport.initialize())
   .use(passport.session())
-  .use(cookieParser())
 
 // WEBSOCKETS //
 let server
@@ -120,7 +121,7 @@ app.use((req, res, next) => {
   req.wss = wss
   next()
 })
-app.use('/', routes)
+app.use('/', routes).use(errorHandler)
 app.use((req, res) => res.status(404))
 
 module.exports = { app, server, wss }

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { getTracks, deleteTrack, addTrackToPerformance, downloadTrack } from '@/services/api'
+import { getTracks, deleteTrack, addTrackToPerformance, downloadTrack, uploadTrackZip } from '@/services/api'
 import type { Track } from '@/types/types'
 import { onMounted, ref, computed } from 'vue'
 import AddTrackModal from '@/components/AddTrackModal.vue'
@@ -63,6 +63,22 @@ const handleDownloadTrack = async (trackId: string) => {
   }
 }
 
+const handleUploadZip = async (event: Event) => {
+  const target = event.target as HTMLInputElement
+  if (!target.files?.length) return
+
+  const file = target.files[0]
+  const formData = new FormData()
+  formData.append('zip', file)
+
+  try {
+    await uploadTrackZip(formData)
+    tracks.value = await getTracks()
+  } catch (error) {
+    console.error('Error uploading zip:', error)
+  }
+}
+
 onMounted(async () => {
   tracks.value = await getTracks()
   const filterTracksByFromLocalStorage = localStorage.getItem('filterTracksBy')
@@ -91,6 +107,20 @@ onMounted(async () => {
           <option value="own">My tracks</option>
           <option value="public">Public tracks</option>
         </select>
+        <!-- Upload zip (for testing only) -->
+        <div class="flex items-center">
+          <label
+            for="zip"
+            class="cursor-pointer rounded-sm bg-light px-4 py-2 font-bold text-primary">
+            Upload zip
+          </label>
+          <input
+            id="zip"
+            type="file"
+            accept=".zip"
+            class="hidden"
+            @change="handleUploadZip($event)" />
+        </div>
       </div>
     </FixedViewHeader>
 

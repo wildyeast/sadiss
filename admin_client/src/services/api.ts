@@ -279,6 +279,10 @@ export async function downloadTrack(trackId: string) {
     credentials: 'include'
   })
 
+  if (!response.ok) {
+    throw new Error(response.statusText)
+  }
+
   // if (response.error) {
   //   throw new Error(response.error)
   // }
@@ -298,6 +302,19 @@ export async function downloadTrack(trackId: string) {
   window.URL.revokeObjectURL(downloadUrl)
 
   // return response.data!.track
+}
+
+export async function uploadTrackZip(trackZip: FormData) {
+  const response = await request<{ track: Track }>('/api/track/upload-zip', {
+    method: 'POST',
+    body: trackZip
+  })
+
+  if (response.error) {
+    throw new Error(response.error)
+  }
+
+  return response.data!.track
 }
 
 /* TRACK PERFORMANCE */

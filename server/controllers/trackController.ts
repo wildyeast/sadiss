@@ -1,4 +1,4 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 // The following is a hack to get the types to work.
 // See https://github.com/DefinitelyTyped/DefinitelyTyped/issues/47780#issuecomment-790684085
 import { Multer } from 'multer' // Don't remove this line
@@ -13,39 +13,35 @@ import { activePerformances, initializeActivePerformance } from '../services/act
 import path from 'path'
 import fs from 'fs'
 import { logger } from '../tools'
-import { TrackService } from '../services/trackService'
+import {
+  createTrack,
+  createTrackZip,
+  getTrackDataForDownload,
+  loadTrackForPlayback,
+  uploadTrackFromJson
+} from '../services/trackService'
 import { InvalidInputError } from '../errors/InvalidInputError'
 import { NotFoundError } from '../errors/NotFoundError'
 import { ProcessingError } from '../errors/ProcessingError'
 import { ForbiddenError } from '../errors/ForbiddenError'
+import unzipper from 'unzipper'
+import { getPartialFileByPrefix } from '../services/fileService'
 
 const uuid = require('uuid')
 
-const trackService = new TrackService()
-
 const Track = mongoose.model('Track', trackSchema)
 
-exports.loadTrackForPlayback = async (req: Request, res: Response) => {
+exports.loadTrackForPlayback = async (req: Request, res: Response, next: NextFunction) => {
   const { trackId, performanceId } = req.body
 
   try {
-    const result = await trackService.loadTrackForPlayback(trackId, performanceId)
+    const result = await loadTrackForPlayback(trackId, performanceId)
     return res.status(200).json(result)
   } catch (error) {
-    if (error instanceof InvalidInputError) {
-      return res.status(400).json({ message: error.message })
-    } else if (error instanceof NotFoundError) {
-      return res.status(404).json({ message: error.message })
-    } else if (error instanceof ProcessingError) {
-      return res.status(500).json({ message: error.message })
-    } else {
-      console.error('Unexpected error:', error)
-      return res.status(500).json({ message: 'An unexpected error occurred.' })
-    }
+    next(error)
   }
 }
 
-// Start track
 exports.startTrack = async (req: Request, res: Response) => {
   const { trackId, performanceId, startTime, startAtChunk, loop } = req.body
 
@@ -142,12 +138,15 @@ exports.uploadTrack = async (req: Request, res: Response) => {
   }
 
   try {
-    const { path, partialFileToSave } = handleUploadedPartialFile(<File[]>req.files)
+    const partialFilePrefix = 'partialfile_'
+    const ttsFilePrefix = 'ttsfile_'
+
+    const partialFileInfo = getPartialFileByPrefix(<File[]>req.files, partialFilePrefix)
 
     const { ttsFilesToSave, ttsLangs, ttsJson } = handleUploadedTtsFiles(<File[]>req.files)
 
     const filename = uuid.v4()
-    const { partialsCount, chunks } = await chunk(path, ttsJson)
+    const { partialsCount, chunks } = await chunk(partialFileInfo?.path, ttsJson)
     fs.writeFile(`${process.env.CHUNKS_DIR}/${filename}`, JSON.stringify(chunks), (err: any) => {
       if (err) {
         console.error(err)
@@ -161,36 +160,22 @@ exports.uploadTrack = async (req: Request, res: Response) => {
     const ttsRate = req.body.ttsRate
     const isPublic = req.body.isPublic === 'true'
 
-    // Save track to DB
-    const t = new Track({
+    const track = await createTrack(
+      filename,
       name,
-      chunkFileName: filename,
-      notes,
       mode,
+      notes,
+      ttsLangs,
       waveform,
       ttsRate,
-      partialFile: partialFileToSave,
-      ttsFiles: ttsFilesToSave,
-      creator: req.user!.id,
-      isPublic
-    })
+      ttsFilesToSave,
+      partialFileInfo,
+      partialsCount,
+      isPublic,
+      req.user!.id
+    )
 
-    if (mode === 'choir' && partialsCount > 0) {
-      t.partialsCount = partialsCount
-    }
-
-    if (ttsLangs) {
-      t.ttsLangs = Array.from(ttsLangs)
-    }
-
-    t.save((err) => {
-      if (err) {
-        logger.error('Failed uploading track with:', err)
-        res.status(500).send(err)
-      } else {
-        res.status(201).send(t)
-      }
-    })
+    res.status(201).json(track)
   } catch (err) {
     logger.error('Failed uploading track with:', err)
     res.status(500).send(err)
@@ -303,22 +288,6 @@ exports.stopTrack = (req: Request, res: Response) => {
   }
 }
 
-const handleUploadedPartialFile = (files: File[]) => {
-  const partialFilePrefix = 'partialfile_'
-  const partialFile: File = Object.values(files).filter((file: File) => file.originalname.includes(partialFilePrefix))[0]
-  let path
-  const partialFileToSave = <{ origName: string; fileName: string }>{}
-
-  if (partialFile) {
-    path = partialFile.path
-    const originalFileName = partialFile.originalname.replace(partialFilePrefix, '')
-    partialFileToSave.origName = originalFileName + '.txt'
-    partialFileToSave.fileName = partialFile.filename
-  }
-
-  return { path, partialFileToSave }
-}
-
 const handleUploadedTtsFiles = (files: File[]) => {
   const ttsFilePrefix = 'ttsfile_'
   const ttsFiles = Object.values(files).filter((file: File) => file.originalname.includes(ttsFilePrefix))
@@ -340,20 +309,20 @@ const handleUploadedTtsFiles = (files: File[]) => {
   return { ttsFilesToSave, ttsLangs, ttsJson }
 }
 
-exports.downloadTrack = async (req: Request, res: Response) => {
+exports.downloadTrack = async (req: Request, res: Response, next: NextFunction) => {
   try {
     if (!isValidObjectId(req.params.trackId)) {
       res.status(400).send({ error: 'Invalid track id.' })
       return
     }
 
-    const trackDataForDownload = await trackService.getTrackDataForDownload(req.params.trackId)
+    const trackDataForDownload = await getTrackDataForDownload(req.params.trackId)
 
-    if (req.user!.id.toString() !== trackDataForDownload.creator.toString() || !trackDataForDownload.isPublic) {
+    if (req.user!.id.toString() !== trackDataForDownload.creator.toString() && !trackDataForDownload.isPublic) {
       throw new ForbiddenError('Forbidden.')
     }
 
-    const zipFilePath = await trackService.createTrackZip(trackDataForDownload)
+    const zipFilePath = await createTrackZip(trackDataForDownload)
 
     res.setHeader('Content-Type', 'application/zip')
     res.setHeader('Content-Disposition', `attachment; filename="${trackDataForDownload.name.replace(' ', '_')}.zip"`)
@@ -373,18 +342,53 @@ exports.downloadTrack = async (req: Request, res: Response) => {
     //   })
     // }, 10000)
   } catch (err: any) {
-    switch (err.constructor) {
-      case InvalidInputError:
-        res.status(400).send({ error: err.message })
-        break
-      case ForbiddenError:
-        res.status(403).send({ error: 'Forbidden.' })
-        break
-      case NotFoundError:
-        res.status(404).send({ error: err.message })
-        break
-      default:
-        res.status(500).json({ error: 'Server error.' })
+    console.warn('Error downloading track:', err)
+    next(err)
+  }
+}
+
+exports.uploadZip = async (req: Request, res: Response, next: NextFunction) => {
+  if (!req.headers.cookie) {
+    throw new ForbiddenError('Forbidden.')
+  }
+
+  if (!req.file) {
+    throw new InvalidInputError('No file uploaded.')
+  }
+
+  const extractPath = path.join(process.cwd(), 'public', `${uuid.v4()}`)
+
+  if (!fs.existsSync(extractPath)) {
+    fs.mkdirSync(extractPath, { recursive: true })
+  }
+
+  const zipFilePath = req.file.path
+
+  try {
+    await fs
+      .createReadStream(zipFilePath)
+      .pipe(unzipper.Extract({ path: extractPath }))
+      .promise()
+
+    const trackJsonPath = path.join(extractPath, 'track.json')
+
+    if (!fs.existsSync(trackJsonPath)) {
+      throw new ProcessingError('No track.json found in zip file.')
     }
+
+    const uploadSuccessful = await uploadTrackFromJson(
+      trackJsonPath,
+      extractPath,
+      process.env.API_BASE_URL + '/api/track/create',
+      req.headers.cookie
+    )
+
+    if (uploadSuccessful) {
+      res.status(201).send({ message: 'Track uploaded successfully.' })
+    } else {
+      throw new ProcessingError('Error uploading track.')
+    }
+  } catch (err: any) {
+    next(err)
   }
 }

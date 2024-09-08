@@ -8,7 +8,6 @@ export const trackSchema = new Schema<TrackDocument>({
   partialsCount: Number,
   mode: { type: String, required: true },
   notes: String,
-  ttsInstructions: String,
   ttsLangs: Array<String>,
   waveform: String,
   ttsRate: String,
