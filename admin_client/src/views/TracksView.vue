@@ -74,6 +74,8 @@ const handleUploadZip = async (event: Event) => {
   try {
     await uploadTrackZip(formData)
     tracks.value = await getTracks()
+    // reload page to see the new tracks
+    location.reload()
   } catch (error) {
     console.error('Error uploading zip:', error)
   }
