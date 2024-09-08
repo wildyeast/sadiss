@@ -187,12 +187,14 @@ export async function uploadTrackFromJson(
     formData.append('ttsRate', trackJson.ttsRate)
     formData.append('isPublic', String(trackJson.isPublic))
 
-    const partialFilePath = path.join(publicFolderPath, trackJson.partialFile.origName)
-    if (fs.existsSync(partialFilePath)) {
-      const fileNameWithoutExtension = trackJson.partialFile.origName.slice(0, '.txt'.length * -1)
-      formData.append('files', fs.createReadStream(partialFilePath) as any, `partialfile_${fileNameWithoutExtension}`)
-    } else {
-      throw new ProcessingError(`Partial file not found: ${partialFilePath}`)
+    if (trackJson.partialFile) {
+      const partialFilePath = path.join(publicFolderPath, trackJson.partialFile.origName)
+      if (fs.existsSync(partialFilePath)) {
+        const fileNameWithoutExtension = trackJson.partialFile.origName.slice(0, '.txt'.length * -1)
+        formData.append('files', fs.createReadStream(partialFilePath) as any, `partialfile_${fileNameWithoutExtension}`)
+      } else {
+        throw new ProcessingError(`Partial file not found: ${partialFilePath}`)
+      }
     }
 
     trackJson.ttsFiles.forEach((ttsFile, index) => {
