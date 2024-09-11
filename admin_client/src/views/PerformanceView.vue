@@ -130,7 +130,9 @@ onUnmounted(() => {
       <div
         v-if="Object.keys(connectedClients).length"
         class="flex gap-4">
-        <span v-for="choirId of Object.keys(connectedClients)">
+        <span
+          v-for="choirId of Object.keys(connectedClients)"
+          :key="choirId">
           <font-awesome-icon
             icon="fa-qrcode"
             class="mr-1" />{{ choirId }}: {{ connectedClients[choirId] }}</span
@@ -146,6 +148,7 @@ onUnmounted(() => {
         @update="onSortOrderUpdate">
         <button
           v-for="(track, index) in tracks"
+          :key="track._id"
           @click="selectTrack(index)"
           class="flex w-full items-center justify-between border p-4"
           :class="{ 'bg-secondary': selectedTrack === track }">
