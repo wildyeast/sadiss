@@ -104,6 +104,18 @@ onMounted(() => {
 onUnmounted(() => {
   clearInterval(getClientsInterval)
 })
+
+const displayClientCount = ref(false)
+
+// For debugging and testing
+const generateDummyClientData = () => {
+  clearInterval(getClientsInterval)
+  const numberOfVoices = Math.floor(Math.random() * 20)
+
+  for (let i = 0; i < numberOfVoices; i++) {
+    connectedClients.value[i] = Math.floor(Math.random() * 10)
+  }
+}
 </script>
 <template>
   <main class="flex h-screen flex-col justify-between">
@@ -121,23 +133,31 @@ onUnmounted(() => {
               size="xl" />
           </button>
         </div>
+
+        <!-- Client list -->
+        <div>
+          <div class="flex w-full justify-between bg-secondary">
+            <button @click="generateDummyClientData">Generate fake clients</button>
+            <button @click="() => (displayClientCount = !displayClientCount)">Unfold client list</button>
+          </div>
+          <div
+            v-if="displayClientCount"
+            class="flex flex-wrap">
+            <div
+              v-for="choirId of Object.keys(connectedClients)"
+              :key="choirId"
+              class="flex w-[60px] justify-between">
+              <span>|</span>
+              <span>{{ choirId }}: {{ connectedClients[choirId] }}</span>
+              <span>|</span>
+            </div>
+          </div>
+        </div>
       </FixedViewHeader>
 
       <!-- Spacer for pushing content below down so it is visible below the fixed header
         TODO: Maybe do away with the fixed header or think of a less annoying way of doing this. -->
       <div class="mt-12 pt-16"></div>
-
-      <div
-        v-if="Object.keys(connectedClients).length"
-        class="flex gap-4">
-        <span
-          v-for="choirId of Object.keys(connectedClients)"
-          :key="choirId">
-          <font-awesome-icon
-            icon="fa-qrcode"
-            class="mr-1" />{{ choirId }}: {{ connectedClients[choirId] }}</span
-        >
-      </div>
 
       <VueDraggable
         v-if="tracks.length"
