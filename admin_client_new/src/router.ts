@@ -6,7 +6,7 @@ import TracksView from "./views/TracksView.vue"
 
 const routes = [
   { path: "/", component: DashboardView },
-  { path: "/login", component: LoginView },
+  { path: "/login", component: LoginView, meta: { hideNavbar: true } },
   { path: "/performances", component: PerformancesView },
   { path: "/tracks", component: TracksView },
 ]
