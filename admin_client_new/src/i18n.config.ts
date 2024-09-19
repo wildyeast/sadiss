@@ -6,7 +6,7 @@ const i18n = createI18n({
   globalInjection: true,
   messages: {
     en: {
-      created_by: "Created by"
+      created_by: "Created by",
       login: "Login",
       performances: "Performances",
     },
