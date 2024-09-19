@@ -4,13 +4,15 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "vue-tsc -b && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
     "@fontsource/inter": "^5.0.21",
+    "axios": "^1.7.7",
     "vue": "^3.4.37",
+    "vue-i18n": "^10.0.1",
     "vue-router": "^4.4.4"
   },
   "devDependencies": {

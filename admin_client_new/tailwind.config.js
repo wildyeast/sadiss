@@ -6,6 +6,9 @@ export default {
       black: "#000",
       white: "#fff",
       secondary: "#5A5A5A",
+      middlegrey: "#F5F5F5",
+      "input-border": "#C2C2C2",
+      "button-bg": "#2C2C2C",
     },
     extend: {
       fontFamily: {
@@ -15,6 +18,9 @@ export default {
         xss: "11px",
         xs: "12px",
         sm: "14px",
+        md: "16px",
+        lg: "20px",
+        xl: "32px",
       },
     },
   },
