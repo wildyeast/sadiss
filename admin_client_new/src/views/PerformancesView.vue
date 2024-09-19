@@ -21,14 +21,19 @@ onMounted(async () => {
 <template>
   <ConnectedClientsList />
   <h1>{{ $t("performances") }}</h1>
-  {{ performances[0] }}
   <div class="w-full text-md text-secondary">
     <div
       v-for="performance of performances"
       :key="performance._id"
-      class="border-t border-secondary py-2 px-4">
-      <span>{{ performance.name }}</span>
-      <span>{{ $t("created_by") }}{{ performance.creator.username }}</span>
+      class="border-t last:border-b border-secondary p-4">
+      <div class="flex justify-between">
+        <span>{{ performance.name }}</span>
+        <span>{{ $t("created_by") }}: {{ performance.creator.username }}</span>
+        <span>
+          {{ performance.trackCount }}
+          {{ $t("track", performance.trackCount) }}
+        </span>
+      </div>
     </div>
   </div>
 </template>

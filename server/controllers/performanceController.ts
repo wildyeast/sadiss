@@ -6,12 +6,51 @@ import { TrackPerformance } from '../models'
 
 // Get all performances that are public or owned by the user
 exports.getPerformances = async (req: Request, res: Response) => {
+  interface PerformanceWithTrackCount {
+    _id: string
+    name: string
+    creator: {
+      _id: string
+      username: string
+    }
+    isPublic: boolean
+    trackCount?: number
+  }
+
   try {
     // Get all performances that are public or owned by the user
     const performances = await SadissPerformance.find(
       { $or: [{ isPublic: true }, { creator: req.user!.id }], deleted: { $ne: true } },
       '_id name creator isPublic'
-    ).populate('creator', 'username')
+    )
+      .populate('creator', 'username')
+      .lean<PerformanceWithTrackCount[]>()
+
+    // Get track counts using MongoDB aggregation pipeline
+    const performanceIds = performances.map((performance) => performance._id)
+
+    const trackCounts = await TrackPerformance.aggregate([
+      {
+        $match: { performance: { $in: performanceIds }, deleted: { $ne: true } }
+      },
+      {
+        $group: {
+          _id: '$performance',
+          count: { $sum: 1 }
+        }
+      }
+    ])
+
+    // Map track counts back to performances
+    const trackCountMap = trackCounts.reduce((acc, curr) => {
+      acc[curr._id] = curr.count
+      return acc
+    }, {} as Record<string, number>)
+
+    // Attach the track count to the corresponding performance
+    for (const performance of performances) {
+      performance.trackCount = trackCountMap[performance._id] || 0
+    }
 
     res.json({ performances })
   } catch (err) {

@@ -9,6 +9,7 @@ const i18n = createI18n({
       created_by: "Created by",
       login: "Login",
       performances: "Performances",
+      track: "Track | Tracks",
     },
   },
 })

@@ -6,4 +6,5 @@ export default interface SadissPerformance {
   creator: { _id: string; username: string }
   isPublic: boolean
   tracks: Track[]
+  trackCount: number
 }
