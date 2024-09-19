@@ -1,32 +1,24 @@
 <script setup lang="ts">
-import axios from "axios"
 import { reactive } from "vue"
 import router from "../router"
+import { login } from "../api"
 
 const formData = reactive({
   email: "",
   password: "",
 })
 
-async function login() {
-  await axios.post<{ token: string }>(
-    `${import.meta.env.VITE_APP_API_URL}/login`,
-    {
-      email: formData.email,
-      password: formData.password,
-    },
-    {
-      withCredentials: true,
-    }
-  )
-
+async function handleLogin() {
+  await login(formData.email, formData.password)
   await router.push("/")
 }
 </script>
 
 <template>
   <div class="flex flex-col items-center">
-    <form class="flex flex-col items-center gap-4" @submit.prevent="login">
+    <form
+      class="flex flex-col items-center gap-4"
+      @submit.prevent="handleLogin">
       <input v-model="formData.email" type="text" placeholder="Email" />
       <input
         v-model="formData.password"
