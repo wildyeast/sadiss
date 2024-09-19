@@ -2,6 +2,8 @@
 import { ref, Ref, computed, onMounted } from "vue"
 import ChevronDown from "../assets/chevron_down.svg"
 import ChevronUp from "../assets/chevron_up.svg"
+import ClientsCount from "../assets/clients_count.svg"
+import ConflictingClientsCount from "../assets/conflicting_clients_count.svg"
 
 const connectedClients: Ref<{ [key: string]: string }> = ref({})
 
@@ -42,7 +44,14 @@ onMounted(() => {
     <div class="flex items-center justify-between w-full z-50 h-[32px]">
       <span class="text-xs">Time Sync</span>
       <div class="flex gap-2">
-        <span class="text-sm">{{ connectedClientCount }}</span>
+        <div class="flex items-center gap-1">
+          <ClientsCount class="h-[17px] w-[17px]" />
+          <span class="text-sm">{{ connectedClientCount }}</span>
+        </div>
+        <div class="flex items-center gap-1">
+          <ConflictingClientsCount class="h-[16px] w-[16px]" />
+          <span class="text-sm">X</span>
+        </div>
         <button @click="toggleClientList">
           <ChevronDown
             v-if="!clientListDisplayed"
