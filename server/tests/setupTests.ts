@@ -41,7 +41,8 @@ beforeAll(async () => {
   global.mockUser = {
     id: registerRes.body._id,
     username: registerRes.body.username,
-    email: registerRes.body.email
+    email: registerRes.body.email,
+    password: mockUser.password
   }
 
   // Login with created user and save JWT token

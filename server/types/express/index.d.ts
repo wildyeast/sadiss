@@ -17,7 +17,7 @@ declare global {
       password: string
     }
   }
-  var mockUser: { username: string; id: Types.ObjectId; email: string }
+  var mockUser: { username: string; id: Types.ObjectId; email: string; password: string }
   var agent: SuperAgentTest
   var testWss: Server // Websocket server for testing
 }

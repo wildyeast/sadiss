@@ -1,20 +1,21 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { User } from '../models/user'
+import { InvalidInputError, NotFoundError } from '../errors'
 
 export const authenticateUser = async (email: string, password: string) => {
   if (!email || !password) {
-    throw new Error('Please provide an email and password')
+    throw new InvalidInputError('Please provide an email and password')
   }
 
   const user = await User.findOne({ email })
   if (!user) {
-    throw new Error('Invalid email or password')
+    throw new NotFoundError('Invalid email or password')
   }
 
   const isPasswordMatched = await bcrypt.compare(password, user.password)
   if (!isPasswordMatched) {
-    throw new Error('Invalid email or password')
+    throw new NotFoundError('Invalid email or password')
   }
 
   return user

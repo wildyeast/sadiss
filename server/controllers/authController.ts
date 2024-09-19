@@ -4,6 +4,7 @@ import { User } from '../models/user'
 import { env } from 'process'
 import { authenticateUser, generateToken } from '../services/authService'
 import bcrypt from 'bcryptjs'
+import { NotFoundError } from '../errors'
 
 export const login = async (req: Request, res: Response) => {
   try {
@@ -25,7 +26,11 @@ export const login = async (req: Request, res: Response) => {
 
     res.json({ message: 'Login successful' })
   } catch (err) {
-    res.status(500)
+    if (err instanceof NotFoundError) {
+      return res.status(404).json({ message: 'Invalid email or password' })
+    } else {
+      res.status(500)
+    }
   }
 }
 
