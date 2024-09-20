@@ -48,10 +48,8 @@ router.beforeEach(async (to, _from, next) => {
   // }
 
   if (to.matched.some(record => record.meta.requiresAuth) && !user) {
-    console.log("User not logged in")
     next("/login")
   } else {
-    console.log("User already logged in")
     if (to.name === "Login" && user) {
       next("/dashboard")
     } else {
