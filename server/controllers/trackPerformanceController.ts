@@ -74,8 +74,8 @@ exports.updateTrackPerformanceOrder = async (req: Request, res: Response) => {
     }
 
     res.status(200).send({ message: 'Track performance order updated' })
-  } catch (error) {
-    res.status(500).send({ error: 'Server error' })
+  } catch (error: any) {
+    res.status(500).send({ error: `Server error: ${error}` })
   }
 }
 
