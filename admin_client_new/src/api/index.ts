@@ -1,4 +1,15 @@
 import { login } from "./authService"
-import { getPerformances } from "./performanceService"
+import {
+  getPerformances,
+  getPerformance,
+  getPerformanceWithTracks,
+  updateTrackPerformanceOrder,
+} from "./performanceService"
 
-export { login, getPerformances }
+export {
+  login,
+  getPerformances,
+  getPerformance,
+  getPerformanceWithTracks,
+  updateTrackPerformanceOrder,
+}

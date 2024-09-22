@@ -14,7 +14,7 @@ onMounted(async () => {
 <template>
   <ConnectedClientsList />
   <h1>{{ $t("performances") }}</h1>
-  <div class="w-full text-md text-secondary">
+  <div class="list-container">
     <RouterLink
       :to="{
         name: 'PerformanceDetail',
@@ -22,7 +22,7 @@ onMounted(async () => {
       }"
       v-for="performance of performances"
       :key="performance._id"
-      class="block border-t last:border-b border-secondary p-4">
+      class="list-entry bg-red">
       <div class="flex justify-between">
         <span>{{ performance.name }}</span>
         <span>{{ $t("created_by") }}: {{ performance.creator.username }}</span>
