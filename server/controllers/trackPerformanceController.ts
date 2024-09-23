@@ -5,6 +5,7 @@ import { Types } from 'mongoose'
 import { isValidObjectId } from 'mongoose'
 import { unloadTrackFromActivePerformance } from '../services/activePerformanceService'
 import { setStartTime } from '../services/trackPerformanceService'
+import { InvalidInputError } from '../errors'
 
 exports.addTrackToPerformance = async (req: Request, res: Response) => {
   try {
@@ -113,7 +114,7 @@ exports.setStartTime = async (req: Request, res: Response) => {
   try {
     const { trackPerformanceId, startTime } = req.body
 
-    if (!trackPerformanceId || !startTime) {
+    if (!trackPerformanceId || !startTime || !isValidObjectId(trackPerformanceId) || !Number.isInteger(startTime)) {
       return res.status(400).send({ error: 'Invalid input data' })
     }
 
@@ -121,6 +122,9 @@ exports.setStartTime = async (req: Request, res: Response) => {
 
     res.status(200).send({ message: 'Start time updated' })
   } catch (error) {
+    if (error instanceof InvalidInputError) {
+      return res.status(400).send({ error: error.message })
+    }
     res.status(500).send({ error: 'Server error' })
   }
 }

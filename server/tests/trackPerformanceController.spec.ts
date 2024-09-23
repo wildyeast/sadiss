@@ -146,6 +146,61 @@ describe('trackPerformanceController test', () => {
       const updatedTrackPerformance = await TrackPerformance.findById(trackPerformanceId)
       expect(updatedTrackPerformance!.startTime).toBe(startTime)
     })
+
+    it('should return 400 if the provided startTime is less than 0', async () => {
+      const { trackPerformances } = await createTestTrackPerformance()
+      const { _id: trackPerformanceId } = trackPerformances[0]
+
+      const trackPerformance = await TrackPerformance.findById(trackPerformanceId)
+      expect(trackPerformance).toBeDefined()
+      expect(trackPerformance!.startTime).toBe(0)
+
+      const startTime = -1
+      await agent
+        .post('/api/track-performance/set-start-time')
+        .send({ trackPerformanceId: trackPerformanceId, startTime })
+        .expect(400)
+    })
+
+    it('should return 400 if the provided trackPerformanceId is not a valid ObjectId', async () => {
+      const { trackPerformances } = await createTestTrackPerformance()
+      const { _id: trackPerformanceId } = trackPerformances[0]
+
+      const trackPerformance = await TrackPerformance.findById(trackPerformanceId)
+      expect(trackPerformance).toBeDefined()
+      expect(trackPerformance!.startTime).toBe(0)
+
+      const startTime = 10
+      await agent
+        .post('/api/track-performance/set-start-time')
+        .send({ trackPerformanceId: 'invalidObjectId', startTime })
+        .expect(400)
+    })
+
+    it('should return 500 if there is an error while updating the startTime', async () => {
+      const { trackPerformances } = await createTestTrackPerformance()
+      const { _id: trackPerformanceId } = trackPerformances[0]
+
+      jest.spyOn(TrackPerformance, 'findByIdAndUpdate').mockImplementationOnce(() => {
+        throw new Error('Server error')
+      })
+
+      const startTime = 10
+      await agent
+        .post('/api/track-performance/set-start-time')
+        .send({ trackPerformanceId: trackPerformanceId, startTime })
+        .expect(500)
+    })
+
+    it('should return 400 if the provided data is invalid', async () => {
+      const { trackPerformances } = await createTestTrackPerformance()
+      const { _id: trackPerformanceId } = trackPerformances[0]
+
+      await agent
+        .post('/api/track-performance/set-start-time')
+        .send({ trackPerformanceId, startTime: 'invalidStartTime' })
+        .expect(400)
+    })
   })
 })
 
