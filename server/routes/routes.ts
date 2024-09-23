@@ -81,6 +81,8 @@ router.post(
 // Update sortOrder of trackPerformance
 router.post('/api/track-performance/update-order', track_performance_controller.updateTrackPerformanceOrder)
 
+router.post('/api/track-performance/set-start-time', track_performance_controller.setStartTime)
+
 router.post('/api/track-performance/delete', track_performance_controller.deleteTrackFromPerformance)
 
 /* PERFORMANCE VIEW */

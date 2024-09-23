@@ -36,7 +36,8 @@ describe('getPerformanceWithTracks', () => {
             isPublic: true,
             notes: 'test notes',
             sortOrder: 1,
-            trackPerformanceId: trackPerformances[0]._id
+            trackPerformanceId: trackPerformances[0]._id,
+            startTime: 0
           },
           {
             _id: tracks[1]._id,
@@ -61,7 +62,8 @@ describe('getPerformanceWithTracks', () => {
             isPublic: true,
             sortOrder: 2,
             trackPerformanceId: trackPerformances[1]._id,
-            notes: 'test notes'
+            notes: 'test notes',
+            startTime: 0
           }
         ]
       }

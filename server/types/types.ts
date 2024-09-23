@@ -86,6 +86,7 @@ export interface TrackPerformanceDocument extends Document {
   track: TrackDocument
   performance: SadissPerformanceDocument
   sortOrder: number
+  startTime: number
   deleted: boolean
   deletedAt: Date
   deletedBy: Types.ObjectId

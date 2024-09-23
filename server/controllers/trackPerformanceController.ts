@@ -4,6 +4,7 @@ import { SadissPerformance, Track } from '../models'
 import { Types } from 'mongoose'
 import { isValidObjectId } from 'mongoose'
 import { unloadTrackFromActivePerformance } from '../services/activePerformanceService'
+import { setStartTime } from '../services/trackPerformanceService'
 
 exports.addTrackToPerformance = async (req: Request, res: Response) => {
   try {
@@ -30,9 +31,10 @@ exports.addTrackToPerformance = async (req: Request, res: Response) => {
 
     const trackPerformances = await TrackPerformance.find({ performance: performanceId })
     const sortOrder = trackPerformances.length + 1
+    const startTime = 0
 
     // Create a new TrackPerformance record and save it to the database
-    const trackPerformance = new TrackPerformance({ track: trackId, performance: performanceId, sortOrder })
+    const trackPerformance = new TrackPerformance({ track: trackId, performance: performanceId, sortOrder, startTime })
     trackPerformance.save((err) => {
       if (err) {
         console.error('Error while creating performance', err)
@@ -102,6 +104,22 @@ exports.deleteTrackFromPerformance = async (req: Request, res: Response) => {
     unloadTrackFromActivePerformance(trackPerformanceId)
 
     res.status(200).send({ message: 'Track performance deleted' })
+  } catch (error) {
+    res.status(500).send({ error: 'Server error' })
+  }
+}
+
+exports.setStartTime = async (req: Request, res: Response) => {
+  try {
+    const { trackPerformanceId, startTime } = req.body
+
+    if (!trackPerformanceId || !startTime) {
+      return res.status(400).send({ error: 'Invalid input data' })
+    }
+
+    await setStartTime(trackPerformanceId, startTime)
+
+    res.status(200).send({ message: 'Start time updated' })
   } catch (error) {
     res.status(500).send({ error: 'Server error' })
   }

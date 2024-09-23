@@ -10,6 +10,12 @@ const i18n = createI18n({
       login: "Login",
       performances: "Performances",
       track: "Track | Tracks",
+      waveforms: {
+        sine: "Sine",
+        square: "Square",
+        sawtooth: "Sawtooth",
+        triangle: "Triangle",
+      },
     },
   },
 })

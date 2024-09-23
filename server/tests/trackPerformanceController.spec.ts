@@ -127,6 +127,26 @@ describe('trackPerformanceController test', () => {
       await agent.post('/api/track-performance/update-order').send(reSortRequestObject).expect(400)
     })
   })
+
+  describe('POST /api/track-performance/set-start-time', () => {
+    it('should set the startTime of the TrackPerformance to the provided value', async () => {
+      const { trackPerformances } = await createTestTrackPerformance()
+      const { _id: trackPerformanceId } = trackPerformances[0]
+
+      const trackPerformance = await TrackPerformance.findById(trackPerformanceId)
+      expect(trackPerformance).toBeDefined()
+      expect(trackPerformance!.startTime).toBe(0)
+
+      const startTime = 10
+      await agent
+        .post('/api/track-performance/set-start-time')
+        .send({ trackPerformanceId: trackPerformanceId, startTime })
+        .expect(200)
+
+      const updatedTrackPerformance = await TrackPerformance.findById(trackPerformanceId)
+      expect(updatedTrackPerformance!.startTime).toBe(startTime)
+    })
+  })
 })
 
 export {}

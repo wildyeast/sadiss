@@ -14,7 +14,7 @@ exports.getPerformanceWithTracks = async (req: Request, res: Response) => {
 
     const trackPerformances = await TrackPerformance.find(
       { performance: performance._id, deleted: { $ne: true } },
-      'track _id sortOrder'
+      'track _id sortOrder startTime'
     )
       .populate('track', 'name notes mode waveform ttsRate creator isPublic partialFile ttsFiles chunkFileName')
       .lean()
@@ -40,8 +40,9 @@ exports.getPerformanceWithTracks = async (req: Request, res: Response) => {
       const track = trackPerformance.track
       const trackPerformanceId = trackPerformance._id
       const sortOrder = trackPerformance.sortOrder
+      const startTime = trackPerformance.startTime
 
-      return { ...track, trackPerformanceId, sortOrder }
+      return { ...track, trackPerformanceId, sortOrder, startTime }
     })
 
     res.json({ performance: { ...performance, tracks } })

@@ -2,8 +2,15 @@
 import { computed, onMounted, ref, Ref } from "vue"
 import { VueDraggable } from "vue-draggable-plus"
 import { SadissPerformance, TrackPerformanceIdAndSortOrder } from "../types"
-import { getPerformanceWithTracks, updateTrackPerformanceOrder } from "../api"
+import {
+  getPerformanceWithTracks,
+  loadTrackForPlayback,
+  updateTrackPerformanceOrder,
+} from "../api"
 import ConnectedClientsList from "../components/ConnectedClientsList.vue"
+import WaveformIcon from "../assets/waveform.svg"
+import TtsRateIcon from "../assets/tts_rate.svg"
+import PlayerControls from "../components/PlayerControls.vue"
 
 const props = defineProps<{ id: string }>()
 
@@ -11,6 +18,12 @@ const performance: Ref<SadissPerformance | null> = ref(null)
 const tracks = computed(() => performance.value?.tracks)
 
 const selectedTrackIndex = ref(-1)
+const selectedTrackLengthInChunks = ref(-1)
+
+const nextTrack = computed(() => {
+  if (selectedTrackIndex.value === -1 || !tracks.value) return
+  return tracks.value[selectedTrackIndex.value + 1]
+})
 
 const onSortOrderUpdate = async () => {
   if (!tracks.value) return
@@ -30,6 +43,24 @@ const onSortOrderUpdate = async () => {
   await updateTrackPerformanceOrder(trackPerformanceIdsAndSortOrders)
 }
 
+const handleTrackSelect = async (index: number) => {
+  selectedTrackLengthInChunks.value = -1
+
+  if (selectedTrackIndex.value === index || !tracks.value) return
+
+  try {
+    selectedTrackIndex.value = index
+    selectedTrackLengthInChunks.value = await loadTrackForPlayback(
+      tracks.value[index]._id,
+      props.id
+    )
+  } catch (error) {
+    console.error(error)
+    selectedTrackIndex.value = -1
+    selectedTrackLengthInChunks.value = -1
+  }
+}
+
 onMounted(async () => {
   try {
     const performanceId = props.id as string
@@ -44,6 +75,19 @@ onMounted(async () => {
   <ConnectedClientsList />
   <div v-if="performance" class="w-full">
     <h1>{{ performance.name }}</h1>
+
+    <p
+      v-if="selectedTrackIndex > -1 && tracks && tracks[selectedTrackIndex]"
+      class="text-center mb-4">
+      {{ selectedTrackIndex + 1 }} {{ tracks[selectedTrackIndex].name }}
+      <PlayerControls
+        :performance-id="id"
+        :selected-track="tracks[selectedTrackIndex]"
+        :next-track="nextTrack"
+        :track-loaded="selectedTrackLengthInChunks > -1"
+        :selected-track-length-in-chunks="selectedTrackLengthInChunks" />
+    </p>
+
     <VueDraggable
       v-if="tracks"
       v-model="tracks"
@@ -53,12 +97,40 @@ onMounted(async () => {
       @update="onSortOrderUpdate">
       <div
         class="list-entry"
-        v-for="track of performance.tracks"
-        :key="track._id">
-        <div class="flex justify-between">
-          <span class="drag-handle">☰</span>
+        :class="{ 'bg-secondary text-white': selectedTrackIndex === index }"
+        v-for="(track, index) of performance.tracks"
+        :key="track._id"
+        @click="handleTrackSelect(index)">
+        <div class="flex gap-3">
+          <div>
+            <span class="drag-handle text-xl">☰</span>
+          </div>
+          <div class="space-y-2">
+            <div class="space-x-2">
+              <span>{{ index + 1 }}</span>
+              <span>{{ track.name }}</span>
+            </div>
+
+            <div class="flex gap-3">
+              <div class="flex gap-1">
+                <WaveformIcon
+                  class="w-[21px]"
+                  :class="{
+                    '[&>*]:stroke-white': selectedTrackIndex === index,
+                  }" />
+                <span>{{ $t(`waveforms.${track.waveform}`) }}</span>
+              </div>
+              <div v-if="track.ttsRate" class="flex items-center gap-1">
+                <TtsRateIcon
+                  class="w-[18px] h-[18px]"
+                  :class="{
+                    '[&>*]:fill-white': selectedTrackIndex === index,
+                  }" />
+                <span>{{ track.ttsRate }}</span>
+              </div>
+            </div>
+          </div>
         </div>
-        <span>{{ track.name }}</span>
       </div>
     </VueDraggable>
   </div>
