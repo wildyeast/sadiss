@@ -112,6 +112,12 @@ onMounted(async () => {
             </div>
 
             <div class="flex gap-3">
+              <!-- Start time -->
+              <div>
+                <span>{{ track.startTime }}</span>
+              </div>
+
+              <!-- Waveform -->
               <div class="flex gap-1">
                 <WaveformIcon
                   class="w-[21px]"
@@ -120,6 +126,8 @@ onMounted(async () => {
                   }" />
                 <span>{{ $t(`waveforms.${track.waveform}`) }}</span>
               </div>
+
+              <!-- TTS rate -->
               <div v-if="track.ttsRate" class="flex items-center gap-1">
                 <TtsRateIcon
                   class="w-[18px] h-[18px]"

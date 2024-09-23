@@ -13,4 +13,5 @@ export default interface Track {
   ttsFiles?: TtsFileDownloadInformation[]
   trackPerformanceId: string
   sortOrder: number
+  startTime: number
 }

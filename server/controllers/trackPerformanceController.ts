@@ -118,9 +118,9 @@ exports.setStartTime = async (req: Request, res: Response) => {
       return res.status(400).send({ error: 'Invalid input data' })
     }
 
-    await setStartTime(trackPerformanceId, startTime)
+    const trackPerformance = await setStartTime(trackPerformanceId, startTime)
 
-    res.status(200).send({ message: 'Start time updated' })
+    res.status(200).send({ message: 'Start time updated', trackPerformance })
   } catch (error) {
     if (error instanceof InvalidInputError) {
       return res.status(400).send({ error: error.message })

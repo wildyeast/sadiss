@@ -40,7 +40,7 @@ exports.getPerformanceWithTracks = async (req: Request, res: Response) => {
       const track = trackPerformance.track
       const trackPerformanceId = trackPerformance._id
       const sortOrder = trackPerformance.sortOrder
-      const startTime = trackPerformance.startTime
+      const startTime = trackPerformance.startTime || 0
 
       return { ...track, trackPerformanceId, sortOrder, startTime }
     })
