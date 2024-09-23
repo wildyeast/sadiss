@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import PlayIcon from "../assets/play.svg"
-import PauseIcon from "../assets/pause.svg"
-import ResetIcon from "../assets/reset.svg"
-
 import { ref, onMounted, onUnmounted, computed, watch } from "vue"
 import type { Track } from "../types"
 import { loadTrackForPlayback, startTrack, stopTrack } from "../api"
+import formatTime from "../utils/formatTime"
+import PlayIcon from "../assets/play.svg"
+import PauseIcon from "../assets/pause.svg"
+import ResetIcon from "../assets/reset.svg"
 
 const props = defineProps<{
   performanceId: string
@@ -80,12 +80,6 @@ const toggleShouldGoToNextTrack = () => {
 const progress = ref<number>(0)
 const currentChunkIndex = ref<number>(0)
 const totalChunks = ref<number>(0)
-
-const formatTime = (chunks: number) => {
-  const minutes = Math.floor(chunks / 60)
-  const seconds = chunks % 60
-  return `${minutes}.${seconds.toString().padStart(2, "0")}`
-}
 
 const currentChunkTimeFormatted = computed(() =>
   formatTime(currentChunkIndex.value)

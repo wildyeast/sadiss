@@ -7,7 +7,7 @@ export default {
       white: "#fff",
       secondary: "#5A5A5A",
       middlegrey: "#F5F5F5",
-      "input-border": "#C2C2C2",
+      silver: "#C2C2C2",
       "button-bg": "#2C2C2C",
     },
     extend: {

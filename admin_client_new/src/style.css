@@ -23,7 +23,7 @@ h1 {
 }
 
 input {
-  @apply w-full py-2 px-4 border-2 border-input-border bg-middlegrey;
+  @apply w-full py-2 px-4 border-2 border-silver bg-middlegrey;
 }
 
 .button-primary {

@@ -8,9 +8,11 @@ import {
   updateTrackPerformanceOrder,
 } from "../api"
 import ConnectedClientsList from "../components/ConnectedClientsList.vue"
+import PlayerControls from "../components/PlayerControls.vue"
+import formatTime from "../utils/formatTime"
 import WaveformIcon from "../assets/waveform.svg"
 import TtsRateIcon from "../assets/tts_rate.svg"
-import PlayerControls from "../components/PlayerControls.vue"
+import ClockIcon from "../assets/clock.svg"
 
 const props = defineProps<{ id: string }>()
 
@@ -44,9 +46,9 @@ const onSortOrderUpdate = async () => {
 }
 
 const handleTrackSelect = async (index: number) => {
-  selectedTrackLengthInChunks.value = -1
-
   if (selectedTrackIndex.value === index || !tracks.value) return
+
+  selectedTrackLengthInChunks.value = -1
 
   try {
     selectedTrackIndex.value = index
@@ -106,19 +108,24 @@ onMounted(async () => {
             <span class="drag-handle text-xl">☰</span>
           </div>
           <div class="space-y-2">
-            <div class="space-x-2">
+            <div class="space-x-2 text-md">
               <span>{{ index + 1 }}</span>
               <span>{{ track.name }}</span>
             </div>
 
             <div class="flex gap-3">
               <!-- Start time -->
-              <div>
-                <span>{{ track.startTime }}</span>
-              </div>
+              <button class="icon-and-label">
+                <ClockIcon
+                  class="w-[18px] h-[18px]"
+                  :class="{
+                    '[&>*]:stroke-white': selectedTrackIndex === index,
+                  }" />
+                <span>{{ formatTime(track.startTime) }}</span>
+              </button>
 
               <!-- Waveform -->
-              <div class="flex gap-1">
+              <div class="icon-and-label">
                 <WaveformIcon
                   class="w-[21px]"
                   :class="{
@@ -128,7 +135,7 @@ onMounted(async () => {
               </div>
 
               <!-- TTS rate -->
-              <div v-if="track.ttsRate" class="flex items-center gap-1">
+              <div v-if="track.ttsRate" class="icon-and-label">
                 <TtsRateIcon
                   class="w-[18px] h-[18px]"
                   :class="{
@@ -143,3 +150,9 @@ onMounted(async () => {
     </VueDraggable>
   </div>
 </template>
+
+<style scoped>
+.icon-and-label {
+  @apply flex gap-2 items-center text-silver text-sm;
+}
+</style>
