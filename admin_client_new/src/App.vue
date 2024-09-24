@@ -12,7 +12,9 @@ const route = useRoute()
     <RouterLink to="/" class="my-[30px]">
       <SadissLogo />
     </RouterLink>
-    <nav v-if="!route.meta.hideNavbar" class="text-sm grid grid-cols-3">
+    <nav
+      v-if="!route.meta.hideNavbar"
+      class="text-sm grid grid-cols-[1fr_1fr_1fr] w-full">
       <!-- Spacer for left column of grid -->
       <div />
 
