@@ -9,6 +9,7 @@ export default {
       middlegrey: "#F5F5F5",
       silver: "#C2C2C2",
       "button-bg": "#2C2C2C",
+      danger: "#FF0000",
     },
     extend: {
       fontFamily: {
