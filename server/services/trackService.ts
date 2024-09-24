@@ -107,7 +107,8 @@ export async function createTrack(
   partialFileInfo: { fileName: string; origName: string } | null,
   partialsCount: number,
   isPublic: boolean,
-  creator: Types.ObjectId
+  creator: Types.ObjectId,
+  trackLengthInChunks: number
 ) {
   const track = new Track({
     name,

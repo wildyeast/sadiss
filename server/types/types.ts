@@ -46,6 +46,7 @@ export interface TrackDocument extends Document {
   name: string
   chunks: string
   chunkFileName: string
+  trackLengthInChunks: number
   partialsCount: number
   mode: TrackMode
   notes: string

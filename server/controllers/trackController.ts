@@ -159,6 +159,7 @@ exports.uploadTrack = async (req: Request, res: Response) => {
     const waveform = req.body.waveform
     const ttsRate = req.body.ttsRate
     const isPublic = req.body.isPublic === 'true'
+    const trackLengthInChunks = chunks.length
 
     const track = await createTrack(
       filename,
@@ -172,7 +173,8 @@ exports.uploadTrack = async (req: Request, res: Response) => {
       partialFileInfo,
       partialsCount,
       isPublic,
-      req.user!.id
+      req.user!.id,
+      trackLengthInChunks
     )
 
     res.status(201).json(track)

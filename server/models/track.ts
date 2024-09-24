@@ -5,6 +5,7 @@ export const trackSchema = new Schema<TrackDocument>({
   name: { type: String, required: true },
   chunks: String,
   chunkFileName: String,
+  trackLengthInChunks: Number,
   partialsCount: Number,
   mode: { type: String, required: true },
   notes: String,
