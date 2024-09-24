@@ -37,29 +37,27 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="w-full">
-    <h1>{{ $t("track", 2) }}</h1>
-    <div v-if="loading" class="w-full pt-10 flex justify-center">
-      <p>{{ $t("loading") }}</p>
-    </div>
-    <div v-else>
-      <div v-if="tracks" class="list-container">
-        <div v-for="track in tracks" :key="track._id" class="list-entry">
-          <div class="flex justify-between">
-            <div class="flex gap-4">
-              <p>{{ track.name }}</p>
-              <p>{{ formatTime(track.trackLengthInChunks) }}</p>
-            </div>
-            <div v-if="track.notes">
-              <p>{{ track.notes }}</p>
-            </div>
-            <button @click="handleDeleteTrack(track._id)">
-              <TrashIcon />
-            </button>
+  <h1>{{ $t("track", 2) }}</h1>
+  <div v-if="loading" class="w-full flex justify-center">
+    {{ $t("loading") }}
+  </div>
+  <div v-else class="w-full">
+    <div v-if="tracks" class="list-container">
+      <div v-for="track in tracks" :key="track._id" class="list-entry">
+        <div class="flex justify-between">
+          <div class="flex gap-4">
+            <p>{{ track.name }}</p>
+            <p>{{ formatTime(track.trackLengthInChunks) }}</p>
           </div>
+          <div v-if="track.notes">
+            <p>{{ track.notes }}</p>
+          </div>
+          <button @click="handleDeleteTrack(track._id)">
+            <TrashIcon />
+          </button>
         </div>
       </div>
-      <ActionButtonLink to="/tracks/new" :text="$t('add_track')" />
     </div>
+    <ActionButtonLink to="/tracks/new" :text="$t('add_track')" />
   </div>
 </template>
