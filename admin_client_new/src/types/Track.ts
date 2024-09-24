@@ -14,4 +14,5 @@ export default interface Track {
   trackPerformanceId: string
   sortOrder: number
   startTime: number
+  trackLengthInChunks: number
 }
