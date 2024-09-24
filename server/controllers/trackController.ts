@@ -97,7 +97,7 @@ exports.getTracks = async (req: Request, res: Response) => {
   try {
     const allTracks = await Track.find(
       { $or: [{ isPublic: true }, { creator: req.user!.id }], deleted: { $ne: true } },
-      '_id name notes mode waveform ttsRate creator isPublic partialFile ttsFiles'
+      '_id name notes mode waveform ttsRate creator isPublic partialFile ttsFiles trackLengthInChunks'
     )
       .populate('creator', 'username') // Populate the 'creator' field with 'username'
       .lean()
