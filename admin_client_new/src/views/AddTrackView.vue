@@ -1,36 +1,46 @@
 <script setup lang="ts">
-import { computed, onMounted, reactive, ref, useTemplateRef } from "vue"
-import { useI18n } from "vue-i18n"
+import { computed, reactive, ref } from "vue"
 import { TtsFileDownloadInformation } from "../types"
+import FileUploadInput from "../components/FileUploadInput.vue"
+import { storeTrack } from "../api"
+import { useRouter } from "vue-router"
 
-const { t } = useI18n()
-
-const partialFileInput = useTemplateRef("partialFileInput")
-
-const partialsFileNameToDisplay = ref(t("partial_file_upload_no_file"))
+const router = useRouter()
 
 const formData = reactive({
-  title: "",
+  name: "",
   partialFile: null as File | null,
   isChoir: false,
-  ttsLanguages: "",
+  ttsFiles: {} as Record<number, Record<string, File>>,
+  notes: "",
+  waveform: "sine",
+  ttsRate: 1,
+  isPublic: false,
 })
 
-const handlePartialFileUpload = async (e: Event) => {
-  const input = e.target as HTMLInputElement
-  if (input.files && input.files.length > 0) {
-    formData.partialFile = input.files[0]
-    partialsFileNameToDisplay.value = formData.partialFile.name
-  } else {
-    formData.partialFile = null
-    partialsFileNameToDisplay.value = t("partial_file_upload_no_file")
+const handlePartialFileSelected = (file: File | null) => {
+  if (!file) {
+    return
   }
+  formData.partialFile = file
 }
 
-const triggerFileInputClick = () => {
-  partialFileInput.value?.click()
+// #region Text to Speech
+const handleTtsFileSelected = async (
+  file: File | null,
+  voice: number,
+  lang: string
+) => {
+  if (!file) {
+    return
+  }
+  if (!formData.ttsFiles[voice]) {
+    formData.ttsFiles[voice] = {}
+  }
+  formData.ttsFiles[voice][lang] = file
 }
 
+const ttsLanguages = ref("en-US, de-DE")
 const numberOfVoices = ref(1)
 
 const voiceLangCombinations = computed(() => {
@@ -38,7 +48,7 @@ const voiceLangCombinations = computed(() => {
   const allowedNumberOfVoices = formData.isChoir ? numberOfVoices.value : 1
   const combinations = []
   for (let i = 0; i < allowedNumberOfVoices; i++) {
-    for (const lang of formData.ttsLanguages.split(",")) {
+    for (const lang of ttsLanguages.value.split(",")) {
       const combination = <
         { voice: number; lang: string; file?: TtsFileDownloadInformation }
       >{
@@ -52,12 +62,58 @@ const voiceLangCombinations = computed(() => {
 
   return combinations
 })
+// #endregion
 
-onMounted(() => {
-  if (partialFileInput.value) {
-    partialFileInput.value.addEventListener("change", handlePartialFileUpload)
+// #region Store track
+const handleAddTrack = async () => {
+  try {
+    const data = createTrackData()
+    await storeTrack(data)
+    await router.push("/tracks")
+  } catch (error) {
+    console.error(error)
   }
-})
+}
+
+const createTrackData = () => {
+  const data = new FormData()
+  data.append("name", formData.name)
+  data.append("notes", formData.notes)
+  data.append("mode", formData.isChoir ? "choir" : "nonChoir")
+  data.append("waveform", formData.waveform)
+  data.append("ttsRate", formData.ttsRate.toString())
+  data.append("isPublic", formData.isPublic.toString())
+
+  if (formData.partialFile) {
+    const fileNameWithoutExtension = formData.partialFile.name.slice(
+      0,
+      formData.partialFile.name.lastIndexOf(".")
+    )
+    data.append(
+      "files",
+      formData.partialFile,
+      `partialfile_${fileNameWithoutExtension}`
+    )
+  }
+
+  for (const voice in formData.ttsFiles) {
+    for (const lang in formData.ttsFiles[voice]) {
+      const ttsFile = formData.ttsFiles[voice][lang]
+      const fileNameWithoutExtension = ttsFile.name.slice(
+        0,
+        ttsFile.name.lastIndexOf(".")
+      )
+      data.append(
+        "files",
+        ttsFile,
+        `ttsfile_${voice}_${lang}_${fileNameWithoutExtension}`
+      )
+    }
+  }
+
+  return data
+}
+// #endregion
 </script>
 <template>
   <div>
@@ -67,29 +123,75 @@ onMounted(() => {
       <!-- Title -->
       <div class="label-and-input">
         <label for="title">{{ $t("title") }}</label>
-        <input type="text" id="title" v-model="formData.title" class="input" />
+        <input type="text" id="title" v-model="formData.name" />
       </div>
 
       <!-- Partial File Upload -->
-      <div class="label-and-input">
+      <div class="space-y-2">
         <p>{{ $t("partial_file") }}</p>
-        <input
-          ref="partialFileInput"
-          class="hidden"
-          type="file"
-          @change="handlePartialFileUpload($event)"
-          accept="*.txt" />
-
-        <span id="file-name">
-          {{ partialsFileNameToDisplay }}
-        </span>
-        <button @click.prevent="triggerFileInputClick" class="button-primary">
-          {{ $t("partial_file_upload_button") }}
-        </button>
+        <FileUploadInput
+          :buttonText="$t('partial_file_upload_button')"
+          accept="*.txt"
+          @fileSelected="handlePartialFileSelected" />
       </div>
 
       <!-- Text to Speech -->
-      <p>{{ $t("text_to_speech") }}</p>
+      <div class="space-y-2">
+        <p>{{ $t("text_to_speech") }}</p>
+
+        <!-- Languages -->
+        <div class="label-and-input">
+          <label for="ttsLanguages">{{ $t("languages") }}</label>
+          <input
+            type="text"
+            id="ttsLanguages"
+            v-model="ttsLanguages"
+            placeholder="e.g. en-US" />
+        </div>
+
+        <!-- Number of Voices -->
+        <!-- TODO -->
+
+        <!-- TTS File Upload -->
+        <div class="space-y-2">
+          <div
+            v-for="(combination, index) in voiceLangCombinations"
+            :key="index">
+            <div class="label-and-input mb-4">
+              <label :for="`ttsFile-${combination.voice}-${combination.lang}`">
+                {{ $t("voice") }} {{ combination.voice + 1 }} -
+                {{ combination.lang }}
+              </label>
+              <FileUploadInput
+                :buttonText="$t('tts_file_upload_button')"
+                accept="*.srt, *.txt"
+                @fileSelected="
+                  handleTtsFileSelected(
+                    $event,
+                    combination.voice,
+                    combination.lang
+                  )
+                " />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      <div>
+        <label for="notes">{{ $t("notes") }}</label>
+        <textarea id="notes" v-model="formData.notes" class="input" rows="4" />
+      </div>
+
+      <!-- Submit button -->
+      <div class="flex justify-end">
+        <button
+          type="submit"
+          class="button-primary"
+          @click.prevent="handleAddTrack">
+          {{ $t("add_track") }}
+        </button>
+      </div>
     </form>
   </div>
 </template>

@@ -6,3 +6,12 @@ export async function getTracks() {
 
   return response.data.tracks
 }
+
+export async function storeTrack(track: FormData) {
+  const response = await apiClient.post<{ track: Track }>(
+    "/api/track/create",
+    track
+  )
+
+  return response.data!.track
+}

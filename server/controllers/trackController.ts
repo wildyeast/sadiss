@@ -156,6 +156,9 @@ exports.uploadTrack = async (req: Request, res: Response) => {
     const isPublic = req.body.isPublic === 'true'
     const trackLengthInChunks = chunks.length
 
+    console.log('Added track has length: ', trackLengthInChunks)
+    console.log('Chunks: ', chunks)
+
     const track = await createTrack(
       filename,
       name,
@@ -200,11 +203,15 @@ const validateInputsForUpload = (req: Request) => {
 }
 
 const deleteFilesIfValidationFailed = (req: Request) => {
-  if (Array.isArray(req.files)) {
-    const uploadsDir = path.join(__dirname, `../${process.env.UPLOADS_DIR}`)
-    req.files.forEach((file) => {
-      fs.unlinkSync(`${uploadsDir}/${file.filename}`)
-    })
+  try {
+    if (Array.isArray(req.files)) {
+      const uploadsDir = path.join(__dirname, `../${process.env.UPLOADS_DIR}`)
+      req.files.forEach((file) => {
+        fs.unlinkSync(`${uploadsDir}/${file.filename}`)
+      })
+    }
+  } catch (err) {
+    logger.error('Failed deleting files with:', err)
   }
 }
 
