@@ -15,3 +15,11 @@ export async function storeTrack(track: FormData) {
 
   return response.data!.track
 }
+
+export async function deleteTrack(trackId: string) {
+  const response = await apiClient.post<{ message: string }>(
+    `/api/track/delete/${trackId}`
+  )
+
+  return response.data.message
+}
