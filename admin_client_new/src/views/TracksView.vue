@@ -56,6 +56,15 @@ onMounted(async () => {
               <TrashIcon />
             </button>
           </div>
+        </div>
+        <RouterLink
+          to="/tracks/new"
+          class="button flex flex-col items-center my-6 gap-4">
+          <PlusIcon />
+          <span class="text-lg text-secondary">{{
+            $t("add_track_to_performance")
+          }}</span>
+        </RouterLink>
       </div>
     </div>
   </div>
