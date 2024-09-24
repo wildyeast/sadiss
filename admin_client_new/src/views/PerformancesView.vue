@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { onMounted, Ref, ref } from "vue"
-import ConnectedClientsList from "../components/ConnectedClientsList.vue"
 import { SadissPerformance } from "../types"
 import { getPerformances } from "../api"
 
@@ -12,7 +11,6 @@ onMounted(async () => {
 </script>
 
 <template>
-  <ConnectedClientsList />
   <h1>{{ $t("performances") }}</h1>
   <div class="list-container">
     <RouterLink
