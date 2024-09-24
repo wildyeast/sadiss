@@ -4,6 +4,7 @@ import { TtsFileDownloadInformation } from "../types"
 import FileUploadInput from "../components/FileUploadInput.vue"
 import { storeTrack } from "../api"
 import { useRouter } from "vue-router"
+import IconCross from "../assets/cross.svg"
 
 const router = useRouter()
 
@@ -117,7 +118,14 @@ const createTrackData = () => {
 </script>
 <template>
   <div class="pb-10">
-    <h1>{{ $t("add_track") }}</h1>
+    <div class="relative">
+      <h1>{{ $t("add_track") }}</h1>
+      <RouterLink
+        :to="{ name: 'Tracks' }"
+        class="absolute top-[1px] right-0 pl-2 py-1">
+        <IconCross class="h-[20px]" />
+      </RouterLink>
+    </div>
 
     <form class="text-secondary space-y-6">
       <!-- Choir mode -->
