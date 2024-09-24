@@ -5,7 +5,7 @@ import { Track } from "../types"
 import { formatTime } from "../utils/formatTime"
 import { useI18n } from "vue-i18n"
 import TrashIcon from "../assets/trash.svg"
-import PlusIcon from "../assets/plus.svg"
+import ActionButtonLink from "../components/ActionButtonLink.vue"
 
 const { t } = useI18n()
 
@@ -59,12 +59,7 @@ onMounted(async () => {
           </div>
         </div>
       </div>
-      <RouterLink
-        to="/tracks/new"
-        class="button flex flex-col items-center my-6 gap-4">
-        <PlusIcon />
-        <span class="text-lg text-secondary">{{ $t("add_track") }}</span>
-      </RouterLink>
+      <ActionButtonLink to="/tracks/new" :text="$t('add_track')" />
     </div>
   </div>
 </template>
