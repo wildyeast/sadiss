@@ -1,3 +1,3 @@
 <template>
-  <p>Test</p>
+  <h1>{{ $t("dashboard") }}</h1>
 </template>

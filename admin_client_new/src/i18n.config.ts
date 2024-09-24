@@ -7,6 +7,7 @@ const i18n = createI18n({
   messages: {
     en: {
       created_by: "Created by",
+      dashboard: "Dashboard",
       login: "Login",
       performances: "Performances",
       track: "Track | Tracks",
