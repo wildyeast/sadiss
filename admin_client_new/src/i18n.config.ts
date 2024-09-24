@@ -10,7 +10,12 @@ const i18n = createI18n({
       created_by: "Created by",
       dashboard: "Dashboard",
       login: "Login",
+      partial_file: "Partials File",
+      partial_file_upload_button: "Select Partials File",
+      partial_file_upload_no_file: "No file selected",
       performances: "Performances",
+      text_to_speech: "Text to Speech",
+      title: "Title",
       track: "Track | Tracks",
       waveforms: {
         sine: "Sine",
