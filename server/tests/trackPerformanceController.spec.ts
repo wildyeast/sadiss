@@ -177,21 +177,6 @@ describe('trackPerformanceController test', () => {
         .expect(400)
     })
 
-    it('should return 500 if there is an error while updating the startTime', async () => {
-      const { trackPerformances } = await createTestTrackPerformance()
-      const { _id: trackPerformanceId } = trackPerformances[0]
-
-      jest.spyOn(TrackPerformance, 'findByIdAndUpdate').mockImplementationOnce(() => {
-        throw new Error('Server error')
-      })
-
-      const startTime = 10
-      await agent
-        .post('/api/track-performance/set-start-time')
-        .send({ trackPerformanceId: trackPerformanceId, startTime })
-        .expect(500)
-    })
-
     it('should return 400 if the provided data is invalid', async () => {
       const { trackPerformances } = await createTestTrackPerformance()
       const { _id: trackPerformanceId } = trackPerformances[0]

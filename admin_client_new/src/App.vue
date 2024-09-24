@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { RouterLink, useRoute } from "vue-router"
 import SadissLogo from "./assets/sadiss_logo.svg"
+import { ModalsContainer } from "vue-final-modal"
 
 const route = useRoute()
 </script>
@@ -30,4 +31,5 @@ const route = useRoute()
   <main class="flex flex-col items-center">
     <RouterView />
   </main>
+  <ModalsContainer />
 </template>

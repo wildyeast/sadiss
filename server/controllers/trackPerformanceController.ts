@@ -5,7 +5,7 @@ import { Types } from 'mongoose'
 import { isValidObjectId } from 'mongoose'
 import { unloadTrackFromActivePerformance } from '../services/activePerformanceService'
 import { setStartTime } from '../services/trackPerformanceService'
-import { InvalidInputError } from '../errors'
+import { InvalidInputError, ProcessingError } from '../errors'
 
 exports.addTrackToPerformance = async (req: Request, res: Response) => {
   try {
@@ -114,8 +114,12 @@ exports.setStartTime = async (req: Request, res: Response) => {
   try {
     const { trackPerformanceId, startTime } = req.body
 
-    if (!trackPerformanceId || !startTime || !isValidObjectId(trackPerformanceId) || !Number.isInteger(startTime)) {
-      return res.status(400).send({ error: 'Invalid input data' })
+    if (!trackPerformanceId || !isValidObjectId(trackPerformanceId)) {
+      return res.status(400).send({ error: 'Please provide a valid trackPerformanceId' })
+    }
+
+    if (!startTime || !Number.isInteger(startTime)) {
+      return res.status(400).send({ error: 'Please provide a valid startTime' })
     }
 
     const trackPerformance = await setStartTime(trackPerformanceId, startTime)
@@ -125,7 +129,10 @@ exports.setStartTime = async (req: Request, res: Response) => {
     if (error instanceof InvalidInputError) {
       return res.status(400).send({ error: error.message })
     }
-    res.status(500).send({ error: 'Server error' })
+    if (error instanceof ProcessingError) {
+      return res.status(500).send({ error: error.message })
+    }
+    return res.status(500).send({ error: 'Server error' })
   }
 }
 

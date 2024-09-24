@@ -9,10 +9,11 @@ import {
 } from "../api"
 import ConnectedClientsList from "../components/ConnectedClientsList.vue"
 import PlayerControls from "../components/PlayerControls.vue"
-import formatTime from "../utils/formatTime"
+import { formatTime } from "../utils/formatTime"
 import WaveformIcon from "../assets/waveform.svg"
 import TtsRateIcon from "../assets/tts_rate.svg"
 import ClockIcon from "../assets/clock.svg"
+import ModalSetStartTime from "../components/modals/ModalSetStartTime.vue"
 
 const props = defineProps<{ id: string }>()
 
@@ -61,6 +62,11 @@ const handleTrackSelect = async (index: number) => {
     selectedTrackIndex.value = -1
     selectedTrackLengthInChunks.value = -1
   }
+}
+
+const setStartTimeModalDisplayed = ref(false)
+const showModalSetStartTime = () => {
+  setStartTimeModalDisplayed.value = true
 }
 
 onMounted(async () => {
@@ -115,7 +121,7 @@ onMounted(async () => {
 
             <div class="flex gap-3">
               <!-- Start time -->
-              <button class="icon-and-label">
+              <button class="icon-and-label" @click="showModalSetStartTime()">
                 <ClockIcon
                   class="w-[18px] h-[18px]"
                   :class="{
@@ -148,6 +154,12 @@ onMounted(async () => {
         </div>
       </div>
     </VueDraggable>
+    <ModalSetStartTime
+      v-if="tracks && selectedTrackIndex > -1"
+      v-model="setStartTimeModalDisplayed"
+      @confirm="setStartTimeModalDisplayed = false"
+      :trackperformance-id="tracks[selectedTrackIndex].trackPerformanceId"
+      :title="`Set start time for track ${tracks[selectedTrackIndex].name}`" />
   </div>
 </template>
 

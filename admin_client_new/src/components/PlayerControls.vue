@@ -2,7 +2,7 @@
 import { ref, onMounted, onUnmounted, computed, watch } from "vue"
 import type { Track } from "../types"
 import { loadTrackForPlayback, startTrack, stopTrack } from "../api"
-import formatTime from "../utils/formatTime"
+import { formatTime } from "../utils/formatTime"
 import PlayIcon from "../assets/play.svg"
 import PauseIcon from "../assets/pause.svg"
 import ResetIcon from "../assets/reset.svg"

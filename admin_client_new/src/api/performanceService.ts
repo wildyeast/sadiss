@@ -29,3 +29,13 @@ export const updateTrackPerformanceOrder = async (
     trackPerformances,
   })
 }
+
+export const setStartTime = async (
+  trackPerformanceId: string,
+  startTime: number
+) => {
+  return await apiClient.post("/api/track-performance/set-start-time", {
+    trackPerformanceId,
+    startTime,
+  })
+}

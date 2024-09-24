@@ -9,11 +9,12 @@ describe('trackPerformanceService test', () => {
       const { trackPerformances } = await createTestTrackPerformance()
       const { _id: trackPerformanceId } = trackPerformances[0]
 
-      const startTime = 123
+      const startTime = 4
       const returnedUpdatedTrackPerformance = await setStartTime(trackPerformanceId, startTime)
 
       const updatedTrackPerformance = await TrackPerformance.findById(trackPerformanceId)
       expect(updatedTrackPerformance!.startTime).toBe(startTime)
+      expect(returnedUpdatedTrackPerformance!.startTime).toBe(startTime)
       expect(returnedUpdatedTrackPerformance!._id.toString()).toBe(trackPerformanceId)
     })
   })
@@ -31,5 +32,30 @@ describe('trackPerformanceService test', () => {
 
     const updatedTrackPerformance = await TrackPerformance.findById(trackPerformanceId)
     expect(updatedTrackPerformance!.startTime).toBe(0)
+  })
+
+  it('throws an InvalidInputError if the provided startTime is greater than the track length and does not set it', async () => {
+    const { trackPerformances } = await createTestTrackPerformance()
+    const { _id: trackPerformanceId } = trackPerformances[0]
+
+    const startTime = 1000
+    try {
+      await setStartTime(trackPerformanceId, startTime)
+    } catch (error: any) {
+      expect(error).toBeInstanceOf(InvalidInputError)
+    }
+
+    const updatedTrackPerformance = await TrackPerformance.findById(trackPerformanceId)
+    expect(updatedTrackPerformance!.startTime).toBe(0)
+  })
+
+  it('throws an InvalidInputError if the provided trackPerformanceId does not exist', async () => {
+    const { _id: trackId } = await createTestTrack()
+    const startTime = 4
+    try {
+      await setStartTime(trackId, startTime)
+    } catch (error: any) {
+      expect(error).toBeInstanceOf(InvalidInputError)
+    }
   })
 })
