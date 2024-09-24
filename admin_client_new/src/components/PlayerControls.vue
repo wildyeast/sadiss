@@ -215,9 +215,11 @@ watch(
       </button>
       <button
         @click="toggleShouldGoToNextTrack"
+        class="text-danger"
         :class="{ 'text-highlight': shouldGoToNextTrack }"
         title="Toogle auto-play">
-        <font-awesome-icon icon="fa-forward-fast" size="lg" />
+        <!-- <font-awesome-icon icon="fa-forward-fast" size="lg" /> -->
+        Auto play
       </button>
     </div>
     <div class="w-full px-5">
