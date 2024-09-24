@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, Ref } from "vue"
+import { computed, onMounted, ref, Ref, watch } from "vue"
 import { VueDraggable } from "vue-draggable-plus"
-import { SadissPerformance, TrackPerformanceIdAndSortOrder } from "../types"
+import {
+  SadissPerformance,
+  Track,
+  TrackPerformanceIdAndSortOrder,
+} from "../types"
 import {
   getPerformanceWithTracks,
   loadTrackForPlayback,
@@ -18,7 +22,7 @@ import ModalSetStartTime from "../components/modals/ModalSetStartTime.vue"
 const props = defineProps<{ id: string }>()
 
 const performance: Ref<SadissPerformance | null> = ref(null)
-const tracks = computed(() => performance.value?.tracks)
+const tracks: Ref<Track[] | null> = ref(null)
 
 const selectedTrackIndex = ref(-1)
 const selectedTrackLengthInChunks = ref(-1)
@@ -29,10 +33,17 @@ const nextTrack = computed(() => {
 })
 
 const onSortOrderUpdate = async () => {
+  console.log(tracks.value)
   if (!tracks.value) return
 
   const trackPerformanceIdsAndSortOrders: TrackPerformanceIdAndSortOrder[] = []
+
+  for (const track of tracks.value) {
+    console.log(track)
+  }
+
   for (const [index, track] of tracks.value.entries()) {
+    console.log(track)
     trackPerformanceIdsAndSortOrders.push({
       trackPerformanceId: track.trackPerformanceId as string,
       sortOrder: index + 1,
@@ -58,7 +69,6 @@ const handleTrackSelect = async (index: number) => {
       props.id
     )
   } catch (error) {
-    console.error(error)
     selectedTrackIndex.value = -1
     selectedTrackLengthInChunks.value = -1
   }
@@ -69,11 +79,19 @@ const showModalSetStartTime = () => {
   setStartTimeModalDisplayed.value = true
 }
 
+watch(
+  () => performance.value,
+  newValue => {
+    if (newValue) {
+      tracks.value = newValue.tracks
+    }
+  }
+)
+
 onMounted(async () => {
   try {
     const performanceId = props.id as string
     performance.value = await getPerformanceWithTracks(performanceId)
-    console.log(performance)
   } catch (error) {
     console.error(error)
   }
@@ -106,7 +124,7 @@ onMounted(async () => {
       <div
         class="list-entry"
         :class="{ 'bg-secondary text-white': selectedTrackIndex === index }"
-        v-for="(track, index) of performance.tracks"
+        v-for="(track, index) of tracks"
         :key="track._id"
         @click="handleTrackSelect(index)">
         <div class="flex gap-3">
