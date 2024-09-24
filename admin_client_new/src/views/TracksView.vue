@@ -58,13 +58,13 @@ onMounted(async () => {
             </button>
           </div>
         </div>
-        <RouterLink
-          to="/tracks/new"
-          class="button flex flex-col items-center my-6 gap-4">
-          <PlusIcon />
-          <span class="text-lg text-secondary">{{ $t("add_track") }}</span>
-        </RouterLink>
       </div>
+      <RouterLink
+        to="/tracks/new"
+        class="button flex flex-col items-center my-6 gap-4">
+        <PlusIcon />
+        <span class="text-lg text-secondary">{{ $t("add_track") }}</span>
+      </RouterLink>
     </div>
   </div>
 </template>
