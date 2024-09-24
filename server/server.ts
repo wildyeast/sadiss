@@ -1,6 +1,6 @@
 // Code in part taken from https://www.pubnub.com/blog/nodejs-websocket-programming-examples/
 import express from 'express'
-import { Message } from './types/types'
+import { Message, TrackDocument } from './types/types'
 import * as dotenv from 'dotenv'
 import { passport } from './auth'
 import { Server } from 'ws'
@@ -10,6 +10,9 @@ import { startWebSocketServer } from './services/webSocketServerService'
 import fs from 'fs'
 import { logger } from './tools'
 import { errorHandler } from './middlewares/errorHandler'
+import { readAndParseChunkFile } from './services/fileService'
+import { ProcessingError } from './errors'
+import { Track } from './models'
 
 const cors = require('cors')
 const uuid = require('uuid')
@@ -124,4 +127,29 @@ app.use((req, res, next) => {
 app.use('/', routes).use(errorHandler)
 app.use((req, res) => res.status(404))
 
+// IIFE to make sure all tracks have set trackLengthInChunks
+;(async () => {
+  // Get all tracks and make sure trackLength is set
+  const tracks = await Track.find({ trackLengthInChunks: { $exists: false } })
+  for (const track of tracks) {
+    await setTrackLength(track)
+  }
+})()
+
 module.exports = { app, server, wss }
+
+async function setTrackLength(track: TrackDocument) {
+  let trackLengthInChunks = track.trackLengthInChunks
+
+  if (!trackLengthInChunks) {
+    const chunks = await readAndParseChunkFile(track)
+    if (!chunks) {
+      throw new ProcessingError('Error loading track')
+    }
+
+    trackLengthInChunks = chunks.length
+    await Track.findByIdAndUpdate(track._id, { trackLengthInChunks })
+  }
+
+  return trackLengthInChunks
+}

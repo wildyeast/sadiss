@@ -14,7 +14,7 @@ export async function setStartTime(trackPerformanceId: string, startTime: number
     throw new InvalidInputError('trackPerformanceId does not exist')
   }
 
-  const trackLengthInChunks = await getOrSetTrackLength(trackPerformance.track)
+  const trackLengthInChunks = trackPerformance.track.trackLengthInChunks
 
   if (trackLengthInChunks < startTime) {
     throw new InvalidInputError('startTime cannot be greater than track length')
@@ -24,20 +24,4 @@ export async function setStartTime(trackPerformanceId: string, startTime: number
   await trackPerformance.save()
 
   return trackPerformance
-}
-
-async function getOrSetTrackLength(track: TrackDocument) {
-  let trackLengthInChunks = track.trackLengthInChunks
-
-  if (!trackLengthInChunks) {
-    const chunks = await readAndParseChunkFile(track)
-    if (!chunks) {
-      throw new ProcessingError('Error loading track')
-    }
-
-    trackLengthInChunks = chunks.length
-    await Track.findByIdAndUpdate(track._id, { trackLengthInChunks })
-  }
-
-  return trackLengthInChunks
 }
