@@ -116,10 +116,34 @@ const createTrackData = () => {
 // #endregion
 </script>
 <template>
-  <div>
+  <div class="pb-10">
     <h1>{{ $t("add_track") }}</h1>
 
     <form class="text-secondary space-y-6">
+      <!-- Choir mode -->
+      <div class="flex gap-2">
+        <div>
+          <input type="checkbox" id="isChoir" v-model="formData.isChoir" />
+        </div>
+        <div class="flex flex-col">
+          <label for="isChoir" class="text-black">{{ $t("choir_mode") }}</label>
+          <span>{{ $t("choir_mode_description") }}</span>
+        </div>
+      </div>
+
+      <!-- Public track -->
+      <div class="flex gap-2">
+        <div>
+          <input type="checkbox" id="isPublic" v-model="formData.isPublic" />
+        </div>
+        <div class="flex flex-col">
+          <label for="isPublic" class="text-black">{{
+            $t("public_track")
+          }}</label>
+          <span>{{ $t("public_track_description") }}</span>
+        </div>
+      </div>
+
       <!-- Title -->
       <div class="label-and-input">
         <label for="title">{{ $t("title") }}</label>
@@ -133,6 +157,17 @@ const createTrackData = () => {
           :buttonText="$t('partial_file_upload_button')"
           accept="*.txt"
           @fileSelected="handlePartialFileSelected" />
+      </div>
+
+      <!-- Waveform -->
+      <div class="label-and-input">
+        <label for="waveform">{{ $t("waveform") }}</label>
+        <select id="waveform" v-model="formData.waveform" class="input">
+          <option value="sine">{{ $t("waveforms.sine") }}</option>
+          <option value="square">{{ $t("waveforms.square") }}</option>
+          <option value="sawtooth">{{ $t("waveforms.sawtooth") }}</option>
+          <option value="triangle">{{ $t("waveforms.triangle") }}</option>
+        </select>
       </div>
 
       <!-- Text to Speech -->
