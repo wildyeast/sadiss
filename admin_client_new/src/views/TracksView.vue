@@ -38,7 +38,7 @@ onMounted(async () => {
     <div v-if="tracks" class="list-container">
       <div v-for="track in tracks" :key="track._id" class="list-entry">
         <div class="flex justify-between">
-          <div class="flex">
+          <div class="flex gap-4">
             <p>{{ track.name }}</p>
             <p>{{ formatTime(track.trackLengthInChunks) }}</p>
           </div>

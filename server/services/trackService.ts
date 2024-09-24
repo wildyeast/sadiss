@@ -128,7 +128,8 @@ export async function createTrack(
     ttsRate,
     ttsFiles,
     creator,
-    isPublic
+    isPublic,
+    trackLengthInChunks
   })
 
   if (partialFileInfo) {
