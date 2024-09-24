@@ -9,8 +9,8 @@ const loadTracks = async () => {
   tracks.value = await getTracks()
 }
 
-onMounted(() => {
-  loadTracks()
+onMounted(async () => {
+  await loadTracks()
 })
 </script>
 
