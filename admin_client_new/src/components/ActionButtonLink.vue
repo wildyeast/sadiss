@@ -1,8 +1,9 @@
 <script setup lang="ts">
+import { RouteLocationRaw } from "vue-router"
 import PlusIcon from "../assets/plus.svg"
 
 defineProps<{
-  to: string
+  to: RouteLocationRaw
   text: string
 }>()
 </script>

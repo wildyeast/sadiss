@@ -6,6 +6,7 @@ const i18n = createI18n({
   globalInjection: true,
   messages: {
     en: {
+      add_performance: "Add Performance",
       add_track: "Add Track",
       add_track_to_performance: "Add Track to Performance",
       choir_mode: "Choir Mode",

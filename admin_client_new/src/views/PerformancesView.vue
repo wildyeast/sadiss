@@ -2,6 +2,7 @@
 import { onMounted, Ref, ref } from "vue"
 import { SadissPerformance } from "../types"
 import { getPerformances } from "../api"
+import ActionButtonLink from "../components/ActionButtonLink.vue"
 
 const performances: Ref<SadissPerformance[]> = ref([])
 
@@ -31,4 +32,5 @@ onMounted(async () => {
       </div>
     </RouterLink>
   </div>
+  <ActionButtonLink to="/performances/new" :text="$t('add_performance')" />
 </template>
