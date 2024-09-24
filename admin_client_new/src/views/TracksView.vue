@@ -4,10 +4,17 @@ import { getTracks, deleteTrack } from "../api"
 import { Track } from "../types"
 import { formatTime } from "../utils/formatTime"
 import TrashIcon from "../assets/trash.svg"
+import { useI18n } from "vue-i18n"
+
+const { t } = useI18n()
 
 const tracks: Ref<Track[]> = ref([])
 
 const handleDeleteTrack = async (trackId: string) => {
+  if (!confirm(t("confirm_delete_track"))) {
+    return
+  }
+
   try {
     await deleteTrack(trackId)
     tracks.value = tracks.value.filter(track => track._id !== trackId)

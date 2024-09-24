@@ -7,6 +7,7 @@ const i18n = createI18n({
   messages: {
     en: {
       add_track: "Add Track",
+      confirm_delete_track: "Are you sure you want to delete this track?",
       created_by: "Created by",
       dashboard: "Dashboard",
       languages: "Languages",
