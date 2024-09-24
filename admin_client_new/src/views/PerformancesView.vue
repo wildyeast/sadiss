@@ -22,7 +22,7 @@ onMounted(async () => {
       }"
       v-for="performance of performances"
       :key="performance._id"
-      class="list-entry bg-red">
+      class="list-entry">
       <div class="flex justify-between">
         <span>{{ performance.name }}</span>
         <span>{{ $t("created_by") }}: {{ performance.creator.username }}</span>
