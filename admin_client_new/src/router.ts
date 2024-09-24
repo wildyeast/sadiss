@@ -35,7 +35,7 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/tracks/add",
+    path: "/tracks/new",
     name: "AddTrack",
     component: AddTrackView,
     meta: { requiresAuth: true },
