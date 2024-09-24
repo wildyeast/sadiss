@@ -3,8 +3,9 @@ import { onMounted, ref, Ref } from "vue"
 import { getTracks, deleteTrack } from "../api"
 import { Track } from "../types"
 import { formatTime } from "../utils/formatTime"
-import TrashIcon from "../assets/trash.svg"
 import { useI18n } from "vue-i18n"
+import TrashIcon from "../assets/trash.svg"
+import PlusIcon from "../assets/plus.svg"
 
 const { t } = useI18n()
 
