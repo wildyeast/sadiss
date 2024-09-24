@@ -17,6 +17,7 @@ import {
   createTrack,
   createTrackZip,
   getTrackDataForDownload,
+  getTracks,
   loadTrackForPlayback,
   uploadTrackFromJson
 } from '../services/trackService'
@@ -95,13 +96,7 @@ exports.deleteTrack = async (req: Request, res: Response) => {
 
 exports.getTracks = async (req: Request, res: Response) => {
   try {
-    const allTracks = await Track.find(
-      { $or: [{ isPublic: true }, { creator: req.user!.id }], deleted: { $ne: true } },
-      '_id name notes mode waveform ttsRate creator isPublic partialFile ttsFiles trackLengthInChunks'
-    )
-      .populate('creator', 'username') // Populate the 'creator' field with 'username'
-      .lean()
-
+    const allTracks = await getTracks(req.user!.id)
     res.json({ tracks: allTracks })
   } catch (err) {
     res.status(500).json({ Error: 'Failed fetching tracks.' })

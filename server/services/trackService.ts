@@ -16,6 +16,15 @@ import { TrackDocument, TTSFileObject } from '../types/types'
 import FormData from 'form-data'
 import axios from 'axios'
 
+export async function getTracks(creatorId: Types.ObjectId) {
+  return await Track.find(
+    { $or: [{ isPublic: true }, { creator: creatorId }], deleted: { $ne: true } },
+    '_id name notes mode waveform ttsRate creator isPublic partialFile ttsFiles trackLengthInChunks'
+  )
+    .populate('creator', 'username') // Populate the 'creator' field with 'username'
+    .lean()
+}
+
 export async function loadTrackForPlayback(trackId: string, performanceId: Types.ObjectId) {
   if (!isValidObjectId(trackId)) {
     throw new InvalidInputError('Invalid trackId provided.')
