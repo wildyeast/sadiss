@@ -7,12 +7,14 @@ const i18n = createI18n({
   messages: {
     en: {
       add_track: "Add Track",
+      add_track_to_performance: "Add Track to Performance",
       choir_mode: "Choir Mode",
       choir_mode_description: "Track is for choirs",
       confirm_delete_track: "Are you sure you want to delete this track?",
       created_by: "Created by",
       dashboard: "Dashboard",
       languages: "Languages",
+      loading: "Loading...",
       login: "Login",
       no_file_selected: "No file selected",
       notes: "Comments",
