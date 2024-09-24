@@ -31,5 +31,8 @@ onMounted(async () => {
         </div>
       </button>
     </div>
+    <RouterLink to="/tracks/new" class="button">
+      {{ $t("add_track") }}
+    </RouterLink>
   </div>
 </template>

@@ -6,6 +6,7 @@ const i18n = createI18n({
   globalInjection: true,
   messages: {
     en: {
+      add_track: "Add Track",
       created_by: "Created by",
       dashboard: "Dashboard",
       login: "Login",
