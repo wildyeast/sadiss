@@ -156,9 +156,6 @@ exports.uploadTrack = async (req: Request, res: Response) => {
     const isPublic = req.body.isPublic === 'true'
     const trackLengthInChunks = chunks.length
 
-    console.log('Added track has length: ', trackLengthInChunks)
-    console.log('Chunks: ', chunks)
-
     const track = await createTrack(
       filename,
       name,
