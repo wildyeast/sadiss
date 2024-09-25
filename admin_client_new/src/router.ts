@@ -7,6 +7,7 @@ import TracksView from "./views/TracksView.vue"
 import { isUserLoggedIn } from "./api/authService"
 import AddTrackView from "./views/AddTrackView.vue"
 import AddPerformanceView from "./views/AddPerformanceView.vue"
+import AddTracksToPerformanceView from "./views/AddTracksToPerformanceView.vue"
 
 const routes = [
   { path: "/", name: "Dashboard", component: DashboardView },
@@ -29,7 +30,7 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
-    path: "/performance/:id",
+    path: "/performance/:performanceId",
     name: "PerformanceDetail",
     component: PerformanceDetailView,
     meta: { requiresAuth: true },
@@ -46,6 +47,13 @@ const routes = [
     name: "AddTrack",
     component: AddTrackView,
     meta: { requiresAuth: true },
+  },
+  {
+    path: "/performance/:performanceId/add-tracks",
+    name: "AddTracksToPerformance",
+    component: AddTracksToPerformanceView,
+    meta: { requiresAuth: true },
+    props: true,
   },
 ]
 

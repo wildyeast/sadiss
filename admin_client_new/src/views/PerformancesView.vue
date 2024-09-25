@@ -22,7 +22,7 @@ onMounted(async () => {
       <RouterLink
         :to="{
           name: 'PerformanceDetail',
-          params: { id: performance._id },
+          params: { performanceId: performance._id },
         }"
         v-for="performance of performances"
         :key="performance._id"

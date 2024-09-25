@@ -39,3 +39,22 @@ export const setStartTime = async (
     startTime,
   })
 }
+
+export const addTracksToPerformance = async (
+  performanceId: string,
+  trackIds: string[]
+) => {
+  // TODO: Adjust endpoint so it can take multiple trackIds
+  await apiClient.post("/api/add-tracks-to-performance", {
+    trackIds,
+    performanceId,
+  })
+}
+
+export const deleteTrackFromPerformance = async (
+  trackPerformanceId: string
+) => {
+  await apiClient.post("/api/track-performance/delete", {
+    trackPerformanceId,
+  })
+}

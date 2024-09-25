@@ -7,6 +7,7 @@ import {
   TrackPerformanceIdAndSortOrder,
 } from "../types"
 import {
+  deleteTrackFromPerformance,
   getPerformanceWithTracks,
   loadTrackForPlayback,
   updateTrackPerformanceOrder,
@@ -17,9 +18,14 @@ import { formatTime } from "../utils/formatTime"
 import WaveformIcon from "../assets/waveform.svg"
 import TtsRateIcon from "../assets/tts_rate.svg"
 import ClockIcon from "../assets/clock.svg"
+import IconTrash from "../assets/trash.svg"
 import ModalSetStartTime from "../components/modals/ModalSetStartTime.vue"
+import ActionButtonLink from "../components/ActionButtonLink.vue"
+import { useI18n } from "vue-i18n"
 
-const props = defineProps<{ id: string }>()
+const { t } = useI18n()
+
+const props = defineProps<{ performanceId: string }>()
 
 const performance: Ref<SadissPerformance | null> = ref(null)
 const tracks: Ref<Track[] | null> = ref(null)
@@ -33,7 +39,6 @@ const nextTrack = computed(() => {
 })
 
 const onSortOrderUpdate = async () => {
-  console.log(tracks.value)
   if (!tracks.value) return
 
   const trackPerformanceIdsAndSortOrders: TrackPerformanceIdAndSortOrder[] = []
@@ -66,7 +71,7 @@ const handleTrackSelect = async (index: number) => {
     selectedTrackIndex.value = index
     selectedTrackLengthInChunks.value = await loadTrackForPlayback(
       tracks.value[index]._id,
-      props.id
+      props.performanceId
     )
   } catch (error) {
     selectedTrackIndex.value = -1
@@ -79,10 +84,24 @@ const showModalSetStartTime = () => {
   setStartTimeModalDisplayed.value = true
 }
 
+const handleDeleteTrackFromPerformance = async (trackPerformanceId: string) => {
+  if (!confirm(t("confirm_delete_track_from_performance"))) return
+
+  if (!trackPerformanceId) return
+
+  try {
+    await deleteTrackFromPerformance(trackPerformanceId)
+    tracks.value?.splice(selectedTrackIndex.value, 1)
+  } catch (error) {
+    console.error(error)
+  }
+}
+
 watch(
   () => performance.value,
   newValue => {
     if (newValue) {
+      console.log(newValue)
       tracks.value = newValue.tracks
     }
   }
@@ -90,7 +109,7 @@ watch(
 
 onMounted(async () => {
   try {
-    const performanceId = props.id as string
+    const performanceId = props.performanceId as string
     performance.value = await getPerformanceWithTracks(performanceId)
   } catch (error) {
     console.error(error)
@@ -107,7 +126,7 @@ onMounted(async () => {
       class="text-center mb-4">
       {{ selectedTrackIndex + 1 }} {{ tracks[selectedTrackIndex].name }}
       <PlayerControls
-        :performance-id="id"
+        :performance-id="performanceId"
         :selected-track="tracks[selectedTrackIndex]"
         :next-track="nextTrack"
         :track-loaded="selectedTrackLengthInChunks > -1"
@@ -128,9 +147,12 @@ onMounted(async () => {
         :key="track._id"
         @click="handleTrackSelect(index)">
         <div class="flex gap-3">
+          <!-- Drag handle -->
           <div>
             <span class="drag-handle text-xl">☰</span>
           </div>
+
+          <!-- Track info -->
           <div class="space-y-2">
             <div class="space-x-2 text-md">
               <span>{{ index + 1 }}</span>
@@ -169,9 +191,28 @@ onMounted(async () => {
               </div>
             </div>
           </div>
+
+          <!-- Delete track from performance -->
+          <div class="flex justify-end flex-1">
+            <button
+              class="button-secondary"
+              @click.stop="
+                handleDeleteTrackFromPerformance(track.trackPerformanceId)
+              ">
+              <IconTrash
+                :class="{
+                  '[&>*]:fill-white': selectedTrackIndex === index,
+                }" />
+            </button>
+          </div>
         </div>
       </div>
     </VueDraggable>
+
+    <ActionButtonLink
+      :to="`/performance/${performanceId}/add-tracks`"
+      :text="$t('add_tracks_to_performance')" />
+
     <ModalSetStartTime
       v-if="tracks && selectedTrackIndex > -1"
       v-model="setStartTimeModalDisplayed"

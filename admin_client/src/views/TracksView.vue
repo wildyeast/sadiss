@@ -206,7 +206,7 @@ onMounted(async () => {
 
       <AddTrackToPerformanceModal
         ref="addTrackToPerformanceModal"
-        @add-track-to-performance="handleAddTrackToPerformance" />
+        @add-tracks-to-performance="handleAddTrackToPerformance" />
     </Teleport>
   </main>
 </template>

@@ -320,7 +320,7 @@ export async function uploadTrackZip(trackZip: FormData) {
 /* TRACK PERFORMANCE */
 export async function addTrackToPerformance(trackId: string, performanceId: string) {
   const response = await request<{ trackPerformance: { performanceId: string; trackId: string } }>(
-    `/api/add-track-to-performance`,
+    `/api/add-tracks-to-performance`,
     {
       method: 'POST',
       body: JSON.stringify({
