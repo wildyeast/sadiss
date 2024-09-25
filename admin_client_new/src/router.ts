@@ -55,6 +55,10 @@ const routes = [
     meta: { requiresAuth: true },
     props: true,
   },
+  {
+    path: "/:catchAll(.*)",
+    redirect: "/",
+  },
 ]
 
 const router = createRouter({
