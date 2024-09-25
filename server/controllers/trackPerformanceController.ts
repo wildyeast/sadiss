@@ -7,9 +7,9 @@ import { unloadTrackFromActivePerformance } from '../services/activePerformanceS
 import { setStartTime } from '../services/trackPerformanceService'
 import { InvalidInputError, ProcessingError } from '../errors'
 
-exports.addTrackToPerformance = async (req: Request, res: Response) => {
+exports.addTracksToPerformance = async (req: Request, res: Response) => {
   try {
-    const { trackId, performanceId } = req.body
+    const { trackIds, performanceId } = req.body
 
     const performance = await SadissPerformance.findById(performanceId)
 
@@ -17,33 +17,41 @@ exports.addTrackToPerformance = async (req: Request, res: Response) => {
       return res.status(404).send({ error: 'Performance not found' })
     }
 
-    // If performance is public check if the track is public
-    if (performance.isPublic) {
-      const track = await Track.findById(trackId)
+    if (!trackIds || !trackIds.length) {
+      return res.status(400).send({ error: 'Please provide at least one track' })
+    }
 
-      if (!track) {
-        return res.status(404).send({ error: 'Track not found' })
+    // If performance is public check if all tracks are public
+    if (performance.isPublic) {
+      const tracks = await Track.find({ _id: { $in: trackIds } })
+
+      if (tracks.length !== trackIds.length) {
+        return res.status(404).send({ error: 'One or more tracks not found' })
       }
 
-      if (!track.isPublic) {
+      const privateTrack = tracks.find((track) => !track.isPublic)
+      if (privateTrack) {
         return res.status(400).send({ message: 'Cannot add private track to public performance' })
       }
     }
 
-    const trackPerformances = await TrackPerformance.find({ performance: performanceId })
-    const sortOrder = trackPerformances.length + 1
+    const trackPerformancesCount = await TrackPerformance.countDocuments({ performance: performanceId })
+    let sortOrder = trackPerformancesCount + 1
     const startTime = 0
 
-    // Create a new TrackPerformance record and save it to the database
-    const trackPerformance = new TrackPerformance({ track: trackId, performance: performanceId, sortOrder, startTime })
-    trackPerformance.save((err) => {
-      if (err) {
-        console.error('Error while creating performance', err)
-        res.status(500).send(err)
-      } else {
-        res.status(201).send({ trackPerformance })
-      }
+    const trackPerformances = trackIds.map((trackId: string) => ({
+      track: trackId,
+      performance: performanceId,
+      sortOrder: sortOrder++,
+      startTime
+    }))
+
+    const insertedDocuments = await TrackPerformance.insertMany(trackPerformances)
+    const sanitizedDocuments = insertedDocuments.map((doc) => {
+      const { createdAt, updatedAt, __v, ...rest } = doc.toObject()
+      return rest
     })
+    res.status(201).send({ trackPerformances: sanitizedDocuments })
   } catch (error) {
     res.status(500).send({ error: 'Server error' })
   }

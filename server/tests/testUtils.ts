@@ -64,16 +64,14 @@ export const createTestTrackPerformance = async (tracksToCreateCount = 1) => {
   }
   const performanceId = await createTestPerformance()
 
-  const trackPerformances: TrackPerformanceDocument[] = []
-
-  for (const track of tracks) {
-    const res: { body: { trackPerformance: TrackPerformanceDocument } } = await agent.post('/api/add-track-to-performance').send({
-      trackId: track._id,
+  const res: { body: { trackPerformances: TrackPerformanceDocument[] } } = await agent
+    .post('/api/add-tracks-to-performance')
+    .send({
+      trackIds: tracks.map((track) => track._id),
       performanceId
     })
 
-    trackPerformances.push(res.body.trackPerformance)
-  }
+  const trackPerformances = res.body.trackPerformances
 
   return { tracks, performanceId, trackPerformances }
 }

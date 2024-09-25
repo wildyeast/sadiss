@@ -4,19 +4,21 @@ import { isValidObjectId } from 'mongoose'
 
 export const validateTrackAccess = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const trackId = req.body.trackId
+    const trackIds = req.body.trackIds
 
-    if (!trackId || !isValidObjectId(trackId)) {
+    if (!trackIds || trackIds.some((trackId: string) => !trackId || !isValidObjectId(trackId))) {
       return res.status(400).json({ error: 'Invalid input data' })
     }
 
-    const track = await Track.findById(trackId).lean()
+    const tracks = await Track.find({ _id: { $in: trackIds } }).lean()
 
-    if (!track) {
-      return res.status(404).json({ error: 'Track not found' })
+    if (tracks.length !== trackIds.length) {
+      return res.status(404).json({ error: 'One or more tracks not found' })
     }
 
-    if (!track.isPublic && track.creator.toString() !== req.user!.id.toString()) {
+    const unauthorized = tracks.some((track) => !track.isPublic && track.creator.toString() !== req.user!.id.toString())
+
+    if (unauthorized) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 

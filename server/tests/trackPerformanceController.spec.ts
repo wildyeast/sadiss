@@ -3,13 +3,13 @@ import { TrackPerformance } from '../models/trackPerformance'
 import { createTestPerformance, createTestTrack, createTestTrackPerformance } from './testUtils'
 
 describe('trackPerformanceController test', () => {
-  describe('addTrackToPerformance function', () => {
+  describe('addTracksToPerformance function', () => {
     it('should return a 201 status and the saved TrackPerformance data on success', async () => {
       const { _id: trackId } = await createTestTrack()
       const performanceId = await createTestPerformance()
 
-      const trackPerformanceData = { trackId: trackId, performanceId }
-      await agent.post('/api/add-track-to-performance').send(trackPerformanceData).expect(201)
+      const trackPerformanceData = { trackIds: [trackId], performanceId }
+      await agent.post('/api/add-tracks-to-performance').send(trackPerformanceData).expect(201)
 
       const savedTrackPerformance = await TrackPerformance.findOne({ track: trackId, performance: performanceId })
       expect(savedTrackPerformance).toBeDefined()
@@ -20,16 +20,16 @@ describe('trackPerformanceController test', () => {
       const { _id: trackId } = await createTestTrack()
       const performanceId = await createTestPerformance()
 
-      const trackPerformanceData = { trackId: trackId, performanceId }
-      const res = await agent.post('/api/add-track-to-performance').send(trackPerformanceData).expect(201)
+      const trackPerformanceData = { trackIds: [trackId], performanceId }
+      const res = await agent.post('/api/add-tracks-to-performance').send(trackPerformanceData).expect(201)
 
       const savedTrackPerformance = await TrackPerformance.findOne({ track: trackId, performance: performanceId })
       expect(savedTrackPerformance).toBeDefined()
       expect(savedTrackPerformance!.sortOrder).toBe(1)
 
       const { _id: trackId2 } = await createTestTrack()
-      const trackPerformanceData2 = { trackId: trackId2, performanceId }
-      const res2 = await agent.post('/api/add-track-to-performance').send(trackPerformanceData2).expect(201)
+      const trackPerformanceData2 = { trackIds: [trackId2], performanceId }
+      const res2 = await agent.post('/api/add-tracks-to-performance').send(trackPerformanceData2).expect(201)
 
       const savedTrackPerformance2 = await TrackPerformance.findOne({ track: trackId2, performance: performanceId })
       expect(savedTrackPerformance2).toBeDefined()
@@ -40,26 +40,45 @@ describe('trackPerformanceController test', () => {
       const { _id: trackId } = await createTestTrack()
       const performanceId = await createTestPerformance()
 
-      const trackPerformanceData = { trackId: trackId, performanceId }
-      const res = await agent.post('/api/add-track-to-performance').send(trackPerformanceData).expect(201)
+      const trackPerformanceData = { trackIds: [trackId], performanceId }
+      const res = await agent.post('/api/add-tracks-to-performance').send(trackPerformanceData).expect(201)
 
       const savedTrackPerformance = await TrackPerformance.findOne({ track: trackId, performance: performanceId })
       expect(savedTrackPerformance).toBeDefined()
       expect(savedTrackPerformance!.startTime).toBe(0)
     })
 
+    it('can take an array of trackIds, create a trackPerformance for each of them, and set the sort order correctly', async () => {
+      const { _id: trackId1 } = await createTestTrack()
+      const { _id: trackId2 } = await createTestTrack()
+      const performanceId = await createTestPerformance()
+
+      const trackPerformanceData = { trackIds: [trackId1, trackId2], performanceId }
+      const res = await agent.post('/api/add-tracks-to-performance').send(trackPerformanceData).expect(201)
+
+      const savedTrackPerformance1 = await TrackPerformance.findOne({ track: trackId1, performance: performanceId })
+      expect(savedTrackPerformance1).toBeDefined()
+      expect(savedTrackPerformance1!.sortOrder).toBe(1)
+      expect(savedTrackPerformance1!.startTime).toBe(0)
+
+      const savedTrackPerformance2 = await TrackPerformance.findOne({ track: trackId2, performance: performanceId })
+      expect(savedTrackPerformance2).toBeDefined()
+      expect(savedTrackPerformance2!.sortOrder).toBe(2)
+      expect(savedTrackPerformance2!.startTime).toBe(0)
+    })
+
     it('should return a 400 error if no performanceId is provided', async () => {
       const track = await createTestTrack()
       const trackPerformanceData = { track: track }
-      const res = await agent.post('/api/add-track-to-performance').send(trackPerformanceData)
+      const res = await agent.post('/api/add-tracks-to-performance').send(trackPerformanceData)
       expect(res.status).toBe(400)
       expect(res.body.error).toBe('Invalid input data')
     })
 
-    it('should return a 400 error if no trackId is provided', async () => {
+    it('should return a 400 error if no trackIds are provided', async () => {
       const performanceId = await createTestPerformance()
       const trackPerformanceData = { performance: performanceId }
-      const res = await agent.post('/api/add-track-to-performance').send(trackPerformanceData)
+      const res = await agent.post('/api/add-tracks-to-performance').send(trackPerformanceData)
       expect(res.status).toBe(400)
       expect(res.body.error).toBe('Invalid input data')
     })
@@ -77,22 +96,22 @@ describe('trackPerformanceController test', () => {
         mode: 'choir',
         waveform: 'sine'
       })
-      const trackPerformanceData = { trackId: track._id, performanceId: performance._id }
-      const res = await agent.post('/api/add-track-to-performance').send(trackPerformanceData)
+      const trackPerformanceData = { trackIds: [track._id], performanceId: performance._id }
+      const res = await agent.post('/api/add-tracks-to-performance').send(trackPerformanceData)
       expect(res.status).toBe(400)
       expect(res.body.message).toBeTruthy()
     })
 
     it('should return a 500 error if there is an error while creating a TrackPerformance record', async () => {
-      jest.spyOn(TrackPerformance.prototype, 'save').mockImplementationOnce(() => {
+      jest.spyOn(TrackPerformance, 'insertMany').mockImplementationOnce(() => {
         throw new Error('Server error')
       })
 
       const { _id: trackId } = await createTestTrack()
       const performanceId = await createTestPerformance()
 
-      const trackPerformanceData = { trackId, performanceId }
-      await agent.post('/api/add-track-to-performance').send(trackPerformanceData).expect(500)
+      const trackPerformanceData = { trackIds: [trackId], performanceId }
+      await agent.post('/api/add-tracks-to-performance').send(trackPerformanceData).expect(500)
     })
   })
 
@@ -124,8 +143,10 @@ describe('trackPerformanceController test', () => {
       const { _id: trackId } = await createTestTrack()
       const { _id: trackId2 } = await createTestTrack()
 
-      await agent.post('/api/add-track-to-performance').send({ trackId, performanceId }).expect(201)
-      await agent.post('/api/add-track-to-performance').send({ trackId: trackId2, performanceId }).expect(201)
+      await agent
+        .post('/api/add-tracks-to-performance')
+        .send({ trackIds: [trackId, trackId2], performanceId })
+        .expect(201)
 
       const res = await agent.get(`/api/performance/${performanceId}/with-tracks`).expect(200)
 
@@ -176,6 +197,7 @@ describe('trackPerformanceController test', () => {
 
     it('should return 400 if the provided trackPerformanceId is not a valid ObjectId', async () => {
       const { trackPerformances } = await createTestTrackPerformance()
+
       const { _id: trackPerformanceId } = trackPerformances[0]
 
       const trackPerformance = await TrackPerformance.findById(trackPerformanceId)

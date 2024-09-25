@@ -74,9 +74,9 @@ router.get('/api/client-count-per-choir-id/:performanceId', performance_controll
 /* TRACKPERFORMANCE */
 // Add track to performance
 router.post(
-  '/api/add-track-to-performance',
+  '/api/add-tracks-to-performance',
   [validateTrackAccess, validatePerformanceAccess],
-  track_performance_controller.addTrackToPerformance
+  track_performance_controller.addTracksToPerformance
 )
 // Update sortOrder of trackPerformance
 router.post('/api/track-performance/update-order', track_performance_controller.updateTrackPerformanceOrder)
