@@ -36,6 +36,18 @@ describe('trackPerformanceController test', () => {
       expect(savedTrackPerformance2!.sortOrder).toBe(2)
     })
 
+    it('should set the startTime of the TrackPerformance to 0', async () => {
+      const { _id: trackId } = await createTestTrack()
+      const performanceId = await createTestPerformance()
+
+      const trackPerformanceData = { trackId: trackId, performanceId }
+      const res = await agent.post('/api/add-track-to-performance').send(trackPerformanceData).expect(201)
+
+      const savedTrackPerformance = await TrackPerformance.findOne({ track: trackId, performance: performanceId })
+      expect(savedTrackPerformance).toBeDefined()
+      expect(savedTrackPerformance!.startTime).toBe(0)
+    })
+
     it('should return a 400 error if no performanceId is provided', async () => {
       const track = await createTestTrack()
       const trackPerformanceData = { track: track }
