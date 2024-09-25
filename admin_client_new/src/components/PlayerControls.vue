@@ -6,6 +6,9 @@ import { formatTime } from "../utils/formatTime"
 import PlayIcon from "../assets/play.svg"
 import PauseIcon from "../assets/pause.svg"
 import ResetIcon from "../assets/reset.svg"
+import { useMCorp } from "../composables/useMCorp"
+
+const { getGlobalTime } = useMCorp()
 
 const props = defineProps<{
   performanceId: string
@@ -20,26 +23,6 @@ const emit = defineEmits<{
   (e: "setCurrentTrack", trackId: string): void
 }>()
 
-let motion: any
-const globalTime = ref(-1)
-const initializeMCorp = async () => {
-  // @ts-ignore: Can't find name MCorp, which is added via <script> in index.html
-  const mCorpApp = MCorp.app(import.meta.env.VITE_APP_MCORP_API_KEY, {
-    anon: true,
-  })
-  mCorpApp.run = () => {
-    motion = mCorpApp.motions["shared"]
-    startClock()
-  }
-  mCorpApp.init()
-}
-
-const startClock = () => {
-  setInterval(() => {
-    globalTime.value = motion.pos
-  }, 10)
-}
-
 const playingTrackId = ref<string>("")
 const startAtChunk = ref<number>(0)
 const trackIsRunning = computed(() => playingTrackId.value !== "")
@@ -48,7 +31,7 @@ const handleStartTrack = async (trackId: string) => {
   await startTrack(
     trackId,
     props.performanceId,
-    globalTime.value,
+    getGlobalTime(),
     startAtChunk.value,
     shouldLoop.value
   )
@@ -169,7 +152,6 @@ const establishWebsocketConnection = async () => {
 }
 
 onMounted(async () => {
-  initializeMCorp()
   establishWebsocketConnection()
 })
 

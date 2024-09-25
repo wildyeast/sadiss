@@ -12,6 +12,7 @@ const i18n = createI18n({
       add_tracks_to_performance: "Add Tracks to Performance",
       choir_mode: "Choir Mode",
       choir_mode_description: "Track is for choirs",
+      clients_logged_in: "Clients Logged in",
       confirm_delete_track: "Are you sure you want to delete this track?",
       confirm_delete_track_from_performance:
         "Are you sure you want to delete this track from the performance?",
@@ -25,13 +26,20 @@ const i18n = createI18n({
       partial_file: "Partials File",
       partial_file_upload_button: "Select Partials File",
       performances: "Performances",
+      performances_running: "Performances running",
       public_track: "Public Track",
       public_track_description:
         "Publish track to be visible and usable by anyone",
       text_to_speech: "Text to Speech",
+      time_sync: "Time Sync",
+      time_sync_status: {
+        stable: "Stable",
+        unsynced: "Unsynced",
+      },
       title: "Title",
       track: "Track | Tracks",
       tts_file_upload_button: "Select Text to Speech File",
+      users_logged_in: "Users Logged in",
       voice: "Voice",
       waveform: "Waveform",
       waveforms: {
