@@ -17,10 +17,7 @@ export function useMCorp() {
     mCorpApp.run = () => {
       motion = mCorpApp.motions["shared"]
       startClock()
-
-      console.log(mCorpIsInitialized.value)
       mCorpIsInitialized.value = true
-      console.log(mCorpIsInitialized.value)
     }
     mCorpApp.init()
   }
