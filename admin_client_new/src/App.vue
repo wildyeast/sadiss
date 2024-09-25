@@ -35,7 +35,7 @@ onMounted(() => {
 
       <!-- User link -->
       <div class="flex justify-center pr-4">
-        <RouterLink to="/users" class="flex gap-2">
+        <RouterLink to="/user" class="flex gap-2">
           <span>Usr</span>
           <IconUser />
         </RouterLink>

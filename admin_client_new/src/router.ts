@@ -8,9 +8,16 @@ import { isUserLoggedIn } from "./api/authService"
 import AddTrackView from "./views/AddTrackView.vue"
 import AddPerformanceView from "./views/AddPerformanceView.vue"
 import AddTracksToPerformanceView from "./views/AddTracksToPerformanceView.vue"
+import ProfileView from "./views/ProfileView.vue"
 
 const routes = [
   { path: "/", name: "Dashboard", component: DashboardView },
+  {
+    path: "/user",
+    name: "User",
+    component: ProfileView,
+    meta: { requiresAuth: true },
+  },
   {
     path: "/login",
     name: "Login",
