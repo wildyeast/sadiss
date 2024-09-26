@@ -8,7 +8,7 @@ const performancesCount = ref(-1)
 </script>
 
 <template>
-  <h1 class="text-lg">{{ $t("dashboard") }}</h1>
+  <h1>{{ $t("dashboard") }}</h1>
 
   <div class="space-y-6">
     <!-- Sync -->
@@ -40,6 +40,6 @@ const performancesCount = ref(-1)
 
 <style scoped>
 .infobox {
-  @apply flex gap-2 text-sm min-w-[300px] justify-center border border-silver py-2;
+  @apply flex gap-2 text-sm w-[300px] md:w-[460px] justify-center border border-silver py-2;
 }
 </style>
