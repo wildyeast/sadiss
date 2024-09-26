@@ -44,5 +44,5 @@ input,
 }
 
 .list-entry {
-  @apply border-t last:border-b border-secondary p-4 md:px-8 block w-full;
+  @apply border-t last:border-b border-secondary p-4 md:px-6 block w-full;
 }

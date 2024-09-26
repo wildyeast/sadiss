@@ -47,7 +47,7 @@ router.post('/api/track/load', track_controller.loadTrackForPlayback)
 router.get('/api/track/download/:trackId', track_controller.downloadTrack)
 
 // Upload zip (downloaded via above route, most likely)
-router.post('/api/track/upload-zip', upload.single('zip'), track_controller.uploadZip)
+router.post('/api/track/upload-zip', upload.single('file'), track_controller.uploadZip)
 
 /* PERFORMANCE */
 // Get performances
@@ -73,11 +73,7 @@ router.get('/api/client-count-per-choir-id/:performanceId', performance_controll
 
 /* TRACKPERFORMANCE */
 // Add track to performance
-router.post(
-  '/api/add-tracks-to-performance',
-  [validateTrackAccess, validatePerformanceAccess],
-  track_performance_controller.addTracksToPerformance
-)
+router.post('/api/add-tracks-to-performance', track_performance_controller.addTracksToPerformance)
 // Update sortOrder of trackPerformance
 router.post('/api/track-performance/update-order', track_performance_controller.updateTrackPerformanceOrder)
 

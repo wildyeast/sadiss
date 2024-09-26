@@ -23,3 +23,29 @@ export async function deleteTrack(trackId: string) {
 
   return response.data.message
 }
+
+export async function downloadTrack(trackId: string, trackName: string) {
+  const response = await apiClient.get("/api/track/download/" + trackId, {
+    responseType: "blob",
+  })
+
+  const blob = await response.data
+  const downloadUrl = window.URL.createObjectURL(blob)
+
+  const link = document.createElement("a")
+  link.href = downloadUrl
+  link.download = `${trackName.replace(" ", "_")}.zip`
+  document.body.appendChild(link)
+  link.click()
+
+  document.body.removeChild(link)
+  window.URL.revokeObjectURL(downloadUrl)
+}
+
+export async function uploadTrackZip(trackZip: FormData) {
+  const response = await apiClient.post<{ track: Track }>(
+    "/api/track/upload-zip",
+    trackZip
+  )
+  return response.data!.track
+}
