@@ -122,7 +122,7 @@ const createTrackData = () => {
       :to="{ name: 'Tracks' }"
       :text="$t('add_track')" />
 
-    <form class="text-secondary space-y-6">
+    <form>
       <!-- Choir mode -->
       <div class="flex gap-2">
         <div>

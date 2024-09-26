@@ -22,6 +22,10 @@ h1 {
   @apply text-lg md:text-2xl text-secondary my-4 text-center;
 }
 
+form {
+  @apply text-secondary space-y-6;
+}
+
 input,
 .input {
   @apply w-full py-2 px-4 border-2 border-silver bg-middlegrey;
