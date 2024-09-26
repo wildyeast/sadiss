@@ -134,17 +134,19 @@ exports.uploadTrack = async (req: Request, res: Response) => {
 
   try {
     const partialFilePrefix = 'partialfile_'
-    const ttsFilePrefix = 'ttsfile_'
 
     const partialFileInfo = getPartialFileByPrefix(<File[]>req.files, partialFilePrefix)
 
     const { ttsFilesToSave, ttsLangs, ttsJson } = handleUploadedTtsFiles(<File[]>req.files)
 
     const filename = uuid.v4()
+
     const { partialsCount, chunks } = await chunk(partialFileInfo?.path, ttsJson)
+
     fs.writeFile(`${process.env.CHUNKS_DIR}/${filename}`, JSON.stringify(chunks), (err: any) => {
       if (err) {
         console.error(err)
+        throw new ProcessingError('Failed writing chunks.')
       }
     })
 
@@ -390,6 +392,7 @@ exports.uploadZip = async (req: Request, res: Response, next: NextFunction) => {
       throw new ProcessingError('Error uploading track.')
     }
   } catch (err: any) {
+    console.warn('Error uploading zip:', err)
     next(err)
   }
 }

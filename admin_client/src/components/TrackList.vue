@@ -2,10 +2,12 @@
 import { formatTime } from "../utils/formatTime"
 import { Track } from "../types"
 import TrashIcon from "../assets/trash.svg"
+import IconDownload from "../assets/download.svg"
 import { onMounted, ref, Ref } from "vue"
-import { deleteTrack, getTracks } from "../api"
+import { deleteTrack, downloadTrack, getTracks } from "../api"
 import { useI18n } from "vue-i18n"
 import { useUserStore } from "../stores/useUserStore"
+import { useTrackStore } from "../stores/useTrackStore"
 
 const { t } = useI18n()
 
@@ -14,15 +16,7 @@ const props = defineProps<{
   selectedTracks?: Track[]
 }>()
 
-const emit = defineEmits<{
-  (e: "hasLoadedTracks"): void
-}>()
-
-const tracks: Ref<Track[] | null> = ref(null)
-
-const loadTracks = async () => {
-  tracks.value = await getTracks()
-}
+const trackStore = useTrackStore()
 
 const userStore = useUserStore()
 const loggedInUserIsOwnerOfTrack = (ownerId: string) => {
@@ -30,7 +24,7 @@ const loggedInUserIsOwnerOfTrack = (ownerId: string) => {
 }
 
 const handleDeleteTrack = async (trackId: string) => {
-  if (!tracks.value) return
+  if (!trackStore.tracks) return
 
   if (!confirm(t("confirm_delete_track"))) {
     return
@@ -38,7 +32,7 @@ const handleDeleteTrack = async (trackId: string) => {
 
   try {
     await deleteTrack(trackId)
-    tracks.value = tracks.value.filter(track => track._id !== trackId)
+    trackStore.tracks = trackStore.tracks.filter(track => track._id !== trackId)
   } catch (error) {
     console.error(error)
   }
@@ -54,15 +48,27 @@ const selectTrack = (track: Track) => {
   }
 }
 
+const handleDownloadTrack = async (trackId: string) => {
+  if (!trackStore.tracks) return
+
+  const track = trackStore.tracks.find(track => track._id === trackId)
+  if (!track) return
+
+  try {
+    await downloadTrack(trackId, track.name)
+  } catch (error) {
+    console.error("Error downloading track:", error)
+  }
+}
+
 onMounted(async () => {
-  await loadTracks()
-  emit("hasLoadedTracks")
+  trackStore.loadTracks()
 })
 </script>
 <template>
-  <div v-if="tracks" class="list-container">
+  <div v-if="trackStore.tracks" class="list-container">
     <div
-      v-for="track in tracks"
+      v-for="track in trackStore.tracks"
       :key="track._id"
       class="list-entry"
       :class="{
@@ -78,11 +84,16 @@ onMounted(async () => {
         <div v-if="track.notes">
           <p>{{ track.notes }}</p>
         </div>
-        <button
-          v-if="canDelete && loggedInUserIsOwnerOfTrack(track.creator._id)"
-          @click="handleDeleteTrack(track._id)">
-          <TrashIcon />
-        </button>
+        <div class="flex gap-6">
+          <button @click="handleDownloadTrack(track._id)">
+            <IconDownload />
+          </button>
+          <button
+            v-if="canDelete && loggedInUserIsOwnerOfTrack(track.creator._id)"
+            @click="handleDeleteTrack(track._id)">
+            <TrashIcon />
+          </button>
+        </div>
       </div>
     </div>
   </div>

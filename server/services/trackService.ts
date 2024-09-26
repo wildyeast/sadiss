@@ -186,8 +186,6 @@ export async function uploadTrackFromJson(
   try {
     const trackJson: TrackJson = JSON.parse(fs.readFileSync(trackJsonPath, 'utf8'))
 
-    console.log('Uploading track from .zip with following JSON:', trackJson)
-
     const formData = new FormData()
 
     formData.append('name', trackJson.name)
@@ -223,23 +221,17 @@ export async function uploadTrackFromJson(
       }
     })
 
-    console.log('Uploading track to server...', uploadUrl)
-
     const response = await axios.post(`${process.env.API_BASE_URL}/api/track/create`, formData, {
       headers: {
-        ...formData.getHeaders(), // Include the form data headers
+        ...formData.getHeaders(),
         Cookie: authCookie
       }
     })
 
-    console.log('Response:', response.data)
-
-    if (response.data.success) {
-      console.log('Track uploaded successfully', response.data)
+    if (response.status === 201) {
       return true
     } else {
-      logger.info('Track uploaded successfully')
-      console.error('Failed to upload track:', response.statusText)
+      logger.error('Failed to upload track:', response.statusText)
       return false
     }
   } catch (err) {
