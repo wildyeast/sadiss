@@ -49,7 +49,7 @@ onMounted(async () => {
           <!-- Right hand side buttons -->
           <div v-if="loggedInUserIsOwnerOfPerformance(performance.creator._id)">
             <button>
-              <IconTrash />
+              <IconTrash class="md:h-[24px] md:w-[24px]" />
             </button>
           </div>
         </div>

@@ -21,7 +21,7 @@ const handleAddPerformance = async () => {
 </script>
 
 <template>
-  <div class="w-full px-3">
+  <div class="md:w-full">
     <HeadlineWithCancelButton
       :to="{ name: 'Performances' }"
       :text="$t('add_performance')" />

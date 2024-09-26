@@ -117,7 +117,7 @@ const createTrackData = () => {
 // #endregion
 </script>
 <template>
-  <div class="pb-10">
+  <div class="pb-10 md:w-full">
     <HeadlineWithCancelButton
       :to="{ name: 'Tracks' }"
       :text="$t('add_track')" />
