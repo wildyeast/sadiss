@@ -233,9 +233,3 @@ const createTrackData = () => {
     </form>
   </div>
 </template>
-
-<style scoped>
-.label-and-input {
-  @apply flex flex-col gap-1;
-}
-</style>

@@ -31,6 +31,10 @@ input,
   @apply text-middlegrey bg-button-bg p-3 rounded-lg text-md;
 }
 
+.label-and-input {
+  @apply flex flex-col gap-1;
+}
+
 .list-container {
   @apply w-full text-md text-secondary;
 }
