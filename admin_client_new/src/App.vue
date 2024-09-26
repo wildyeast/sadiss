@@ -19,7 +19,7 @@ onMounted(() => {
 <template>
   <!-- Top Bar -->
   <div
-    class="h-[130px] md:h-[70px] flex flex-col md:flex-row items-center justify-center md:border-b md:border-middlegrey">
+    class="h-[130px] md:h-[70px] flex flex-col md:flex-row items-center justify-center md:border-b md:border-silver">
     <RouterLink to="/" class="my-[30px] md:mt-[30px] md:ml-[60px]">
       <SadissLogo />
     </RouterLink>
