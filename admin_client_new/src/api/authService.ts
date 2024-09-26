@@ -22,9 +22,9 @@ export async function isUserLoggedIn() {
   try {
     const response = await apiClient.get<{
       message: string
-      user?: { username: string }
+      userId: string
     }>("/is-logged-in")
-    return response.data.user
+    return response.data.userId
   } catch (error: any) {
     if (error.response) {
       throw new Error(error.response.data.message || "Login failed")

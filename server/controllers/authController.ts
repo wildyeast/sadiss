@@ -63,9 +63,9 @@ exports.isLoggedIn = async (req: Request, res: Response) => {
       if (err) return res.sendStatus(403)
       req.user = user
 
-      const userDocument = await User.findById(req.user!.id, 'username -_id')
+      const userDocument = await User.findById(req.user!.id, '_id')
 
-      res.json({ message: 'Logged in', user: userDocument })
+      res.json({ message: 'Logged in', userId: userDocument!._id })
     })
   } catch (err) {
     res.status(500).json({ message: 'Failed to check login status' })

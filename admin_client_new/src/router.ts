@@ -9,6 +9,7 @@ import AddTrackView from "./views/AddTrackView.vue"
 import AddPerformanceView from "./views/AddPerformanceView.vue"
 import AddTracksToPerformanceView from "./views/AddTracksToPerformanceView.vue"
 import ProfileView from "./views/ProfileView.vue"
+import { useUserStore } from "./stores/useUserStore"
 
 const routes = [
   { path: "/", name: "Dashboard", component: DashboardView },
@@ -74,16 +75,18 @@ const router = createRouter({
 })
 
 router.beforeEach(async (to, _from, next) => {
-  const user = await isUserLoggedIn()
-  // if (user) {
-  //   const store = useStore()
-  //   store.userName = user!.username
-  // }
+  const userStore = useUserStore()
+  const userId = await isUserLoggedIn()
+  if (userId) {
+    userStore.loggedInUserId = userId
+  } else {
+    userStore.loggedInUserId = null
+  }
 
-  if (to.matched.some(record => record.meta.requiresAuth) && !user) {
+  if (to.matched.some(record => record.meta.requiresAuth) && !userId) {
     next("/login")
   } else {
-    if (to.name === "Login" && user) {
+    if (to.name === "Login" && userId) {
       next("/dashboard")
     } else {
       next()
