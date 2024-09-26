@@ -70,7 +70,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory("/admin-next"),
+  history: createWebHistory("/admin"),
   routes,
 })
 
