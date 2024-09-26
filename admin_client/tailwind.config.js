@@ -1,20 +1,33 @@
 /** @type {import('tailwindcss').Config} */
-module.exports = {
-  content: ['./index.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
+export default {
+  purge: ["./index.html", "./src/**/*.{vue,js,ts,jsx,tsx}"],
   theme: {
+    colors: {
+      black: "#000",
+      white: "#fff",
+      secondary: "#5A5A5A",
+      middlegrey: "#F5F5F5",
+      silver: "#C2C2C2",
+      "button-bg": "#2C2C2C",
+      danger: "#FF0000",
+    },
     extend: {
       fontFamily: {
-        verdana: ['VERDANA', 'sans-serif'],
-        'verdana-bold': ['VERDANA-BOLD', 'bold']
-      }
+        inter: ["Inter", "sans-serif"],
+      },
+      fontSize: {
+        xss: "11px",
+        xs: "12px",
+        sm: "14px",
+        md: "16px",
+        lg: "20px",
+        xl: "24px",
+        "2xl": "32px",
+      },
     },
-    colors: {
-      primary: '#5A5A5A',
-      secondary: '#71ada8',
-      highlight: '#79ea04',
-      light: '#faf1f1',
-      danger: '#ff3d00'
-    }
   },
-  plugins: []
+  variants: {
+    extend: {},
+  },
+  plugins: [],
 }

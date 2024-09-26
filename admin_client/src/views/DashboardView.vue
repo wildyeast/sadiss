@@ -1,20 +1,45 @@
 <script setup lang="ts">
-import FixedViewHeader from '@/components/FixedViewHeader.vue'
+import { ref } from "vue"
+import { mCorpIsInitialized } from "../composables/useMCorp"
+
+const usersLoggedInCount = ref(-1)
+const clientsLoggedInCount = ref(-1)
+const performancesCount = ref(-1)
 </script>
+
 <template>
-  <main>
-    <FixedViewHeader title="Dashboard" />
-    <div class="mt-12 flex items-center gap-4 px-2 pt-16 lg:flex-col">
-      <router-link
-        to="/performances"
-        class="w-1/2 border p-6 text-center text-lg"
-        >Performances
-      </router-link>
-      <router-link
-        to="/tracks"
-        class="w-1/2 border p-6 text-center text-lg"
-        >Tracks
-      </router-link>
+  <h1>{{ $t("dashboard") }}</h1>
+
+  <div class="space-y-6">
+    <!-- Sync -->
+    <div class="infobox">
+      <span>{{ $t("time_sync") }}:</span>
+      <span>{{
+        mCorpIsInitialized
+          ? $t("time_sync_status.stable")
+          : $t("time_sync_status.unsynced")
+      }}</span>
     </div>
-  </main>
+    <!-- Users logged in count -->
+    <div class="infobox">
+      <span>{{ $t("users_logged_in") }}:</span>
+      <span class="text-danger">{{ usersLoggedInCount }}</span>
+    </div>
+    <!-- Clients logged in count -->
+    <div class="infobox">
+      <span>{{ $t("clients_logged_in") }}:</span>
+      <span class="text-danger">{{ clientsLoggedInCount }}</span>
+    </div>
+    <!-- Performances running -->
+    <div class="infobox">
+      <span>{{ $t("performances_running") }}:</span>
+      <span class="text-danger">{{ performancesCount }}</span>
+    </div>
+  </div>
 </template>
+
+<style scoped>
+.infobox {
+  @apply flex gap-2 text-sm w-[300px] md:w-[460px] justify-center border border-silver py-2;
+}
+</style>

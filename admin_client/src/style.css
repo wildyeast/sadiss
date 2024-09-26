@@ -3,32 +3,46 @@
 @tailwind utilities;
 
 @font-face {
-  font-family: 'VERDANA';
-  src: url('../fonts/verdana.ttf');
+  font-family: "Inter";
+  src: url("/src/assets/fonts/Inter-VariableFont_opsz,wght.ttf")
+    format("truetype");
+  font-weight: 100 900;
+  font-style: normal;
 }
 
 @font-face {
-  font-family: 'VERDANA-BOLD';
-  src: url('../fonts/verdana-bold.ttf');
+  font-family: "Inter";
+  src: url("/src/assets/fonts/Inter-Italic-VariableFont_opsz,wght.ttf")
+    format("truetype");
+  font-weight: 100 900;
+  font-style: italic;
 }
 
-@layer base {
-  html {
-    font-family: verdana, system-ui, sans-serif;
-    @apply text-light;
-  }
+h1 {
+  @apply text-lg md:text-2xl text-secondary my-4 text-center;
 }
 
-html {
-  @apply bg-primary;
+form {
+  @apply text-secondary space-y-6 max-w-[500px] mx-auto;
 }
 
-h1,
-p,
-button {
-  @apply text-light;
+input,
+.input {
+  @apply w-full py-2 px-4 border-2 border-silver bg-middlegrey;
 }
 
-input {
-  @apply text-primary;
+.button-primary {
+  @apply text-middlegrey bg-button-bg p-3 rounded-lg text-md;
+}
+
+.label-and-input {
+  @apply flex flex-col gap-1;
+}
+
+.list-container {
+  @apply w-full text-md text-secondary;
+}
+
+.list-entry {
+  @apply border-t last:border-b border-secondary p-4 md:px-8 block w-full;
 }
