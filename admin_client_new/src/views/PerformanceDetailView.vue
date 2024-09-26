@@ -149,7 +149,7 @@ onMounted(async () => {
         <div class="flex gap-3">
           <!-- Drag handle -->
           <div>
-            <span class="drag-handle text-xl">☰</span>
+            <span class="drag-handle text-2xl">☰</span>
           </div>
 
           <!-- Track info -->

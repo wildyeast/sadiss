@@ -3,13 +3,21 @@ import { onMounted, Ref, ref } from "vue"
 import { SadissPerformance } from "../types"
 import { getPerformances } from "../api"
 import ActionButtonLink from "../components/ActionButtonLink.vue"
+import IconTrash from "../assets/trash.svg"
+import { useUserStore } from "../stores/useUserStore"
 
 const performances: Ref<SadissPerformance[]> = ref([])
+
+const userStore = useUserStore()
+const loggedInUserIsOwnerOfPerformance = (ownerId: string) => {
+  return userStore.loggedInUserId === ownerId
+}
 
 const loading = ref(true)
 
 onMounted(async () => {
   performances.value = await getPerformances()
+  console.log(performances.value)
   loading.value = false
 })
 </script>
@@ -27,15 +35,23 @@ onMounted(async () => {
         v-for="performance of performances"
         :key="performance._id"
         class="list-entry">
-        <div class="flex justify-between">
-          <span>{{ performance.name }}</span>
-          <span
-            >{{ $t("created_by") }}: {{ performance.creator.username }}</span
-          >
-          <span>
-            {{ performance.trackCount }}
-            {{ $t("track", performance.trackCount) }}
-          </span>
+        <div class="flex justify-between items-center">
+          <div class="flex gap-4 items-center md:text-xl">
+            <span>{{ performance.name }}</span>
+            <span>
+              {{ performance.trackCount }}
+              {{ $t("track", performance.trackCount) }}</span
+            >
+            <span class="text-lg"
+              >{{ $t("created_by") }}: {{ performance.creator.username }}</span
+            >
+          </div>
+          <!-- Right hand side buttons -->
+          <div v-if="loggedInUserIsOwnerOfPerformance(performance.creator._id)">
+            <button>
+              <IconTrash />
+            </button>
+          </div>
         </div>
       </RouterLink>
     </div>
