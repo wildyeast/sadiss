@@ -5,6 +5,7 @@ import TrashIcon from "../assets/trash.svg"
 import { onMounted, ref, Ref } from "vue"
 import { deleteTrack, getTracks } from "../api"
 import { useI18n } from "vue-i18n"
+import { useUserStore } from "../stores/useUserStore"
 
 const { t } = useI18n()
 
@@ -21,6 +22,11 @@ const tracks: Ref<Track[] | null> = ref(null)
 
 const loadTracks = async () => {
   tracks.value = await getTracks()
+}
+
+const userStore = useUserStore()
+const loggedInUserIsOwnerOfTrack = (ownerId: string) => {
+  return userStore.loggedInUserId === ownerId
 }
 
 const handleDeleteTrack = async (trackId: string) => {
@@ -72,7 +78,9 @@ onMounted(async () => {
         <div v-if="track.notes">
           <p>{{ track.notes }}</p>
         </div>
-        <button v-if="canDelete" @click="handleDeleteTrack(track._id)">
+        <button
+          v-if="canDelete && loggedInUserIsOwnerOfTrack(track.creator._id)"
+          @click="handleDeleteTrack(track._id)">
           <TrashIcon />
         </button>
       </div>
