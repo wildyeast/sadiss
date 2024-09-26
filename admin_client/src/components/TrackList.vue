@@ -7,6 +7,7 @@ import { onMounted, ref, Ref } from "vue"
 import { deleteTrack, downloadTrack, getTracks } from "../api"
 import { useI18n } from "vue-i18n"
 import { useUserStore } from "../stores/useUserStore"
+import { useTrackStore } from "../stores/useTrackStore"
 
 const { t } = useI18n()
 
@@ -15,15 +16,7 @@ const props = defineProps<{
   selectedTracks?: Track[]
 }>()
 
-const emit = defineEmits<{
-  (e: "hasLoadedTracks"): void
-}>()
-
-const tracks: Ref<Track[] | null> = ref(null)
-
-const loadTracks = async () => {
-  tracks.value = await getTracks()
-}
+const trackStore = useTrackStore()
 
 const userStore = useUserStore()
 const loggedInUserIsOwnerOfTrack = (ownerId: string) => {
@@ -31,7 +24,7 @@ const loggedInUserIsOwnerOfTrack = (ownerId: string) => {
 }
 
 const handleDeleteTrack = async (trackId: string) => {
-  if (!tracks.value) return
+  if (!trackStore.tracks) return
 
   if (!confirm(t("confirm_delete_track"))) {
     return
@@ -39,7 +32,7 @@ const handleDeleteTrack = async (trackId: string) => {
 
   try {
     await deleteTrack(trackId)
-    tracks.value = tracks.value.filter(track => track._id !== trackId)
+    trackStore.tracks = trackStore.tracks.filter(track => track._id !== trackId)
   } catch (error) {
     console.error(error)
   }
@@ -56,9 +49,9 @@ const selectTrack = (track: Track) => {
 }
 
 const handleDownloadTrack = async (trackId: string) => {
-  if (!tracks.value) return
+  if (!trackStore.tracks) return
 
-  const track = tracks.value.find(track => track._id === trackId)
+  const track = trackStore.tracks.find(track => track._id === trackId)
   if (!track) return
 
   try {
@@ -69,14 +62,13 @@ const handleDownloadTrack = async (trackId: string) => {
 }
 
 onMounted(async () => {
-  await loadTracks()
-  emit("hasLoadedTracks")
+  trackStore.loadTracks()
 })
 </script>
 <template>
-  <div v-if="tracks" class="list-container">
+  <div v-if="trackStore.tracks" class="list-container">
     <div
-      v-for="track in tracks"
+      v-for="track in trackStore.tracks"
       :key="track._id"
       class="list-entry"
       :class="{

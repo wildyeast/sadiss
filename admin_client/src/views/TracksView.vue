@@ -1,9 +1,12 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from "vue"
+import { useTemplateRef } from "vue"
 import ActionButtonLink from "../components/ActionButtonLink.vue"
 import TrackList from "../components/TrackList.vue"
 import IconUpload from "../assets/upload.svg"
 import { uploadTrackZip } from "../api";
+import { useTrackStore } from "../stores/useTrackStore";
+
+const trackStore = useTrackStore()
 
 const handleUploadZip = async (event: Event) => {
   const target = event.target as HTMLInputElement
@@ -15,9 +18,7 @@ const handleUploadZip = async (event: Event) => {
 
   try {
     await uploadTrackZip(formData)
-    // tracks.value = await getTracks()
-    // reload page to see the new tracks
-    // location.reload()
+    trackStore.loadTracks()
   } catch (error) {
     console.error("Error uploading zip:", error)
   }
@@ -30,8 +31,6 @@ const triggerUploadZipClick = () => {
   
   zipFileInput.value.click()
 }
-
-const loading = ref(true)
 </script>
 
 <template>
@@ -53,9 +52,9 @@ const loading = ref(true)
         </div>
     </div>
   </div>
-  <div v-if="loading" class="w-full flex justify-center">
+  <div v-if="trackStore.loading" class="w-full flex justify-center">
     {{ $t("loading") }}
   </div>
-  <TrackList @hasLoadedTracks="() => (loading = false)" :can-delete="true" />
-  <ActionButtonLink v-if="!loading" to="/tracks/new" :text="$t('add_track')" />
+  <TrackList :can-delete="true" />
+  <ActionButtonLink v-if="!trackStore.loading" to="/tracks/new" :text="$t('add_track')" />
 </template>
