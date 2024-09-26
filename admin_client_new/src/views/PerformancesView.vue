@@ -42,7 +42,7 @@ onMounted(async () => {
               {{ performance.trackCount }}
               {{ $t("track", performance.trackCount) }}</span
             >
-            <span class="text-lg"
+            <span class="md:text-lg"
               >{{ $t("created_by") }}: {{ performance.creator.username }}</span
             >
           </div>
