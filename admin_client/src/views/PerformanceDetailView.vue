@@ -19,6 +19,7 @@ import WaveformIcon from "../assets/waveform.svg"
 import TtsRateIcon from "../assets/tts_rate.svg"
 import ClockIcon from "../assets/clock.svg"
 import IconTrash from "../assets/trash.svg"
+import IconQrCode from "../assets/qr_code.svg"
 import ModalSetStartTime from "../components/modals/ModalSetStartTime.vue"
 import ActionButtonLink from "../components/ActionButtonLink.vue"
 import { useI18n } from "vue-i18n"
@@ -96,7 +97,6 @@ watch(
   () => performance.value,
   newValue => {
     if (newValue) {
-      console.log(newValue)
       tracks.value = newValue.tracks
     }
   }
@@ -113,9 +113,15 @@ onMounted(async () => {
 </script>
 <template>
   <ConnectedClientsList />
-  <div v-if="performance" class="w-full">
+  <div v-if="performance" class="w-full relative">
     <h1>{{ performance.name }}</h1>
 
+    <!-- QR Code generation button -->
+    <RouterLink
+      class="absolute top-6 left-5"
+      :to="`/performance/${performanceId}/create-qr-codes`">
+      <IconQrCode class="w-[27px] h-[27px]" />
+    </RouterLink>
     <p
       v-if="selectedTrackIndex > -1 && tracks && tracks[selectedTrackIndex]"
       class="text-center mb-4">

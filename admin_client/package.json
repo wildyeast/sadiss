@@ -23,7 +23,9 @@
   "dependencies": {
     "@fontsource/inter": "^5.0.21",
     "axios": "^1.7.7",
+    "client-zip": "^2.4.5",
     "pinia": "^2.2.2",
+    "qrcode.vue": "^3.5.0",
     "vue": "^3.4.37",
     "vue-draggable-plus": "^0.5.3",
     "vue-final-modal": "^4.5.5",

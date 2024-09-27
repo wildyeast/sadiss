@@ -1,29 +1,25 @@
 <script setup lang="ts">
-import { onMounted, Ref, ref } from "vue"
-import { SadissPerformance } from "../types"
-import { getPerformances } from "../api"
+import { onMounted } from "vue"
 import ActionButtonLink from "../components/ActionButtonLink.vue"
 import IconTrash from "../assets/trash.svg"
 import { useUserStore } from "../stores/useUserStore"
-
-const performances: Ref<SadissPerformance[]> = ref([])
+import { usePerformanceStore } from "../stores/usePerformancesTore"
 
 const userStore = useUserStore()
 const loggedInUserIsOwnerOfPerformance = (ownerId: string) => {
   return userStore.loggedInUserId === ownerId
 }
 
-const loading = ref(true)
-
+const performanceStore = usePerformanceStore()
 onMounted(async () => {
-  performances.value = await getPerformances()
-  loading.value = false
+  await performanceStore.loadPerformances()
+  performanceStore.loading = false
 })
 </script>
 
 <template>
   <h1>{{ $t("performances") }}</h1>
-  <div v-if="loading">{{ $t("loading") }}</div>
+  <div v-if="performanceStore.loading">{{ $t("loading") }}</div>
   <div v-else class="w-full">
     <div class="list-container">
       <RouterLink
@@ -31,7 +27,7 @@ onMounted(async () => {
           name: 'PerformanceDetail',
           params: { performanceId: performance._id },
         }"
-        v-for="performance of performances"
+        v-for="performance of performanceStore.performances"
         :key="performance._id"
         class="list-entry">
         <div class="flex justify-between items-center">

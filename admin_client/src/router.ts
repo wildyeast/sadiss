@@ -10,6 +10,7 @@ import AddPerformanceView from "./views/AddPerformanceView.vue"
 import AddTracksToPerformanceView from "./views/AddTracksToPerformanceView.vue"
 import ProfileView from "./views/ProfileView.vue"
 import { useUserStore } from "./stores/useUserStore"
+import CreateQrCodesView from "./views/CreateQrCodesView.vue"
 
 const routes = [
   { path: "/", name: "Dashboard", component: DashboardView },
@@ -60,6 +61,13 @@ const routes = [
     path: "/performance/:performanceId/add-tracks",
     name: "AddTracksToPerformance",
     component: AddTracksToPerformanceView,
+    meta: { requiresAuth: true },
+    props: true,
+  },
+  {
+    path: "/performance/:performanceId/create-qr-codes",
+    name: "CreateQrCodes",
+    component: CreateQrCodesView,
     meta: { requiresAuth: true },
     props: true,
   },
