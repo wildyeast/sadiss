@@ -2,7 +2,7 @@
 import { computed, nextTick, reactive, ref, Ref } from "vue"
 import { useQrCodeGenerator } from "../composables/useQrCodeGenerator"
 import { useRouter } from "vue-router"
-import { usePerformanceStore } from "../stores/usePerformancesTore"
+import { usePerformanceStore } from "../stores/usePerformanceStore"
 import QrcodeVue from "qrcode.vue"
 
 const {

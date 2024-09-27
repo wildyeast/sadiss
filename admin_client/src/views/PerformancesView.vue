@@ -3,7 +3,7 @@ import { onMounted } from "vue"
 import ActionButtonLink from "../components/ActionButtonLink.vue"
 import IconTrash from "../assets/trash.svg"
 import { useUserStore } from "../stores/useUserStore"
-import { usePerformanceStore } from "../stores/usePerformancesTore"
+import { usePerformanceStore } from "../stores/usePerformanceStore"
 
 const userStore = useUserStore()
 const loggedInUserIsOwnerOfPerformance = (ownerId: string) => {
