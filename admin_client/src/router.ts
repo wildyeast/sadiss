@@ -13,7 +13,12 @@ import { useUserStore } from "./stores/useUserStore"
 import CreateQrCodesView from "./views/CreateQrCodesView.vue"
 
 const routes = [
-  { path: "/", name: "Dashboard", component: DashboardView },
+  {
+    path: "/",
+    name: "Dashboard",
+    component: DashboardView,
+    meta: { requiresAuth: true },
+  },
   {
     path: "/user",
     name: "User",
