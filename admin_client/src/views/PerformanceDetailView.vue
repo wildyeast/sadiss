@@ -43,12 +43,7 @@ const onSortOrderUpdate = async () => {
 
   const trackPerformanceIdsAndSortOrders: TrackPerformanceIdAndSortOrder[] = []
 
-  for (const track of tracks.value) {
-    console.log(track)
-  }
-
   for (const [index, track] of tracks.value.entries()) {
-    console.log(track)
     trackPerformanceIdsAndSortOrders.push({
       trackPerformanceId: track.trackPerformanceId as string,
       sortOrder: index + 1,
