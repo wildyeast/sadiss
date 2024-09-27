@@ -5,8 +5,11 @@ import HeadlineWithCancelButton from "../components/HeadlineWithCancelButton.vue
 import { Track } from "../types"
 import { addTracksToPerformance } from "../api"
 import { useRouter } from "vue-router"
+import { useTrackStore } from "../stores/useTrackStore"
 
 const router = useRouter()
+
+const { loading } = useTrackStore()
 
 const props = defineProps<{ performanceId: string }>()
 
@@ -23,8 +26,6 @@ const handleAddTrackToPerformance = async () => {
     console.error(error)
   }
 }
-
-const loading = ref(true)
 </script>
 
 <template>
@@ -36,11 +37,8 @@ const loading = ref(true)
     <div v-if="loading" class="w-full flex justify-center">
       {{ $t("loading") }}
     </div>
-    <TrackList
-      @has-loaded-tracks="() => (loading = false)"
-      :can-delete="false"
-      :selected-tracks="selectedTracks" />
-    <div v-if="!loading" class="mt-6 flex justify-end mr-3">
+    <TrackList :can-delete="false" :selected-tracks="selectedTracks" />
+    <div v-if="!loading" class="mt-6 flex justify-end mr-3 pb-10">
       <button
         @click="handleAddTrackToPerformance"
         class="button-primary"
