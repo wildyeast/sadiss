@@ -23,7 +23,7 @@ onMounted(() => {
     <RouterLink
       to="/"
       class="my-[30px] md:mt-[30px] md:ml-[60px]"
-      :class="{ 'md:ml-0': route.meta.hideNavbar }">
+      :class="{ 'md:mr-[60px]': route.meta.hideNavbar }">
       <SadissLogo />
     </RouterLink>
     <div

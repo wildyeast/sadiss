@@ -15,7 +15,7 @@ async function handleLogin() {
 </script>
 
 <template>
-  <div class="flex flex-col items-center">
+  <div class="flex flex-col items-center md:pt-10">
     <form
       class="flex flex-col items-center gap-4"
       @submit.prevent="handleLogin">
