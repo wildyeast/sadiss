@@ -4,6 +4,7 @@ import { useQrCodeGenerator } from "../composables/useQrCodeGenerator"
 import { useRouter } from "vue-router"
 import { usePerformanceStore } from "../stores/usePerformanceStore"
 import QrcodeVue from "qrcode.vue"
+import HeadlineWithCancelButton from "../components/HeadlineWithCancelButton.vue"
 
 const {
   generateQrCodes,
@@ -60,8 +61,10 @@ const handleGenerateQrCodes = async () => {
 }
 </script>
 <template>
-  <div>
-    <h1>{{ $t("generate_qr_codes") }}</h1>
+  <div class="pb-10 md:w-full">
+    <HeadlineWithCancelButton
+      :text="$t('generate_qr_codes')"
+      :to="{ name: 'PerformanceDetail', params: { id: performanceId } }" />
     <form>
       <!-- Voice count -->
       <div class="label-and-input">
