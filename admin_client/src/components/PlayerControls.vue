@@ -7,8 +7,11 @@ import PlayIcon from "../assets/play.svg"
 import PauseIcon from "../assets/pause.svg"
 import ResetIcon from "../assets/reset.svg"
 import { useMCorp } from "../composables/useMCorp"
+import { useWebSocket } from "../composables/useWebSocket"
 
 const { getGlobalTime } = useMCorp()
+
+const { ws, addMessageListener } = useWebSocket()
 
 const props = defineProps<{
   performanceId: string
@@ -73,90 +76,57 @@ const totalChunkTimeFormatted = computed(() => {
   return formatTime(valueToFormat)
 })
 
-const wsUrl = import.meta.env.VITE_APP_WS_URL
-let attemptingToRegister = false
-const isRegistered = ref(false)
-const ws = ref<WebSocket>()
-
-const establishWebsocketConnection = async () => {
-  if (attemptingToRegister || isRegistered.value) return
-  attemptingToRegister = true
-  ws.value = new WebSocket(wsUrl)
-
-  ws.value.onopen = function () {
-    isRegistered.value = true
-    attemptingToRegister = false
-    this.send(
-      JSON.stringify({ message: "isAdmin", performanceId: props.performanceId })
-    )
+const webSocketMessageListener = async (data: any) => {
+  if (data.start) {
+    // Nothing to do at start.
   }
 
-  ws.value.onclose = () => {
-    isRegistered.value = false
-    attemptingToRegister = false
-    // TODO: Handle lost connection. Does not mean that playback has stopped.
-  }
-
-  ws.value.onerror = error => {
-    isRegistered.value = false
-    attemptingToRegister = false
-    console.error(JSON.stringify(error))
-    // TODO: Handle error
-  }
-
-  ws.value.onmessage = async event => {
-    if (!event.data) {
-      return
-    }
-
-    const data = JSON.parse(event.data)
-
-    if (data.start) {
-      // Nothing to do at start.
-    }
-
-    if (data.stop) {
-      if (shouldGoToNextTrack.value && props.nextTrack) {
-        const trackLoadedSuccessfully = await loadTrackForPlayback(
-          props.nextTrack._id,
-          props.performanceId
-        )
-        if (!trackLoadedSuccessfully) {
-          alert("Failed to load next track. Stopping.")
-          playingTrackId.value = ""
-          return
-        }
-        handleStartTrack(props.nextTrack._id)
-        emit("nextTrackStarted")
-      } else {
+  if (data.stop) {
+    if (shouldGoToNextTrack.value && props.nextTrack) {
+      const trackLoadedSuccessfully = await loadTrackForPlayback(
+        props.nextTrack._id,
+        props.performanceId
+      )
+      if (!trackLoadedSuccessfully) {
+        alert("Failed to load next track. Stopping.")
         playingTrackId.value = ""
+        return
       }
-      progress.value = 0
-      currentChunkIndex.value = 0
-      totalChunks.value = 0
-      return
+      handleStartTrack(props.nextTrack._id)
+      emit("nextTrackStarted")
+    } else {
+      playingTrackId.value = ""
     }
+    progress.value = 0
+    currentChunkIndex.value = 0
+    totalChunks.value = 0
+    return
+  }
 
-    if (data.trackId) {
-      playingTrackId.value = data.trackId
-      progress.value = Math.floor((data.chunkIndex / data.totalChunks) * 100)
-      currentChunkIndex.value = data.chunkIndex
-      totalChunks.value = data.totalChunks
-      shouldLoop.value = data.loop
+  if (data.trackId) {
+    playingTrackId.value = data.trackId
+    progress.value = Math.floor((data.chunkIndex / data.totalChunks) * 100)
+    currentChunkIndex.value = data.chunkIndex
+    totalChunks.value = data.totalChunks
+    shouldLoop.value = data.loop
 
-      if (playingTrackId.value !== props.selectedTrack._id) {
-        emit("setCurrentTrack", playingTrackId.value)
-      }
+    if (playingTrackId.value !== props.selectedTrack._id) {
+      emit("setCurrentTrack", playingTrackId.value)
     }
   }
 }
 
 onMounted(async () => {
-  establishWebsocketConnection()
+  if (!ws.value) return
+  ws.value.send(
+    JSON.stringify({ message: "isAdmin", performanceId: props.performanceId })
+  )
+  addMessageListener(webSocketMessageListener)
 })
 
 onUnmounted(() => {
   ws.value?.close()
+  // removeMessageListener(webSocketMessageListener)
 })
 
 // Enforce min and max values

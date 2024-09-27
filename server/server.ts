@@ -6,7 +6,7 @@ import { passport } from './auth'
 import { Server } from 'ws'
 import { connectDB } from './database'
 import { startKeepAliveInterval } from './tools/startKeepAliveInterval'
-import { startWebSocketServer } from './services/webSocketServerService'
+import { startWebSocketServer, startDashboardInformationInterval } from './services/webSocketService'
 import fs from 'fs'
 import { logger } from './tools'
 import { errorHandler } from './middlewares/errorHandler'
@@ -15,7 +15,6 @@ import { ProcessingError } from './errors'
 import { Track } from './models'
 
 const cors = require('cors')
-const uuid = require('uuid')
 const session = require('express-session')
 const cookieParser = require('cookie-parser')
 
@@ -87,35 +86,8 @@ if (process.env.NODE_ENV === 'test') {
 }
 
 startKeepAliveInterval(wss)
-wss.on('connection', (client) => {
-  // Assign id to new connection, needed for nonChoir partial distribution
-  client.id = uuid.v4()
-  logger.info(`New client connected! Assigned id: ${client.id} Total clients: ${wss.clients.size}`)
 
-  client.onclose = () => logger.info(`Client ${client.id} has disconnected!`)
-
-  client.onmessage = (event) => {
-    const parsed: Message = JSON.parse(event.data.toString())
-    logger.debug(`Received message from ws client: ${parsed.message}`)
-    if (parsed.message === 'clientInfo') {
-      client.choirId = parsed.clientId
-      client.ttsLang = parsed.ttsLang
-      client.performanceId = parsed.performanceId
-      logger.info(
-        `Performance ${client.performanceId}: Client ${client.id} registered with choir id ${client.choirId} and TTS lang ${client.ttsLang.iso}`
-      )
-      client.send('clientInfoReceived')
-    } else if (parsed.message === 'measure') {
-      client.send('measure')
-    } else if (parsed.message === 'isAdmin') {
-      client.isAdmin = true
-      if (parsed.performanceId) {
-        client.performanceId = parsed.performanceId
-        logger.info(`Performance ${client.performanceId}: Client ${client.id} is admin`)
-      }
-    }
-  }
-})
+startDashboardInformationInterval(wss)
 
 const routes = require('./routes/routes')
 
