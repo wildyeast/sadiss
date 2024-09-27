@@ -17,7 +17,6 @@ const loading = ref(true)
 
 onMounted(async () => {
   performances.value = await getPerformances()
-  console.log(performances.value)
   loading.value = false
 })
 </script>
