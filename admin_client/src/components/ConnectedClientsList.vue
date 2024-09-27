@@ -7,10 +7,6 @@ import IconConflictingClientsCount from "../assets/conflicting_clients_count.svg
 
 const connectedClients: Ref<{ [key: string]: string }> = ref({})
 
-const connectedClientCount = computed(
-  () => Object.keys(connectedClients.value).length
-)
-
 const clientListDisplayed = ref(false)
 const totalConnectedClients = computed(() =>
   Object.values(connectedClients.value).reduce(
@@ -57,7 +53,7 @@ onMounted(() => {
       <div class="flex gap-2 md:gap-4">
         <div class="flex items-center gap-1 md:gap-2 md:w-[70px]">
           <IconClientsCount class="h-[17px] w-[17px] md:h-[31px] md:w-[31px]" />
-          <span class="text-sm md:text-lg">{{ connectedClientCount }}</span>
+          <span class="text-sm md:text-lg">{{ totalConnectedClients }}</span>
         </div>
         <div class="flex items-center gap-1 md:gap-2 md:w-[70px]">
           <IconConflictingClientsCount
