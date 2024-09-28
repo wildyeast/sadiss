@@ -66,7 +66,7 @@ const voiceLangCombinations = computed(() => {
 // #endregion
 
 // #region Store track
-const handleAddTrack = async () => {
+const handleStoreTrack = async () => {
   try {
     await storeTrack(formData)
     await router.push("/tracks")
@@ -74,7 +74,6 @@ const handleAddTrack = async () => {
     console.error(error)
   }
 }
-
 // #endregion
 </script>
 <template>
@@ -187,7 +186,7 @@ const handleAddTrack = async () => {
         <button
           type="submit"
           class="button-primary"
-          @click.prevent="handleAddTrack">
+          @click.prevent="handleStoreTrack">
           {{ $t("add_track") }}
         </button>
       </div>
