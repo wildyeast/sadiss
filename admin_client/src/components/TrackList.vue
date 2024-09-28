@@ -90,14 +90,14 @@ onMounted(async () => {
             </p>
             <p class="hidden md:block md:text-lg">{{ track.mode }}</p>
             <div class="hidden md:flex gap-4">
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-2" :title="t('waveform')">
                 <IconWaveform
                   :class="{
                     '[&>path]:stroke-white': selectedTracks?.includes(track),
                   }" />
                 <p class="md:text-lg">{{ track.waveform }}</p>
               </div>
-              <div class="flex items-center gap-2">
+              <div class="flex items-center gap-2" :title="t('tts_rate')">
                 <IconTtsRate
                   :class="{
                     '[&>path]:fill-white': selectedTracks?.includes(track),
@@ -122,20 +122,26 @@ onMounted(async () => {
           <div class="flex gap-6 items-center">
             <RouterLink
               v-if="noOptions"
-              :to="{ name: 'ViewTrack', params: { trackId: track._id } }">
+              :to="{ name: 'ViewTrack', params: { trackId: track._id } }"
+              :title="t('view_track')">
               <IconInfo />
             </RouterLink>
             <RouterLink
               v-if="noOptions && loggedInUserIsOwnerOfTrack(track.creator._id)"
-              :to="{ name: 'EditTrack', params: { trackId: track._id } }">
+              :to="{ name: 'EditTrack', params: { trackId: track._id } }"
+              :title="t('edit_track')">
               <IconEdit />
             </RouterLink>
-            <button @click="handleDownloadTrack(track._id)" v-if="noOptions">
+            <button
+              @click="handleDownloadTrack(track._id)"
+              v-if="noOptions"
+              :title="t('download_track')">
               <IconDownload />
             </button>
             <button
               v-if="noOptions && loggedInUserIsOwnerOfTrack(track.creator._id)"
-              @click="handleDeleteTrack(track._id)">
+              @click="handleDeleteTrack(track._id)"
+              :title="t('delete_track')">
               <IconTrash />
             </button>
           </div>
