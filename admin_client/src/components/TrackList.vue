@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { formatTime } from "../utils/formatTime"
 import { Track } from "../types"
-import TrashIcon from "../assets/trash.svg"
+import IconTrash from "../assets/trash.svg"
 import IconDownload from "../assets/download.svg"
+import IconEdit from "../assets/edit.svg"
+import IconInfo from "../assets/info.svg"
 import { onMounted } from "vue"
 import { deleteTrack, downloadTrack } from "../api"
 import { useI18n } from "vue-i18n"
@@ -84,14 +86,22 @@ onMounted(async () => {
         <div v-if="track.notes">
           <p>{{ track.notes }}</p>
         </div>
-        <div class="flex gap-6">
+        <div class="flex gap-6 items-center">
+          <RouterLink
+            :to="{ name: 'ViewTrack', params: { trackId: track._id } }">
+            <IconInfo />
+          </RouterLink>
+          <RouterLink
+            :to="{ name: 'EditTrack', params: { trackId: track._id } }">
+            <IconEdit />
+          </RouterLink>
           <button @click="handleDownloadTrack(track._id)">
             <IconDownload />
           </button>
           <button
             v-if="canDelete && loggedInUserIsOwnerOfTrack(track.creator._id)"
             @click="handleDeleteTrack(track._id)">
-            <TrashIcon />
+            <IconTrash />
           </button>
         </div>
       </div>

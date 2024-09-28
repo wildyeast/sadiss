@@ -11,6 +11,9 @@ import AddTracksToPerformanceView from "./views/AddTracksToPerformanceView.vue"
 import ProfileView from "./views/ProfileView.vue"
 import { useUserStore } from "./stores/useUserStore"
 import CreateQrCodesView from "./views/CreateQrCodesView.vue"
+import ViewTrackView from "./views/ViewTrackView.vue"
+import EditTrackView from "./views/EditTrackView.vue"
+import { useTrackStore } from "./stores/useTrackStore"
 
 const routes = [
   {
@@ -63,6 +66,20 @@ const routes = [
     meta: { requiresAuth: true },
   },
   {
+    path: "/tracks/:trackId",
+    name: "ViewTrack",
+    component: ViewTrackView,
+    meta: { requiresAuth: true },
+    props: true,
+  },
+  {
+    path: "/tracks/:trackId/edit",
+    name: "EditTrack",
+    component: EditTrackView,
+    meta: { requiresAuth: true },
+    props: true,
+  },
+  {
     path: "/performance/:performanceId/add-tracks",
     name: "AddTracksToPerformance",
     component: AddTracksToPerformanceView,
@@ -101,6 +118,10 @@ router.beforeEach(async (to, _from, next) => {
   } else {
     if (to.name === "Login" && userId) {
       next("/dashboard")
+    } else if (to.name === "ViewTrack" || to.name === "EditTrack") {
+      const trackStore = useTrackStore()
+      await trackStore.loadTracks()
+      next()
     } else {
       next()
     }

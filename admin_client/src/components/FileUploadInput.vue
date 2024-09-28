@@ -2,9 +2,10 @@
 import { ref, useTemplateRef } from "vue"
 import { useI18n } from "vue-i18n"
 
-defineProps<{
+const props = defineProps<{
   buttonText: string
   accept?: string
+  selectedFileName?: string
 }>()
 
 const emit = defineEmits<{
@@ -14,7 +15,7 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 const fileInput = useTemplateRef("fileInput")
-const fileNameToDisplay = ref(t("no_file_selected"))
+const fileNameToDisplay = ref(props.selectedFileName || t("no_file_selected"))
 
 const handleFileUpload = (e: Event) => {
   const input = e.target as HTMLInputElement

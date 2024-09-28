@@ -18,9 +18,14 @@ export const useTrackStore = defineStore("track", () => {
     }
   }
 
+  const getTrackById = (trackId: string) => {
+    return tracks.value.find(track => track._id === trackId)
+  }
+
   return {
     tracks,
     loading,
     loadTracks,
+    getTrackById,
   }
 })

@@ -7,12 +7,19 @@ export async function getTracks() {
   return response.data.tracks
 }
 
+export async function getTrack(trackId: string) {
+  const response = await apiClient.get<{ track: Track }>(
+    `/api/track/${trackId}`
+  )
+  return response.data.track
+}
+
 export async function storeTrack(trackData: StoreTrack) {
   const createTrackData = (trackDataToStore: StoreTrack) => {
     const data = new FormData()
     data.append("name", trackDataToStore.name)
     data.append("notes", trackDataToStore.notes)
-    data.append("mode", trackDataToStore.isChoir ? "choir" : "nonChoir")
+    data.append("mode", trackDataToStore.mode)
     data.append("waveform", trackDataToStore.waveform)
     data.append("ttsRate", trackDataToStore.ttsRate.toString())
     data.append("isPublic", trackDataToStore.isPublic.toString())
@@ -55,6 +62,14 @@ export async function storeTrack(trackData: StoreTrack) {
   )
 
   return response.data!.track
+}
+
+export async function editTrack(trackId: string, trackData: StoreTrack) {
+  const response = await apiClient.post<{ track: Track }>(
+    `/api/track/edit/${trackId}`,
+    trackData
+  )
+  return response.data.track
 }
 
 export async function deleteTrack(trackId: string) {
