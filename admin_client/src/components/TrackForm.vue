@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import HeadlineWithCancelButton from "../components/HeadlineWithCancelButton.vue"
 import FileUploadInput from "../components/FileUploadInput.vue"
-import { computed, onMounted, ref } from "vue"
+import { computed, ref } from "vue"
 import { StoreTrack, TtsFileDownloadInformation } from "../types"
 import { useI18n } from "vue-i18n"
 
