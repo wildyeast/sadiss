@@ -55,7 +55,7 @@ const triggerUploadZipClick = () => {
   <div v-if="trackStore.loading" class="w-full flex justify-center">
     {{ $t("loading") }}
   </div>
-  <TrackList :can-delete="true" />
+  <TrackList :noOptions="true" />
   <ActionButtonLink
     v-if="!trackStore.loading"
     to="/tracks/new"

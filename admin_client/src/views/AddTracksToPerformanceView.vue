@@ -37,7 +37,7 @@ const handleAddTrackToPerformance = async () => {
     <div v-if="loading" class="w-full flex justify-center">
       {{ $t("loading") }}
     </div>
-    <TrackList :can-delete="false" :selected-tracks="selectedTracks" />
+    <TrackList :noOptions="false" :selected-tracks="selectedTracks" />
     <div v-if="!loading" class="mt-6 flex justify-end mr-3 pb-10">
       <button
         @click="handleAddTrackToPerformance"

@@ -14,7 +14,7 @@ import { useTrackStore } from "../stores/useTrackStore"
 const { t } = useI18n()
 
 const props = defineProps<{
-  canDelete: boolean
+  noOptions: boolean
   selectedTracks?: Track[]
 }>()
 
@@ -88,18 +88,20 @@ onMounted(async () => {
         </div>
         <div class="flex gap-6 items-center">
           <RouterLink
+            v-if="noOptions"
             :to="{ name: 'ViewTrack', params: { trackId: track._id } }">
             <IconInfo />
           </RouterLink>
           <RouterLink
+            v-if="noOptions && loggedInUserIsOwnerOfTrack(track.creator._id)"
             :to="{ name: 'EditTrack', params: { trackId: track._id } }">
             <IconEdit />
           </RouterLink>
-          <button @click="handleDownloadTrack(track._id)">
+          <button @click="handleDownloadTrack(track._id)" v-if="noOptions">
             <IconDownload />
           </button>
           <button
-            v-if="canDelete && loggedInUserIsOwnerOfTrack(track.creator._id)"
+            v-if="noOptions && loggedInUserIsOwnerOfTrack(track.creator._id)"
             @click="handleDeleteTrack(track._id)">
             <IconTrash />
           </button>

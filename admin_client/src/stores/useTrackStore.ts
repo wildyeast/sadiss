@@ -1,20 +1,22 @@
 import { defineStore } from "pinia"
-import { Ref, ref } from "vue"
+import { computed, Ref, ref } from "vue"
 import { Track } from "../types"
 import { getTracks } from "../api"
 
 export const useTrackStore = defineStore("track", () => {
   const tracks: Ref<Track[]> = ref([])
-  const loading = ref(false)
+
+  let currentLoading = false
+  const loading = computed(() => tracks.value.length === 0 && currentLoading)
 
   const loadTracks = async () => {
-    loading.value = true
+    currentLoading = true
     try {
       tracks.value = await getTracks()
     } catch (error) {
       console.error("Error loading tracks:", error)
     } finally {
-      loading.value = false
+      currentLoading = false
     }
   }
 
