@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue"
+import { ref } from "vue"
 import { mCorpIsInitialized } from "../composables/useMCorp"
 import { useWebSocket } from "../composables/useWebSocket"
 
-const { addMessageListener, initializeWebsocketConnection } = useWebSocket()
+const { addMessageListener } = useWebSocket()
 
 const usersLoggedInCount = ref(-1)
 const clientsLoggedInCount = ref(-1)
@@ -15,10 +15,6 @@ addMessageListener(data => {
     clientsLoggedInCount.value = data.adminInfo.connectedClientsCount
     performancesCount.value = data.adminInfo.activePerformancesCount
   }
-})
-
-onMounted(() => {
-  initializeWebsocketConnection()
 })
 </script>
 

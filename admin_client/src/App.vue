@@ -6,13 +6,16 @@ import { useMCorp } from "./composables/useMCorp"
 import { onMounted } from "vue"
 import IconUser from "./assets/user.svg"
 import IconTimeSync from "./assets/time_sync.svg"
+import { useWebSocket } from "./composables/useWebSocket"
 
 const route = useRoute()
 
 const { initializeMCorp, mCorpIsInitialized } = useMCorp()
+const { initializeWebsocketConnection } = useWebSocket()
 
 onMounted(() => {
   initializeMCorp()
+  initializeWebsocketConnection()
 })
 </script>
 
