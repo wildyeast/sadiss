@@ -5,6 +5,8 @@ import IconTrash from "../assets/trash.svg"
 import IconDownload from "../assets/download.svg"
 import IconEdit from "../assets/edit.svg"
 import IconInfo from "../assets/info.svg"
+import IconWaveform from "../assets/waveform.svg"
+import IconTtsRate from "../assets/tts_rate.svg"
 import { onMounted } from "vue"
 import { deleteTrack, downloadTrack } from "../api"
 import { useI18n } from "vue-i18n"
@@ -79,32 +81,64 @@ onMounted(async () => {
       }"
       @click="selectTrack(track)">
       <div class="flex justify-between">
-        <div class="flex gap-4">
-          <p>{{ track.name }}</p>
-          <p>{{ formatTime(track.trackLengthInChunks) }}</p>
+        <div class="flex flex-col gap-2">
+          <div class="flex gap-4 md:text-xl items-center">
+            <p>{{ track.name }}</p>
+            <p>{{ formatTime(track.trackLengthInChunks) }}</p>
+            <p class="hidden md:block md:text-lg">
+              {{ track.creator.username }}
+            </p>
+            <p class="hidden md:block md:text-lg">{{ track.mode }}</p>
+            <div class="hidden md:flex gap-4">
+              <div class="flex items-center gap-2">
+                <IconWaveform
+                  :class="{
+                    '[&>path]:stroke-white': selectedTracks?.includes(track),
+                  }" />
+                <p class="md:text-lg">{{ track.waveform }}</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <IconTtsRate
+                  :class="{
+                    '[&>path]:fill-white': selectedTracks?.includes(track),
+                  }" />
+                <p class="md:text-lg">{{ track.ttsRate }}</p>
+              </div>
+              <p v-if="track.isPublic" class="md:text-lg">Public</p>
+            </div>
+          </div>
+          <div v-if="track.notes" class="hidden md:block">
+            <p>
+              {{
+                track.notes.substring(0, 100) +
+                (track.notes.length > 100 ? "..." : "")
+              }}
+            </p>
+          </div>
         </div>
-        <div v-if="track.notes">
-          <p>{{ track.notes }}</p>
-        </div>
-        <div class="flex gap-6 items-center">
-          <RouterLink
-            v-if="noOptions"
-            :to="{ name: 'ViewTrack', params: { trackId: track._id } }">
-            <IconInfo />
-          </RouterLink>
-          <RouterLink
-            v-if="noOptions && loggedInUserIsOwnerOfTrack(track.creator._id)"
-            :to="{ name: 'EditTrack', params: { trackId: track._id } }">
-            <IconEdit />
-          </RouterLink>
-          <button @click="handleDownloadTrack(track._id)" v-if="noOptions">
-            <IconDownload />
-          </button>
-          <button
-            v-if="noOptions && loggedInUserIsOwnerOfTrack(track.creator._id)"
-            @click="handleDeleteTrack(track._id)">
-            <IconTrash />
-          </button>
+
+        <!-- Track options -->
+        <div>
+          <div class="flex gap-6 items-center">
+            <RouterLink
+              v-if="noOptions"
+              :to="{ name: 'ViewTrack', params: { trackId: track._id } }">
+              <IconInfo />
+            </RouterLink>
+            <RouterLink
+              v-if="noOptions && loggedInUserIsOwnerOfTrack(track.creator._id)"
+              :to="{ name: 'EditTrack', params: { trackId: track._id } }">
+              <IconEdit />
+            </RouterLink>
+            <button @click="handleDownloadTrack(track._id)" v-if="noOptions">
+              <IconDownload />
+            </button>
+            <button
+              v-if="noOptions && loggedInUserIsOwnerOfTrack(track.creator._id)"
+              @click="handleDeleteTrack(track._id)">
+              <IconTrash />
+            </button>
+          </div>
         </div>
       </div>
     </div>
