@@ -1,29 +1,47 @@
 <script setup lang="ts">
 import HeadlineWithCancelButton from "../components/HeadlineWithCancelButton.vue"
 import FileUploadInput from "../components/FileUploadInput.vue"
-import { computed, reactive, ref } from "vue"
+import { computed, onMounted, ref } from "vue"
 import { StoreTrack, TtsFileDownloadInformation } from "../types"
+import { useI18n } from "vue-i18n"
 
-defineEmits<{
-  (event: "storeTrack", formData: StoreTrack): void
+const { t } = useI18n()
+
+const {
+  track = {
+    name: "",
+    partialFile: null as File | null,
+    isChoir: false,
+    ttsFiles: {} as Record<number, Record<string, File>>,
+    notes: "",
+    waveform: "sine",
+    ttsRate: 1,
+    isPublic: false,
+  },
+  isEditMode,
+  isViewMode,
+} = defineProps<{
+  track?: StoreTrack
+  isEditMode?: boolean
+  isViewMode?: boolean
 }>()
 
-const formData = reactive<StoreTrack>({
-  name: "",
-  partialFile: null as File | null,
-  isChoir: false,
-  ttsFiles: {} as Record<number, Record<string, File>>,
-  notes: "",
-  waveform: "sine",
-  ttsRate: 1,
-  isPublic: false,
+defineEmits<{
+  (event: "storeTrack", track: StoreTrack): void
+}>()
+
+const title = computed(() => {
+  if (isEditMode) {
+    return track?.name ?? t("edit_track")
+  }
+  return isViewMode && track ? track.name : t("add_track")
 })
 
 const handlePartialFileSelected = (file: File | null) => {
   if (!file) {
     return
   }
-  formData.partialFile = file
+  track.partialFile = file
 }
 
 // #region Text to Speech
@@ -35,10 +53,10 @@ const handleTtsFileSelected = async (
   if (!file) {
     return
   }
-  if (!formData.ttsFiles[voice]) {
-    formData.ttsFiles[voice] = {}
+  if (!track.ttsFiles[voice]) {
+    track.ttsFiles[voice] = {}
   }
-  formData.ttsFiles[voice][lang] = file
+  track.ttsFiles[voice][lang] = file
 }
 
 const ttsLanguages = ref("en-US, de-DE")
@@ -46,7 +64,7 @@ const numberOfVoices = ref(1)
 
 const voiceLangCombinations = computed(() => {
   // If nonChoir, only allow 1 voice
-  const allowedNumberOfVoices = formData.isChoir ? numberOfVoices.value : 1
+  const allowedNumberOfVoices = track.isChoir ? numberOfVoices.value : 1
   const combinations = []
   for (let i = 0; i < allowedNumberOfVoices; i++) {
     for (const lang of ttsLanguages.value.split(",")) {
@@ -68,15 +86,13 @@ const voiceLangCombinations = computed(() => {
 
 <template>
   <div class="pb-10 md:w-full">
-    <HeadlineWithCancelButton
-      :to="{ name: 'Tracks' }"
-      :text="$t('add_track')" />
+    <HeadlineWithCancelButton :to="{ name: 'Tracks' }" :text="title" />
 
     <form>
       <!-- Choir mode -->
       <div class="flex gap-2">
         <div>
-          <input type="checkbox" id="isChoir" v-model="formData.isChoir" />
+          <input type="checkbox" id="isChoir" v-model="track.isChoir" />
         </div>
         <div class="flex flex-col">
           <label for="isChoir" class="text-black">{{ $t("choir_mode") }}</label>
@@ -87,7 +103,7 @@ const voiceLangCombinations = computed(() => {
       <!-- Public track -->
       <div class="flex gap-2">
         <div>
-          <input type="checkbox" id="isPublic" v-model="formData.isPublic" />
+          <input type="checkbox" id="isPublic" v-model="track.isPublic" />
         </div>
         <div class="flex flex-col">
           <label for="isPublic" class="text-black">{{
@@ -100,7 +116,7 @@ const voiceLangCombinations = computed(() => {
       <!-- Title -->
       <div class="label-and-input">
         <label for="title">{{ $t("title") }}</label>
-        <input type="text" id="title" v-model="formData.name" />
+        <input type="text" id="title" v-model="track.name" />
       </div>
 
       <!-- Partial File Upload -->
@@ -115,7 +131,7 @@ const voiceLangCombinations = computed(() => {
       <!-- Waveform -->
       <div class="label-and-input">
         <label for="waveform">{{ $t("waveform") }}</label>
-        <select id="waveform" v-model="formData.waveform" class="input">
+        <select id="waveform" v-model="track.waveform" class="input">
           <option value="sine">{{ $t("waveforms.sine") }}</option>
           <option value="square">{{ $t("waveforms.square") }}</option>
           <option value="sawtooth">{{ $t("waveforms.sawtooth") }}</option>
@@ -168,7 +184,7 @@ const voiceLangCombinations = computed(() => {
       <!-- Notes -->
       <div>
         <label for="notes">{{ $t("notes") }}</label>
-        <textarea id="notes" v-model="formData.notes" class="input" rows="4" />
+        <textarea id="notes" v-model="track.notes" class="input" rows="4" />
       </div>
 
       <!-- Submit button -->
@@ -176,7 +192,7 @@ const voiceLangCombinations = computed(() => {
         <button
           type="submit"
           class="button-primary"
-          @click.prevent="$emit('storeTrack', formData)">
+          @click.prevent="$emit('storeTrack', track)">
           {{ $t("add_track") }}
         </button>
       </div>

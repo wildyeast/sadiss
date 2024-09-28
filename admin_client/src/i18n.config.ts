@@ -19,6 +19,7 @@ const i18n = createI18n({
       created_by: "Created by",
       dashboard: "Dashboard",
       default_language: "Default Language",
+      edit_track: "Edit Track",
       generate_qr_codes: "Generate QR Codes",
       languages: "Languages",
       loading: "Loading...",
