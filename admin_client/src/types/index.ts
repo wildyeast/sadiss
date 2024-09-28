@@ -4,6 +4,7 @@ import { Waveform } from "./Waveform"
 import TtsFileDownloadInformation from "./TtsFileDownloadInformation"
 import TrackPerformanceIdAndSortOrder from "./TrackPerformanceIdAndSortOrder"
 import QrCodeData from "./QrCodeData"
+import StoreTrack from "./StoreTrack"
 
 export type {
   SadissPerformance,
@@ -12,4 +13,5 @@ export type {
   TtsFileDownloadInformation,
   TrackPerformanceIdAndSortOrder,
   QrCodeData,
+  StoreTrack,
 }

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed, reactive, ref } from "vue"
-import { TtsFileDownloadInformation } from "../types"
+import { StoreTrack, TtsFileDownloadInformation } from "../types"
 import FileUploadInput from "../components/FileUploadInput.vue"
 import { storeTrack } from "../api"
 import { useRouter } from "vue-router"
@@ -8,7 +8,7 @@ import HeadlineWithCancelButton from "../components/HeadlineWithCancelButton.vue
 
 const router = useRouter()
 
-const formData = reactive({
+const formData = reactive<StoreTrack>({
   name: "",
   partialFile: null as File | null,
   isChoir: false,
@@ -68,52 +68,13 @@ const voiceLangCombinations = computed(() => {
 // #region Store track
 const handleAddTrack = async () => {
   try {
-    const data = createTrackData()
-    await storeTrack(data)
+    await storeTrack(formData)
     await router.push("/tracks")
   } catch (error) {
     console.error(error)
   }
 }
 
-const createTrackData = () => {
-  const data = new FormData()
-  data.append("name", formData.name)
-  data.append("notes", formData.notes)
-  data.append("mode", formData.isChoir ? "choir" : "nonChoir")
-  data.append("waveform", formData.waveform)
-  data.append("ttsRate", formData.ttsRate.toString())
-  data.append("isPublic", formData.isPublic.toString())
-
-  if (formData.partialFile) {
-    const fileNameWithoutExtension = formData.partialFile.name.slice(
-      0,
-      formData.partialFile.name.lastIndexOf(".")
-    )
-    data.append(
-      "files",
-      formData.partialFile,
-      `partialfile_${fileNameWithoutExtension}`
-    )
-  }
-
-  for (const voice in formData.ttsFiles) {
-    for (const lang in formData.ttsFiles[voice]) {
-      const ttsFile = formData.ttsFiles[voice][lang]
-      const fileNameWithoutExtension = ttsFile.name.slice(
-        0,
-        ttsFile.name.lastIndexOf(".")
-      )
-      data.append(
-        "files",
-        ttsFile,
-        `ttsfile_${voice}_${lang}_${fileNameWithoutExtension}`
-      )
-    }
-  }
-
-  return data
-}
 // #endregion
 </script>
 <template>

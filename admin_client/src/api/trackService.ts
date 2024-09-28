@@ -1,4 +1,4 @@
-import { Track } from "../types"
+import { StoreTrack, Track } from "../types"
 import apiClient from "./axiosInstance"
 
 export async function getTracks() {
@@ -7,7 +7,48 @@ export async function getTracks() {
   return response.data.tracks
 }
 
-export async function storeTrack(track: FormData) {
+export async function storeTrack(trackData: StoreTrack) {
+  const createTrackData = (trackDataToStore: StoreTrack) => {
+    const data = new FormData()
+    data.append("name", trackDataToStore.name)
+    data.append("notes", trackDataToStore.notes)
+    data.append("mode", trackDataToStore.isChoir ? "choir" : "nonChoir")
+    data.append("waveform", trackDataToStore.waveform)
+    data.append("ttsRate", trackDataToStore.ttsRate.toString())
+    data.append("isPublic", trackDataToStore.isPublic.toString())
+
+    if (trackDataToStore.partialFile) {
+      const fileNameWithoutExtension = trackDataToStore.partialFile.name.slice(
+        0,
+        trackDataToStore.partialFile.name.lastIndexOf(".")
+      )
+      data.append(
+        "files",
+        trackDataToStore.partialFile,
+        `partialfile_${fileNameWithoutExtension}`
+      )
+    }
+
+    for (const voice in trackDataToStore.ttsFiles) {
+      for (const lang in trackDataToStore.ttsFiles[voice]) {
+        const ttsFile = trackDataToStore.ttsFiles[voice][lang]
+        const fileNameWithoutExtension = ttsFile.name.slice(
+          0,
+          ttsFile.name.lastIndexOf(".")
+        )
+        data.append(
+          "files",
+          ttsFile,
+          `ttsfile_${voice}_${lang}_${fileNameWithoutExtension}`
+        )
+      }
+    }
+
+    return data
+  }
+
+  const track = createTrackData(trackData)
+
   const response = await apiClient.post<{ track: Track }>(
     "/api/track/create",
     track
