@@ -107,7 +107,7 @@ router.beforeEach(async (to, _from, next) => {
   }
 })
 
-router.afterEach((to, _from) => {
+router.afterEach((_to, _from) => {
   window.scrollTo(0, 0)
 })
 
