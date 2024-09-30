@@ -23,7 +23,7 @@ h1 {
 }
 
 form {
-  @apply text-secondary space-y-default max-w-[500px] md:max-w-[820px] mx-auto;
+  @apply text-secondary space-y-default max-w-[500px] md:max-w-[820px] mx-auto px-4 md:px-0;
 }
 
 input,
