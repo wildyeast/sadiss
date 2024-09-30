@@ -88,11 +88,14 @@ export async function createTrackZip(track: TrackDocument): Promise<string> {
 
     const baseFilePath = path.join(process.cwd(), `${process.env.UPLOADS_DIR}`)
 
-    track.ttsFiles.forEach((file) => {
+    for (const file of track.ttsFiles) {
+      if (!file.fileName) {
+        continue
+      }
       const uniqueFileName = file.lang + '_' + file.voice + '_' + file.origName
       const filePath = path.join(baseFilePath, file.fileName)
       archive.append(fs.createReadStream(filePath), { name: uniqueFileName })
-    })
+    }
 
     // Get the file data from uploads folder
     if (track.partialFile) {
