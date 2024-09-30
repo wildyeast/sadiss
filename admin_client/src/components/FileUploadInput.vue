@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, useTemplateRef } from "vue"
 import { useI18n } from "vue-i18n"
+import IconFile from "../assets/file.svg"
 
 const props = defineProps<{
   buttonText: string
@@ -35,21 +36,22 @@ const triggerFileInputClick = () => {
 </script>
 
 <template>
-  <div class="flex flex-col gap-1">
-    <!-- Hidden File Input -->
-    <input
-      ref="fileInput"
-      type="file"
-      class="hidden"
-      :accept="accept"
-      @change="handleFileUpload" />
-
-    <!-- Display Selected File Name -->
-    <span>{{ fileNameToDisplay }}</span>
-
-    <!-- Button to Trigger File Input -->
-    <button @click.prevent="triggerFileInputClick" class="button-primary">
-      {{ buttonText }}
-    </button>
+  <div class="flex items-center gap-8 md:gap-14">
+    <IconFile />
+    <div class="flex flex-col gap-1">
+      <!-- Hidden File Input -->
+      <input
+        ref="fileInput"
+        type="file"
+        class="hidden"
+        :accept="accept"
+        @change="handleFileUpload" />
+      <!-- Display Selected File Name -->
+      <span>{{ fileNameToDisplay }}</span>
+      <!-- Button to Trigger File Input -->
+      <button @click.prevent="triggerFileInputClick" class="button-primary">
+        {{ buttonText }}
+      </button>
+    </div>
   </div>
 </template>

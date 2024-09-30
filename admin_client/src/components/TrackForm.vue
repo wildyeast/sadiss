@@ -154,7 +154,7 @@ onMounted(() => {
             <span>{{ $t("choir_mode_description") }}</span>
           </div>
 
-          <IconChoir class="ml-5" />
+          <IconChoir class="ml-5 h-[30px] w-[30px] md:h-[31px] md:w-[38px]" />
         </div>
 
         <!-- Public track -->
@@ -188,8 +188,8 @@ onMounted(() => {
       </div>
 
       <!-- Partial File Upload -->
-      <div v-if="!isEditMode" class="space-y-2">
-        <p>{{ $t("partial_file") }}</p>
+      <div v-if="!isEditMode" class="label-and-input">
+        <label for="partialFile">{{ $t("partial_file") }}</label>
         <FileUploadInput
           v-if="!isViewMode"
           :buttonText="$t('partial_file_upload_button')"
@@ -236,12 +236,14 @@ onMounted(() => {
           (!isEditMode && !isViewMode) ||
           (isViewMode && ttsFileNames.length > 0)
         "
-        class="space-y-2">
-        <p>{{ $t("text_to_speech") }}</p>
+        class="space-y-2 md:space-y-6">
+        <p class="text-lg md:text-xl">{{ $t("text_to_speech") }}</p>
 
         <!-- Languages -->
         <div class="label-and-input">
-          <label for="ttsLanguages">{{ $t("languages") }}</label>
+          <label for="ttsLanguages" class="md:!text-lg">{{
+            $t("languages")
+          }}</label>
           <input
             type="text"
             id="ttsLanguages"
@@ -259,7 +261,9 @@ onMounted(() => {
             v-for="(combination, index) in voiceLangCombinations"
             :key="index">
             <div class="label-and-input mb-4">
-              <label :for="`ttsFile-${combination.voice}-${combination.lang}`">
+              <label
+                :for="`ttsFile-${combination.voice}-${combination.lang}`"
+                class="md:!text-lg">
                 {{ $t("voice") }} {{ combination.voice + 1 }} -
                 {{ combination.lang }}
               </label>
@@ -284,8 +288,8 @@ onMounted(() => {
       </div>
 
       <!-- Notes -->
-      <div>
-        <label for="notes">{{ $t("notes") }}</label>
+      <div class="label-and-input">
+        <label for="notes" class="md:self-start">{{ $t("notes") }}</label>
         <textarea
           id="notes"
           v-model="formData.notes"
