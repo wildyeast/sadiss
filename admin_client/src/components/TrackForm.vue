@@ -6,6 +6,7 @@ import { StoreTrack, TtsFileDownloadInformation } from "../types"
 import { useI18n } from "vue-i18n"
 import { useTrackStore } from "../stores/useTrackStore"
 import { downloadTrack } from "../api/trackService"
+import IconChoir from "../assets/choir.svg"
 
 const { t } = useI18n()
 
@@ -129,39 +130,50 @@ onMounted(() => {
     <HeadlineWithCancelButton :to="{ name: 'Tracks' }" :text="title" />
 
     <form>
-      <!-- Choir mode -->
-      <div class="flex gap-2">
-        <div>
-          <input
-            type="checkbox"
-            id="isChoir"
-            :checked="formData.mode === 'choir'"
-            :disabled="isViewMode"
-            @change="(event: Event) => {
-              const target = event.target as HTMLInputElement;
-              formData.mode = target.checked ? 'choir' : 'nonChoir';
-            }" />
-        </div>
-        <div class="flex flex-col">
-          <label for="isChoir" class="text-black">{{ $t("choir_mode") }}</label>
-          <span>{{ $t("choir_mode_description") }}</span>
-        </div>
-      </div>
+      <div class="space-y-default md:space-y-0 md:flex md:justify-between">
+        <!-- Choir mode -->
+        <div class="flex gap-2">
+          <!-- Checkbox -->
+          <div>
+            <input
+              type="checkbox"
+              id="isChoir"
+              :checked="formData.mode === 'choir'"
+              :disabled="isViewMode"
+              @change="(event: Event) => {
+                const target = event.target as HTMLInputElement;
+                formData.mode = target.checked ? 'choir' : 'nonChoir';
+              }" />
+          </div>
 
-      <!-- Public track -->
-      <div class="flex gap-2">
-        <div>
-          <input
-            type="checkbox"
-            id="isPublic"
-            v-model="formData.isPublic"
-            :disabled="isViewMode" />
+          <!-- Choir mode label -->
+          <div class="flex flex-col">
+            <label for="isChoir" class="text-black">{{
+              $t("choir_mode")
+            }}</label>
+            <span>{{ $t("choir_mode_description") }}</span>
+          </div>
+
+          <IconChoir class="ml-5" />
         </div>
-        <div class="flex flex-col">
-          <label for="isPublic" class="text-black">{{
-            $t("public_track")
-          }}</label>
-          <span>{{ $t("public_track_description") }}</span>
+
+        <!-- Public track -->
+        <div class="flex gap-2">
+          <div>
+            <input
+              type="checkbox"
+              id="isPublic"
+              v-model="formData.isPublic"
+              :disabled="isViewMode" />
+          </div>
+          <div class="flex flex-col">
+            <label for="isPublic" class="text-black">{{
+              $t("public_track")
+            }}</label>
+            <span class="max-w-[240px]">{{
+              $t("public_track_description")
+            }}</span>
+          </div>
         </div>
       </div>
 

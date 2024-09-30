@@ -23,7 +23,7 @@ h1 {
 }
 
 form {
-  @apply text-secondary space-y-6 max-w-[500px] mx-auto;
+  @apply text-secondary space-y-default max-w-[500px] md:max-w-[820px] mx-auto;
 }
 
 input,
@@ -45,4 +45,8 @@ input,
 
 .list-entry {
   @apply border-t last:border-b border-secondary p-4 md:px-6 block w-full;
+}
+
+.space-y-default {
+  @apply space-y-6;
 }

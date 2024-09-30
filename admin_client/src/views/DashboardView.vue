@@ -21,7 +21,7 @@ addMessageListener(data => {
 <template>
   <h1>{{ $t("dashboard") }}</h1>
 
-  <div class="space-y-6">
+  <div class="space-y-default">
     <!-- Sync -->
     <div class="infobox">
       <span>{{ $t("time_sync") }}:</span>
