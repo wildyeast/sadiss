@@ -56,7 +56,7 @@ onMounted(() => {
       </nav>
     </div>
   </div>
-  <main class="flex flex-col items-center">
+  <main class="flex flex-col items-center px-4 md:px-0">
     <RouterView />
   </main>
   <ModalsContainer />

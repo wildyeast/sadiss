@@ -125,7 +125,7 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="pb-10 md:w-full">
+  <div class="pb-10 w-full">
     <HeadlineWithCancelButton :to="{ name: 'Tracks' }" :text="title" />
 
     <form>
