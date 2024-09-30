@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { useTemplateRef } from "vue"
+import SearchBar from "../components/SearchBar.vue"
 import ActionButtonLink from "../components/ActionButtonLink.vue"
 import TrackList from "../components/TrackList.vue"
 import IconUpload from "../assets/upload.svg"
@@ -31,17 +32,23 @@ const triggerUploadZipClick = () => {
 
   zipFileInput.value.click()
 }
+
+const handleSearch = (query: string) => {
+  trackStore.filterTracks(query)
+}
 </script>
 
 <template>
   <div class="grid grid-cols-3 w-full px-6">
-    <div>
-      <!-- Spacer -->
+    <div class="flex items-center">
+      <SearchBar @search="handleSearch" />
     </div>
     <h1>{{ $t("track", 2) }}</h1>
     <div class="flex justify-end">
       <div class="flex items-center">
-        <button @click="triggerUploadZipClick"><IconUpload /></button>
+        <button @click="triggerUploadZipClick">
+          <IconUpload />
+        </button>
         <input
           ref="zipFileInput"
           id="zip"
@@ -54,6 +61,9 @@ const triggerUploadZipClick = () => {
   </div>
   <div v-if="trackStore.loading" class="w-full flex justify-center">
     {{ $t("loading") }}
+  </div>
+  <div v-else-if="trackStore.tracks.length === 0">
+    {{ $t("no_tracks_found") }}
   </div>
   <TrackList :noOptions="true" />
   <ActionButtonLink
