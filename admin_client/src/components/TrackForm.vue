@@ -253,7 +253,17 @@ onMounted(() => {
         </div>
 
         <!-- Number of Voices -->
-        <!-- TODO -->
+        <div v-if="formData.mode === 'choir'" class="label-and-input">
+          <label for="numberOfVoices" class="md:!text-lg">{{
+            $t("voice_count")
+          }}</label>
+          <input
+            type="number"
+            id="numberOfVoices"
+            v-model="numberOfVoices"
+            min="1"
+            :disabled="isViewMode" />
+        </div>
 
         <!-- TTS File Upload -->
         <div class="space-y-2">
