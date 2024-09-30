@@ -29,6 +29,12 @@ export const storePerformance = async (name: string) => {
   return response.data
 }
 
+export const editPerformance = async (performanceId: string, name: string) => {
+  await apiClient.post(`/api/performance/edit/${performanceId}`, {
+    name,
+  })
+}
+
 export const updateTrackPerformanceOrder = async (
   trackPerformances: TrackPerformanceIdAndSortOrder[]
 ) => {

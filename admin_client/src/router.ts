@@ -14,7 +14,7 @@ import CreateQrCodesView from "./views/CreateQrCodesView.vue"
 import ViewTrackView from "./views/ViewTrackView.vue"
 import EditTrackView from "./views/EditTrackView.vue"
 import { useTrackStore } from "./stores/useTrackStore"
-
+import EditPerformanceView from "./views/EditPerformanceView.vue"
 const routes = [
   {
     path: "/",
@@ -50,6 +50,13 @@ const routes = [
     path: "/performance/:performanceId",
     name: "PerformanceDetail",
     component: PerformanceDetailView,
+    meta: { requiresAuth: true },
+    props: true,
+  },
+  {
+    path: "/performance/:performanceId/edit",
+    name: "EditPerformance",
+    component: EditPerformanceView,
     meta: { requiresAuth: true },
     props: true,
   },

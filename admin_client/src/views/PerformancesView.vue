@@ -2,6 +2,7 @@
 import { onMounted } from "vue"
 import ActionButtonLink from "../components/ActionButtonLink.vue"
 import IconTrash from "../assets/trash.svg"
+import IconEdit from "../assets/edit.svg"
 import { useUserStore } from "../stores/useUserStore"
 import { usePerformanceStore } from "../stores/usePerformanceStore"
 
@@ -37,14 +38,19 @@ onMounted(async () => {
               {{ performance.trackCount }}
               {{ $t("track", performance.trackCount) }}</span
             >
-            <span class="md:text-lg"
+            <span class="hidden md:block md:text-lg"
               >{{ $t("created_by") }}: {{ performance.creator.username }}</span
             >
           </div>
           <!-- Right hand side buttons -->
-          <div v-if="loggedInUserIsOwnerOfPerformance(performance.creator._id)">
+          <div
+            v-if="loggedInUserIsOwnerOfPerformance(performance.creator._id)"
+            class="flex items-center gap-4">
+            <RouterLink :to="`/performance/${performance._id}/edit`">
+              <IconEdit />
+            </RouterLink>
             <button>
-              <IconTrash class="md:h-[24px] md:w-[24px]" />
+              <IconTrash />
             </button>
           </div>
         </div>
