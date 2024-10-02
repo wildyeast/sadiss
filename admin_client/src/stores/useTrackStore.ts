@@ -28,8 +28,11 @@ export const useTrackStore = defineStore("track", () => {
   }
 
   const filterTracks = (query: string) => {
-    tracks.value = originalTracks.value.filter(track =>
-      track.name.toLowerCase().includes(query.toLowerCase())
+    tracks.value = originalTracks.value.filter(
+      track =>
+        track.name.toLowerCase().includes(query.toLowerCase()) ||
+        track.creator.username.toLowerCase().includes(query.toLowerCase()) ||
+        (track.notes && track.notes.toLowerCase().includes(query.toLowerCase()))
     )
   }
 
