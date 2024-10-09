@@ -2,14 +2,16 @@
 import { ref } from "vue"
 import TrackList from "../components/TrackList.vue"
 import HeadlineWithCancelButton from "../components/HeadlineWithCancelButton.vue"
+import SearchBar from "../components/SearchBar.vue"
 import { Track } from "../types"
 import { addTracksToPerformance } from "../api"
 import { useRouter } from "vue-router"
 import { useTrackStore } from "../stores/useTrackStore"
+import IconCross from "../assets/cross.svg"
 
 const router = useRouter()
 
-const { loading } = useTrackStore()
+const { loading, filterTracks } = useTrackStore()
 
 const props = defineProps<{ performanceId: string }>()
 
@@ -30,10 +32,23 @@ const handleAddTrackToPerformance = async () => {
 
 <template>
   <div class="w-full">
+    <div
+      class="hidden md:grid grid-cols-3 items-center px-5 w-full justify-between">
+      <SearchBar @search="filterTracks" />
+      <h1>{{ $t("add_tracks_to_performance") }}</h1>
+      <button
+        @click="router.push(`/performance/${performanceId}`)"
+        class="flex justify-end">
+        <IconCross class="h-[20px]" />
+      </button>
+    </div>
     <HeadlineWithCancelButton
-      class="mx-3"
+      class="md:hidden"
       :to="`/performance/${performanceId}`"
       :text="$t('add_tracks_to_performance')" />
+    <div class="md:hidden p-3 pt-0">
+      <SearchBar @search="filterTracks" />
+    </div>
     <div v-if="loading" class="w-full flex justify-center">
       {{ $t("loading") }}
     </div>
