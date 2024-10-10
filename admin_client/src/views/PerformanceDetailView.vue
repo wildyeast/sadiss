@@ -121,14 +121,14 @@ addMessageListener(data => {
     clientsConnectedToPerformanceByChoirId.value =
       data.adminInfo.clientsConnectedToPerformanceByChoirId
 
-    const voices = Object.keys(clientsConnectedToPerformanceByChoirId.value)
+    // const voices = Object.keys(clientsConnectedToPerformanceByChoirId.value)
 
-    const differenceBetweenActualCountAndMaxVoiceCount =
-      maxVoiceCount.value - voices.length
+    // const differenceBetweenActualCountAndMaxVoiceCount =
+    //   maxVoiceCount.value - voices.length
 
-    for (let i = 0; i < differenceBetweenActualCountAndMaxVoiceCount; i++) {
-      clientsConnectedToPerformanceByChoirId.value[`${voices.length + i}`] = 0
-    }
+    // for (let i = 0; i < differenceBetweenActualCountAndMaxVoiceCount; i++) {
+    //   clientsConnectedToPerformanceByChoirId.value[`${voices.length + i}`] = 0
+    // }
   }
 })
 
