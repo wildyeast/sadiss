@@ -75,7 +75,7 @@ const createAdminInfoMessage = (wss: Server, adminPerformanceId?: Types.ObjectId
 
   if (adminPerformanceId) {
     const clientsConnectedToPerformanceByChoirId = Array.from(wss.clients).reduce((acc, client) => {
-      if (client.performanceId === adminPerformanceId && client.choirId) {
+      if (client.performanceId === adminPerformanceId && client.choirId !== undefined) {
         acc[client.choirId] = (acc[client.choirId] || 0) + 1
       }
       return acc
