@@ -36,6 +36,12 @@ export const useTrackStore = defineStore("track", () => {
     )
   }
 
+  const filterTracksByUser = (userId: string) => {
+    tracks.value = originalTracks.value.filter(
+      track => track.creator._id === userId
+    )
+  }
+
   const getTrackById = (trackId: string) => {
     return tracks.value.find(track => track._id === trackId)
   }
@@ -46,5 +52,6 @@ export const useTrackStore = defineStore("track", () => {
     loadTracks,
     getTrackById,
     filterTracks,
+    filterTracksByUser,
   }
 })

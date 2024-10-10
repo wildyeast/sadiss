@@ -31,6 +31,10 @@ input,
   @apply w-full py-2 px-4 border-2 border-silver bg-middlegrey md:py-0 md:h-[30px] md:px-1;
 }
 
+select {
+  @apply text-secondary py-1 px-4 border-2 border-secondary bg-white md:py-0 md:h-[30px];
+}
+
 .button-primary {
   @apply text-middlegrey bg-button-bg p-3 rounded-lg text-md;
 }
