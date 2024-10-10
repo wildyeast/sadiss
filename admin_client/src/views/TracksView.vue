@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, useTemplateRef } from "vue"
+import { onMounted, ref, useTemplateRef } from "vue"
 import SearchBar from "../components/SearchBar.vue"
 import ActionButtonLink from "../components/ActionButtonLink.vue"
 import TrackList from "../components/TrackList.vue"
@@ -54,6 +54,13 @@ const handleFilterChange = (event: Event) => {
     localStorage.removeItem(FILTER_SETTING_KEY)
   }
 }
+
+onMounted(async () => {
+  await trackStore.loadTracks()
+  if (filterBy.value === "myTracks" && userStore.loggedInUserId) {
+    trackStore.filterTracksByUser(userStore.loggedInUserId)
+  }
+})
 </script>
 
 <template>
@@ -64,7 +71,7 @@ const handleFilterChange = (event: Event) => {
     </div>
     <h1>{{ $t("track", 2) }}</h1>
     <div class="flex items-center justify-end gap-4 mb-3 md:mb-0">
-      <select v-model="filterBy" @change="handleFilterChange($event)">
+      <select v-model="filterBy" @change="handleFilterChange">
         <option value="all">{{ $t("all_tracks") }}</option>
         <option value="myTracks">{{ $t("my_tracks") }}</option>
       </select>

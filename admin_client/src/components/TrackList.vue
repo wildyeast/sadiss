@@ -7,7 +7,6 @@ import IconEdit from "../assets/edit.svg"
 import IconInfo from "../assets/info.svg"
 import IconWaveform from "../assets/waveform.svg"
 import IconTtsRate from "../assets/tts_rate.svg"
-import { onMounted } from "vue"
 import { deleteTrack, downloadTrack } from "../api"
 import { useI18n } from "vue-i18n"
 import { useUserStore } from "../stores/useUserStore"
@@ -64,10 +63,6 @@ const handleDownloadTrack = async (trackId: string) => {
     console.error("Error downloading track:", error)
   }
 }
-
-onMounted(async () => {
-  trackStore.loadTracks()
-})
 </script>
 <template>
   <div v-if="trackStore.tracks" class="list-container">
