@@ -57,7 +57,6 @@ export const addTracksToPerformance = async (
   performanceId: string,
   trackIds: string[]
 ) => {
-  // TODO: Adjust endpoint so it can take multiple trackIds
   await apiClient.post("/api/add-tracks-to-performance", {
     trackIds,
     performanceId,
