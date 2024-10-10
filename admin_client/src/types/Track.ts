@@ -15,4 +15,5 @@ export default interface Track {
   sortOrder: number
   startTime: number
   trackLengthInChunks: number
+  partialsCount: number
 }

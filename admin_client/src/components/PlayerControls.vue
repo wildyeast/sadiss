@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed, watch } from "vue"
+import { ref, onMounted, computed, watch } from "vue"
 import type { Track } from "../types"
 import { loadTrackForPlayback, startTrack, stopTrack } from "../api"
 import { formatTime } from "../utils/formatTime"
@@ -11,7 +11,7 @@ import { useWebSocket } from "../composables/useWebSocket"
 
 const { getGlobalTime } = useMCorp()
 
-const { ws, addMessageListener } = useWebSocket()
+const { addMessageListener } = useWebSocket()
 
 const props = defineProps<{
   performanceId: string
@@ -117,16 +117,7 @@ const webSocketMessageListener = async (data: any) => {
 }
 
 onMounted(async () => {
-  if (!ws.value) return
-  ws.value.send(
-    JSON.stringify({ message: "isAdmin", performanceId: props.performanceId })
-  )
   addMessageListener(webSocketMessageListener)
-})
-
-onUnmounted(() => {
-  ws.value?.close()
-  // removeMessageListener(webSocketMessageListener)
 })
 
 // Enforce min and max values

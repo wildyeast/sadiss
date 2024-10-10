@@ -16,7 +16,7 @@ exports.getPerformanceWithTracks = async (req: Request, res: Response) => {
       { performance: performance._id, deleted: { $ne: true } },
       'track _id sortOrder startTime'
     )
-      .populate('track', 'name notes mode waveform ttsRate creator isPublic partialFile ttsFiles chunkFileName')
+      .populate('track', 'name notes mode waveform ttsRate creator isPublic partialFile ttsFiles chunkFileName partialsCount')
       .lean()
 
     trackPerformances.sort((a, b) => {

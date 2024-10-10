@@ -1,44 +1,44 @@
 <script setup lang="ts">
-import { ref, Ref, computed, onMounted } from "vue"
+import { ref, computed, onMounted } from "vue"
 import IconChevronDown from "../assets/chevron_down.svg"
 import IconChevronUp from "../assets/chevron_up.svg"
 import IconClientsCount from "../assets/clients_count.svg"
 import IconConflictingClientsCount from "../assets/conflicting_clients_count.svg"
 
-const connectedClients: Ref<{ [key: string]: string }> = ref({})
+const props = defineProps<{
+  connectedClients: Record<string, number>
+}>()
 
 const clientListDisplayed = ref(false)
+
 const totalConnectedClients = computed(() =>
-  Object.values(connectedClients.value).reduce(
-    (acc, curr) => acc + parseInt(curr),
-    0
-  )
+  Object.values(props.connectedClients).reduce((acc, curr) => acc + curr, 0)
 )
 
 const voicesWithoutClientsCount = computed(() => {
-  return Object.values(connectedClients.value).filter(v => v === "0").length
+  return Object.values(props.connectedClients).filter(v => v === 0).length
 })
 
 const toggleClientList = () => {
   clientListDisplayed.value = !clientListDisplayed.value
 
   if (clientListDisplayed.value) {
-    generateFakeVoicesAndClients()
+    // generateFakeVoicesAndClients()
   }
 }
 
-const generateFakeVoicesAndClients = () => {
-  connectedClients.value = {}
-  const voices = Math.floor(Math.random() * 16) + 4
-  for (let i = 0; i < voices; i++) {
-    connectedClients.value[i.toString()] = Math.floor(
-      Math.random() * 12
-    ).toString()
-  }
-}
+// const generateFakeVoicesAndClients = () => {
+//   connectedClients.value = {}
+//   const voices = Math.floor(Math.random() * 16) + 4
+//   for (let i = 0; i < voices; i++) {
+//     connectedClients.value[i.toString()] = Math.floor(
+//       Math.random() * 12
+//     ).toString()
+//   }
+// }
 
 onMounted(() => {
-  generateFakeVoicesAndClients()
+  // generateFakeVoicesAndClients()
 })
 </script>
 
@@ -80,7 +80,7 @@ onMounted(() => {
       <span
         v-for="client in Object.keys(connectedClients)"
         :key="client"
-        :class="{ 'text-silver': connectedClients[client] === '0' }">
+        :class="{ 'text-silver': connectedClients[client] === 0 }">
         {{ client }}: {{ connectedClients[client] }}
       </span>
     </div>

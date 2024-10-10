@@ -23,10 +23,13 @@ import IconQrCode from "../assets/qr_code.svg"
 import ModalSetStartTime from "../components/modals/ModalSetStartTime.vue"
 import ActionButtonLink from "../components/ActionButtonLink.vue"
 import { useI18n } from "vue-i18n"
+import { useWebSocket } from "../composables/useWebSocket"
 
 const { t } = useI18n()
 
 const props = defineProps<{ performanceId: string }>()
+
+const { sendMessage, addMessageListener } = useWebSocket()
 
 const performance: Ref<SadissPerformance | null> = ref(null)
 const tracks: Ref<Track[] | null> = ref(null)
@@ -93,6 +96,41 @@ const handleDeleteTrackFromPerformance = async (trackPerformanceId: string) => {
   }
 }
 
+// We calculate here instead of on the server because we don't fetch the performance with tracks
+// again when deleting a track from the performance.
+const maxVoiceCount = computed(() => {
+  if (!tracks.value) return 0
+
+  return Math.max(
+    ...tracks.value.flatMap(track => [
+      track.partialsCount ?? 0,
+      track.ttsFiles?.length ?? 0,
+    ])
+  )
+})
+
+const clientsConnectedToPerformanceByChoirId: Ref<Record<string, number>> = ref(
+  {}
+)
+
+addMessageListener(data => {
+  if (
+    data.message === "adminInfo" &&
+    data.adminInfo.clientsConnectedToPerformanceByChoirId
+  ) {
+    clientsConnectedToPerformanceByChoirId.value =
+      data.adminInfo.clientsConnectedToPerformanceByChoirId
+
+    const differenceBetweenActualCountAndMaxVoiceCount =
+      maxVoiceCount.value -
+      Object.keys(clientsConnectedToPerformanceByChoirId.value).length
+
+    for (let i = 0; i < differenceBetweenActualCountAndMaxVoiceCount; i++) {
+      clientsConnectedToPerformanceByChoirId.value[`${i}`] = 0
+    }
+  }
+})
+
 watch(
   () => performance.value,
   newValue => {
@@ -106,13 +144,18 @@ onMounted(async () => {
   try {
     const performanceId = props.performanceId as string
     performance.value = await getPerformanceWithTracks(performanceId)
+    sendMessage({
+      message: "isAdmin",
+      performanceId: props.performanceId,
+    })
   } catch (error) {
     console.error(error)
   }
 })
 </script>
 <template>
-  <ConnectedClientsList />
+  <ConnectedClientsList
+    :connected-clients="clientsConnectedToPerformanceByChoirId" />
   <div v-if="performance" class="w-full relative">
     <h1>{{ performance.name }}</h1>
 

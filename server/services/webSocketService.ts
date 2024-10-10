@@ -3,6 +3,7 @@ import { activePerformances } from './activePerformanceService'
 import { logger } from '../tools'
 import { Message } from '../types/types'
 import { v4 as uuidv4 } from 'uuid'
+import { Types } from 'mongoose'
 
 /**
  * Starts a WebSocket server on the specified port.
@@ -35,7 +36,7 @@ export const startWebSocketServer = (port = 0) => {
       } else if (parsed.message === 'isAdmin') {
         client.isAdmin = true
 
-        client.send(createAdminInfoMessage(wss))
+        client.send(JSON.stringify(createAdminInfoMessage(wss)))
 
         if (parsed.performanceId) {
           client.performanceId = parsed.performanceId
@@ -52,19 +53,38 @@ export const startDashboardInformationInterval = (wss: Server) => {
   setInterval(() => {
     for (const client of wss.clients) {
       if (client.isAdmin) {
-        const adminInfo = createAdminInfoMessage(wss)
-        client.send(adminInfo)
+        const adminInfo = createAdminInfoMessage(wss, client.performanceId)
+        client.send(JSON.stringify(adminInfo))
+        console.log('adminInfo', adminInfo)
       }
     }
   }, 5000)
 }
 
-const createAdminInfoMessage = (wss: Server) => {
-  return JSON.stringify({
+const createAdminInfoMessage = (wss: Server, adminPerformanceId?: Types.ObjectId) => {
+  interface AdminInfo {
+    activePerformancesCount: number
+    connectedClientsCount: number
+    clientsConnectedToPerformanceByChoirId?: Record<string, number>
+  }
+
+  const adminInfo: AdminInfo = {
+    activePerformancesCount: activePerformances.filter((performance) => performance.isRunning()).length,
+    connectedClientsCount: wss.clients.size
+  }
+
+  if (adminPerformanceId) {
+    const clientsConnectedToPerformanceByChoirId = Array.from(wss.clients).reduce((acc, client) => {
+      if (client.performanceId === adminPerformanceId && client.choirId) {
+        acc[client.choirId] = (acc[client.choirId] || 0) + 1
+      }
+      return acc
+    }, {} as Record<string, number>)
+    adminInfo.clientsConnectedToPerformanceByChoirId = clientsConnectedToPerformanceByChoirId
+  }
+
+  return {
     message: 'adminInfo',
-    adminInfo: {
-      activePerformancesCount: activePerformances.filter((performance) => performance.isRunning()).length,
-      connectedClientsCount: wss.clients.size
-    }
-  })
+    adminInfo
+  }
 }
