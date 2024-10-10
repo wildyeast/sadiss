@@ -118,17 +118,25 @@ addMessageListener(data => {
     data.message === "adminInfo" &&
     data.adminInfo.clientsConnectedToPerformanceByChoirId
   ) {
-    clientsConnectedToPerformanceByChoirId.value =
-      data.adminInfo.clientsConnectedToPerformanceByChoirId
+    clientsConnectedToPerformanceByChoirId.value = {}
 
-    // const voices = Object.keys(clientsConnectedToPerformanceByChoirId.value)
+    for (let i = 0; i < maxVoiceCount.value; i++) {
+      clientsConnectedToPerformanceByChoirId.value[`${i}`] = 0
+    }
 
-    // const differenceBetweenActualCountAndMaxVoiceCount =
-    //   maxVoiceCount.value - voices.length
-
-    // for (let i = 0; i < differenceBetweenActualCountAndMaxVoiceCount; i++) {
-    //   clientsConnectedToPerformanceByChoirId.value[`${voices.length + i}`] = 0
-    // }
+    for (const choirId in data.adminInfo
+      .clientsConnectedToPerformanceByChoirId) {
+      const voiceCount =
+        data.adminInfo.clientsConnectedToPerformanceByChoirId[choirId]
+      if (voiceCount) {
+        const key = Object.keys(
+          clientsConnectedToPerformanceByChoirId.value
+        ).includes(choirId)
+          ? choirId
+          : `X ${choirId}`
+        clientsConnectedToPerformanceByChoirId.value[key] = voiceCount
+      }
+    }
   }
 })
 
