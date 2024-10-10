@@ -65,7 +65,7 @@ onMounted(() => {
         <button @click="toggleClientList">
           <IconChevronDown
             v-if="!clientListDisplayed"
-            class="h-[13px] w-[13px] icon [&>*]:stroke-[red] md:h-[24px] md:w-[24px]" />
+            class="h-[13px] w-[13px] icon md:h-[24px] md:w-[24px]" />
           <IconChevronUp
             v-else
             class="h-[13px] w-[13px] md:h-[24px] md:w-[24px]" />
