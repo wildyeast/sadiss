@@ -37,7 +37,8 @@ describe('getPerformanceWithTracks', () => {
             notes: 'test notes',
             sortOrder: 1,
             trackPerformanceId: trackPerformances[0]._id,
-            startTime: 0
+            startTime: 0,
+            partialsCount: 8
           },
           {
             _id: tracks[1]._id,
@@ -63,7 +64,8 @@ describe('getPerformanceWithTracks', () => {
             sortOrder: 2,
             trackPerformanceId: trackPerformances[1]._id,
             notes: 'test notes',
-            startTime: 0
+            startTime: 0,
+            partialsCount: 8
           }
         ]
       }
