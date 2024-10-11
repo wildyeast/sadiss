@@ -55,7 +55,6 @@ export const startDashboardInformationInterval = (wss: Server) => {
       if (client.isAdmin) {
         const adminInfo = createAdminInfoMessage(wss, client.performanceId)
         client.send(JSON.stringify(adminInfo))
-        console.log('adminInfo', adminInfo)
       }
     }
   }, 5000)
