@@ -1,14 +1,8 @@
 import { authenticateUser, generateToken } from '../services/authService'
-import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
-import { User } from '../models/user'
-import { InvalidInputError, NotFoundError } from '../errors'
+import { NotFoundError } from '../errors'
 
 describe('authService', () => {
-  it('should throw an error if email or password is missing', async () => {
-    await expect(authenticateUser('', '')).rejects.toThrow(InvalidInputError)
-  })
-
   it('should throw an error if the user is not found', async () => {
     await expect(authenticateUser('test@example.com', 'password')).rejects.toThrow(NotFoundError)
   })

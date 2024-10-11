@@ -19,7 +19,7 @@ export const login = async (req: Request, res: Response) => {
     res.cookie('jwt', token, {
       httpOnly: true,
       secure: secureOption,
-      //@ts-ignore 'Strict' might be correct here, not 'strict'
+      //@ts-ignore 'Strict' seems to be correct here, not 'strict'
       sameSite: 'Strict',
       expires: new Date(Date.now() + 1000 * 60 * 60 * 24) // 1 day
     })

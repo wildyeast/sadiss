@@ -3,6 +3,7 @@ import passport from 'passport'
 import { authenticateToken } from '../auth'
 import { validatePerformanceAccess } from '../middlewares/validatePerformanceAccess'
 import { validateTrackAccess } from '../middlewares/validateTrackAccess'
+import { validateLoginInput } from '../middlewares/validateLoginInput'
 
 const track_controller = require('../controllers/trackController')
 const performance_controller = require('../controllers/performanceController')
@@ -87,7 +88,7 @@ router.get('/api/performance/:id/with-tracks', performance_view_controller.getPe
 
 /* AUTH */
 // Login
-router.post('/login', passport.authenticate('local', { session: false }), auth_controller.login)
+router.post('/login', validateLoginInput, passport.authenticate('local', { session: false }), auth_controller.login)
 
 // Register
 router.post('/register', auth_controller.register)
