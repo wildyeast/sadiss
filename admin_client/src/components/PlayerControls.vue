@@ -139,7 +139,6 @@ watch(
 
 <template>
   <div class="flex flex-col items-center justify-between gap-3 py-3">
-    <p>{{ selectedTrack.name }}</p>
     <div class="grid grid-cols-3 gap-3 w-full px-5">
       <div>
         <!-- Spacer -->
