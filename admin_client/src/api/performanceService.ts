@@ -35,6 +35,16 @@ export const editPerformance = async (performanceId: string, name: string) => {
   })
 }
 
+export const deletePerformance = async (performanceId: string) => {
+  const response = await apiClient.post(
+    `/api/performance/delete/${performanceId}`,
+    {
+      performanceId,
+    }
+  )
+  return response
+}
+
 export const updateTrackPerformanceOrder = async (
   trackPerformances: TrackPerformanceIdAndSortOrder[]
 ) => {
