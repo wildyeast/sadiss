@@ -10,6 +10,7 @@ export default {
       silver: "#C2C2C2",
       "button-bg": "#2C2C2C",
       danger: "#FF0000",
+      highlight: "#79ea04",
     },
     extend: {
       fontFamily: {

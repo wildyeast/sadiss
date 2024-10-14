@@ -40,6 +40,8 @@ const i18n = createI18n({
       public_track: "Public Track",
       public_track_description:
         "Publish track to be visible and usable by anyone",
+      start_track: "Start track",
+      stop_track: "Stop track",
       text_to_speech: "Text to Speech",
       time_sync: "Time Sync",
       time_sync_status: {
@@ -47,6 +49,8 @@ const i18n = createI18n({
         unsynced: "Unsynced",
       },
       title: "Title",
+      toggle_auto_play: "Toggle auto-play",
+      toggle_loop: "Toggle loop",
       track: "Track | Tracks",
       tts_file_upload_button: "Select Text to Speech File",
       tts_languages: "TTS Languages",

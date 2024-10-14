@@ -6,6 +6,7 @@ import { formatTime } from "../utils/formatTime"
 import PlayIcon from "../assets/play.svg"
 import PauseIcon from "../assets/pause.svg"
 import ResetIcon from "../assets/reset.svg"
+import IconLoop from "../assets/loop.svg"
 import { useMCorp } from "../composables/useMCorp"
 import { useWebSocket } from "../composables/useWebSocket"
 
@@ -139,34 +140,44 @@ watch(
 <template>
   <div class="flex flex-col items-center justify-between gap-3 py-3">
     <p>{{ selectedTrack.name }}</p>
-    <div class="flex items-center">
-      <button @click="handleStopTrack" class="btn--main-control">
-        <ResetIcon />
-      </button>
-      <button
-        v-if="!trackIsRunning"
-        @click="handleStartTrack(selectedTrack._id)"
-        title="Start track">
-        <PlayIcon />
-      </button>
-      <button
-        v-else
-        @click="handleStopTrack"
-        title="Stop track"
-        class="btn--main-control">
-        <PauseIcon />
-      </button>
-      <button
-        @click="toggleShouldGoToNextTrack"
-        class="text-danger mr-4"
-        :class="{ 'text-highlight': shouldGoToNextTrack }"
-        title="Toogle auto-play">
-        <!-- <font-awesome-icon icon="fa-forward-fast" size="lg" /> -->
-        Auto play
-      </button>
-      <button @click="toggleLoop" class="text-danger" title="Toogle auto-play">
-        Loop
-      </button>
+    <div class="grid grid-cols-3 gap-3 w-full px-5">
+      <div>
+        <!-- Spacer -->
+      </div>
+      <div>
+        <button
+          @click="handleStopTrack"
+          class="btn--main-control"
+          :title="$t('stop_track')">
+          <ResetIcon />
+        </button>
+        <button
+          v-if="!trackIsRunning"
+          @click="handleStartTrack(selectedTrack._id)"
+          :title="$t('start_track')">
+          <PlayIcon />
+        </button>
+        <button
+          v-else
+          @click="handleStopTrack"
+          :title="$t('stop_track')"
+          class="btn--main-control">
+          <PauseIcon />
+        </button>
+      </div>
+      <div class="flex items-center justify-end">
+        <button
+          @click="toggleShouldGoToNextTrack"
+          class="mr-4"
+          :class="{ 'text-highlight': shouldGoToNextTrack }"
+          :title="$t('toggle_auto_play')">
+          <!-- <font-awesome-icon icon="fa-forward-fast" size="lg" /> -->
+          Auto play
+        </button>
+        <button @click="toggleLoop" :title="$t('toggle_loop')">
+          <IconLoop :class="{ '[&>*]:stroke-highlight': shouldLoop }" />
+        </button>
+      </div>
     </div>
     <div class="w-full px-5">
       <div class="flex justify-between">
