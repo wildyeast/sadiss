@@ -1,17 +1,16 @@
-import { Server } from 'ws'
 import { activePerformances } from './activePerformanceService'
 import { logger } from '../tools'
 import { Message } from '../types/types'
 import { v4 as uuidv4 } from 'uuid'
 import { Types } from 'mongoose'
-
+import { SadissWebSocketServer } from '../lib/SadissWebsocket'
 /**
  * Starts a WebSocket server on the specified port.
  * @param port The port number to listen on. If not provided, a random port will be used.
  * @returns The WebSocket server instance.
  */
 export const startWebSocketServer = (port = 0) => {
-  const wss = new Server({ port })
+  const wss = new SadissWebSocketServer({ port })
 
   wss.on('connection', (client) => {
     // Assign id to new connection, needed for nonChoir partial distribution
@@ -49,7 +48,7 @@ export const startWebSocketServer = (port = 0) => {
   return wss
 }
 
-export const startDashboardInformationInterval = (wss: Server) => {
+export const startDashboardInformationInterval = (wss: SadissWebSocketServer) => {
   setInterval(() => {
     for (const client of wss.clients) {
       if (client.isAdmin) {
@@ -60,7 +59,7 @@ export const startDashboardInformationInterval = (wss: Server) => {
   }, 5000)
 }
 
-const createAdminInfoMessage = (wss: Server, adminPerformanceId?: Types.ObjectId) => {
+const createAdminInfoMessage = (wss: SadissWebSocketServer, adminPerformanceId?: Types.ObjectId) => {
   interface AdminInfo {
     activePerformancesCount: number
     connectedClientsCount: number
