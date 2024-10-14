@@ -22,6 +22,8 @@ const i18n = createI18n({
       default_language: "Default Language",
       delete_track: "Delete Track",
       download_track: "Download Track",
+      drag_and_drop_to_upload: "or drag and drop here",
+      drop_now: "Drop now!",
       edit_performance: "Edit Performance",
       edit_track: "Edit Track",
       generate_qr_codes: "Generate QR Codes",
