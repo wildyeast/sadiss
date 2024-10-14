@@ -11,6 +11,7 @@ import { deleteTrack, downloadTrack } from "../api"
 import { useI18n } from "vue-i18n"
 import { useUserStore } from "../stores/useUserStore"
 import { useTrackStore } from "../stores/useTrackStore"
+import { onMounted } from "vue"
 
 const { t } = useI18n()
 
@@ -63,6 +64,12 @@ const handleDownloadTrack = async (trackId: string) => {
     console.error("Error downloading track:", error)
   }
 }
+
+onMounted(async () => {
+  if (!trackStore.tracks.length) {
+    await trackStore.loadTracks()
+  }
+})
 </script>
 <template>
   <div v-if="trackStore.tracks" class="list-container">
