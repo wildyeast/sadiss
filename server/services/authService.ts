@@ -5,6 +5,7 @@ import { NotFoundError } from '../errors'
 
 export const authenticateUser = async (email: string, password: string) => {
   const user = await User.findOne({ email })
+
   if (!user) {
     throw new NotFoundError('Invalid email or password')
   }

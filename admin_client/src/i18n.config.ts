@@ -26,6 +26,14 @@ const i18n = createI18n({
       drop_now: "Drop now!",
       edit_performance: "Edit Performance",
       edit_track: "Edit Track",
+      error: {
+        anErrorOccurred: "An error occurred. Please try again later.",
+        incorrectCredentials: "Invalid email or password",
+        invalidInput: "Please provide an email and password",
+        logoutFailed: "Logout failed",
+        noResponseFromServer:
+          "No response from server. Please try again later.",
+      },
       generate_qr_codes: "Generate QR Codes",
       languages: "Languages",
       loading: "Loading...",

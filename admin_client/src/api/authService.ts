@@ -1,4 +1,7 @@
 import apiClient from "./axiosInstance"
+import i18n from "../i18n.config"
+
+const t = i18n.global.t
 
 export const login = async (email: string, password: string) => {
   try {
@@ -9,11 +12,18 @@ export const login = async (email: string, password: string) => {
     return response.data.message
   } catch (error: any) {
     if (error.response) {
-      throw new Error(error.response.data.message || "Login failed")
+      switch (error.response.status) {
+        case 400:
+          throw new Error(t("error.invalidInput"))
+        case 401:
+          throw new Error(t("error.incorrectCredentials"))
+        default:
+          throw new Error(t("error.anErrorOccurred"))
+      }
     } else if (error.request) {
-      throw new Error("No response from server. Please try again later.")
+      throw new Error(t("error.noResponseFromServer"))
     } else {
-      throw new Error("An error occurred. Please try again later.")
+      throw new Error(t("error.anErrorOccurred"))
     }
   }
 }
@@ -27,11 +37,12 @@ export async function isUserLoggedIn() {
     return response.data.userId
   } catch (error: any) {
     if (error.response) {
-      throw new Error(error.response.data.message || "Login failed")
+      const errorCode = error.response.data.code || "INVALID_LOGIN"
+      throw new Error(t(`error.${errorCode}`))
     } else if (error.request) {
-      throw new Error("No response from server. Please try again later.")
+      throw new Error(t("error.noResponseFromServer"))
     } else {
-      throw new Error("An error occurred. Please try again later.")
+      throw new Error(t("error.anErrorOccurred"))
     }
   }
 }
@@ -43,11 +54,11 @@ export async function logout() {
     return response.data.message
   } catch (error: any) {
     if (error.response) {
-      throw new Error(error.response.data.message || "Logout failed")
+      throw new Error(t("error.logoutFailed"))
     } else if (error.request) {
-      throw new Error("No response from server. Please try again later.")
+      throw new Error(t("error.noResponseFromServer"))
     } else {
-      throw new Error("An error occurred. Please try again later.")
+      throw new Error(t("error.anErrorOccurred"))
     }
   }
 }

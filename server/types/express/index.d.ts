@@ -13,7 +13,7 @@ declare global {
       user?: User | undefined
     }
     interface User {
-      id: Types.ObjectId
+      _id: Types.ObjectId
       password: string
     }
   }
