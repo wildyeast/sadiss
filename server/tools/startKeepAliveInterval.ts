@@ -1,10 +1,11 @@
 import { Server } from 'ws'
+import { SadissWebSocketServer } from '../lib/SadissWebsocket'
 
 /**
  * Every 50s we check if connected clients have received a message in the last 5s. If they have not, we send a message to keep the connection alive.
- * @param {Server} wss The current ws websocket server instance.
+ * @param {SadissWebSocketServer} wss The current ws websocket server instance.
  */
-export const startKeepAliveInterval = (wss: Server) => {
+export const startKeepAliveInterval = (wss: SadissWebSocketServer) => {
   setInterval(() => {
     if (wss.clients.size) {
       for (const client of wss.clients) {

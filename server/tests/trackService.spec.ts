@@ -1,6 +1,6 @@
 import { getTrackDataForDownload } from '../services/trackService'
 import { createTestTrack } from './testUtils'
-
+import { Types } from 'mongoose'
 describe('trackService', () => {
   it('should return a track with the correct fields for download', async () => {
     const track = await createTestTrack()
@@ -17,7 +17,7 @@ describe('trackService', () => {
       ttsFiles: track.ttsFiles,
       partialFile: track.partialFile,
       isPublic: track.isPublic,
-      creator: track.creator.toString()
+      creator: new Types.ObjectId(track.creator)
     })
   })
 })

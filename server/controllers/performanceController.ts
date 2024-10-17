@@ -20,7 +20,7 @@ exports.getPerformances = async (req: Request, res: Response) => {
   try {
     // Get all performances that are public or owned by the user
     const performances = await SadissPerformance.find(
-      { $or: [{ isPublic: true }, { creator: req.user!.id }], deleted: { $ne: true } },
+      { $or: [{ isPublic: true }, { creator: req.user?._id }], deleted: { $ne: true } },
       '_id name creator isPublic'
     )
       .populate('creator', 'username')
@@ -62,7 +62,7 @@ exports.getPerformances = async (req: Request, res: Response) => {
 exports.getOwnPerformances = async (req: Request, res: Response) => {
   try {
     const performances = await SadissPerformance.find(
-      { creator: req.user!.id, deleted: { $ne: true } },
+      { creator: req.user?._id, deleted: { $ne: true } },
       '_id name creator isPublic'
     ).populate('creator', 'username')
 
@@ -108,7 +108,7 @@ exports.createPerformance = async (req: Request, res: Response) => {
     }
 
     // Save new performance to database
-    const performance = new SadissPerformance({ name, isPublic: !!isPublic, creator: req.user!.id })
+    const performance = new SadissPerformance({ name, isPublic: !!isPublic, creator: req.user?._id })
     performance.save((err) => {
       if (err) {
         res.status(500).send(err)
@@ -134,7 +134,7 @@ exports.deletePerformance = async (req: Request, res: Response) => {
     }
 
     // Check if user owns performance
-    if (performance.creator.toString() !== req.user!.id.toString()) {
+    if (performance.creator.toString() !== req.user?._id.toString()) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
@@ -143,14 +143,14 @@ exports.deletePerformance = async (req: Request, res: Response) => {
     for (const trackPerformance of trackPerformances) {
       trackPerformance.deleted = true
       trackPerformance.deletedAt = new Date()
-      trackPerformance.deletedBy = req.user!.id
+      trackPerformance.deletedBy = req.user?._id
       await trackPerformance.save()
     }
 
     // Soft delete performance
     performance.deleted = true
     performance.deletedAt = new Date()
-    performance.deletedBy = req.user!.id
+    performance.deletedBy = req.user?._id
     await performance.save()
 
     res.status(200).json({ message: 'Performance deleted' })
@@ -172,7 +172,7 @@ exports.editPerformance = async (req: Request, res: Response) => {
     }
 
     // Check if user owns performance
-    if (performance.creator.toString() !== req.user!.id.toString()) {
+    if (performance.creator.toString() !== req.user?._id.toString()) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 

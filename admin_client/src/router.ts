@@ -113,17 +113,25 @@ const router = createRouter({
 
 router.beforeEach(async (to, _from, next) => {
   const userStore = useUserStore()
-  const userId = await isUserLoggedIn()
-  if (userId) {
-    userStore.loggedInUserId = userId
-  } else {
-    userStore.loggedInUserId = null
+  try {
+    const userId = await isUserLoggedIn()
+    if (userId) {
+      userStore.loggedInUserId = userId
+    } else {
+      userStore.loggedInUserId = null
+    }
+  } catch (error) {
+    next("/login")
+    return
   }
 
-  if (to.matched.some(record => record.meta.requiresAuth) && !userId) {
+  if (
+    to.matched.some(record => record.meta.requiresAuth) &&
+    !userStore.loggedInUserId
+  ) {
     next("/login")
   } else {
-    if (to.name === "Login" && userId) {
+    if (to.name === "Login" && userStore.loggedInUserId) {
       next("/dashboard")
     } else if (to.name === "ViewTrack" || to.name === "EditTrack") {
       const trackStore = useTrackStore()

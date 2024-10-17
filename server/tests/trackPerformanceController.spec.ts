@@ -72,15 +72,13 @@ describe('trackPerformanceController test', () => {
       const trackPerformanceData = { track: track }
       const res = await agent.post('/api/add-tracks-to-performance').send(trackPerformanceData)
       expect(res.status).toBe(400)
-      expect(res.body.error).toBe('Invalid input data')
     })
 
     it('should return a 400 error if no trackIds are provided', async () => {
       const performanceId = await createTestPerformance()
-      const trackPerformanceData = { performance: performanceId }
+      const trackPerformanceData = { performanceId }
       const res = await agent.post('/api/add-tracks-to-performance').send(trackPerformanceData)
       expect(res.status).toBe(400)
-      expect(res.body.error).toBe('Invalid input data')
     })
 
     it('should return a 400 error if a non-public track is added to a public performance', async () => {

@@ -6,10 +6,9 @@ import fs from 'fs'
 import mongoose from 'mongoose'
 import { trackSchema } from '../models/track'
 import path from 'path'
+import { app, server, wss } from '../server'
 
 dotenv.config({ path: '.env.test' })
-
-const { app, server, wss } = require('../server')
 
 const agent = request.agent(app)
 global.agent = agent

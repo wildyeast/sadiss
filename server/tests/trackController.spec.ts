@@ -1,7 +1,6 @@
 import { Track, TrackPerformance } from '../models'
 import { createTestPerformance, createTestTrack, createTestTrackPerformance } from './testUtils'
 import { generateMockId } from './testUtils'
-import fs from 'fs'
 
 describe('trackController test', () => {
   describe('GET /api/tracks', () => {
@@ -448,7 +447,10 @@ describe('trackController test', () => {
 
   describe('POST /api/track/upload-zip', () => {
     it('should return 201 if zip file uploaded successfully', async () => {
+      const trackService = require('../services/trackService')
+      const mockUploadTrackFromJson = jest.spyOn(trackService, 'uploadTrackFromJson').mockResolvedValueOnce(true)
       await agent.post('/api/track/upload-zip').attach('file', 'tests/testFiles/testZipFile.zip').expect(201)
+      expect(mockUploadTrackFromJson).toHaveBeenCalled()
     })
 
     // it('should return 400 if no file provided', async () => {

@@ -69,7 +69,7 @@ exports.deleteTrack = async (req: Request, res: Response) => {
     }
 
     // Check if user owns track
-    if (track.creator.toString() !== req.user!.id.toString()) {
+    if (track.creator.toString() !== req.user!._id.toString()) {
       return res.status(401).json({ error: 'Unauthorized' })
     }
 
@@ -78,14 +78,14 @@ exports.deleteTrack = async (req: Request, res: Response) => {
     for (const trackPerformance of trackPerformances) {
       trackPerformance.deleted = true
       trackPerformance.deletedAt = new Date()
-      trackPerformance.deletedBy = req.user!.id
+      trackPerformance.deletedBy = req.user!._id
       trackPerformance.save()
     }
 
     // Soft delete track
     track.deleted = true
     track.deletedAt = new Date()
-    track.deletedBy = req.user!.id
+    track.deletedBy = req.user!._id
     track.save()
 
     res.status(200).json({ message: 'Track deleted' })
@@ -96,7 +96,7 @@ exports.deleteTrack = async (req: Request, res: Response) => {
 
 exports.getTracks = async (req: Request, res: Response) => {
   try {
-    const allTracks = await getTracks(req.user!.id)
+    const allTracks = await getTracks(req.user!._id)
     res.json({ tracks: allTracks })
   } catch (err) {
     res.status(500).json({ Error: 'Failed fetching tracks.' })
@@ -170,7 +170,7 @@ exports.uploadTrack = async (req: Request, res: Response) => {
       partialFileInfo,
       partialsCount,
       isPublic,
-      req.user!.id,
+      req.user!._id,
       trackLengthInChunks
     )
 
@@ -227,7 +227,7 @@ exports.editTrack = async (req: Request, res: Response) => {
       return
     }
 
-    if (track.creator.toString() !== req.user!.id.toString()) {
+    if (track.creator.toString() !== req.user!._id.toString()) {
       res.status(403).send({ error: 'Forbidden.' })
       return
     }
@@ -321,7 +321,7 @@ exports.downloadTrack = async (req: Request, res: Response, next: NextFunction) 
 
     const trackDataForDownload = await getTrackDataForDownload(req.params.trackId)
 
-    if (req.user!.id.toString() !== trackDataForDownload.creator.toString() && !trackDataForDownload.isPublic) {
+    if (req.user!._id.toString() !== trackDataForDownload.creator.toString() && !trackDataForDownload.isPublic) {
       throw new ForbiddenError('Forbidden.')
     }
 
@@ -345,7 +345,6 @@ exports.downloadTrack = async (req: Request, res: Response, next: NextFunction) 
     //   })
     // }, 10000)
   } catch (err: any) {
-    console.warn('Error downloading track:', err)
     next(err)
   }
 }
@@ -392,7 +391,6 @@ exports.uploadZip = async (req: Request, res: Response, next: NextFunction) => {
       throw new ProcessingError('Error uploading track.')
     }
   } catch (err: any) {
-    console.warn('Error uploading zip:', err)
     next(err)
   }
 }

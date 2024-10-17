@@ -57,15 +57,7 @@ exports.register = async (req: Request, res: Response) => {
 
 exports.isLoggedIn = async (req: Request, res: Response) => {
   try {
-    const token = req.cookies.jwt
-    if (!token) return res.send({ message: 'No token' }).status(401)
-
-    jwt.verify(token, process.env.JWT_SECRET!, async (err: any, user: any) => {
-      if (err) return res.sendStatus(403)
-      req.user = user
-
-      res.json({ message: 'Logged in', userId: user.id })
-    })
+    res.json({ message: 'Logged in', userId: req.user?._id })
   } catch (err) {
     res.status(500).json({ message: 'Failed to check login status' })
   }

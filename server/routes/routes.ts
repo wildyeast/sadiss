@@ -94,7 +94,7 @@ router.post('/login', validateLoginInput, passport.authenticate('local', { sessi
 router.post('/register', auth_controller.register)
 
 // Is logged in
-router.get('/is-logged-in', auth_controller.isLoggedIn)
+router.get('/is-logged-in', authenticateToken, auth_controller.isLoggedIn)
 
 // Logout
 router.get('/logout', auth_controller.logout)

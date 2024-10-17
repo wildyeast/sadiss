@@ -1,9 +1,9 @@
 // Code in part taken from https://www.pubnub.com/blog/nodejs-websocket-programming-examples/
 import express from 'express'
-import { Message, TrackDocument } from './types/types'
+import { TrackDocument } from './types/types'
 import * as dotenv from 'dotenv'
 import { passport } from './auth'
-import { Server } from 'ws'
+import { Server } from 'http'
 import { connectDB } from './database'
 import { startKeepAliveInterval } from './tools/startKeepAliveInterval'
 import { startWebSocketServer, startDashboardInformationInterval } from './services/webSocketService'
@@ -13,6 +13,7 @@ import { errorHandler } from './middlewares/errorHandler'
 import { readAndParseChunkFile } from './services/fileService'
 import { ProcessingError } from './errors'
 import { Track } from './models'
+import { SadissWebSocketServer } from './lib/SadissWebsocket'
 
 const cors = require('cors')
 const session = require('express-session')
@@ -72,9 +73,8 @@ const app = express()
   .use(passport.initialize())
   .use(passport.session())
 
-// WEBSOCKETS //
-let server
-let wss: Server
+let server: Server
+let wss: SadissWebSocketServer
 if (process.env.NODE_ENV === 'test') {
   wss = startWebSocketServer()
   server = app.listen()
@@ -108,7 +108,7 @@ app.use((req, res) => res.status(404))
   }
 })()
 
-module.exports = { app, server, wss }
+export { app, server, wss }
 
 async function setTrackLength(track: TrackDocument) {
   let trackLengthInChunks = track.trackLengthInChunks

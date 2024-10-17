@@ -34,7 +34,10 @@ const authenticateToken = (req: Request, res: Response, next: NextFunction) => {
 
   jwt.verify(token, process.env.JWT_SECRET!, (err: any, user: any) => {
     if (err) return res.sendStatus(403)
-    req.user = user
+    req.user = {
+      _id: user.id,
+      password: user.password
+    }
     next()
   })
 }

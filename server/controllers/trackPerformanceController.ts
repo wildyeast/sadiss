@@ -11,14 +11,18 @@ exports.addTracksToPerformance = async (req: Request, res: Response) => {
   try {
     const { trackIds, performanceId } = req.body
 
-    const performance = await SadissPerformance.findById(performanceId)
-
-    if (!performance) {
-      return res.status(404).send({ error: 'Performance not found' })
+    if (!performanceId || !isValidObjectId(performanceId)) {
+      return res.status(400).send({ error: 'Please provide a valid performanceId' })
     }
 
     if (!trackIds || !trackIds.length) {
       return res.status(400).send({ error: 'Please provide at least one track' })
+    }
+
+    const performance = await SadissPerformance.findById(performanceId)
+
+    if (!performance) {
+      return res.status(404).send({ error: 'Performance not found' })
     }
 
     // If performance is public check if all tracks are public
@@ -107,7 +111,7 @@ exports.deleteTrackFromPerformance = async (req: Request, res: Response) => {
 
     trackPerformance.deleted = true
     trackPerformance.deletedAt = new Date()
-    trackPerformance.deletedBy = req.user!.id
+    trackPerformance.deletedBy = req.user!._id
     await trackPerformance.save()
 
     unloadTrackFromActivePerformance(trackPerformanceId)
