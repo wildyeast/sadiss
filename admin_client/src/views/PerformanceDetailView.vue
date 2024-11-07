@@ -201,7 +201,7 @@ onMounted(async () => {
         @click="handleTrackSelect(index)">
         <div class="flex gap-3">
           <!-- Drag handle -->
-          <div>
+          <div class="cursor-grab">
             <span class="drag-handle text-2xl">☰</span>
           </div>
 
