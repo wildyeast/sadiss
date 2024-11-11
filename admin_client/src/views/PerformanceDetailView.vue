@@ -1,5 +1,13 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, Ref, watch, useTemplateRef } from "vue"
+import {
+  computed,
+  onMounted,
+  ref,
+  Ref,
+  watch,
+  useTemplateRef,
+  inject,
+} from "vue"
 import { VueDraggable } from "vue-draggable-plus"
 import {
   SadissPerformance,
@@ -25,7 +33,10 @@ import ActionButtonLink from "../components/ActionButtonLink.vue"
 import { useI18n } from "vue-i18n"
 import { useWebSocket } from "../composables/useWebSocket"
 import { useElementSize } from "@vueuse/core"
-import { TOP_BAR_HEIGHT_MOBILE, TOP_BAR_HEIGHT_DESKTOP } from "../constants"
+
+const TOP_BAR_HEIGHT_MOBILE = inject<number>("TOP_BAR_HEIGHT_MOBILE")
+const TOP_BAR_HEIGHT_DESKTOP = inject<number>("TOP_BAR_HEIGHT_DESKTOP")
+
 const { t } = useI18n()
 
 const props = defineProps<{ performanceId: string }>()

@@ -21,9 +21,9 @@ export function usePlayer() {
   /**
    * Prepares the audio context and warms up the TTS engine
    */
-  const preparePlaybackAndTts = () => {
+  const preparePlaybackAndTts = async () => {
     startAudioCtx()
-    warmUpTtsEngine()
+    await warmUpTtsEngine()
   }
 
   const startAudioCtx = () => {

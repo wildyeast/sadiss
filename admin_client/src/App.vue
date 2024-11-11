@@ -2,9 +2,14 @@
 import TopBar from "./components/TopBar.vue"
 import { ModalsContainer } from "vue-final-modal"
 import { useMCorp } from "./composables/useMCorp"
-import { onMounted } from "vue"
+import { onMounted, provide } from "vue"
 import { useWebSocket } from "./composables/useWebSocket"
-import { TOP_BAR_HEIGHT_MOBILE, TOP_BAR_HEIGHT_DESKTOP } from "./constants"
+
+const TOP_BAR_HEIGHT_MOBILE = 130
+const TOP_BAR_HEIGHT_DESKTOP = 70
+
+provide("TOP_BAR_HEIGHT_MOBILE", TOP_BAR_HEIGHT_MOBILE)
+provide("TOP_BAR_HEIGHT_DESKTOP", TOP_BAR_HEIGHT_DESKTOP)
 
 const { initializeMCorp } = useMCorp()
 const { initializeWebsocketConnection } = useWebSocket()
@@ -20,7 +25,7 @@ onMounted(() => {
     <TopBar
       :class="`fixed top-0 left-0 w-full z-50 h-[${TOP_BAR_HEIGHT_MOBILE}px] md:h-[${TOP_BAR_HEIGHT_DESKTOP}px]`" />
     <main
-      :class="`flex flex-col  items-center pt-[${TOP_BAR_HEIGHT_MOBILE}px] md:pt-[${TOP_BAR_HEIGHT_DESKTOP}px]`">
+      :class="`flex flex-col items-center pt-[${TOP_BAR_HEIGHT_MOBILE}px] md:pt-[${TOP_BAR_HEIGHT_DESKTOP}px]`">
       <RouterView />
     </main>
   </div>
