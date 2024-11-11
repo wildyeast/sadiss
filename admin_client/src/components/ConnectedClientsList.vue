@@ -75,7 +75,7 @@ onMounted(() => {
 
     <!-- Client list, unfolded on button click -->
     <div
-      class="grid grid-cols-[repeat(auto-fill,_70px)] gap-2 bg-secondary md:w-full px-2 md:px-10 md:py-4 justify-center"
+      class="grid grid-cols-[repeat(auto-fill,_70px)] gap-2 bg-secondary md:w-full px-2 md:px-10 md:py-4 justify-center absolute top-[32px] md:top-[60px] left-0 right-0 z-40"
       v-show="clientListDisplayed">
       <span
         v-for="client in Object.keys(connectedClients)"
