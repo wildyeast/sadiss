@@ -1,0 +1,2 @@
+export const TOP_BAR_HEIGHT_MOBILE = 130
+export const TOP_BAR_HEIGHT_DESKTOP = 70

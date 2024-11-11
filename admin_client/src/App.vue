@@ -1,16 +1,12 @@
 <script setup lang="ts">
-import { RouterLink, useRoute } from "vue-router"
-import SadissLogo from "./assets/sadiss_logo.svg"
+import TopBar from "./components/TopBar.vue"
 import { ModalsContainer } from "vue-final-modal"
 import { useMCorp } from "./composables/useMCorp"
 import { onMounted } from "vue"
-import IconUser from "./assets/user.svg"
-import IconTimeSync from "./assets/time_sync.svg"
 import { useWebSocket } from "./composables/useWebSocket"
+import { TOP_BAR_HEIGHT_MOBILE, TOP_BAR_HEIGHT_DESKTOP } from "./constants"
 
-const route = useRoute()
-
-const { initializeMCorp, mCorpIsInitialized } = useMCorp()
+const { initializeMCorp } = useMCorp()
 const { initializeWebsocketConnection } = useWebSocket()
 
 onMounted(() => {
@@ -20,44 +16,13 @@ onMounted(() => {
 </script>
 
 <template>
-  <!-- Top Bar -->
-  <div
-    class="h-[130px] md:h-[70px] flex flex-col md:flex-row items-center justify-center md:border-b md:border-silver">
-    <RouterLink
-      to="/"
-      class="my-[30px] md:mt-[30px] md:ml-[60px]"
-      :class="{ 'md:mr-[60px]': route.meta.hideNavbar }">
-      <SadissLogo />
-    </RouterLink>
-    <div
-      v-if="!route.meta.hideNavbar"
-      class="w-full text-xs flex flex-col items-end md:pr-6 pr-4 gap-3">
-      <div class="items-center gap-3 hidden md:flex">
-        <span>{{ $t("time_sync") }}</span>
-        <IconTimeSync :class="{ '[&>*]:stroke-danger': !mCorpIsInitialized }" />
-      </div>
-      <nav
-        class="text-sm grid grid-cols-[1fr_1fr_1fr] md:flex md:justify-end md:h-full md:items-end w-full text-secondary">
-        <div class="md:hidden">
-          <!-- Spacer for left column of grid on mobile -->
-        </div>
-        <!-- Main links -->
-        <div class="flex gap-8 md:gap-4">
-          <RouterLink to="/performances">Performances</RouterLink>
-          <RouterLink to="/tracks">Tracks</RouterLink>
-        </div>
-        <!-- User link -->
-        <div class="flex justify-center md:pl-8">
-          <RouterLink to="/user" class="flex gap-2">
-            <span>Usr</span>
-            <IconUser />
-          </RouterLink>
-        </div>
-      </nav>
-    </div>
+  <div class="flex h-screen flex-col">
+    <TopBar
+      :class="`fixed top-0 left-0 w-full z-50 h-[${TOP_BAR_HEIGHT_MOBILE}px] md:h-[${TOP_BAR_HEIGHT_DESKTOP}px]`" />
+    <main
+      :class="`flex flex-col  items-center pt-[${TOP_BAR_HEIGHT_MOBILE}px] md:pt-[${TOP_BAR_HEIGHT_DESKTOP}px]`">
+      <RouterView />
+    </main>
   </div>
-  <main class="flex flex-col items-center">
-    <RouterView />
-  </main>
   <ModalsContainer />
 </template>
