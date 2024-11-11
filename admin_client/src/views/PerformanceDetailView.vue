@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, Ref, watch } from "vue"
+import { computed, onMounted, ref, Ref, watch, useTemplateRef } from "vue"
 import { VueDraggable } from "vue-draggable-plus"
 import {
   SadissPerformance,
@@ -24,12 +24,16 @@ import ModalSetStartTime from "../components/modals/ModalSetStartTime.vue"
 import ActionButtonLink from "../components/ActionButtonLink.vue"
 import { useI18n } from "vue-i18n"
 import { useWebSocket } from "../composables/useWebSocket"
-
+import { useElementSize } from "@vueuse/core"
+import { TOP_BAR_HEIGHT_MOBILE, TOP_BAR_HEIGHT_DESKTOP } from "../constants"
 const { t } = useI18n()
 
 const props = defineProps<{ performanceId: string }>()
 
 const { sendMessage, addMessageListener } = useWebSocket()
+
+const header = useTemplateRef<HTMLDivElement>("header")
+const { height: headerHeight } = useElementSize(header)
 
 const performance: Ref<SadissPerformance | null> = ref(null)
 const tracks: Ref<Track[] | null> = ref(null)
@@ -164,41 +168,49 @@ onMounted(async () => {
 </script>
 <template>
   <ConnectedClientsList
+    ref="connectedClientsList"
+    class="fixed top-0 right-0 z-40"
+    :class="`pt-[${TOP_BAR_HEIGHT_MOBILE}px] md:pt-[${TOP_BAR_HEIGHT_DESKTOP}px]`"
     :connected-clients="clientsConnectedToPerformanceByChoirId" />
-  <div v-if="performance" class="w-full relative">
-    <h1>{{ performance.name }}</h1>
-
-    <!-- QR Code generation button -->
-    <RouterLink
-      class="absolute top-6 left-5"
-      :to="`/performance/${performanceId}/create-qr-codes`">
-      <IconQrCode class="w-[27px] h-[27px]" />
-    </RouterLink>
-    <p
-      v-if="selectedTrackIndex > -1 && tracks && tracks[selectedTrackIndex]"
-      class="text-center mb-4">
-      {{ selectedTrackIndex + 1 }} {{ tracks[selectedTrackIndex].name }}
-      <PlayerControls
-        :performance-id="performanceId"
-        :selected-track="tracks[selectedTrackIndex]"
-        :next-track="nextTrack"
-        :track-loaded="selectedTrackLengthInChunks > -1"
-        :selected-track-length-in-chunks="selectedTrackLengthInChunks" />
-    </p>
+  <div v-if="performance" class="w-full relative pt-[32px] md:pt-0">
+    <div ref="header" class="fixed left-0 right-0 bg-white shadow-lg">
+      <h1>{{ performance.name }}</h1>
+      <!-- QR Code generation button -->
+      <RouterLink
+        class="absolute top-6 left-5"
+        :to="`/performance/${performanceId}/create-qr-codes`">
+        <IconQrCode class="w-[27px] h-[27px]" />
+      </RouterLink>
+      <p
+        v-if="selectedTrackIndex > -1 && tracks && tracks[selectedTrackIndex]"
+        class="text-center mb-4">
+        {{ selectedTrackIndex + 1 }} {{ tracks[selectedTrackIndex].name }}
+        <PlayerControls
+          :performance-id="performanceId"
+          :selected-track="tracks[selectedTrackIndex]"
+          :next-track="nextTrack"
+          :track-loaded="selectedTrackLengthInChunks > -1"
+          :selected-track-length-in-chunks="selectedTrackLengthInChunks" />
+      </p>
+    </div>
 
     <VueDraggable
       v-if="tracks"
       v-model="tracks"
       class="list-container"
+      :style="{
+        'padding-top': `${headerHeight}px`,
+      }"
       handle=".drag-handle"
       :animation="100"
       @update="onSortOrderUpdate">
       <div
-        class="list-entry"
+        class="list-entry first:border-t-0"
         :class="{ 'bg-secondary text-white': selectedTrackIndex === index }"
         v-for="(track, index) of tracks"
         :key="track._id"
         @click="handleTrackSelect(index)">
+        {{ headerHeight }}
         <div class="flex gap-3">
           <!-- Drag handle -->
           <div class="cursor-grab">
