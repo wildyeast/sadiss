@@ -27,7 +27,6 @@ export function usePlayer() {
   }
 
   const startAudioCtx = () => {
-    console.log('Starting ctx.')
     ctx = new AudioContext()
 
     ctx.onstatechange = () => {
