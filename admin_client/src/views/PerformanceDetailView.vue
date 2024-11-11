@@ -167,12 +167,14 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <div v-if="performance" class="w-full relative md:pt-0">
+  <div v-if="performance" class="w-full relative">
     <ConnectedClientsList
       ref="connectedClientsList"
       class="fixed z-40"
       :connected-clients="clientsConnectedToPerformanceByChoirId" />
-    <div ref="header" class="fixed left-0 right-0 bg-white shadow-lg pt-[32px]">
+    <div
+      ref="header"
+      class="fixed left-0 right-0 bg-white shadow-lg pt-[32px] md:pt-0">
       <h1>{{ performance.name }}</h1>
       <!-- QR Code generation button -->
       <RouterLink
