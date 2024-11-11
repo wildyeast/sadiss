@@ -1,13 +1,5 @@
 <script setup lang="ts">
-import {
-  computed,
-  onMounted,
-  ref,
-  Ref,
-  watch,
-  useTemplateRef,
-  inject,
-} from "vue"
+import { computed, onMounted, ref, Ref, watch, useTemplateRef } from "vue"
 import { VueDraggable } from "vue-draggable-plus"
 import {
   SadissPerformance,
@@ -33,9 +25,6 @@ import ActionButtonLink from "../components/ActionButtonLink.vue"
 import { useI18n } from "vue-i18n"
 import { useWebSocket } from "../composables/useWebSocket"
 import { useElementSize } from "@vueuse/core"
-
-const TOP_BAR_HEIGHT_MOBILE = inject<number>("TOP_BAR_HEIGHT_MOBILE")
-const TOP_BAR_HEIGHT_DESKTOP = inject<number>("TOP_BAR_HEIGHT_DESKTOP")
 
 const { t } = useI18n()
 
@@ -178,17 +167,16 @@ onMounted(async () => {
 })
 </script>
 <template>
-  <ConnectedClientsList
-    ref="connectedClientsList"
-    class="fixed top-0 right-0 z-40"
-    :class="`pt-[${TOP_BAR_HEIGHT_MOBILE}px] md:pt-[${TOP_BAR_HEIGHT_DESKTOP}px]`"
-    :connected-clients="clientsConnectedToPerformanceByChoirId" />
-  <div v-if="performance" class="w-full relative pt-[32px] md:pt-0">
-    <div ref="header" class="fixed left-0 right-0 bg-white shadow-lg">
+  <div v-if="performance" class="w-full relative md:pt-0">
+    <ConnectedClientsList
+      ref="connectedClientsList"
+      class="fixed z-40"
+      :connected-clients="clientsConnectedToPerformanceByChoirId" />
+    <div ref="header" class="fixed left-0 right-0 bg-white shadow-lg pt-[32px]">
       <h1>{{ performance.name }}</h1>
       <!-- QR Code generation button -->
       <RouterLink
-        class="absolute top-6 left-5"
+        class="absolute top-12 md:top-6 left-5"
         :to="`/performance/${performanceId}/create-qr-codes`">
         <IconQrCode class="w-[27px] h-[27px]" />
       </RouterLink>
