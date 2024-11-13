@@ -47,7 +47,6 @@ import { useBarcodeScanner } from '@/composables/useBarcodeScanner'
 import { QrCodeScanResult } from '@/types/types'
 import { useMainStore } from '@/stores/MainStore'
 import { usePlayer } from '@/composables/usePlayer'
-import { TextToSpeech } from '@capacitor-community/text-to-speech'
 
 const appVersionNumber = import.meta.env.VITE_APP_VERSION
 
@@ -59,36 +58,8 @@ const { preparePlaybackAndTts } = usePlayer()
 const { startScan, stopScan, processScanResult } = useBarcodeScanner()
 
 const scanCode = async () => {
-  // Prepare for playback
-  // await preparePlaybackAndTts()
-
-  const isAndroid = window.location.search.includes('android=true')
-
-  // Android, iOS: empirical data
-  // 0.5, 1.0
-  // 1.0, 1.2
-  // 1.5, 1.3
-
-  // longer sentence
-  // 0.5, 0.5
-  // 1.0, 1.04
-  // 1.2, 1.08
-  // 1.5, 1.15
-
-  const androidRate = 1
-
-  const iOSRate = 0.3 * androidRate + 0.85
-
-  await TextToSpeech.speak({
-    text: 'The world is a dangerous place, not because of those who do evil, but because of those who look on and do nothing.',
-    lang: 'en-US',
-    rate: isAndroid ? 1.2 : 1.08,
-    pitch: 1.0,
-    volume: 1.0,
-    category: 'playback'
-  })
-
-  return
+  // Don't await this, otherwise it takes too long to start the scan!
+  preparePlaybackAndTts()
 
   // Make camera visible and everything else invisible in app viewport, classes defined in App.vue
   document.body.classList.add('qrscanner')
