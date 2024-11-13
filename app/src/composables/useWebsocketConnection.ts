@@ -1,6 +1,8 @@
 import { useMainStore } from '@/stores/MainStore'
 import { onUnmounted, ref } from 'vue'
 import { usePlayer } from './usePlayer'
+import { Capacitor } from '@capacitor/core'
+
 const { handleChunkData, setOffset, stopPlayback, setStartTime, setTrackSettings } = usePlayer()
 
 const isRegistered = ref(false)
@@ -66,7 +68,14 @@ export function useWebsocketConnection() {
       // TODO: This is not ideal, we shouldn't set globalStartTime every time we receive data
       // Is there a way around it though? Clients can join late. Do they need this information?
       setStartTime(data.startTime)
-      setTrackSettings(data.waveform, data.ttsRate)
+
+      let ttsRate = data.ttsRate
+
+      if (Capacitor.getPlatform() === 'ios') {
+        ttsRate = ttsRateCorrection(ttsRate)
+      }
+
+      setTrackSettings(data.waveform, ttsRate)
       if (data.chunk && Object.keys(data.chunk).length) {
         handleChunkData(data.chunk)
       }
@@ -78,4 +87,25 @@ export function useWebsocketConnection() {
   }
 
   return { establishWebsocketConnection, attemptingToRegister, isRegistered }
+}
+
+const ttsRateCorrection = (ttsRate: number) => {
+  const ttsRateLookupTable = {
+    0.2: 0.15,
+    0.3: 0.2,
+    0.4: 0.3,
+    0.5: 0.5,
+    0.6: 0.6,
+    0.7: 0.8,
+    0.8: 0.92,
+    0.9: 1.05,
+    1.0: 1.06,
+    1.1: 1.07,
+    1.2: 1.08,
+    1.3: 1.1,
+    1.4: 1.12,
+    1.5: 1.15
+  }
+
+  return ttsRateLookupTable[ttsRate as keyof typeof ttsRateLookupTable] || ttsRate
 }
