@@ -35,12 +35,17 @@ export const startWebSocketServer = (port = 0) => {
       } else if (parsed.message === 'isAdmin') {
         client.isAdmin = true
 
-        client.send(JSON.stringify(createAdminInfoMessage(wss)))
+        let message
 
         if (parsed.performanceId) {
+          message = createAdminInfoMessage(wss, parsed.performanceId)
           client.performanceId = parsed.performanceId
           logger.info(`Performance ${client.performanceId}: Client ${client.id} is admin`)
+        } else {
+          message = createAdminInfoMessage(wss)
         }
+
+        client.send(JSON.stringify(message))
       }
     }
   })
@@ -73,7 +78,7 @@ const createAdminInfoMessage = (wss: SadissWebSocketServer, adminPerformanceId?:
 
   if (adminPerformanceId) {
     const clientsConnectedToPerformanceByChoirId = Array.from(wss.clients).reduce((acc, client) => {
-      if (client.performanceId === adminPerformanceId && client.choirId !== undefined) {
+      if (client.performanceId === adminPerformanceId && client.choirId >= 0) {
         acc[client.choirId] = (acc[client.choirId] || 0) + 1
       }
       return acc
