@@ -1,6 +1,6 @@
 // Code in part taken from https://www.pubnub.com/blog/nodejs-websocket-programming-examples/
 import express from 'express'
-import { TrackDocument } from './types/types'
+import { TrackDocument } from './types'
 import * as dotenv from 'dotenv'
 import { passport } from './auth'
 import { Server } from 'http'

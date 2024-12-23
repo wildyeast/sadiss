@@ -1,6 +1,6 @@
 import { activePerformances } from './activePerformanceService'
 import { logger } from '../tools'
-import { Message } from '../types/types'
+import { Message } from '../types'
 import { v4 as uuidv4 } from 'uuid'
 import { Types } from 'mongoose'
 import { SadissWebSocketServer } from '../lib/SadissWebsocket'

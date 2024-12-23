@@ -12,7 +12,7 @@ import fs from 'fs'
 import archiver from 'archiver'
 import { error } from 'console'
 import { logger } from '../tools'
-import { TrackDocument, TTSFileObject } from '../types/types'
+import { TrackDocument } from '../types'
 import FormData from 'form-data'
 import axios from 'axios'
 

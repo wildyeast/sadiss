@@ -1,6 +1,4 @@
-import { Server } from 'ws'
-import { PartialChunk, TrackMode, Frame } from './types/types'
-import WebSocket from 'ws'
+import { PartialChunk, TrackMode, Frame } from './types'
 import { Types } from 'mongoose'
 import { logger } from './tools'
 import { SadissWebSocket, SadissWebSocketServer } from './lib/SadissWebsocket'

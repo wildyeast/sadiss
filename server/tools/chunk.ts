@@ -1,4 +1,4 @@
-import { PartialChunk, TtsInstructions, TtsJson } from '../types/types'
+import { PartialChunk, TtsInstructions, TtsJson } from '../types'
 import readline from 'readline'
 
 const fs = require('fs')

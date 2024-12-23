@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose'
-import { TrackDocument, TTSFileObject } from '../types/types'
+import { TrackDocument, TTSFileObject } from '../types'
 
 export const trackSchema = new Schema<TrackDocument>({
   name: { type: String, required: true },

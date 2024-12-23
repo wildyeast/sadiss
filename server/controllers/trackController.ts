@@ -6,7 +6,7 @@ type File = Express.Multer.File
 import { chunk } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
 import mongoose, { isValidObjectId } from 'mongoose'
-import { TtsJson, TrackDocument } from '../types/types'
+import { TtsJson } from '../types'
 import { trackSchema } from '../models/track'
 import { TrackPerformance } from '../models'
 import { activePerformances, initializeActivePerformance } from '../services/activePerformanceService'

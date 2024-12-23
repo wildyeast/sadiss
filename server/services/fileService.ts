@@ -1,6 +1,6 @@
 import fs from 'fs'
 type File = Express.Multer.File
-import { Frame, TrackDocument } from '../types/types'
+import { Frame, TrackDocument } from '../types'
 
 export async function readAndParseChunkFile(track: TrackDocument) {
   try {

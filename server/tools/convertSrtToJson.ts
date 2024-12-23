@@ -1,4 +1,4 @@
-import { TtsJson } from '../types/types'
+import { TtsJson } from '../types'
 import { logger } from './logger'
 import fs from 'fs'
 

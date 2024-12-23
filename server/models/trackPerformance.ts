@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose'
-import { TrackPerformanceDocument } from '../types/types'
+import { TrackPerformanceDocument } from '../types'
 
 export const trackPerformanceSchema = new Schema<TrackPerformanceDocument>({
   track: { type: Schema.Types.ObjectId, ref: 'Track', required: true },

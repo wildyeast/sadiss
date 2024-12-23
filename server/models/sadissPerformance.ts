@@ -1,5 +1,5 @@
 import { Schema, model } from 'mongoose'
-import { SadissPerformanceDocument } from '../types/types'
+import { SadissPerformanceDocument } from '../types'
 
 export const sadissPerformanceSchema = new Schema<SadissPerformanceDocument>({
   name: { type: String, required: true },

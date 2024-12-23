@@ -1,5 +1,5 @@
 import mongoose, { Types } from 'mongoose'
-import { TrackDocument, TrackPerformanceDocument } from '../types/types'
+import { TrackDocument, TrackPerformanceDocument } from '../types'
 import WebSocket from 'ws'
 import { logger } from '../tools'
 
