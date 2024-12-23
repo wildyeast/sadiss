@@ -3,6 +3,7 @@ import { PartialChunk, TrackMode, Frame } from './types/types'
 import WebSocket from 'ws'
 import { Types } from 'mongoose'
 import { logger } from './tools'
+import { SadissWebSocket, SadissWebSocketServer } from './lib/SadissWebsocket'
 
 const MAX_PARTIALS_PER_CLIENT = 16
 
@@ -16,7 +17,13 @@ export class ActivePerformance {
   constructor(readonly id: Types.ObjectId) {}
 
   // More or less accurate timer taken from https://stackoverflow.com/a/29972322/16725862
-  startSendingInterval = (startTime: number, wss: Server, loopTrack: boolean, trackId: string, startAtChunk: number) => {
+  startSendingInterval = (
+    startTime: number,
+    wss: SadissWebSocketServer,
+    loopTrack: boolean,
+    trackId: string,
+    startAtChunk: number
+  ) => {
     interface PartialMap {
       [partialId: string]: string[]
     }
@@ -243,7 +250,7 @@ export class ActivePerformance {
     // WebSocket.WebSocket: see https://github.com/websockets/ws/issues/1517#issuecomment-623148704
     const getClientIdWithMinPartials = (
       allocatedPartials: { [clientId: string]: PartialChunk[] },
-      clients: WebSocket.WebSocket[]
+      clients: SadissWebSocket[]
     ) => {
       // If there is a client that is not allocated any partials, give it to them
       for (const client of clients) {

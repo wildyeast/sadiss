@@ -2,7 +2,7 @@
 
 import { Types } from 'mongoose'
 import { SuperAgentTest } from 'supertest'
-import { Server } from 'ws'
+import { SadissWebSocketServer } from '../../lib/SadissWebsocket'
 
 export {}
 
@@ -19,5 +19,5 @@ declare global {
   }
   var mockUser: { username: string; id: Types.ObjectId; email: string; password: string }
   var agent: SuperAgentTest
-  var testWss: Server // Websocket server for testing
+  var testWss: SadissWebSocketServer // Websocket server for testing
 }
