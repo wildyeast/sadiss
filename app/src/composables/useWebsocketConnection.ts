@@ -65,8 +65,7 @@ export function useWebsocketConnection() {
         return
       }
 
-      // TODO: This is not ideal, we shouldn't set globalStartTime every time we receive data
-      // Is there a way around it though? Clients can join late. Do they need this information?
+      // We need to set globalStartTime every time we receive data and not just at the start of the track because clients can join late.
       setStartTime(data.startTime)
 
       let ttsRate = data.ttsRate
