@@ -231,6 +231,10 @@ export class ActivePerformance {
         }
 
         if (chunk.partials?.length || chunk.ttsInstructions) {
+          if (chunk.ttsInstructions) {
+            chunk.ttsInstructions.time = '0'
+          }
+
           const json = JSON.stringify({
             startTime: actualStartTime + 2,
             waveform: this.trackWaveform,
