@@ -121,6 +121,10 @@ onMounted(() => {
     formData.mode = track.value.mode
     formData.notes = track.value.notes ?? ""
     formData.waveform = track.value.waveform
+
+    if (track.value.ttsRate) {
+      formData.ttsRate = track.value.ttsRate
+    }
   }
 })
 </script>
@@ -214,6 +218,19 @@ onMounted(() => {
           <option value="sawtooth">{{ $t("waveforms.sawtooth") }}</option>
           <option value="triangle">{{ $t("waveforms.triangle") }}</option>
         </select>
+      </div>
+
+      <!-- TTS Rate -->
+      <div class="label-and-input">
+        <label for="ttsRate">{{ $t("tts_rate") }}</label>
+        <input
+          type="number"
+          id="ttsRate"
+          v-model="formData.ttsRate"
+          min="0.2"
+          max="1.5"
+          step="0.1"
+          :disabled="isViewMode" />
       </div>
 
       <div
