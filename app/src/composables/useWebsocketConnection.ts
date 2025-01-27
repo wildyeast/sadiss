@@ -53,8 +53,16 @@ export function useWebsocketConnection() {
         return
       }
 
-      const data = JSON.parse(event.data)
-      // console.log('\nReceived message: ', Object.keys(data))
+      console.log(event.data)
+
+      let data
+      try {
+        data = JSON.parse(event.data)
+        console.log(data)
+      } catch (error) {
+        // Data is not JSON, ignore it
+        return
+      }
 
       if (data.start) {
         setOffset()
