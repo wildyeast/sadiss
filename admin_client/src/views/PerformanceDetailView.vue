@@ -208,7 +208,6 @@ onMounted(async () => {
         v-for="(track, index) of tracks"
         :key="track._id"
         @click="handleTrackSelect(index)">
-        {{ headerHeight }}
         <div class="flex gap-3">
           <!-- Drag handle -->
           <div class="cursor-grab">
