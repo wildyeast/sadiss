@@ -75,6 +75,8 @@ export function useWebsocketConnection() {
       }
 
       setTrackSettings(data.waveform, ttsRate)
+
+      // TODO: This can be moved into usePlayer.ts, doesn't need to happen here.
       if (data.chunk && Object.keys(data.chunk).length) {
         handleChunkData(data.chunk)
       }
