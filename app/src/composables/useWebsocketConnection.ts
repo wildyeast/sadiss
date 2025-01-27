@@ -76,6 +76,7 @@ export function useWebsocketConnection() {
       // We need to set globalStartTime every time we receive data and not just at the start of the track because clients can join late.
       setStartTime(data.startTime)
 
+      // TODO: This can be moved into usePlayer.ts, doesn't need to happen here.
       let ttsRate = data.ttsRate
 
       if (Capacitor.getPlatform() === 'ios') {
