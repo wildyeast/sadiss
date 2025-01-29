@@ -1,3 +1,3 @@
 export interface TtsInstructions {
-  [voice: string]: { time: string; langs: { [language: string]: string } }
+  [voice: string]: { time: number; langs: { [language: string]: string } }
 }

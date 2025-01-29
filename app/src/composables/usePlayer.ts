@@ -123,7 +123,6 @@ export function usePlayer() {
       const speakingInterval = setInterval(() => {
         const timeToSpeakAt = startTimeInCtxTime + tts.time + outputLatencyOffset
         if (ctx.currentTime >= timeToSpeakAt) {
-          console.log('Speaking at: ', timeToSpeakAt)
           clearInterval(speakingInterval)
           speak(tts.phrase)
         }

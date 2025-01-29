@@ -93,7 +93,7 @@ export const chunk = async (path?: string, ttsInstructions?: TtsJson) => {
         const langs = ttsInstructions[ttsTime][voice]
         if (!instructionObject[voice]) {
           instructionObject[voice] = {
-            time: ttsTime,
+            time: +ttsTime,
             langs: {}
           }
         }

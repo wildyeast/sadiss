@@ -35,7 +35,7 @@ export class ActivePerformance {
 
     interface Chunk {
       partials?: PartialChunk[]
-      ttsInstructions?: { time: string; phrase: string }
+      ttsInstructions?: { time: number; phrase: string }
     }
 
     if (this.sendingIntervalRunning) {
@@ -231,10 +231,6 @@ export class ActivePerformance {
         }
 
         if (chunk.partials?.length || chunk.ttsInstructions) {
-          if (chunk.ttsInstructions) {
-            chunk.ttsInstructions.time = '0'
-          }
-
           const json = JSON.stringify({
             startTime: actualStartTime + 2,
             waveform: this.trackWaveform,
