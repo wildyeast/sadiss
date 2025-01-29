@@ -22,8 +22,8 @@ export const convertSrtToJson = (srtFiles: { path: string; originalname: string 
       line = line.trim()
 
       if (!line) {
-        const removedHtmlTags = removeHtmlTags(currentLine)
-        ttsJson = writeToObject(ttsJson, currentTimestamp, voice, lang, removedHtmlTags)
+        const currentLineWithoutHtmlTags = removeHtmlTags(currentLine)
+        ttsJson = writeToObject(ttsJson, currentTimestamp, voice, lang, currentLineWithoutHtmlTags)
         currentLine = ''
         currentTimestamp = -1
         lastLineWasTimestamp = false
