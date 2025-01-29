@@ -88,7 +88,7 @@ export const chunk = async (path?: string, ttsInstructions?: TtsJson) => {
   // Insert TTS data into chunks
   if (ttsInstructions) {
     for (const ttsTime in ttsInstructions) {
-      const instructionObject: { [voice: string]: { time: string; langs: { [language: string]: string } } } = {}
+      const instructionObject: TtsInstructions = {}
       for (const voice in ttsInstructions[ttsTime]) {
         const langs = ttsInstructions[ttsTime][voice]
         if (!instructionObject[voice]) {
