@@ -5,8 +5,7 @@ import * as dotenv from 'dotenv'
 import { passport } from './auth'
 import { Server } from 'http'
 import { connectDB } from './database'
-import { startKeepAliveInterval } from './tools/startKeepAliveInterval'
-import { startWebSocketServer, startDashboardInformationInterval } from './services/webSocketService'
+import { startWebSocketServer } from './services/webSocketService'
 import fs from 'fs'
 import { logger } from './tools'
 import { errorHandler } from './middlewares/errorHandler'
@@ -84,10 +83,6 @@ if (process.env.NODE_ENV === 'test') {
 
   server = app.listen(process.env.BASE_PORT, () => logger.info(`Http server listening on port ${process.env.BASE_PORT}.`))
 }
-
-startKeepAliveInterval(wss)
-
-startDashboardInformationInterval(wss)
 
 const routes = require('./routes/routes')
 
