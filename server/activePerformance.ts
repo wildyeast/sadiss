@@ -11,17 +11,12 @@ export class ActivePerformance {
   public trackWaveform: OscillatorType = 'sine'
   public trackTtsRate: string = '1'
   private sendingIntervalRunning = false
+  private startAtChunk = 0
 
   constructor(readonly id: Types.ObjectId) {}
 
   // More or less accurate timer taken from https://stackoverflow.com/a/29972322/16725862
-  startSendingInterval = (
-    startTime: number,
-    wss: SadissWebSocketServer,
-    loopTrack: boolean,
-    trackId: string,
-    startAtChunk: number
-  ) => {
+  startSendingInterval = (startTime: number, wss: SadissWebSocketServer, loopTrack: boolean, trackId: string) => {
     interface PartialMap {
       [partialId: string]: string[]
     }
@@ -51,11 +46,11 @@ export class ActivePerformance {
 
     const interval = 1000 // ms
     let expected = Date.now() + interval
-    let chunkIndex = startAtChunk
+    let chunkIndex = this.startAtChunk
 
     // This makes it so that we start at the chosen chunk position immediately after starting the track
     // This works because chunks are 1s long.
-    let actualStartTime = startTime - startAtChunk
+    let actualStartTime = startTime - this.startAtChunk
 
     // nonChoir mode: Stores partialIds and array of client ids that were given
     // the respective partial in the last iteration
@@ -320,11 +315,12 @@ export class ActivePerformance {
 
   stopSendingInterval = () => (this.sendingIntervalRunning = false)
 
-  loadTrack = (track: Frame[], mode: TrackMode, waveform: OscillatorType, ttsRate: string) => {
+  loadTrack = (track: Frame[], mode: TrackMode, waveform: OscillatorType, ttsRate: string, startAtChunk: number) => {
     this.loadedTrack = track
     this.trackMode = mode
     this.trackWaveform = waveform
     this.trackTtsRate = ttsRate
+    this.startAtChunk = startAtChunk
   }
 
   unloadTrack = () => (this.loadedTrack = [])

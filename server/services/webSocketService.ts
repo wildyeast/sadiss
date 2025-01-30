@@ -83,6 +83,11 @@ const startWebsocketHeartbeatAndUpdates = (wss: SadissWebSocketServer) => {
     if (!wss.clients.size) return
 
     for (const client of wss.clients) {
+      if (!(client instanceof SadissWebSocket)) {
+        logger.error('Invalid WebSocket client instance')
+        continue
+      }
+
       handlePingPong(client, idleTimeout)
       handleAdminInfo(wss, client)
     }

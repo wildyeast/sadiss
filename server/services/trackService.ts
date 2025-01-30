@@ -3,7 +3,7 @@
 import { isValidObjectId, Types } from 'mongoose'
 import { InvalidInputError } from '../errors/InvalidInputError'
 import { NotFoundError } from '../errors/NotFoundError'
-import { Track } from '../models'
+import { Track, TrackPerformance } from '../models'
 import { readAndParseChunkFile } from './fileService'
 import { ProcessingError } from '../errors/ProcessingError'
 import { initializeActivePerformance } from './activePerformanceService'
@@ -44,8 +44,13 @@ export async function loadTrackForPlayback(trackId: string, performanceId: Types
     throw new ProcessingError('Error loading track.')
   }
 
+  const trackPerformance = await TrackPerformance.findOne({ track: trackId, performance: performanceId })
+  if (!trackPerformance) {
+    throw new NotFoundError('Track performance not found.')
+  }
+
   const activePerformance = initializeActivePerformance(performanceId)
-  activePerformance.loadTrack(chunks, track.mode, track.waveform, track.ttsRate)
+  activePerformance.loadTrack(chunks, track.mode, track.waveform, track.ttsRate, trackPerformance.startTime)
 
   return { trackLengthInChunks: chunks.length }
 }

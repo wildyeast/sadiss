@@ -49,7 +49,7 @@ exports.startTrack = async (req: Request, res: Response) => {
   try {
     const activePerformance = initializeActivePerformance(performanceId)
 
-    const trackStarted = activePerformance.startSendingInterval(startTime, req.wss, loop, trackId, startAtChunk)
+    const trackStarted = activePerformance.startSendingInterval(startTime, req.wss, loop, trackId)
     if (trackStarted) {
       res.json({ data: 'Track started.' })
     } else {

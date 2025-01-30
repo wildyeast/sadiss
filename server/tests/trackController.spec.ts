@@ -405,10 +405,9 @@ describe('trackController test', () => {
     })
 
     it('should return 200 and trackLengthInChunks if track found and performance activePerformance created', async () => {
-      const { _id: trackId } = await createTestTrack()
-      const performanceId = await createTestPerformance()
+      const { tracks, performanceId } = await createTestTrackPerformance()
 
-      const res = await agent.post(`/api/track/load`).send({ trackId, performanceId }).expect(200)
+      const res = await agent.post(`/api/track/load`).send({ trackId: tracks[0]._id, performanceId }).expect(200)
       expect(res.body.trackLengthInChunks).toBeTruthy()
     })
   })
