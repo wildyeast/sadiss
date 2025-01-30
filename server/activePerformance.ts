@@ -325,5 +325,7 @@ export class ActivePerformance {
 
   unloadTrack = () => (this.loadedTrack = [])
 
+  hasLoadedTrack = () => this.loadedTrack.length > 0
+
   isRunning = () => this.sendingIntervalRunning
 }

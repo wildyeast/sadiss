@@ -1,6 +1,7 @@
-import { getTrackDataForDownload } from '../services/trackService'
-import { createTestTrack } from './testUtils'
+import { getTrackDataForDownload, loadTrackForPlayback } from '../services/trackService'
+import { createTestTrack, createTestTrackPerformance } from './testUtils'
 import { Types } from 'mongoose'
+import { activePerformances, getActivePerformance } from '../services/activePerformanceService'
 describe('trackService', () => {
   it('should return a track with the correct fields for download', async () => {
     const track = await createTestTrack()
@@ -18,6 +19,21 @@ describe('trackService', () => {
       partialFile: track.partialFile,
       isPublic: track.isPublic,
       creator: new Types.ObjectId(track.creator)
+    })
+  })
+
+  describe('loadTrackForPlayback', () => {
+    it('should load a track into an active performance', async () => {
+      const { tracks, performanceId } = await createTestTrackPerformance()
+      const track = tracks[0]
+
+      // No active performance should exist yet
+      expect(getActivePerformance(performanceId)?.hasLoadedTrack()).toBe(undefined)
+
+      const result = await loadTrackForPlayback(track._id, performanceId)
+
+      expect(result).toBeDefined()
+      expect(getActivePerformance(performanceId)?.hasLoadedTrack()).toBe(true)
     })
   })
 })

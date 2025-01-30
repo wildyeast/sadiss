@@ -1,20 +1,18 @@
-// TrackService.ts
-
-import { isValidObjectId, Types } from 'mongoose'
-import { InvalidInputError } from '../errors/InvalidInputError'
+import { Types } from 'mongoose'
 import { NotFoundError } from '../errors/NotFoundError'
-import { Track, TrackPerformance } from '../models'
+import { Track } from '../models'
 import { readAndParseChunkFile } from './fileService'
 import { ProcessingError } from '../errors/ProcessingError'
-import { initializeActivePerformance } from './activePerformanceService'
+import { initializeActivePerformanceAndLoadTrack } from './activePerformanceService'
 import path from 'path'
 import fs from 'fs'
 import archiver from 'archiver'
-import { error } from 'console'
 import { logger } from '../tools'
 import { TrackDocument } from '../types'
 import FormData from 'form-data'
 import axios from 'axios'
+import { trackRepository } from '../repositories/TrackRepository'
+import { trackPerformanceRepository } from '../repositories/TrackPerformanceRepository'
 
 export async function getTracks(creatorId: Types.ObjectId) {
   return await Track.find(
@@ -25,16 +23,8 @@ export async function getTracks(creatorId: Types.ObjectId) {
     .lean()
 }
 
-export async function loadTrackForPlayback(trackId: string, performanceId: Types.ObjectId) {
-  if (!isValidObjectId(trackId)) {
-    throw new InvalidInputError('Invalid trackId provided.')
-  }
-
-  if (!isValidObjectId(performanceId)) {
-    throw new InvalidInputError('Invalid performanceId provided.')
-  }
-
-  const track = await Track.findOne({ _id: trackId })
+export async function loadTrackForPlayback(trackId: Types.ObjectId, performanceId: Types.ObjectId) {
+  const track = await trackRepository.findById(trackId)
   if (!track) {
     throw new NotFoundError('Track not found.')
   }
@@ -44,18 +34,24 @@ export async function loadTrackForPlayback(trackId: string, performanceId: Types
     throw new ProcessingError('Error loading track.')
   }
 
-  const trackPerformance = await TrackPerformance.findOne({ track: trackId, performance: performanceId })
+  const trackPerformance = await trackPerformanceRepository.findByTrackAndPerformance(trackId, performanceId)
   if (!trackPerformance) {
     throw new NotFoundError('Track performance not found.')
   }
 
-  const activePerformance = initializeActivePerformance(performanceId)
-  activePerformance.loadTrack(chunks, track.mode, track.waveform, track.ttsRate, trackPerformance.startTime)
+  initializeActivePerformanceAndLoadTrack(
+    performanceId,
+    chunks,
+    track.mode,
+    track.waveform,
+    track.ttsRate,
+    trackPerformance.startTime
+  )
 
   return { trackLengthInChunks: chunks.length }
 }
 
-export async function getTrackDataForDownload(trackId: string) {
+export async function getTrackDataForDownload(trackId: Types.ObjectId) {
   const track = await Track.findOne(
     { _id: trackId },
     '-_id name mode notes ttsInstructions ttsLangs waveform ttsRate ttsFiles partialFile isPublic creator'

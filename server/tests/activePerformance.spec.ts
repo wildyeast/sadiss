@@ -1,6 +1,7 @@
 import { initializeActivePerformance } from '../services/activePerformanceService'
 import { createTestTrackPerformance, createWebSocketClient } from './testUtils'
 import { readAndParseChunkFile } from '../services/fileService'
+import { Types } from 'mongoose'
 
 describe('activePerformance test', () => {
   describe('startSendingInterval', () => {
@@ -25,5 +26,19 @@ describe('activePerformance test', () => {
 
       jest.advanceTimersByTime(10000)
     })
+  })
+
+  it('should unload the track from an active performance', () => {
+    const performanceId = new Types.ObjectId()
+    const activePerformance = initializeActivePerformance(performanceId)
+    activePerformance.loadTrack([], 'nonChoir', 'sine', '1', 0)
+    activePerformance.unloadTrack()
+    expect(activePerformance.hasLoadedTrack()).toBe(false)
+  })
+
+  it('should return false if the track is not loaded', () => {
+    const performanceId = new Types.ObjectId()
+    const activePerformance = initializeActivePerformance(performanceId)
+    expect(activePerformance.hasLoadedTrack()).toBe(false)
   })
 })

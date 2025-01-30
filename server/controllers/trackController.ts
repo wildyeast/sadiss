@@ -5,7 +5,7 @@ import { Multer } from 'multer' // Don't remove this line
 type File = Express.Multer.File
 import { chunk } from '../tools'
 import { convertSrtToJson } from '../tools/convertSrtToJson'
-import mongoose, { isValidObjectId } from 'mongoose'
+import mongoose, { isValidObjectId, Types } from 'mongoose'
 import { TtsJson } from '../types'
 import { trackSchema } from '../models/track'
 import { TrackPerformance } from '../models'
@@ -36,7 +36,16 @@ exports.loadTrackForPlayback = async (req: Request, res: Response, next: NextFun
   const { trackId, performanceId } = req.body
 
   try {
+    if (!isValidObjectId(trackId)) {
+      throw new InvalidInputError('Invalid trackId provided.')
+    }
+
+    if (!isValidObjectId(performanceId)) {
+      throw new InvalidInputError('Invalid performanceId provided.')
+    }
+
     const result = await loadTrackForPlayback(trackId, performanceId)
+
     return res.status(200).json(result)
   } catch (error) {
     next(error)
@@ -319,7 +328,7 @@ exports.downloadTrack = async (req: Request, res: Response, next: NextFunction) 
       return
     }
 
-    const trackDataForDownload = await getTrackDataForDownload(req.params.trackId)
+    const trackDataForDownload = await getTrackDataForDownload(new Types.ObjectId(req.params.trackId))
 
     if (req.user!._id.toString() !== trackDataForDownload.creator.toString() && !trackDataForDownload.isPublic) {
       throw new ForbiddenError('Forbidden.')

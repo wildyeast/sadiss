@@ -3,7 +3,7 @@ import { TTSFileObject } from './TtsFileObject'
 import { TrackMode } from './TrackMode'
 
 export interface TrackDocument extends Document {
-  _id: string
+  _id: Types.ObjectId
   name: string
   chunks: string
   chunkFileName: string
