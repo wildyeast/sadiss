@@ -7,11 +7,15 @@ import mongoose from 'mongoose'
 import { trackSchema } from '../models/track'
 import path from 'path'
 import { app, server, wss } from '../server'
+import { beforeAll, beforeEach, afterEach, afterAll, vi } from 'vitest'
 
 dotenv.config({ path: '.env.test' })
 
-const agent = request.agent(app)
-global.agent = agent
+dotenv.config({ path: '.env.test' })
+
+export const agent = request.agent(app)
+
+export let mockUser: any
 
 beforeAll(async () => {
   // Connect to the in-memory database
@@ -32,38 +36,38 @@ beforeAll(async () => {
   // }))
 
   // Register a user to be used for testing
-  const mockUser = {
+  const mockUserDetails = {
     username: 'Test User',
     email: 'testuser@example.com',
     password: 'testpassword'
   }
 
-  const registerRes = await agent.post('/register').send(mockUser)
-  global.mockUser = {
+  const registerRes = await agent.post('/register').send(mockUserDetails)
+  mockUser = {
     id: registerRes.body._id,
     username: registerRes.body.username,
     email: registerRes.body.email,
-    password: mockUser.password
+    password: mockUserDetails.password
   }
 
   // Login with created user and save JWT token
   await agent.post('/login').send({
-    email: mockUser.email,
-    password: mockUser.password
+    email: mockUserDetails.email,
+    password: mockUserDetails.password
   })
 })
 
 beforeEach(async () => {
   // About 'advanceTimers: true' see https://github.com/nock/nock/issues/2200#issuecomment-1699838032
-  jest.useFakeTimers({ advanceTimers: true })
+  vi.useFakeTimers({ shouldAdvanceTime: true })
 })
 
 afterEach(async () => {
   if (process.env.NODE_ENV === 'test' && process.env.UPLOADS_DIR && process.env.CHUNKS_DIR) {
     await deleteTracksAndFilesCreatedDuringTest()
   }
-  jest.restoreAllMocks()
-  jest.clearAllTimers()
+  vi.restoreAllMocks()
+  vi.clearAllTimers()
 })
 
 afterAll(async () => {
